@@ -2,6 +2,20 @@
 
 날짜별로 배운 것과 어느 커밋에서 다뤘는지.
 
+## 2026-04-23 (8차) — 키 이벤트 dispatch 규칙 / 플랫포머 fixture
+
+- [x] **키 이벤트는 클릭과 달리 `Entry.dispatchEvent`로 안 됨**. Entry가 `document`에
+  DOM 리스너로 직접 붙어서 합성 이벤트 3가지 규칙 필요:
+  (1) 타겟은 `document` (window 아님)
+  (2) `event.code` (`'ArrowRight'`) — `event.keyCode`는 무시됨 (modern KeyboardEvent에서 read-only)
+  (3) 누름 유지는 keydown만, 단발은 keydown+keyup 페어
+  [`entryjs/src/util/utils.js:810-823`](../../entryjs/src/util/utils.js#L810)
+  + `Entry.Utils.inputToKeycode` at line 860
+- [x] [`tools/inspect.mjs`](../tools/inspect.mjs) `--key` 플래그 수정 — CODE_MAP으로 숫자 shorthand(37→ArrowLeft 등) 제공
+- [x] [`tools/verify-platformer.mjs`](../tools/verify-platformer.mjs) — 방향키 hold 상태 시뮬레이션 레퍼런스
+- [x] 새 fixture `platformer.ent` (6 오브젝트, 시차 스크롤) — 플레이어 x 고정 + 배경/블럭이 offset으로 이동, parallax factor 0.15/0.4/1.0
+- [x] [06-gotchas.md §헤드리스 런타임 검증](06-gotchas.md#헤드리스-런타임-검증--이벤트-직접-dispatch-패턴) 업데이트 — 올바른/틀린 예 포함
+
 ## 2026-04-23 (7차) — 헤드리스 런타임 검증 테크닉
 
 - [x] `Entry.dispatchEvent('entityClick', entity)` 로 프로그래매틱 클릭 시뮬레이션 가능 — Playwright 캔버스 좌표 계산 없이 `when_object_click` 트리거 동작 검증

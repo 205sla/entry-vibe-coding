@@ -38,8 +38,10 @@ Flags:
   --screenshot             save tools/inspect-<fixture>.png
   --blocks                 dump block tree for each object
   --click N                after load, dispatch entityClick N times (default: 10)
-  --key CODE N             simulate pressing key with keycode CODE N times
-                           (37=←, 38=↑, 39=→, 40=↓)
+  --key CODE N             simulate N key press+release cycles.
+                           CODE accepts W3C code ('ArrowRight', 'Space', 'KeyA')
+                           or numeric keycode shorthand (37 ↔ ArrowLeft,
+                           38 ↔ ArrowUp, 39 ↔ ArrowRight, 40 ↔ ArrowDown)
   --watch N                sample entity[0] x/y/direction every 300ms, N times
   --base-url URL           override http://localhost:3000
   --no-check-objobj        skip [object Object] check in SVG text
@@ -188,14 +190,22 @@ if (CLICK_N > 0) {
 // ---------- Section: key simulation ----------
 
 if (KEY_ARGS) {
-    console.log(`\n=== simulating ${KEY_ARGS.n}× keycode ${KEY_ARGS.code} ===`);
+    // Entry listens on `document` (not window) and reads `event.code` ('ArrowRight'
+    // etc.), not `event.keyCode` (see entryjs/src/util/utils.js:860 inputToKeycode).
+    // Map numeric keycodes to W3C code strings for common keys.
+    const CODE_MAP = {
+        '37': 'ArrowLeft', '38': 'ArrowUp', '39': 'ArrowRight', '40': 'ArrowDown',
+        '32': 'Space', '13': 'Enter', '27': 'Escape',
+    };
+    const resolveCode = (raw) => CODE_MAP[raw] || (/^[A-Z]$/.test(raw) ? 'Key' + raw
+        : /^[0-9]$/.test(raw) ? 'Digit' + raw : raw);
+    const wsCode = resolveCode(String(KEY_ARGS.code));
+    console.log(`\n=== simulating ${KEY_ARGS.n}× key '${wsCode}' ===`);
     for (let i = 1; i <= KEY_ARGS.n; i++) {
         await page.evaluate((code) => {
-            // Entry listens on Entry.keyPressed (a DOM 'keydown' event).
-            const ev = new KeyboardEvent('keydown', { keyCode: +code, which: +code });
-            window.dispatchEvent(ev);
-            if (Entry.keyPressed) Entry.keyPressed.notify(ev);
-        }, KEY_ARGS.code);
+            document.dispatchEvent(new KeyboardEvent('keydown', { code, key: code }));
+            document.dispatchEvent(new KeyboardEvent('keyup',   { code, key: code }));
+        }, wsCode);
         await page.waitForTimeout(100);
     }
 }

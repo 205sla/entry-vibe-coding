@@ -1,0 +1,296 @@
+{
+  "name": "플랫포머 (시차 스크롤)",
+  "variables": [
+    { "id": "offset",    "name": "오프셋",   "variableType": "variable", "value": "0",   "visible": false },
+    { "id": "vy",        "name": "세로속도", "variableType": "variable", "value": "0",   "visible": false },
+    { "id": "on_ground", "name": "땅위",     "variableType": "variable", "value": "1",   "visible": false },
+    { "id": "distance",  "name": "거리",     "variableType": "variable", "value": "0",   "visible": true, "x": -220, "y": 120 }
+  ],
+  "objects": [
+    {
+      "id": "sky_far",
+      "name": "먼 구름",
+      "pictures": [{ "id": "c1", "name": "구름", "fileurl": "/images/game/cloud.svg", "imageType": "svg", "dimension": { "width": 160, "height": 90 } }],
+      "entity": { "x": 0, "y": 90, "scaleX": 1.6, "scaleY": 1.6 },
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+            {
+              "type": "locate_xy",
+              "params": [
+                {
+                  "type": "calc_basic",
+                  "params": [
+                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] },
+                    { "__field": "MULTI" },
+                    { "type": "number", "params": ["0.15"] }
+                  ]
+                },
+                { "type": "number", "params": ["90"] },
+                null
+              ]
+            },
+            { "type": "wait_second", "params": [0.02, null] }
+          ]]
+        }
+      ]]
+    },
+    {
+      "id": "sky_mid",
+      "name": "가까운 구름",
+      "pictures": [{ "id": "c2", "name": "구름", "fileurl": "/images/game/cloud.svg", "imageType": "svg", "dimension": { "width": 160, "height": 90 } }],
+      "entity": { "x": 150, "y": 60, "scaleX": 1.0, "scaleY": 1.0 },
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+            {
+              "type": "locate_xy",
+              "params": [
+                {
+                  "type": "calc_basic",
+                  "params": [
+                    { "type": "number", "params": ["150"] },
+                    { "__field": "PLUS" },
+                    {
+                      "type": "calc_basic",
+                      "params": [
+                        { "type": "get_variable", "params": [{ "__field": "offset" }, null] },
+                        { "__field": "MULTI" },
+                        { "type": "number", "params": ["0.4"] }
+                      ]
+                    }
+                  ]
+                },
+                { "type": "number", "params": ["60"] },
+                null
+              ]
+            },
+            { "type": "wait_second", "params": [0.02, null] }
+          ]]
+        }
+      ]]
+    },
+    {
+      "id": "block_a",
+      "name": "블럭A",
+      "pictures": [{ "id": "ba", "name": "블럭", "fileurl": "/images/game/block.svg", "imageType": "svg", "dimension": { "width": 100, "height": 100 } }],
+      "entity": { "x": 150, "y": -70, "scaleX": 0.5, "scaleY": 0.5 },
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+            {
+              "type": "locate_xy",
+              "params": [
+                {
+                  "type": "calc_basic",
+                  "params": [
+                    { "type": "number", "params": ["150"] },
+                    { "__field": "PLUS" },
+                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] }
+                  ]
+                },
+                { "type": "number", "params": ["-70"] },
+                null
+              ]
+            },
+            { "type": "wait_second", "params": [0.02, null] }
+          ]]
+        }
+      ]]
+    },
+    {
+      "id": "block_b",
+      "name": "블럭B",
+      "pictures": [{ "id": "bb", "name": "블럭", "fileurl": "/images/game/block.svg", "imageType": "svg", "dimension": { "width": 100, "height": 100 } }],
+      "entity": { "x": 400, "y": -70, "scaleX": 0.5, "scaleY": 0.5 },
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+            {
+              "type": "locate_xy",
+              "params": [
+                {
+                  "type": "calc_basic",
+                  "params": [
+                    { "type": "number", "params": ["400"] },
+                    { "__field": "PLUS" },
+                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] }
+                  ]
+                },
+                { "type": "number", "params": ["-70"] },
+                null
+              ]
+            },
+            { "type": "wait_second", "params": [0.02, null] }
+          ]]
+        }
+      ]]
+    },
+    {
+      "id": "block_c",
+      "name": "블럭C",
+      "pictures": [{ "id": "bc", "name": "블럭", "fileurl": "/images/game/block.svg", "imageType": "svg", "dimension": { "width": 100, "height": 100 } }],
+      "entity": { "x": 700, "y": -70, "scaleX": 0.5, "scaleY": 0.5 },
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+            {
+              "type": "locate_xy",
+              "params": [
+                {
+                  "type": "calc_basic",
+                  "params": [
+                    { "type": "number", "params": ["700"] },
+                    { "__field": "PLUS" },
+                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] }
+                  ]
+                },
+                { "type": "number", "params": ["-70"] },
+                null
+              ]
+            },
+            { "type": "wait_second", "params": [0.02, null] }
+          ]]
+        }
+      ]]
+    },
+    {
+      "id": "player",
+      "name": "플레이어",
+      "pictures": [{ "id": "pp", "name": "플레이어", "fileurl": "/images/mascot/bot205-hello.svg", "imageType": "svg", "dimension": { "width": 200, "height": 240 } }],
+      "entity": { "x": -100, "y": -40, "scaleX": 0.4, "scaleY": 0.4 },
+      "script": [
+        [
+          { "type": "when_run_button_click" },
+          { "type": "set_variable", "params": [{ "__field": "offset" }, 0, null] },
+          { "type": "set_variable", "params": [{ "__field": "vy" }, 0, null] },
+          { "type": "set_variable", "params": [{ "__field": "on_ground" }, 1, null] },
+          { "type": "set_variable", "params": [{ "__field": "distance" }, 0, null] },
+          { "type": "locate_xy", "params": [
+              { "type": "number", "params": ["-100"] },
+              { "type": "number", "params": ["-40"] },
+              null
+          ]}
+        ],
+        [
+          { "type": "when_run_button_click" },
+          {
+            "type": "repeat_inf",
+            "params": [null, null],
+            "statements": [[
+              {
+                "type": "_if",
+                "params": [
+                  { "type": "is_press_some_key", "params": [{ "__field": "39" }, null] },
+                  null
+                ],
+                "statements": [[
+                  { "type": "change_variable", "params": [{ "__field": "offset" }, -4, null] },
+                  { "type": "change_variable", "params": [{ "__field": "distance" }, 1, null] }
+                ]]
+              },
+              {
+                "type": "_if",
+                "params": [
+                  { "type": "is_press_some_key", "params": [{ "__field": "37" }, null] },
+                  null
+                ],
+                "statements": [[
+                  { "type": "change_variable", "params": [{ "__field": "offset" }, 4, null] }
+                ]]
+              },
+              { "type": "wait_second", "params": [0.02, null] }
+            ]]
+          }
+        ],
+        [
+          { "type": "when_run_button_click" },
+          {
+            "type": "repeat_inf",
+            "params": [null, null],
+            "statements": [[
+              {
+                "type": "_if",
+                "params": [
+                  {
+                    "type": "boolean_and_or",
+                    "params": [
+                      { "type": "is_press_some_key", "params": [{ "__field": "38" }, null] },
+                      { "__field": "AND" },
+                      {
+                        "type": "boolean_basic_operator",
+                        "params": [
+                          { "type": "get_variable", "params": [{ "__field": "on_ground" }, null] },
+                          { "__field": "EQUAL" },
+                          { "type": "number", "params": ["1"] }
+                        ]
+                      }
+                    ]
+                  },
+                  null
+                ],
+                "statements": [[
+                  { "type": "set_variable", "params": [{ "__field": "vy" }, 10, null] },
+                  { "type": "set_variable", "params": [{ "__field": "on_ground" }, 0, null] }
+                ]]
+              },
+              {
+                "type": "move_y",
+                "params": [
+                  { "type": "get_variable", "params": [{ "__field": "vy" }, null] },
+                  null
+                ]
+              },
+              { "type": "change_variable", "params": [{ "__field": "vy" }, -0.6, null] },
+              {
+                "type": "_if",
+                "params": [
+                  {
+                    "type": "boolean_basic_operator",
+                    "params": [
+                      {
+                        "type": "coordinate_object",
+                        "params": [
+                          null,
+                          { "__field": "self" },
+                          null,
+                          { "__field": "y" }
+                        ]
+                      },
+                      { "__field": "LESS_OR_EQUAL" },
+                      { "type": "number", "params": ["-40"] }
+                    ]
+                  },
+                  null
+                ],
+                "statements": [[
+                  { "type": "locate_y", "params": [
+                      { "type": "number", "params": ["-40"] }, null
+                  ]},
+                  { "type": "set_variable", "params": [{ "__field": "vy" }, 0, null] },
+                  { "type": "set_variable", "params": [{ "__field": "on_ground" }, 1, null] }
+                ]]
+              },
+              { "type": "wait_second", "params": [0.02, null] }
+            ]]
+          }
+        ]
+      ]
+    }
+  ]
+}

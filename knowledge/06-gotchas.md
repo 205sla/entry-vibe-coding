@@ -331,14 +331,69 @@ for (let i = 0; i < 10; i++) {
 |-------------|--------------|------------------|
 | 오브젝트 클릭 | `entityClick` | `when_object_click` |
 | 오브젝트 클릭 해제 | `entityClickCanceled` | `when_object_click_canceled` |
-| 키 누름 | `keyPressed` | `when_some_key_pressed` |
+| 키 누름 | `keyPressed` (내부 bus) + `Entry.pressedKeys[]` 배열 | `when_some_key_pressed`, `is_press_some_key` |
 | 신호 보내기 | `message_cast` 블록 자체 트리거 | `when_message_cast` |
 
-`Entry.Utils` / `Entry.dispatchEvent`를 찾아보면 더 있을 수 있음.
+### 키 이벤트는 **까다로움** — 3가지 함정
+
+`Entry.dispatchEvent('entityClick', entity)`로 클릭은 간단히 됐지만 키는 다르다. Entry가
+`document` DOM 이벤트 리스너로 직접 붙어 있어서 **합성 이벤트 3가지 규칙**을 다 지켜야 한다:
+
+1. **타겟은 `document`** (window 아님)
+2. **`event.code` (W3C 코드 문자열)** — `'ArrowRight'`, `'Space'`, `'KeyA'` 등.
+   `event.keyCode` (숫자 39 등)는 **무시된다**. Modern KeyboardEvent에서 `keyCode`는 어차피 read-only라 생성자 옵션도 먹지 않음
+3. 영속적 "키 누름 상태"가 필요하면 **keydown만 쏘고 keyup을 보내지 않음**. Entry는
+   `keydown`에서 `pressedKeys.push(kc)`, `keyup`에서 pop. 단발 탭이 필요하면 keydown+keyup 짝
+
+증거:
+```js
+// entryjs/src/util/utils.js:810-823
+Entry.pressedKeys = [];
+Entry.keyPressed = new Entry.Event(window);
+const func = (e) => {
+    const keyCode = Entry.Utils.inputToKeycode(e);  // ← event.code → 숫자 매핑
+    if (!keyCode) return;
+    if (Entry.pressedKeys.indexOf(keyCode) < 0) Entry.pressedKeys.push(keyCode);
+    Entry.keyPressed.notify(e);
+};
+addEntryEvent(doc, 'keydown', func);
+// ↑ doc = document, parentDoc = window.parent.document
+```
+
+`Entry.Utils.inputToKeycode` ([utils.js:860](../../entryjs/src/util/utils.js#L860)):
+```js
+let keyCode = event.code == undefined ? event.key : event.code;
+// ... "Digit"/"Numpad" 접두 제거 ...
+return Entry.KeyboardCode.codeToKeyCode[keyCode];
+```
+
+### 올바른 예
+
+```js
+// 화살표 우 — 단발 탭 (바로 뗌)
+document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowRight', key: 'ArrowRight' }));
+document.dispatchEvent(new KeyboardEvent('keyup',   { code: 'ArrowRight', key: 'ArrowRight' }));
+
+// 화살표 우 — 누른 상태 유지 (플랫포머처럼)
+document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowRight', key: 'ArrowRight' }));
+// ...게임 플레이...
+document.dispatchEvent(new KeyboardEvent('keyup',   { code: 'ArrowRight', key: 'ArrowRight' }));
+```
+
+### 틀린 예 (우리가 처음 시도하다 0 동작)
+
+```js
+// 실패 1: window에 dispatch — Entry 리스너가 document에 붙어 있어서 못 받음
+window.dispatchEvent(new KeyboardEvent('keydown', { keyCode: 39 }));
+
+// 실패 2: keyCode만 지정 — event.code가 undefined → inputToKeycode가 null 반환
+document.dispatchEvent(new KeyboardEvent('keydown', { keyCode: 39 }));
+```
 
 ### 참고 테스트
-[`tools/verify-click-teleport.mjs`](../tools/verify-click-teleport.mjs) — click-teleport 게임을
-로드하고 10번 클릭 후 entity 위치 변화 확인.
+
+- [`tools/inspect.mjs`](../tools/inspect.mjs) `--key` 플래그 — CODE_MAP으로 숫자 shorthand도 허용 (37→ArrowLeft 등)
+- [`tools/verify-platformer.mjs`](../tools/verify-platformer.mjs) — 방향키 누르고 있을 때 offset 변화 측정
 
 ---
 
