@@ -4,6 +4,7 @@
   "private": true,
   "description": "Offline-first Entry editor for authoring .ent game projects, based on entryjs dist.",
   "scripts": {
+    "setup": "node scripts/setup.mjs",
     "start": "node server.js",
     "build:registry": "node tools/build-block-registry.mjs",
     "test:smoke": "node --test tests/smoke.test.js",

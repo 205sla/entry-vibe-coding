@@ -10,6 +10,9 @@ temp/
 test-results/
 playwright-report/
 
+# Setup script cache (cloned fallbacks for external users without siblings)
+.setup-cache/
+
 # OS / editor
 .DS_Store
 Thumbs.db

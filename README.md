@@ -238,11 +238,38 @@ Field 슬롯에 `{"type":"text",...}`로 감싸면 엔진이 "text 블록의 결
 
 ---
 
+## 처음 설치
+
+```bash
+git clone https://github.com/205sla/entry-vibe-coding
+cd entry-vibe-coding
+npm install
+npm run setup           # public/lib/ 와 public/images/ 재구축 (한 번만)
+npm start               # → http://localhost:3000
+```
+
+`npm run setup` ([scripts/setup.mjs](scripts/setup.mjs))이 자동으로:
+
+1. **entryjs dist·extern·images** — `../entryjs` 형제 디렉터리가 있으면 복사, 없으면
+   `.setup-cache/entryjs`로 `entrylabs/entryjs` **자동 클론** 후 심볼릭 링크.
+2. **External modules** (entry-tool / entry-paint / entry-lms / sound-editor / legacy-video) —
+   `../MYentry/public/lib/*` 우선, 없으면 공개 GitHub 저장소에서 `dist/develop` 브랜치 클론
+   (entry-tool · legacy-video만 공개). entry-paint·entry-lms·sound-editor는 entrylabs 내부
+   패키지라 공개 미러가 없음 → 이 세 개는 **MYentry 같은 로컬 복사본 필요** (없으면 에러 메시지와 함께 중단).
+3. **Mascot 이미지 + 커서 파일** — `../MYentry/public/images/mascot/`·`../MYentry/public/media/`에서 복사.
+4. **Vendor npm 패키지** — jQuery / jQuery-UI / lodash / Velocity / CodeMirror / React / CreateJS
+   등을 `vendor-install/`에 임시 설치 후 필요한 dist 파일만 `public/lib/vendor/`로 복사.
+5. **preload-js 패치** — `;module.exports=window.createjs;` 접미사 제거
+   (브라우저에서 `module is not defined` 방지).
+
+재실행 안전 (idempotent). 벤더만 스킵: `npm run setup -- --skip-vendor`.
+
 ## 명령어 치트시트
 
 ```bash
 # 의존성
 npm install
+npm run setup
 
 # 블록 레지스트리 재생성 (entryjs 업데이트했을 때)
 npm run build:registry
