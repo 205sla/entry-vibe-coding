@@ -301,6 +301,47 @@ CSS에 `"[object Object]"`가 노출됨.
 
 ---
 
+## 헤드리스 런타임 검증 — 이벤트 직접 dispatch 패턴
+
+### 증상 / 필요
+Playwright 헤드리스에서 **클릭 기반 게임**(`when_object_click`)의 동작을 검증하려면 실제로 클릭을
+발생시켜야 하는데, 1) 스테이지 캔버스 위 좌표 계산이 번거롭고 2) `Entry.engine.toggleRun()`이
+EaselJS `tickEnabled` 문제로 throw할 가능성이 있음.
+
+### 해결 — `Entry.dispatchEvent` 직접 호출
+
+Entry의 클릭 처리는 [`entryjs/src/class/entity.js:90`](../../entryjs/src/class/entity.js#L90)에서
+`Entry.dispatchEvent('entityClick', this.entity)` 한 줄로 이벤트 버스에 쏜다. `when_object_click`
+트리거는 이 이벤트 이름을 구독 ([`block_start.js:229`](../../entryjs/src/playground/blocks/block_start.js#L229) `event: 'when_object_click'`).
+
+따라서 Playwright `page.evaluate` 안에서 바로:
+```js
+try { Entry.engine.toggleRun(); } catch (e) { /* tickEnabled throw 가끔 있음, 무시 */ }
+const entity = Entry.container.getAllObjects()[0].entity;
+for (let i = 0; i < 10; i++) {
+    Entry.dispatchEvent('entityClick', entity);
+    await new Promise(r => setTimeout(r, 100));
+}
+// 이제 entity.x / entity.y / Entry.variableContainer.getVariable('clicks').getValue() 검사
+```
+
+### 다른 이벤트로 일반화
+
+| 사용자 동작 | Entry 이벤트 | 해당 트리거 블록 |
+|-------------|--------------|------------------|
+| 오브젝트 클릭 | `entityClick` | `when_object_click` |
+| 오브젝트 클릭 해제 | `entityClickCanceled` | `when_object_click_canceled` |
+| 키 누름 | `keyPressed` | `when_some_key_pressed` |
+| 신호 보내기 | `message_cast` 블록 자체 트리거 | `when_message_cast` |
+
+`Entry.Utils` / `Entry.dispatchEvent`를 찾아보면 더 있을 수 있음.
+
+### 참고 테스트
+[`tools/verify-click-teleport.mjs`](../tools/verify-click-teleport.mjs) — click-teleport 게임을
+로드하고 10번 클릭 후 entity 위치 변화 확인.
+
+---
+
 ## 엔트리 이미지 404 (내 서버에서)
 
 ### 증상

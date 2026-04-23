@@ -2,6 +2,14 @@
 
 날짜별로 배운 것과 어느 커밋에서 다뤘는지.
 
+## 2026-04-23 (7차) — 헤드리스 런타임 검증 테크닉
+
+- [x] `Entry.dispatchEvent('entityClick', entity)` 로 프로그래매틱 클릭 시뮬레이션 가능 — Playwright 캔버스 좌표 계산 없이 `when_object_click` 트리거 동작 검증
+- [x] 이벤트 이름 출처: [`entity.js:90`](../../entryjs/src/class/entity.js#L90), 구독은 [`block_start.js:229`](../../entryjs/src/playground/blocks/block_start.js#L229)
+- [x] 적용: `click-teleport.ent` 게임 (10번 클릭 시 순간이동) — 1~9 클릭은 카운터만 증가, 10번째에 reset + locate_xy(rand) 정상 동작 관찰
+- [x] 문서: [06-gotchas.md §헤드리스 런타임 검증](06-gotchas.md#헤드리스-런타임-검증--이벤트-직접-dispatch-패턴) — 일반화 표 포함 (entityClick / entityClickCanceled / keyPressed)
+- [x] `toggleRun()`의 tickEnabled throw는 항상 터지는 게 아니라 **간헐적** — try/catch로 감싸면 이벤트 버스는 정상 셋업되어 dispatchEvent가 먹힘
+
 ## 2026-04-23 (6차) — `boolean_and_or`에 단락 평가 없음
 
 - [x] **증상**: `repeat_while_true(pos ≤ len AND level ≤ list[pos])` 루프에서 `can not insert value to array` 런타임 에러

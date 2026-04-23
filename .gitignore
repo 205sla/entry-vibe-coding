@@ -50,19 +50,5 @@ public/lib/legacy-video
 !public/images/game/
 !public/images/game/**
 
-# Screenshots / tooling scratch
-tools/*-state.png
-tools/*-final.png
-tools/editor-state.png
-
-# Scratch 디버깅 스크립트 (일회성, 로컬 보존만)
-tools/check-hp-text.mjs
-tools/devserver.js
-tools/final-check.mjs
-tools/loadcheck.mjs
-tools/quicksmoke.mjs
-tools/run-random-walk.mjs
-tools/screen-*.mjs
-tools/screencheck.mjs
-tools/screenshot.mjs
-tools/verify-follow.mjs
+# inspect.mjs가 생성하는 스크린샷
+tools/inspect-*.png

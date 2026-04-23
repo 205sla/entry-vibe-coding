@@ -16,7 +16,6 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import url from 'node:url';
-import os from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -30,7 +29,6 @@ const IS_WIN = process.platform === 'win32';
 
 function log(msg) { console.log(msg); }
 function okMark(s) { return '\x1b[32m✓\x1b[0m ' + s; }
-function warnMark(s) { return '\x1b[33m!\x1b[0m ' + s; }
 function errMark(s) { return '\x1b[31m✗\x1b[0m ' + s; }
 
 async function step(label, fn) {
@@ -69,7 +67,7 @@ function ensureSymlinkDir(src, dst) {
         // a regular symlink on POSIX — zero admin rights needed.
         fs.symlinkSync(src, dst, 'junction');
         return 'junction';
-    } catch (e) {
+    } catch {
         // Fallback: hard copy (last resort; wastes disk)
         fsCpSync(src, dst);
         return 'copied';
@@ -284,7 +282,7 @@ async function main() {
     log('\n' + okMark('setup complete. `npm start` to launch http://localhost:3000') + '\n');
 }
 
-main().catch(e => {
+main().catch(() => {
     console.error('\n' + errMark('setup failed'));
     process.exit(1);
 });

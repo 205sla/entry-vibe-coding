@@ -30,9 +30,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
 import zlib from 'node:zlib';
+import { createRequire } from 'node:module';
 import sharp from 'sharp';
 import { uid } from 'uid';
-import Puid from 'puid';
+
+// Tar/hash helpers shared with server.js — single source in lib/tar-portable.js.
+const require = createRequire(import.meta.url);
+const { entryStyleHash, makeTar } = require('../lib/tar-portable.js');
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const REGISTRY_PATH = path.resolve(__dirname, 'block-registry.json');
@@ -72,52 +76,8 @@ function loadRegistry() {
 
 // -------- ID helpers ----------
 
-// File ID generator — official algorithm documented in entrylabs/docs:
-//   const createFileId = () => uid(8) + puid.generate();
-//   → e.g. "e49448cdlyy4s42e0013f820158i7nqj"
-// (source: https://github.com/entrylabs/docs/blob/master/source/entryjs/file/2024-07-24-ent.md)
-// Using the official algorithm gives byte-level playentry.org compatibility;
-// our previous `crypto.randomBytes → base36` was a visually-similar approximation.
-const __puid = new Puid();
-function entryStyleHash() {
-    return uid(8) + __puid.generate();   // 8 + 24 = 32 chars of [0-9a-z]
-}
+// Short 4-char id for scenes / objects / pictures (not file hashes).
 function shortId(n = 4) { return uid(n); }
-
-// -------- tar (ustar) ----------
-
-function tarHeader(name, size, typeflag) {
-    const h = Buffer.alloc(512);
-    h.write(name, 0, 100, 'utf8');
-    const isDir = (typeflag === '5');
-    h.write(isDir ? '000755 \0' : '000644 \0', 100, 8, 'ascii');
-    h.write(size.toString(8).padStart(11, '0') + '\0', 124, 12, 'ascii');
-    if (!isDir) {
-        h.write(Math.floor(Date.now() / 1000).toString(8).padStart(11, '0') + '\0',
-                136, 12, 'ascii');
-    }
-    h.write('        ', 148, 8, 'ascii');
-    h.write(typeflag, 156, 1, 'ascii');
-    h.write('ustar\0', 257, 6, 'ascii');
-    h.write('00', 263, 2, 'ascii');
-    let sum = 0;
-    for (let i = 0; i < 512; i++) sum += h[i];
-    h.write(sum.toString(8).padStart(6, '0') + '\0 ', 148, 8, 'ascii');
-    return h;
-}
-function makeTar(files) {
-    const parts = [];
-    for (const f of files) {
-        parts.push(tarHeader(f.name, f.data.length, f.typeflag || '0'));
-        if (f.data.length > 0) {
-            parts.push(f.data);
-            const pad = (512 - (f.data.length % 512)) % 512;
-            if (pad) parts.push(Buffer.alloc(pad));
-        }
-    }
-    parts.push(Buffer.alloc(1024));
-    return Buffer.concat(parts);
-}
 
 // -------- Block script normalization ----------
 
@@ -216,7 +176,7 @@ function makeDefaultEntity(firstPicture) {
     };
 }
 
-async function buildAssets(spec) {
+async function buildAssets(_spec) {
     const dirs1 = [], dirs2 = [], dirs3 = [], payloads = [];
     const seen = new Set();
     const addDir = (bucket, p) => {
@@ -246,7 +206,7 @@ async function buildAssets(spec) {
                 imageBuf = await sharp(buf).png().toBuffer();
                 const m = await sharp(buf).metadata();
                 dimension = { width: m.width || 100, height: m.height || 100 };
-            } catch (e) {
+            } catch {
                 // sharp couldn't read (e.g. odd SVG) — fall back to raw bytes
                 // and assume a reasonable default dimension.
                 dimension = { width: 200, height: 240 };
@@ -260,7 +220,7 @@ async function buildAssets(spec) {
                     .resize(THUMB_MAX_PX, THUMB_MAX_PX, { fit: 'inside' })
                     .png().toBuffer();
                 payloads.push({ name: thumbPath, data: thumbBuf, typeflag: '0' });
-            } catch (e) {
+            } catch {
                 // Reuse the image bytes as the thumb if resize failed.
                 payloads.push({ name: thumbPath, data: imageBuf, typeflag: '0' });
             }

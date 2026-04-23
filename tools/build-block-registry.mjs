@@ -27,7 +27,7 @@ if (!fs.existsSync(BLOCKS_DIR)) {
 
 // Given the ObjectExpression that getBlocks() returns, turn each of its
 // properties into a {type, meta} pair.
-function extractBlocks(objectExpr, file) {
+function extractBlocks(objectExpr) {
     const out = [];
     for (const prop of objectExpr.properties) {
         if (prop.type !== 'Property') continue;
@@ -79,7 +79,7 @@ function summarizeBlockDef(objExpr) {
 // The top-level pattern is `module.exports = { getBlocks() { return { ... } } }`.
 // We recursively collect all top-level ObjectExpressions returned from any
 // function called `getBlocks`; this is robust to minor file-to-file variance.
-function parseBlockFile(src, file) {
+function parseBlockFile(src) {
     const ast = acorn.parse(src, { ecmaVersion: 2022, sourceType: 'module' });
     const blocks = [];
     walk.simple(ast, {
@@ -93,7 +93,7 @@ function parseBlockFile(src, file) {
             walk.simple(fn.body, {
                 ReturnStatement(ret) {
                     if (ret.argument && ret.argument.type === 'ObjectExpression') {
-                        blocks.push(...extractBlocks(ret.argument, file));
+                        blocks.push(...extractBlocks(ret.argument));
                     }
                 }
             });
@@ -115,7 +115,7 @@ for (const file of files) {
     try { src = fs.readFileSync(absPath, 'utf8'); }
     catch (e) { issues.push({ file, phase: 'read', error: e.message }); continue; }
     let list;
-    try { list = parseBlockFile(src, file); }
+    try { list = parseBlockFile(src); }
     catch (e) { issues.push({ file, phase: 'parse', error: e.message }); continue; }
     const category = file.replace(/^block_/, '').replace(/\.js$/, '');
     for (const { type, meta } of list) {

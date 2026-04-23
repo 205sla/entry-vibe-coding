@@ -5,9 +5,18 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
-const crypto = require('crypto');
 const sharp = require('sharp');
 const multer = require('multer');
+
+// All tar/hash helpers live in lib/ — single source of truth, shared with
+// tools/make-ent.mjs. Format details in knowledge/01-binary-format.md.
+const {
+    entryStyleHash,
+    tarHeader,
+    makeTar,
+    forEachTarEntry,
+    extractTarFile,
+} = require('./lib/tar-portable.js');
 
 const THUMB_MAX_PX = 96;
 
@@ -20,82 +29,6 @@ app.use(express.static(path.join(__dirname, 'public'), {
         if (/\.html$/.test(p)) res.setHeader('Cache-Control', 'no-store');
     }
 }));
-
-// ========== Tar helpers (ported from MYentry/server.js) ==========
-
-function extractTarFile(buffer, targetName) {
-    let offset = 0;
-    while (offset < buffer.length - 512) {
-        if (buffer[offset] === 0) break;
-        const name = buffer.toString('utf8', offset, offset + 100).replace(/\0.*/, '');
-        const sizeStr = buffer.toString('ascii', offset + 124, offset + 136).replace(/\0.*/, '').trim();
-        const size = parseInt(sizeStr, 8) || 0;
-        const dataStart = offset + 512;
-        if (name === targetName || name === './' + targetName) {
-            return buffer.slice(dataStart, dataStart + size);
-        }
-        offset = dataStart + Math.ceil(size / 512) * 512;
-    }
-    return null;
-}
-
-// Iterate every entry in a tar buffer. cb receives { name, type, data }.
-function forEachTarEntry(buffer, cb) {
-    let offset = 0;
-    while (offset < buffer.length - 512) {
-        if (buffer[offset] === 0) break;
-        const name = buffer.toString('utf8', offset, offset + 100).replace(/\0.*/, '');
-        const sizeStr = buffer.toString('ascii', offset + 124, offset + 136).replace(/\0.*/, '').trim();
-        const typeflag = buffer.toString('ascii', offset + 156, offset + 157);
-        const size = parseInt(sizeStr, 8) || 0;
-        const dataStart = offset + 512;
-        cb({ name, type: typeflag, data: buffer.slice(dataStart, dataStart + size) });
-        offset = dataStart + Math.ceil(size / 512) * 512;
-    }
-}
-
-// Build a ustar tar header matching npm `tar` portable output. See MYentry/server.js:178 for rationale.
-function tarHeader(name, size, typeflag) {
-    const h = Buffer.alloc(512);
-    h.write(name, 0, 100, 'utf8');
-    const isDir = (typeflag === '5');
-    h.write(isDir ? '000755 \0' : '000644 \0', 100, 8, 'ascii');
-    h.write(size.toString(8).padStart(11, '0') + '\0', 124, 12, 'ascii');
-    if (!isDir) {
-        h.write(Math.floor(Date.now() / 1000).toString(8).padStart(11, '0') + '\0',
-                136, 12, 'ascii');
-    }
-    h.write('        ', 148, 8, 'ascii');
-    h.write(typeflag, 156, 1, 'ascii');
-    h.write('ustar\0', 257, 6, 'ascii');
-    h.write('00', 263, 2, 'ascii');
-    let sum = 0;
-    for (let i = 0; i < 512; i++) sum += h[i];
-    h.write(sum.toString(8).padStart(6, '0') + '\0 ', 148, 8, 'ascii');
-    return h;
-}
-
-function makeTar(files) {
-    const parts = [];
-    for (const f of files) {
-        parts.push(tarHeader(f.name, f.data.length, f.typeflag || '0'));
-        if (f.data.length > 0) {
-            parts.push(f.data);
-            const pad = (512 - (f.data.length % 512)) % 512;
-            if (pad) parts.push(Buffer.alloc(pad));
-        }
-    }
-    parts.push(Buffer.alloc(1024));
-    return Buffer.concat(parts);
-}
-
-function entryStyleHash() {
-    const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
-    const bytes = crypto.randomBytes(32);
-    let out = '';
-    for (let i = 0; i < 32; i++) out += chars[bytes[i] % 36];
-    return out;
-}
 
 // ========== Session cache for loaded .ent (so /api/ent-asset/... can stream from tar) ==========
 
