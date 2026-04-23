@@ -1,6 +1,6 @@
-// One-off verifier for platformer.ent. Not a scratch clone — kept because the
-// platformer has specialized physics (fixed x, parallax, gravity) that
-// inspect.mjs's generic flags can't exercise in a single call.
+// Runtime verification for platformer.ent (reach_something collision variant).
+// Drives the world scroll to position each block under the player, jumps, and
+// confirms player snaps to the right landing_y via collision detection.
 import { chromium } from '@playwright/test';
 import fs from 'node:fs';
 
@@ -21,11 +21,9 @@ await page.evaluate(async (bytes) => {
     Entry.clearProject();
     Entry.loadProject(project);
     await new Promise(r => setTimeout(r, 1500));
+    try { Entry.engine.toggleRun(); } catch {}
+    await new Promise(r => setTimeout(r, 400));
 }, bytes);
-
-// Start the engine
-await page.evaluate(() => { try { Entry.engine.toggleRun(); } catch {} });
-await page.waitForTimeout(400);
 
 const snap = () => page.evaluate(() => {
     const byId = {};
@@ -33,56 +31,73 @@ const snap = () => page.evaluate(() => {
     const get = id => byId[id] ? { x: +byId[id].entity.x.toFixed(1), y: +byId[id].entity.y.toFixed(1) } : null;
     return {
         offset: +Entry.variableContainer.getVariable('offset').getValue(),
-        distance: +Entry.variableContainer.getVariable('distance').getValue(),
         vy: +Entry.variableContainer.getVariable('vy').getValue(),
         on_ground: +Entry.variableContainer.getVariable('on_ground').getValue(),
+        landed: +Entry.variableContainer.getVariable('landed').getValue(),
         player: get('player'),
         block_a: get('block_a'),
         block_b: get('block_b'),
-        sky_far: get('sky_far'),
-        sky_mid: get('sky_mid'),
+        block_c: get('block_c'),
     };
 });
 
-console.log('initial:', JSON.stringify(await snap(), null, 2));
-
-// Hold right arrow for 1 second by firing keydown repeatedly without keyup
-console.log('\n→ holding right arrow for 1s (simulated)...');
-const holdEnd = Date.now() + 1000;
-while (Date.now() < holdEnd) {
-    await page.evaluate(() => {
-        // Entry listens on `document` and uses `event.code` (not keyCode);
-        // see entryjs/src/util/utils.js:860 Entry.Utils.inputToKeycode.
-        const ev = new KeyboardEvent('keydown', { code: 'ArrowRight', key: 'ArrowRight' });
-        document.dispatchEvent(ev);
-    });
-    await page.waitForTimeout(50);
+async function tap(code, ms = 40) {
+    await page.evaluate(c => document.dispatchEvent(new KeyboardEvent('keydown', { code: c, key: c })), code);
+    await page.waitForTimeout(ms);
+    await page.evaluate(c => document.dispatchEvent(new KeyboardEvent('keyup', { code: c, key: c })), code);
 }
-// Release
-await page.evaluate(() => {
-    const ev = new KeyboardEvent('keyup', { code: 'ArrowRight', key: 'ArrowRight' });
-    document.dispatchEvent(ev);
-});
-await page.waitForTimeout(200);
-console.log('after right hold:', JSON.stringify(await snap(), null, 2));
 
-// Jump test
-console.log('\n↑ jumping...');
-await page.evaluate(() => {
-    const ev = new KeyboardEvent('keydown', { code: 'ArrowUp', key: 'ArrowUp' });
-    document.dispatchEvent(ev);
-});
-await page.waitForTimeout(30);
-await page.evaluate(() => {
-    const ev = new KeyboardEvent('keyup', { code: 'ArrowUp', key: 'ArrowUp' });
-    document.dispatchEvent(ev);
-});
-await page.waitForTimeout(150);
-const apex = await snap();
-console.log('mid-jump:', apex.player, 'vy=' + apex.vy, 'on_ground=' + apex.on_ground);
-await page.waitForTimeout(700);
-const land = await snap();
-console.log('after landing:', land.player, 'vy=' + land.vy, 'on_ground=' + land.on_ground);
+console.log('initial:', JSON.stringify(await snap()));
+
+// Engine tick rate in headless is inconsistent; set offset directly to position
+// block_a under the player (world x 150 → screen x -100 requires offset = -250).
+async function setOffset(v) {
+    await page.evaluate(val => {
+        Entry.variableContainer.getVariable('offset').setValue(val);
+    }, v);
+    await page.waitForTimeout(200);  // let each block's repeat_inf apply the new offset
+}
+
+console.log('\n=== test 1: jump onto block_a (offset = -250 → block_a at screen x = -100) ===');
+await setOffset(-250);
+let s = await snap();
+console.log('positioned:', 'block_a.x=' + s.block_a.x, 'player.y=' + s.player.y);
+
+await tap('ArrowUp');
+await page.waitForTimeout(1500);  // enough time for full jump arc + settle
+s = await snap();
+console.log('post-jump:', 'player.y=' + s.player.y, 'vy=' + s.vy, 'on_ground=' + s.on_ground);
+const landedOnA = Math.abs(s.player.y - 48) < 4;
+console.log(landedOnA ? '  ✓ landed on block_a at y≈48' : `  ✗ expected y≈48, got ${s.player.y}`);
+
+console.log('\n=== test 2: block_b slides under player (offset = -500) ===');
+// Scrolling the world is enough — player is airborne after leaving block_a's
+// range, block_b enters the collision zone, collision detection snaps player
+// onto block_b without needing a separate jump.
+await setOffset(-500);
+await page.waitForTimeout(800);  // settle: gravity + collision
+s = await snap();
+console.log('after offset shift:', 'player.y=' + s.player.y, 'vy=' + s.vy,
+            'on_ground=' + s.on_ground, 'block_b.x=' + s.block_b.x);
+const landedOnB = Math.abs(s.player.y - 78) < 4;
+console.log(landedOnB ? '  ✓ landed on block_b at y≈78' : `  ✗ expected y≈78, got ${s.player.y}`);
+
+console.log('\n=== test 3: block_c slides under player (offset = -800) ===');
+await setOffset(-800);
+await page.waitForTimeout(800);
+s = await snap();
+console.log('after offset shift:', 'player.y=' + s.player.y, 'vy=' + s.vy,
+            'on_ground=' + s.on_ground, 'block_c.x=' + s.block_c.x);
+const landedOnC = Math.abs(s.player.y - 108) < 4;
+console.log(landedOnC ? '  ✓ landed on block_c at y≈108' : `  ✗ expected y≈108, got ${s.player.y}`);
+
+console.log('\n=== test 4: walk off block → fall to ground (offset = 0) ===');
+await setOffset(0);  // all blocks back to original positions, none under player
+await page.waitForTimeout(1500);  // gravity pulls player down
+s = await snap();
+console.log('after offset reset:', 'player.y=' + s.player.y, 'vy=' + s.vy, 'on_ground=' + s.on_ground);
+const fellToGround = Math.abs(s.player.y - (-40)) < 4;
+console.log(fellToGround ? '  ✓ fell back to ground y=-40' : `  ✗ expected y≈-40, got ${s.player.y}`);
 
 console.log('\npageErrors:', errs.length);
 if (errs.length) for (const e of errs.slice(0, 5)) console.log(' -', e);

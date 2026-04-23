@@ -2,6 +2,16 @@
 
 날짜별로 배운 것과 어느 커밋에서 다뤘는지.
 
+## 2026-04-23 (9차) — 플랫포머 발판 충돌 패턴
+
+- [x] `platformer.ent` 재작성 — `reach_something(block)` 기반 실제 발판-플레이어 충돌
+- [x] 3 발판 다른 높이(y=-25/5/35) + ground fallback. 각 발판별 landing_y 계산식 문서화
+- [x] `vy ≤ 0` 가드로 위로 점프 시 발판 아래 통과 허용 (Super Mario Bros 식 동작)
+- [x] `landed` per-tick flag로 여러 발판 겹침 시 하나만 처리 (단락 평가 없는 Entry에서 필수)
+- [x] 시차 스크롤과 자동 호환: 발판이 월드 offset으로 스크린에 진입하면 충돌 자동 감지
+- [x] [`tools/verify-platformer.mjs`](../tools/verify-platformer.mjs) — 각 발판별 착지 y 자동 검증 (4/4 통과)
+- [x] 관련 문서: [06-gotchas.md §reach_something 기반 플랫포머 발판 충돌 패턴](06-gotchas.md#reach_something-기반-플랫포머-발판-충돌-패턴)
+
 ## 2026-04-23 (8차) — 키 이벤트 dispatch 규칙 / 플랫포머 fixture
 
 - [x] **키 이벤트는 클릭과 달리 `Entry.dispatchEvent`로 안 됨**. Entry가 `document`에

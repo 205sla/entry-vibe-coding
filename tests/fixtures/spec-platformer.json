@@ -1,10 +1,11 @@
 {
-  "name": "플랫포머 (시차 스크롤)",
+  "name": "플랫포머 (발판 충돌)",
   "variables": [
-    { "id": "offset",    "name": "오프셋",   "variableType": "variable", "value": "0",   "visible": false },
-    { "id": "vy",        "name": "세로속도", "variableType": "variable", "value": "0",   "visible": false },
-    { "id": "on_ground", "name": "땅위",     "variableType": "variable", "value": "1",   "visible": false },
-    { "id": "distance",  "name": "거리",     "variableType": "variable", "value": "0",   "visible": true, "x": -220, "y": 120 }
+    { "id": "offset",    "name": "오프셋",     "variableType": "variable", "value": "0", "visible": false },
+    { "id": "vy",        "name": "세로속도",   "variableType": "variable", "value": "0", "visible": false },
+    { "id": "on_ground", "name": "땅위",       "variableType": "variable", "value": "1", "visible": false },
+    { "id": "landed",    "name": "이번틱착지", "variableType": "variable", "value": "0", "visible": false },
+    { "id": "distance",  "name": "거리",       "variableType": "variable", "value": "0", "visible": true, "x": -220, "y": 120 }
   ],
   "objects": [
     {
@@ -15,24 +16,14 @@
       "script": [[
         { "type": "when_run_button_click" },
         {
-          "type": "repeat_inf",
-          "params": [null, null],
+          "type": "repeat_inf", "params": [null, null],
           "statements": [[
-            {
-              "type": "locate_xy",
-              "params": [
-                {
-                  "type": "calc_basic",
-                  "params": [
+            { "type": "locate_xy", "params": [
+                { "type": "calc_basic", "params": [
                     { "type": "get_variable", "params": [{ "__field": "offset" }, null] },
                     { "__field": "MULTI" },
-                    { "type": "number", "params": ["0.15"] }
-                  ]
-                },
-                { "type": "number", "params": ["90"] },
-                null
-              ]
-            },
+                    { "type": "number", "params": ["0.15"] } ] },
+                { "type": "number", "params": ["90"] }, null ] },
             { "type": "wait_second", "params": [0.02, null] }
           ]]
         }
@@ -46,31 +37,16 @@
       "script": [[
         { "type": "when_run_button_click" },
         {
-          "type": "repeat_inf",
-          "params": [null, null],
+          "type": "repeat_inf", "params": [null, null],
           "statements": [[
-            {
-              "type": "locate_xy",
-              "params": [
-                {
-                  "type": "calc_basic",
-                  "params": [
-                    { "type": "number", "params": ["150"] },
-                    { "__field": "PLUS" },
-                    {
-                      "type": "calc_basic",
-                      "params": [
+            { "type": "locate_xy", "params": [
+                { "type": "calc_basic", "params": [
+                    { "type": "number", "params": ["150"] }, { "__field": "PLUS" },
+                    { "type": "calc_basic", "params": [
                         { "type": "get_variable", "params": [{ "__field": "offset" }, null] },
                         { "__field": "MULTI" },
-                        { "type": "number", "params": ["0.4"] }
-                      ]
-                    }
-                  ]
-                },
-                { "type": "number", "params": ["60"] },
-                null
-              ]
-            },
+                        { "type": "number", "params": ["0.4"] } ] } ] },
+                { "type": "number", "params": ["60"] }, null ] },
             { "type": "wait_second", "params": [0.02, null] }
           ]]
         }
@@ -78,30 +54,19 @@
     },
     {
       "id": "block_a",
-      "name": "블럭A",
+      "name": "발판A",
       "pictures": [{ "id": "ba", "name": "블럭", "fileurl": "/images/game/block.svg", "imageType": "svg", "dimension": { "width": 100, "height": 100 } }],
-      "entity": { "x": 150, "y": -70, "scaleX": 0.5, "scaleY": 0.5 },
+      "entity": { "x": 150, "y": -25, "scaleX": 0.5, "scaleY": 0.5 },
       "script": [[
         { "type": "when_run_button_click" },
         {
-          "type": "repeat_inf",
-          "params": [null, null],
+          "type": "repeat_inf", "params": [null, null],
           "statements": [[
-            {
-              "type": "locate_xy",
-              "params": [
-                {
-                  "type": "calc_basic",
-                  "params": [
-                    { "type": "number", "params": ["150"] },
-                    { "__field": "PLUS" },
-                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] }
-                  ]
-                },
-                { "type": "number", "params": ["-70"] },
-                null
-              ]
-            },
+            { "type": "locate_xy", "params": [
+                { "type": "calc_basic", "params": [
+                    { "type": "number", "params": ["150"] }, { "__field": "PLUS" },
+                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] } ] },
+                { "type": "number", "params": ["-25"] }, null ] },
             { "type": "wait_second", "params": [0.02, null] }
           ]]
         }
@@ -109,30 +74,19 @@
     },
     {
       "id": "block_b",
-      "name": "블럭B",
+      "name": "발판B",
       "pictures": [{ "id": "bb", "name": "블럭", "fileurl": "/images/game/block.svg", "imageType": "svg", "dimension": { "width": 100, "height": 100 } }],
-      "entity": { "x": 400, "y": -70, "scaleX": 0.5, "scaleY": 0.5 },
+      "entity": { "x": 400, "y": 5, "scaleX": 0.5, "scaleY": 0.5 },
       "script": [[
         { "type": "when_run_button_click" },
         {
-          "type": "repeat_inf",
-          "params": [null, null],
+          "type": "repeat_inf", "params": [null, null],
           "statements": [[
-            {
-              "type": "locate_xy",
-              "params": [
-                {
-                  "type": "calc_basic",
-                  "params": [
-                    { "type": "number", "params": ["400"] },
-                    { "__field": "PLUS" },
-                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] }
-                  ]
-                },
-                { "type": "number", "params": ["-70"] },
-                null
-              ]
-            },
+            { "type": "locate_xy", "params": [
+                { "type": "calc_basic", "params": [
+                    { "type": "number", "params": ["400"] }, { "__field": "PLUS" },
+                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] } ] },
+                { "type": "number", "params": ["5"] }, null ] },
             { "type": "wait_second", "params": [0.02, null] }
           ]]
         }
@@ -140,30 +94,19 @@
     },
     {
       "id": "block_c",
-      "name": "블럭C",
+      "name": "발판C",
       "pictures": [{ "id": "bc", "name": "블럭", "fileurl": "/images/game/block.svg", "imageType": "svg", "dimension": { "width": 100, "height": 100 } }],
-      "entity": { "x": 700, "y": -70, "scaleX": 0.5, "scaleY": 0.5 },
+      "entity": { "x": 700, "y": 35, "scaleX": 0.5, "scaleY": 0.5 },
       "script": [[
         { "type": "when_run_button_click" },
         {
-          "type": "repeat_inf",
-          "params": [null, null],
+          "type": "repeat_inf", "params": [null, null],
           "statements": [[
-            {
-              "type": "locate_xy",
-              "params": [
-                {
-                  "type": "calc_basic",
-                  "params": [
-                    { "type": "number", "params": ["700"] },
-                    { "__field": "PLUS" },
-                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] }
-                  ]
-                },
-                { "type": "number", "params": ["-70"] },
-                null
-              ]
-            },
+            { "type": "locate_xy", "params": [
+                { "type": "calc_basic", "params": [
+                    { "type": "number", "params": ["700"] }, { "__field": "PLUS" },
+                    { "type": "get_variable", "params": [{ "__field": "offset" }, null] } ] },
+                { "type": "number", "params": ["35"] }, null ] },
             { "type": "wait_second", "params": [0.02, null] }
           ]]
         }
@@ -180,18 +123,16 @@
           { "type": "set_variable", "params": [{ "__field": "offset" }, 0, null] },
           { "type": "set_variable", "params": [{ "__field": "vy" }, 0, null] },
           { "type": "set_variable", "params": [{ "__field": "on_ground" }, 1, null] },
+          { "type": "set_variable", "params": [{ "__field": "landed" }, 0, null] },
           { "type": "set_variable", "params": [{ "__field": "distance" }, 0, null] },
           { "type": "locate_xy", "params": [
               { "type": "number", "params": ["-100"] },
-              { "type": "number", "params": ["-40"] },
-              null
-          ]}
+              { "type": "number", "params": ["-40"] }, null ] }
         ],
         [
           { "type": "when_run_button_click" },
           {
-            "type": "repeat_inf",
-            "params": [null, null],
+            "type": "repeat_inf", "params": [null, null],
             "statements": [[
               {
                 "type": "_if",
@@ -221,10 +162,10 @@
         [
           { "type": "when_run_button_click" },
           {
-            "type": "repeat_inf",
-            "params": [null, null],
+            "type": "repeat_inf", "params": [null, null],
             "statements": [[
               {
+                "//": "1) jump input",
                 "type": "_if",
                 "params": [
                   {
@@ -245,47 +186,129 @@
                   null
                 ],
                 "statements": [[
-                  { "type": "set_variable", "params": [{ "__field": "vy" }, 10, null] },
+                  { "type": "set_variable", "params": [{ "__field": "vy" }, 14, null] },
                   { "type": "set_variable", "params": [{ "__field": "on_ground" }, 0, null] }
                 ]]
               },
-              {
+
+              { "//": "2) apply velocity + gravity",
                 "type": "move_y",
                 "params": [
-                  { "type": "get_variable", "params": [{ "__field": "vy" }, null] },
-                  null
+                  { "type": "get_variable", "params": [{ "__field": "vy" }, null] }, null
                 ]
               },
               { "type": "change_variable", "params": [{ "__field": "vy" }, -0.6, null] },
+
+              { "//": "3) collision checks — highest surface first; landed flag prevents double-handling",
+                "type": "set_variable", "params": [{ "__field": "landed" }, 0, null] },
+
               {
                 "type": "_if",
                 "params": [
-                  {
-                    "type": "boolean_basic_operator",
-                    "params": [
-                      {
-                        "type": "coordinate_object",
-                        "params": [
-                          null,
-                          { "__field": "self" },
-                          null,
-                          { "__field": "y" }
-                        ]
-                      },
-                      { "__field": "LESS_OR_EQUAL" },
-                      { "type": "number", "params": ["-40"] }
-                    ]
-                  },
+                  { "type": "boolean_and_or", "params": [
+                      { "type": "reach_something", "params": [null, { "__field": "block_c" }, null] },
+                      { "__field": "AND" },
+                      { "type": "boolean_basic_operator", "params": [
+                          { "type": "get_variable", "params": [{ "__field": "vy" }, null] },
+                          { "__field": "LESS_OR_EQUAL" },
+                          { "type": "number", "params": ["0"] } ] } ] },
                   null
                 ],
                 "statements": [[
-                  { "type": "locate_y", "params": [
-                      { "type": "number", "params": ["-40"] }, null
-                  ]},
+                  { "type": "locate_y", "params": [{ "type": "number", "params": ["108"] }, null] },
                   { "type": "set_variable", "params": [{ "__field": "vy" }, 0, null] },
-                  { "type": "set_variable", "params": [{ "__field": "on_ground" }, 1, null] }
+                  { "type": "set_variable", "params": [{ "__field": "on_ground" }, 1, null] },
+                  { "type": "set_variable", "params": [{ "__field": "landed" }, 1, null] }
                 ]]
               },
+              {
+                "type": "_if",
+                "params": [
+                  { "type": "boolean_and_or", "params": [
+                      { "type": "boolean_and_or", "params": [
+                          { "type": "reach_something", "params": [null, { "__field": "block_b" }, null] },
+                          { "__field": "AND" },
+                          { "type": "boolean_basic_operator", "params": [
+                              { "type": "get_variable", "params": [{ "__field": "vy" }, null] },
+                              { "__field": "LESS_OR_EQUAL" },
+                              { "type": "number", "params": ["0"] } ] } ] },
+                      { "__field": "AND" },
+                      { "type": "boolean_basic_operator", "params": [
+                          { "type": "get_variable", "params": [{ "__field": "landed" }, null] },
+                          { "__field": "EQUAL" },
+                          { "type": "number", "params": ["0"] } ] } ] },
+                  null
+                ],
+                "statements": [[
+                  { "type": "locate_y", "params": [{ "type": "number", "params": ["78"] }, null] },
+                  { "type": "set_variable", "params": [{ "__field": "vy" }, 0, null] },
+                  { "type": "set_variable", "params": [{ "__field": "on_ground" }, 1, null] },
+                  { "type": "set_variable", "params": [{ "__field": "landed" }, 1, null] }
+                ]]
+              },
+              {
+                "type": "_if",
+                "params": [
+                  { "type": "boolean_and_or", "params": [
+                      { "type": "boolean_and_or", "params": [
+                          { "type": "reach_something", "params": [null, { "__field": "block_a" }, null] },
+                          { "__field": "AND" },
+                          { "type": "boolean_basic_operator", "params": [
+                              { "type": "get_variable", "params": [{ "__field": "vy" }, null] },
+                              { "__field": "LESS_OR_EQUAL" },
+                              { "type": "number", "params": ["0"] } ] } ] },
+                      { "__field": "AND" },
+                      { "type": "boolean_basic_operator", "params": [
+                          { "type": "get_variable", "params": [{ "__field": "landed" }, null] },
+                          { "__field": "EQUAL" },
+                          { "type": "number", "params": ["0"] } ] } ] },
+                  null
+                ],
+                "statements": [[
+                  { "type": "locate_y", "params": [{ "type": "number", "params": ["48"] }, null] },
+                  { "type": "set_variable", "params": [{ "__field": "vy" }, 0, null] },
+                  { "type": "set_variable", "params": [{ "__field": "on_ground" }, 1, null] },
+                  { "type": "set_variable", "params": [{ "__field": "landed" }, 1, null] }
+                ]]
+              },
+              {
+                "//": "4) fallback: ground at y=-40",
+                "type": "_if",
+                "params": [
+                  { "type": "boolean_and_or", "params": [
+                      { "type": "boolean_basic_operator", "params": [
+                          { "type": "coordinate_object", "params": [null, { "__field": "self" }, null, { "__field": "y" }] },
+                          { "__field": "LESS_OR_EQUAL" },
+                          { "type": "number", "params": ["-40"] } ] },
+                      { "__field": "AND" },
+                      { "type": "boolean_basic_operator", "params": [
+                          { "type": "get_variable", "params": [{ "__field": "landed" }, null] },
+                          { "__field": "EQUAL" },
+                          { "type": "number", "params": ["0"] } ] } ] },
+                  null
+                ],
+                "statements": [[
+                  { "type": "locate_y", "params": [{ "type": "number", "params": ["-40"] }, null] },
+                  { "type": "set_variable", "params": [{ "__field": "vy" }, 0, null] },
+                  { "type": "set_variable", "params": [{ "__field": "on_ground" }, 1, null] },
+                  { "type": "set_variable", "params": [{ "__field": "landed" }, 1, null] }
+                ]]
+              },
+              {
+                "//": "5) nothing touched → airborne",
+                "type": "_if",
+                "params": [
+                  { "type": "boolean_basic_operator", "params": [
+                      { "type": "get_variable", "params": [{ "__field": "landed" }, null] },
+                      { "__field": "EQUAL" },
+                      { "type": "number", "params": ["0"] } ] },
+                  null
+                ],
+                "statements": [[
+                  { "type": "set_variable", "params": [{ "__field": "on_ground" }, 0, null] }
+                ]]
+              },
+
               { "type": "wait_second", "params": [0.02, null] }
             ]]
           }
