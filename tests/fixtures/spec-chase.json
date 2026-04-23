@@ -1,0 +1,97 @@
+{
+  "name": "방향키 조종 + 추적",
+  "objects": [
+    {
+      "id": "player",
+      "name": "플레이어 A",
+      "pictures": [
+        {
+          "id": "a-pic",
+          "name": "A",
+          "fileurl": "/images/mascot/bot205-hello.svg",
+          "imageType": "svg",
+          "dimension": { "width": 200, "height": 240 }
+        }
+      ],
+      "entity": { "x": -120, "y": 0 },
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+            {
+              "type": "_if",
+              "params": [
+                { "type": "is_press_some_key", "params": [{ "__field": "38" }, null] },
+                null
+              ],
+              "statements": [[
+                { "type": "move_y", "params": [5, null] }
+              ]]
+            },
+            {
+              "type": "_if",
+              "params": [
+                { "type": "is_press_some_key", "params": [{ "__field": "40" }, null] },
+                null
+              ],
+              "statements": [[
+                { "type": "move_y", "params": [-5, null] }
+              ]]
+            },
+            {
+              "type": "_if",
+              "params": [
+                { "type": "is_press_some_key", "params": [{ "__field": "37" }, null] },
+                null
+              ],
+              "statements": [[
+                { "type": "move_x", "params": [-5, null] }
+              ]]
+            },
+            {
+              "type": "_if",
+              "params": [
+                { "type": "is_press_some_key", "params": [{ "__field": "39" }, null] },
+                null
+              ],
+              "statements": [[
+                { "type": "move_x", "params": [5, null] }
+              ]]
+            }
+          ]]
+        }
+      ]]
+    },
+    {
+      "id": "chaser",
+      "name": "추적자 B",
+      "pictures": [
+        {
+          "id": "b-pic",
+          "name": "B",
+          "fileurl": "/images/mascot/bot205-idle.svg",
+          "imageType": "svg",
+          "dimension": { "width": 200, "height": 240 }
+        }
+      ],
+      "entity": { "x": 120, "y": 0 },
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+            {
+              "type": "see_angle_object",
+              "params": [{ "__field": "player" }, null]
+            },
+            { "type": "move_direction", "params": [2, null] },
+            { "type": "wait_second", "params": [0.02, null] }
+          ]]
+        }
+      ]]
+    }
+  ]
+}

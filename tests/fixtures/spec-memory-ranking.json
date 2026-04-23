@@ -1,0 +1,616 @@
+{
+  "name": "패턴 기억 + 랭킹",
+  "messages": [
+    { "id": "round_start", "name": "라운드시작" }
+  ],
+  "variables": [
+    {
+      "id": "level",
+      "name": "레벨",
+      "variableType": "variable",
+      "value": "1",
+      "visible": true,
+      "x": -220, "y": 120
+    },
+    {
+      "id": "listening",
+      "name": "듣는중",
+      "variableType": "variable",
+      "value": "0",
+      "visible": false
+    },
+    {
+      "id": "last_input",
+      "name": "마지막입력",
+      "variableType": "variable",
+      "value": "0",
+      "visible": false
+    },
+    {
+      "id": "idx",
+      "name": "인덱스",
+      "variableType": "variable",
+      "value": "0",
+      "visible": false
+    },
+    {
+      "id": "sort_pos",
+      "name": "삽입위치",
+      "variableType": "variable",
+      "value": "1",
+      "visible": false
+    },
+    {
+      "id": "answer",
+      "name": "대답",
+      "variableType": "answer",
+      "value": "0",
+      "visible": false,
+      "x": 150, "y": -100
+    }
+  ],
+  "lists": [
+    { "id": "pattern", "name": "정답", "visible": false },
+    {
+      "id": "ranking",
+      "name": "🏆 랭킹",
+      "visible": true,
+      "isCloud": true,
+      "x": 90, "y": 20,
+      "width": 170, "height": 210
+    },
+    {
+      "id": "ranking_score",
+      "name": "_점수",
+      "visible": false,
+      "isCloud": true
+    }
+  ],
+  "objects": [
+    {
+      "id": "master",
+      "name": "진행자",
+      "pictures": [
+        {
+          "id": "m-pic",
+          "name": "진행자",
+          "fileurl": "/images/mascot/bot205-idle.svg",
+          "imageType": "svg",
+          "dimension": { "width": 200, "height": 240 }
+        }
+      ],
+      "entity": { "x": 0, "y": -10, "scaleX": 0.6, "scaleY": 0.6 },
+      "script": [
+        [
+          { "type": "when_run_button_click" },
+          { "type": "set_variable", "params": [{ "__field": "level" }, 1, null] },
+          { "type": "message_cast", "params": [{ "__field": "round_start" }, null] }
+        ],
+
+        [
+          { "type": "when_message_cast", "params": [null, { "__field": "round_start" }] },
+
+          { "type": "set_variable", "params": [{ "__field": "listening" }, 0, null] },
+          { "type": "set_variable", "params": [{ "__field": "last_input" }, 0, null] },
+
+          {
+            "type": "repeat_while_true",
+            "params": [
+              {
+                "type": "boolean_basic_operator",
+                "params": [
+                  {
+                    "type": "length_of_list",
+                    "params": [null, { "__field": "pattern" }, null]
+                  },
+                  { "__field": "GREATER" },
+                  { "type": "number", "params": ["0"] }
+                ]
+              },
+              { "__field": "while" },
+              null
+            ],
+            "statements": [[
+              {
+                "type": "remove_value_from_list",
+                "params": [
+                  { "type": "number", "params": ["1"] },
+                  { "__field": "pattern" },
+                  null
+                ]
+              }
+            ]]
+          },
+
+          { "type": "set_variable", "params": [{ "__field": "idx" }, 1, null] },
+          {
+            "type": "repeat_basic",
+            "params": [
+              { "type": "get_variable", "params": [{ "__field": "level" }, null] },
+              null
+            ],
+            "statements": [[
+              {
+                "type": "add_value_to_list",
+                "params": [
+                  {
+                    "type": "calc_rand",
+                    "params": [
+                      null,
+                      { "type": "number", "params": ["1"] },
+                      null,
+                      { "type": "number", "params": ["4"] },
+                      null
+                    ]
+                  },
+                  { "__field": "pattern" },
+                  null
+                ]
+              }
+            ]]
+          },
+
+          {
+            "type": "dialog_time",
+            "params": [
+              { "type": "text", "params": ["잘 보세요…"] },
+              { "type": "number", "params": ["1"] },
+              { "__field": "speak" },
+              null
+            ]
+          },
+
+          { "type": "set_variable", "params": [{ "__field": "idx" }, 1, null] },
+          {
+            "type": "repeat_basic",
+            "params": [
+              { "type": "get_variable", "params": [{ "__field": "level" }, null] },
+              null
+            ],
+            "statements": [[
+              {
+                "type": "_if",
+                "params": [
+                  {
+                    "type": "boolean_basic_operator",
+                    "params": [
+                      {
+                        "type": "value_of_index_from_list",
+                        "params": [
+                          null,
+                          { "__field": "pattern" },
+                          null,
+                          { "type": "get_variable", "params": [{ "__field": "idx" }, null] },
+                          null
+                        ]
+                      },
+                      { "__field": "EQUAL" },
+                      { "type": "number", "params": ["1"] }
+                    ]
+                  },
+                  null
+                ],
+                "statements": [[
+                  {
+                    "type": "dialog_time",
+                    "params": [
+                      { "type": "text", "params": ["↑"] },
+                      { "type": "number", "params": ["0.6"] },
+                      { "__field": "speak" },
+                      null
+                    ]
+                  }
+                ]]
+              },
+              {
+                "type": "_if",
+                "params": [
+                  {
+                    "type": "boolean_basic_operator",
+                    "params": [
+                      {
+                        "type": "value_of_index_from_list",
+                        "params": [
+                          null,
+                          { "__field": "pattern" },
+                          null,
+                          { "type": "get_variable", "params": [{ "__field": "idx" }, null] },
+                          null
+                        ]
+                      },
+                      { "__field": "EQUAL" },
+                      { "type": "number", "params": ["2"] }
+                    ]
+                  },
+                  null
+                ],
+                "statements": [[
+                  {
+                    "type": "dialog_time",
+                    "params": [
+                      { "type": "text", "params": ["→"] },
+                      { "type": "number", "params": ["0.6"] },
+                      { "__field": "speak" },
+                      null
+                    ]
+                  }
+                ]]
+              },
+              {
+                "type": "_if",
+                "params": [
+                  {
+                    "type": "boolean_basic_operator",
+                    "params": [
+                      {
+                        "type": "value_of_index_from_list",
+                        "params": [
+                          null,
+                          { "__field": "pattern" },
+                          null,
+                          { "type": "get_variable", "params": [{ "__field": "idx" }, null] },
+                          null
+                        ]
+                      },
+                      { "__field": "EQUAL" },
+                      { "type": "number", "params": ["3"] }
+                    ]
+                  },
+                  null
+                ],
+                "statements": [[
+                  {
+                    "type": "dialog_time",
+                    "params": [
+                      { "type": "text", "params": ["↓"] },
+                      { "type": "number", "params": ["0.6"] },
+                      { "__field": "speak" },
+                      null
+                    ]
+                  }
+                ]]
+              },
+              {
+                "type": "_if",
+                "params": [
+                  {
+                    "type": "boolean_basic_operator",
+                    "params": [
+                      {
+                        "type": "value_of_index_from_list",
+                        "params": [
+                          null,
+                          { "__field": "pattern" },
+                          null,
+                          { "type": "get_variable", "params": [{ "__field": "idx" }, null] },
+                          null
+                        ]
+                      },
+                      { "__field": "EQUAL" },
+                      { "type": "number", "params": ["4"] }
+                    ]
+                  },
+                  null
+                ],
+                "statements": [[
+                  {
+                    "type": "dialog_time",
+                    "params": [
+                      { "type": "text", "params": ["←"] },
+                      { "type": "number", "params": ["0.6"] },
+                      { "__field": "speak" },
+                      null
+                    ]
+                  }
+                ]]
+              },
+              { "type": "wait_second", "params": [0.15, null] },
+              {
+                "type": "change_variable",
+                "params": [{ "__field": "idx" }, 1, null]
+              }
+            ]]
+          },
+
+          {
+            "type": "dialog_time",
+            "params": [
+              { "type": "text", "params": ["따라해보세요!"] },
+              { "type": "number", "params": ["1"] },
+              { "__field": "speak" },
+              null
+            ]
+          },
+
+          { "type": "set_variable", "params": [{ "__field": "idx" }, 1, null] },
+          { "type": "set_variable", "params": [{ "__field": "last_input" }, 0, null] },
+          { "type": "set_variable", "params": [{ "__field": "listening" }, 1, null] },
+
+          {
+            "type": "repeat_basic",
+            "params": [
+              { "type": "get_variable", "params": [{ "__field": "level" }, null] },
+              null
+            ],
+            "statements": [[
+              {
+                "type": "wait_until_true",
+                "params": [
+                  {
+                    "type": "boolean_basic_operator",
+                    "params": [
+                      { "type": "get_variable", "params": [{ "__field": "last_input" }, null] },
+                      { "__field": "NOT_EQUAL" },
+                      { "type": "number", "params": ["0"] }
+                    ]
+                  },
+                  null
+                ]
+              },
+              {
+                "type": "if_else",
+                "params": [
+                  {
+                    "type": "boolean_basic_operator",
+                    "params": [
+                      { "type": "get_variable", "params": [{ "__field": "last_input" }, null] },
+                      { "__field": "EQUAL" },
+                      {
+                        "type": "value_of_index_from_list",
+                        "params": [
+                          null,
+                          { "__field": "pattern" },
+                          null,
+                          { "type": "get_variable", "params": [{ "__field": "idx" }, null] },
+                          null
+                        ]
+                      }
+                    ]
+                  },
+                  null
+                ],
+                "statements": [
+                  [
+                    { "type": "set_variable", "params": [{ "__field": "last_input" }, 0, null] },
+                    { "type": "change_variable", "params": [{ "__field": "idx" }, 1, null] }
+                  ],
+                  [
+                    { "type": "set_variable", "params": [{ "__field": "listening" }, 0, null] },
+                    {
+                      "type": "dialog_time",
+                      "params": [
+                        { "type": "text", "params": ["틀렸습니다!"] },
+                        { "type": "number", "params": ["1"] },
+                        { "__field": "speak" },
+                        null
+                      ]
+                    },
+                    {
+                      "type": "ask_and_wait",
+                      "params": [
+                        { "type": "text", "params": ["닉네임을 입력해 주세요"] },
+                        null
+                      ]
+                    },
+                    { "type": "set_variable", "params": [{ "__field": "sort_pos" }, 1, null] },
+                    {
+                      "//": "Insertion-sort scan: find position where new level > existing score.",
+                      "//2": "Can't use boolean_and_or(pos<=len, level<=list[pos]) because Entry evaluates",
+                      "//3": "both sides of AND eagerly — list access past end throws. Use guarded stop_repeat instead.",
+                      "type": "repeat_inf",
+                      "params": [null, null],
+                      "statements": [[
+                        {
+                          "type": "_if",
+                          "params": [
+                            {
+                              "type": "boolean_basic_operator",
+                              "params": [
+                                { "type": "get_variable", "params": [{ "__field": "sort_pos" }, null] },
+                                { "__field": "GREATER" },
+                                {
+                                  "type": "length_of_list",
+                                  "params": [null, { "__field": "ranking_score" }, null]
+                                }
+                              ]
+                            },
+                            null
+                          ],
+                          "statements": [[
+                            { "type": "stop_repeat", "params": [null] }
+                          ]]
+                        },
+                        {
+                          "type": "_if",
+                          "params": [
+                            {
+                              "type": "boolean_basic_operator",
+                              "params": [
+                                { "type": "get_variable", "params": [{ "__field": "level" }, null] },
+                                { "__field": "GREATER" },
+                                {
+                                  "type": "value_of_index_from_list",
+                                  "params": [
+                                    null,
+                                    { "__field": "ranking_score" },
+                                    null,
+                                    { "type": "get_variable", "params": [{ "__field": "sort_pos" }, null] },
+                                    null
+                                  ]
+                                }
+                              ]
+                            },
+                            null
+                          ],
+                          "statements": [[
+                            { "type": "stop_repeat", "params": [null] }
+                          ]]
+                        },
+                        {
+                          "type": "change_variable",
+                          "params": [{ "__field": "sort_pos" }, 1, null]
+                        }
+                      ]]
+                    },
+                    {
+                      "type": "insert_value_to_list",
+                      "params": [
+                        { "type": "get_variable", "params": [{ "__field": "level" }, null] },
+                        { "__field": "ranking_score" },
+                        { "type": "get_variable", "params": [{ "__field": "sort_pos" }, null] },
+                        null
+                      ]
+                    },
+                    {
+                      "type": "insert_value_to_list",
+                      "params": [
+                        {
+                          "type": "combine_something",
+                          "params": [
+                            null,
+                            { "type": "text", "params": ["Lv."] },
+                            null,
+                            {
+                              "type": "combine_something",
+                              "params": [
+                                null,
+                                { "type": "get_variable", "params": [{ "__field": "level" }, null] },
+                                null,
+                                {
+                                  "type": "combine_something",
+                                  "params": [
+                                    null,
+                                    { "type": "text", "params": [" - "] },
+                                    null,
+                                    { "type": "get_canvas_input_value", "params": [null] },
+                                    null
+                                  ]
+                                },
+                                null
+                              ]
+                            },
+                            null
+                          ]
+                        },
+                        { "__field": "ranking" },
+                        { "type": "get_variable", "params": [{ "__field": "sort_pos" }, null] },
+                        null
+                      ]
+                    },
+                    {
+                      "type": "show_list",
+                      "params": [{ "__field": "ranking" }, null]
+                    },
+                    {
+                      "type": "dialog",
+                      "params": [
+                        { "type": "text", "params": ["랭킹에 등록 완료!"] },
+                        { "__field": "speak" },
+                        null
+                      ]
+                    },
+                    { "type": "stop_object", "params": [{ "__field": "all" }, null] }
+                  ]
+                ]
+              }
+            ]]
+          },
+
+          { "type": "set_variable", "params": [{ "__field": "listening" }, 0, null] },
+          {
+            "type": "dialog_time",
+            "params": [
+              { "type": "text", "params": ["정답!"] },
+              { "type": "number", "params": ["1"] },
+              { "__field": "speak" },
+              null
+            ]
+          },
+          { "type": "change_variable", "params": [{ "__field": "level" }, 1, null] },
+          { "type": "message_cast", "params": [{ "__field": "round_start" }, null] }
+        ],
+
+        [
+          { "type": "when_some_key_pressed", "params": [null, { "__field": "38" }] },
+          {
+            "type": "_if",
+            "params": [
+              {
+                "type": "boolean_basic_operator",
+                "params": [
+                  { "type": "get_variable", "params": [{ "__field": "listening" }, null] },
+                  { "__field": "EQUAL" },
+                  { "type": "number", "params": ["1"] }
+                ]
+              },
+              null
+            ],
+            "statements": [[
+              { "type": "set_variable", "params": [{ "__field": "last_input" }, 1, null] }
+            ]]
+          }
+        ],
+        [
+          { "type": "when_some_key_pressed", "params": [null, { "__field": "39" }] },
+          {
+            "type": "_if",
+            "params": [
+              {
+                "type": "boolean_basic_operator",
+                "params": [
+                  { "type": "get_variable", "params": [{ "__field": "listening" }, null] },
+                  { "__field": "EQUAL" },
+                  { "type": "number", "params": ["1"] }
+                ]
+              },
+              null
+            ],
+            "statements": [[
+              { "type": "set_variable", "params": [{ "__field": "last_input" }, 2, null] }
+            ]]
+          }
+        ],
+        [
+          { "type": "when_some_key_pressed", "params": [null, { "__field": "40" }] },
+          {
+            "type": "_if",
+            "params": [
+              {
+                "type": "boolean_basic_operator",
+                "params": [
+                  { "type": "get_variable", "params": [{ "__field": "listening" }, null] },
+                  { "__field": "EQUAL" },
+                  { "type": "number", "params": ["1"] }
+                ]
+              },
+              null
+            ],
+            "statements": [[
+              { "type": "set_variable", "params": [{ "__field": "last_input" }, 3, null] }
+            ]]
+          }
+        ],
+        [
+          { "type": "when_some_key_pressed", "params": [null, { "__field": "37" }] },
+          {
+            "type": "_if",
+            "params": [
+              {
+                "type": "boolean_basic_operator",
+                "params": [
+                  { "type": "get_variable", "params": [{ "__field": "listening" }, null] },
+                  { "__field": "EQUAL" },
+                  { "type": "number", "params": ["1"] }
+                ]
+              },
+              null
+            ],
+            "statements": [[
+              { "type": "set_variable", "params": [{ "__field": "last_input" }, 4, null] }
+            ]]
+          }
+        ]
+      ]
+    }
+  ]
+}

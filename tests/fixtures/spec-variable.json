@@ -1,0 +1,22 @@
+{
+  "name": "변수 하나 + 반복",
+  "variables": [
+    { "name": "점수", "value": "0" }
+  ],
+  "objects": [
+    {
+      "name": "플레이어",
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "repeat_basic",
+          "params": [10],
+          "statements": [[
+            { "type": "change_variable", "params": ["점수", 1] },
+            { "type": "wait_second", "params": [0.1] }
+          ]]
+        }
+      ]]
+    }
+  ]
+}

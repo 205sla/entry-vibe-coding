@@ -1,0 +1,34 @@
+{
+  "name": "마우스를 따라다니는 오브젝트",
+  "objects": [
+    {
+      "name": "마우스 추적 205봇",
+      "pictures": [
+        {
+          "id": "bot205",
+          "name": "205봇",
+          "fileurl": "/images/mascot/bot205-idle.svg",
+          "thumbUrl": "/images/mascot/bot205-idle.svg",
+          "imageType": "svg",
+          "dimension": { "width": 200, "height": 240 }
+        }
+      ],
+      "entity": { "x": 0, "y": 0 },
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+            {
+              "type": "see_angle_object",
+              "params": [{ "__field": "mouse" }, null]
+            },
+            { "type": "move_direction", "params": [3, null] },
+            { "type": "wait_second", "params": [0.02, null] }
+          ]]
+        }
+      ]]
+    }
+  ]
+}

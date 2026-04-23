@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>MYentry-game</title>
+        <style>
+            :root { color-scheme: dark; }
+            body {
+                margin: 0; min-height: 100vh;
+                display: flex; align-items: center; justify-content: center;
+                background: #1e222b; color: #e6e8ef;
+                font-family: -apple-system, "Segoe UI", sans-serif;
+            }
+            .card {
+                background: #2c313d; padding: 36px 48px; border-radius: 12px;
+                box-shadow: 0 4px 24px rgba(0,0,0,.3);
+                text-align: center; min-width: 360px;
+            }
+            h1 { margin: 0 0 6px; font-size: 22px; }
+            .sub { color: #9aa; font-size: 13px; margin-bottom: 24px; }
+            .actions { display: flex; gap: 12px; justify-content: center; }
+            a.btn {
+                display: inline-block; padding: 10px 18px;
+                background: #4a90e2; color: #fff; text-decoration: none;
+                border-radius: 6px; font-size: 14px;
+            }
+            a.btn.secondary { background: #555c6b; }
+            a.btn:hover { filter: brightness(1.1); }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>MYentry-game</h1>
+            <p class="sub">오프라인 엔트리 편집기로 .ent 게임을 만듭니다</p>
+            <div class="actions">
+                <a class="btn" href="editor.html">새 작품 만들기</a>
+                <a class="btn secondary" href="editor.html?open=1">파일에서 불러오기</a>
+            </div>
+        </div>
+    </body>
+</html>

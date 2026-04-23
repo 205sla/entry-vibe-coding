@@ -1,0 +1,39 @@
+html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: #1e222b;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+}
+
+#toolbar {
+    height: 42px;
+    background: #2c313d;
+    color: #eee;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    border-bottom: 1px solid #1a1d25;
+}
+
+#toolbar button {
+    background: #3a4050;
+    color: #fff;
+    border: 1px solid #555c6b;
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+#toolbar button:hover {
+    background: #4a5060;
+}
+
+#workspace {
+    position: absolute;
+    top: 42px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}

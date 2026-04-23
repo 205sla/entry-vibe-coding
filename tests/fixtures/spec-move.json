@@ -1,0 +1,12 @@
+{
+  "name": "이동 블록 하나",
+  "objects": [
+    {
+      "name": "엔트리봇",
+      "script": [[
+        { "type": "when_run_button_click" },
+        { "type": "move_direction", "params": [10] }
+      ]]
+    }
+  ]
+}

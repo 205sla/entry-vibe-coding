@@ -1,0 +1,26 @@
+{
+  "name": "myentry-game",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline-first Entry editor for authoring .ent game projects, based on entryjs dist.",
+  "scripts": {
+    "start": "node server.js",
+    "build:registry": "node tools/build-block-registry.mjs",
+    "test:smoke": "node --test tests/smoke.test.js",
+    "test:e2e": "playwright test",
+    "verify": "npm run test:smoke && npm run test:e2e"
+  },
+  "dependencies": {
+    "acorn": "^8.16.0",
+    "acorn-walk": "^8.3.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "puid": "^1.0.7",
+    "sharp": "^0.33.5",
+    "tar": "^6.2.1",
+    "uid": "^2.0.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

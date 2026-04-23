@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+        />
+        <title>MYentry-game · 편집기</title>
+
+        <!-- Entry core CSS (from entryjs dist) -->
+        <link href="lib/entry-js/dist/entry.min.css" rel="stylesheet" />
+
+        <!-- External module CSS (local copies of entrylabs packages) -->
+        <link href="lib/entry-tool/dist/entry-tool.css" rel="stylesheet" />
+        <link href="lib/entry-lms/dist/assets/app.css" rel="stylesheet" />
+
+        <!-- App CSS -->
+        <link href="css/editor.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <section id="toolbar" style="height: 42px; background:#2c313d; color:#eee; display:flex; align-items:center; gap:8px; padding:0 12px;">
+            <strong style="margin-right:12px;">MYentry-game</strong>
+            <input type="file" id="open-ent" accept=".ent" style="display:none" />
+            <button type="button" onclick="document.getElementById('open-ent').click()">파일 열기</button>
+            <button type="button" onclick="exportEnt()">내 컴퓨터에 저장</button>
+            <button type="button" onclick="changeWorkspaceMode('block')">블록 모드</button>
+            <span id="status" style="margin-left:auto; font-size:12px; color:#9aa;"></span>
+        </section>
+        <div id="workspace"></div>
+
+        <!-- Language (ko) -->
+        <script src="lib/entry-js/extern/lang/ko.js"></script>
+
+        <!-- CreateJS -->
+        <script src="lib/vendor/preloadjs-0.6.0.min.js"></script>
+        <script src="lib/vendor/easeljs-0.8.0.min.js"></script>
+        <script src="lib/vendor/soundjs-0.6.0.min.js"></script>
+        <script src="lib/vendor/flashaudioplugin-0.6.0.min.js"></script>
+
+        <!-- Core libs -->
+        <script src="lib/vendor/lodash.min.js"></script>
+        <script src="lib/vendor/jquery.min.js"></script>
+        <script src="lib/vendor/jquery-ui.min.js"></script>
+        <script src="lib/vendor/velocity.min.js"></script>
+
+        <!-- CodeMirror (required even when textCodingEnable=false; entry-lms touches globals) -->
+        <script src="lib/vendor/codemirror/lib/codemirror.js"></script>
+        <script src="lib/vendor/codemirror/addon/hint/show-hint.js"></script>
+        <script src="lib/vendor/codemirror/addon/lint/lint.js"></script>
+        <script src="lib/vendor/codemirror/addon/selection/active-line.js"></script>
+        <script src="lib/vendor/codemirror/mode/javascript/javascript.js"></script>
+        <script src="lib/vendor/codemirror/addon/hint/javascript-hint.js"></script>
+
+        <!-- jshint / python.js are playentry.org server-side only; textCodingEnable=false bypasses them. -->
+        <script src="lib/vendor/fuzzy.js"></script>
+
+        <!-- Entry extern utilities (bundled with entryjs) -->
+        <script src="lib/entry-js/extern/util/filbert.js"></script>
+        <script src="lib/entry-js/extern/util/CanvasInput.js"></script>
+        <script src="lib/entry-js/extern/util/ndgmr.Collision.js"></script>
+        <script src="lib/entry-js/extern/util/handle.js"></script>
+        <script src="lib/entry-js/extern/util/bignumber.min.js"></script>
+
+        <!-- Socket.IO client -->
+        <script src="lib/vendor/socket.io.js"></script>
+
+        <!-- React 18 UMD -->
+        <script src="lib/vendor/react.production.min.js"></script>
+        <script src="lib/vendor/react-dom.production.min.js"></script>
+
+        <!-- Entry LMS (local copy of @entrylabs/lms package) -->
+        <script src="lib/entry-lms/dist/assets/app.js"></script>
+
+        <!-- Entry static helpers -->
+        <script src="lib/entry-js/extern/util/static.js"></script>
+
+        <!-- Entry editor tools (local copies) -->
+        <script src="lib/entry-tool/dist/entry-tool.js"></script>
+        <script src="lib/entry-paint/dist/static/js/entry-paint.js"></script>
+        <script src="lib/sound-editor/sound-editor.js"></script>
+        <script src="lib/legacy-video/index.js"></script>
+
+        <!-- Entry main bundle (from entryjs dist) -->
+        <script src="lib/entry-js/dist/entry.min.js"></script>
+
+        <!-- App glue code -->
+        <script src="js/editor.js"></script>
+    </body>
+</html>

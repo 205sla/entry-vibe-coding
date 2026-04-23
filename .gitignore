@@ -1,0 +1,65 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# 로컬 npm install 스크래치 — setup 스크립트로 재생성
+vendor-install/
+
+# Runtime
+temp/
+test-results/
+playwright-report/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# ─── Third-party assets (재구축 가능) ──────────────────────────
+# entryjs/dist 복사본 (17MB+)
+public/lib/entry-js/dist/
+# entryjs/extern 복사본
+public/lib/entry-js/extern/
+# entryjs/images 복사본 (32MB)
+public/lib/entry-js/images/
+
+# entryjs 기원의 public/images/ 전체 제외, 직접 만든 game/blank만 포함
+public/images/**
+
+# npm dist 복사본 (preloadjs 패치 포함)
+public/lib/vendor/
+
+# cursor 파일
+public/media/
+
+# ─── External module junctions (링크 타겟 커밋 불가) ──────────
+public/lib/entry-tool
+public/lib/entry-paint
+public/lib/entry-lms
+public/lib/sound-editor
+public/lib/legacy-video
+
+# ─── 직접 만든 게임 에셋은 유지 ─────────────────────────────
+!public/images/blank/
+!public/images/blank/**
+!public/images/game/
+!public/images/game/**
+
+# Screenshots / tooling scratch
+tools/*-state.png
+tools/*-final.png
+tools/editor-state.png
+
+# Scratch 디버깅 스크립트 (일회성, 로컬 보존만)
+tools/check-hp-text.mjs
+tools/devserver.js
+tools/final-check.mjs
+tools/loadcheck.mjs
+tools/quicksmoke.mjs
+tools/run-random-walk.mjs
+tools/screen-*.mjs
+tools/screencheck.mjs
+tools/screenshot.mjs
+tools/verify-follow.mjs

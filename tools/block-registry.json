@@ -1,0 +1,3617 @@
+{
+  "generatedAt": "2026-04-22T22:11:49.344Z",
+  "entryjsPath": "C:\\Users\\young\\prg\\ENTRY\\entryjs",
+  "blockCount": 274,
+  "issues": [],
+  "blocks": {
+    "learning_title_image": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "learning_title_speech": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "learning_title_text": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "insert_data_for_test": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {},
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "video_capture_for_image_test": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MODE": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "insert_text_block_for_test": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "TEXT": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "test_result": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": {},
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "accuracy_of_result": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "GROUP": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_group": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "GROUP": 0
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "retrain_model": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "TEXT": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "model_is_trained": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_boolean_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_train_visible": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VISIBLE": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_train_chart": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VISIBLE": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_result_info": {
+      "file": "block_ai_learning.js",
+      "category": "ai_learning",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "TYPE": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "learning_title_cluster": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_cluster_option_k": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_cluster_option_centroids": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "CENTRIOD_TYPE": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_cluster_centriod_count": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": {},
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_cluster_centriod_value": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "K": 0,
+        "ATTR": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_cluster_centriod_index_1": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_cluster_centriod_index_2": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_cluster_centriod_index_3": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 6,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_cluster_centriod_index_4": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 8,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_cluster_centriod_index_5": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 10,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_cluster_centriod_index_6": {
+      "file": "block_ai_learning_cluster.js",
+      "category": "ai_learning_cluster",
+      "paramCount": 12,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9,
+        "ATTR6": 11
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "learning_title_decisiontree": {
+      "file": "block_ai_learning_decisiontree.js",
+      "category": "ai_learning_decisiontree",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_decisiontree_option": {
+      "file": "block_ai_learning_decisiontree.js",
+      "category": "ai_learning_decisiontree",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "OPTION": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_decisiontree_tree": {
+      "file": "block_ai_learning_decisiontree.js",
+      "category": "ai_learning_decisiontree",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VISIBLE": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "learning_title_number": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_number_learning_option_k": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_1": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_2": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_3": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 6,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_4": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 8,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_5": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 10,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_6": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 12,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9,
+        "ATTR6": 11
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_param_1": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "CLASS": 2,
+        "OPTION": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_param_2": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 6,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "CLASS": 4,
+        "OPTION": 5
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_param_3": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 8,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "CLASS": 6,
+        "OPTION": 7
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_param_4": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 10,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "CLASS": 8,
+        "OPTION": 9
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_param_5": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 12,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9,
+        "CLASS": 10,
+        "OPTION": 11
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_number_learning_predict_param_6": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 14,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9,
+        "ATTR6": 11,
+        "CLASS": 12,
+        "OPTION": 13
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_number_learning_group_1": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "CLASS": 2
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_number_learning_group_2": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 5,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "CLASS": 4
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_number_learning_group_3": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 7,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "CLASS": 6
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_number_learning_group_4": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 9,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "CLASS": 8
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_number_learning_group_5": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 11,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9,
+        "CLASS": 10
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_number_learning_group_6": {
+      "file": "block_ai_learning_knn.js",
+      "category": "ai_learning_knn",
+      "paramCount": 13,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9,
+        "ATTR6": 11,
+        "CLASS": 12
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "learning_title_logistic_regression": {
+      "file": "block_ai_learning_logistic_regression.js",
+      "category": "ai_learning_logistic_regression",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_logistic_regression_option": {
+      "file": "block_ai_learning_logistic_regression.js",
+      "category": "ai_learning_logistic_regression",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "OPTION": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_logistic_regression_optimizer": {
+      "file": "block_ai_learning_logistic_regression.js",
+      "category": "ai_learning_logistic_regression",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "OPTIMIZER": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "learning_title_regression": {
+      "file": "block_ai_learning_regression.js",
+      "category": "ai_learning_regression",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_regression_option": {
+      "file": "block_ai_learning_regression.js",
+      "category": "ai_learning_regression",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "OPTION": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_regression_predict_1": {
+      "file": "block_ai_learning_regression.js",
+      "category": "ai_learning_regression",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_regression_predict_2": {
+      "file": "block_ai_learning_regression.js",
+      "category": "ai_learning_regression",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_regression_predict_3": {
+      "file": "block_ai_learning_regression.js",
+      "category": "ai_learning_regression",
+      "paramCount": 6,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_regression_predict_4": {
+      "file": "block_ai_learning_regression.js",
+      "category": "ai_learning_regression",
+      "paramCount": 8,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_regression_predict_5": {
+      "file": "block_ai_learning_regression.js",
+      "category": "ai_learning_regression",
+      "paramCount": 10,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_regression_predict_6": {
+      "file": "block_ai_learning_regression.js",
+      "category": "ai_learning_regression",
+      "paramCount": 12,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ATTR1": 1,
+        "ATTR2": 3,
+        "ATTR3": 5,
+        "ATTR4": 7,
+        "ATTR5": 9,
+        "ATTR6": 11
+      },
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_regression_accuracy": {
+      "file": "block_ai_learning_regression.js",
+      "category": "ai_learning_regression",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": {},
+      "skeleton": "basic_string_field",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "learning_title_svm": {
+      "file": "block_ai_learning_svm.js",
+      "category": "ai_learning_svm",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_svm_option": {
+      "file": "block_ai_learning_svm.js",
+      "category": "ai_learning_svm",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "OPTION": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_kernel_linear": {
+      "file": "block_ai_learning_svm.js",
+      "category": "ai_learning_svm",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "TEXT": 0
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_kernel_option": {
+      "file": "block_ai_learning_svm.js",
+      "category": "ai_learning_svm",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "KERNEL": 0,
+        "OPTION": 1,
+        "VALUE": 2
+      },
+      "skeleton": "basic",
+      "class": "ai_learning",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "media_pipe_title": {
+      "file": "block_ai_utilize_media_pipe.js",
+      "category": "ai_utilize_media_pipe",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "media_pipe",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "media_pipe_video_screen": {
+      "file": "block_ai_utilize_media_pipe.js",
+      "category": "ai_utilize_media_pipe",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "media_pipe",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "media_pipe_switch_camera": {
+      "file": "block_ai_utilize_media_pipe.js",
+      "category": "ai_utilize_media_pipe",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "media_pipe",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "check_connected_camera": {
+      "file": "block_ai_utilize_media_pipe.js",
+      "category": "ai_utilize_media_pipe",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "media_pipe",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "media_pipe_flip_camera": {
+      "file": "block_ai_utilize_media_pipe.js",
+      "category": "ai_utilize_media_pipe",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "TARGET": 0
+      },
+      "skeleton": "basic",
+      "class": "media_pipe",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "media_pipe_set_opacity_camera": {
+      "file": "block_ai_utilize_media_pipe.js",
+      "category": "ai_utilize_media_pipe",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "media_pipe",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "media_pipe_motion_value": {
+      "file": "block_ai_utilize_media_pipe.js",
+      "category": "ai_utilize_media_pipe",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "TARGET": 0,
+        "TYPE": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "media_pipe",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "analizyDataAddButton": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_button",
+      "class": null,
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "append_row_to_table": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "PROPERTY": 1
+      },
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "insert_row_to_table": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "NUMBER": 1,
+        "PROPERTY": 2
+      },
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "delete_row_from_table": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "NUMBER": 1,
+        "PROPERTY": 2
+      },
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_value_from_table": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 5,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "NUMBER": 1,
+        "FIELD": 2,
+        "VALUE": 3
+      },
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "save_current_table": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0
+      },
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_table_count": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "PROPERTY": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_value_from_table": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "ROW": 1,
+        "COL": 2
+      },
+      "skeleton": "basic_string_field",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_value_from_last_row": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "COL": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "calc_values_from_table": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "COL": 1,
+        "CALC": 2
+      },
+      "skeleton": "basic_string_field",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "open_table": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "CHART_INDEX": 1
+      },
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "open_table_wait": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "SECOND": 1
+      },
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "open_table_chart": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "CHART_INDEX": 1
+      },
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "close_table_chart": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {},
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_coefficient": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "FIELD1": 1,
+        "FIELD2": 2
+      },
+      "skeleton": "basic_string_field",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_value_from_cell": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "CELL": 1,
+        "VALUE": 2
+      },
+      "skeleton": "basic",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_value_from_cell": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "CELL": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_value_v_lookup": {
+      "file": "block_analysis.js",
+      "category": "analysis",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "MATRIX": 0,
+        "FIELD": 1,
+        "VALUE": 2,
+        "RETURN": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "analysis",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "brush_stamp": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "stamp",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "start_drawing": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "brush_control",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "stop_drawing": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "brush_control",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "start_fill": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "fill_control",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "stop_fill": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "fill_control",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_color": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "brush_control",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_random_color": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "brush_color",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_fill_color": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "fill_control",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_thickness": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "brush_control",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_thickness": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "brush_control",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_brush_transparency": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "brush_color",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_brush_tranparency": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "brush_color",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "brush_erase_all": {
+      "file": "block_brush.js",
+      "category": "brush",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "brush_clear",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "calc_basic": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LEFTHAND": 0,
+        "OPERATOR": 1,
+        "RIGHTHAND": 2
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "calc_rand": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 5,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LEFTHAND": 1,
+        "RIGHTHAND": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "coordinate_mouse": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "coordinate_object": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 1,
+        "COORDINATE": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "quotient_and_mod": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 6,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LEFTHAND": 1,
+        "RIGHTHAND": 3,
+        "OPERATOR": 5
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "calc_operation": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LEFTHAND": 1,
+        "VALUE": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_project_timer_value": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_string_field",
+      "class": "calc_timer",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "choose_project_timer_action": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ACTION": 1
+      },
+      "skeleton": "basic",
+      "class": "calc_timer",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_visible_project_timer": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ACTION": 1
+      },
+      "skeleton": "basic",
+      "class": "calc_timer",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_date": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_date",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "distance_something": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_distance",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_user_name": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_string_field",
+      "class": "calc_user",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_nickname": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_string_field",
+      "class": "calc_user",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "length_of_string": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "STRING": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_string",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "reverse_of_string": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "STRING": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_string",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "combine_something": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 5,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE1": 1,
+        "VALUE2": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_string",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "char_at": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 5,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LEFTHAND": 1,
+        "RIGHTHAND": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_string",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "substring": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 7,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "STRING": 1,
+        "START": 3,
+        "END": 5
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_string",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "count_match_string": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "STRING": 0,
+        "TARGET": 2
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_string",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "index_of_string": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 5,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LEFTHAND": 1,
+        "RIGHTHAND": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_string",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "replace_string": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 7,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "STRING": 1,
+        "OLD_WORD": 3,
+        "NEW_WORD": 5
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_string",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_string_case": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 5,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "STRING": 1,
+        "CASE": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_string",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_block_count": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "OBJECT": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "block",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_rgb_to_hex": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "RED": 0,
+        "GREEN": 1,
+        "BLUE": 2
+      },
+      "skeleton": "basic_string_field",
+      "class": "color",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_hex_to_rgb": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "HEX": 0,
+        "COLOR": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "color",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_boolean_value": {
+      "file": "block_calc.js",
+      "category": "calc",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "BOOLEAN": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "calc_boolean",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "wait_second": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "SECOND": 0
+      },
+      "skeleton": "basic",
+      "class": "delay",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "repeat_basic": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 2,
+      "statementCount": 1,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_loop",
+      "class": "repeat",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "repeat_inf": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 2,
+      "statementCount": 1,
+      "paramsKeyMap": null,
+      "skeleton": "basic_loop",
+      "class": "repeat",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "repeat_while_true": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 3,
+      "statementCount": 1,
+      "paramsKeyMap": {
+        "BOOL": 0,
+        "OPTION": 1
+      },
+      "skeleton": "basic_loop",
+      "class": "repeat",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "stop_repeat": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "repeat",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "continue_repeat": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "repeat",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "_if": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 2,
+      "statementCount": 1,
+      "paramsKeyMap": {
+        "BOOL": 0
+      },
+      "skeleton": "basic_loop",
+      "class": "condition",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "if_else": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 3,
+      "statementCount": 2,
+      "paramsKeyMap": {
+        "BOOL": 0
+      },
+      "skeleton": "basic_double_loop",
+      "class": "condition",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "wait_until_true": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "BOOL": 0
+      },
+      "skeleton": "basic",
+      "class": "wait",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "stop_object": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "TARGET": 0
+      },
+      "skeleton": "basic",
+      "class": "terminate",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "restart_project": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_without_next",
+      "class": "terminate",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "when_clone_start": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_event",
+      "class": "clone",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "create_clone": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "clone",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "delete_clone": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_without_next",
+      "class": "clone",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "remove_all_clones": {
+      "file": "block_flow.js",
+      "category": "flow",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "clone",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "functionAddButton": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_button",
+      "class": null,
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "function_name": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_text",
+      "class": "properties",
+      "isPrimitive": false
+    },
+    "showFunctionPropsButton": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_button",
+      "class": "properties",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_func_variable": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VARIABLE": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "local_variable",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_func_variable": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VARIABLE": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "local_variable",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "function_create_value": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 4,
+      "statementCount": 1,
+      "paramsKeyMap": {
+        "FIELD": 0,
+        "VALUE": 3
+      },
+      "skeleton": "basic_create_value",
+      "class": null,
+      "isPrimitive": false
+    },
+    "function_general": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "function_executor",
+      "isPrimitive": false
+    },
+    "function_value": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_string_field",
+      "class": "function_executor",
+      "isPrimitive": false
+    },
+    "function_field_label": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "NAME": 0,
+        "NEXT": 1
+      },
+      "skeleton": "basic_param",
+      "class": null,
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "function_field_string": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "PARAM": 0,
+        "NEXT": 1
+      },
+      "skeleton": "basic_param",
+      "class": null,
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "function_field_boolean": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "PARAM": 0,
+        "NEXT": 1
+      },
+      "skeleton": "basic_param",
+      "class": null,
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "function_param_string": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_string_field",
+      "class": null,
+      "isPrimitive": false
+    },
+    "function_param_boolean": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_boolean_field",
+      "class": null,
+      "isPrimitive": false
+    },
+    "function_create": {
+      "file": "block_func.js",
+      "category": "func",
+      "paramCount": 2,
+      "statementCount": 1,
+      "paramsKeyMap": {
+        "FIELD": 0
+      },
+      "skeleton": "basic_create",
+      "class": null,
+      "isPrimitive": false
+    },
+    "is_clicked": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_boolean_field",
+      "class": "boolean_input",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_object_clicked": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_boolean_field",
+      "class": "boolean_input",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_press_some_key": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "boolean_input",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "reach_something": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 1
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "boolean_collision",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_type": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "TYPE": 2
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "boolean_type",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "boolean_basic_operator": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LEFTHAND": 0,
+        "OPERATOR": 1,
+        "RIGHTHAND": 2
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "boolean_compare",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "boolean_and_or": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LEFTHAND": 0,
+        "OPERATOR": 1,
+        "RIGHTHAND": 2
+      },
+      "skeleton": "basic_boolean_field",
+      "class": null,
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "boolean_not": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 1
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "boolean",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_boost_mode": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_boolean_field",
+      "class": "boolean_input",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_current_device_type": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "DEVICE": 0
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "boolean_device",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_touch_supported": {
+      "file": "block_judgement.js",
+      "category": "judgement",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_boolean_field",
+      "class": "boolean_device",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "show": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "visibility",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "hide": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "visibility",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "dialog_time": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "SECOND": 1,
+        "OPTION": 2
+      },
+      "skeleton": "basic",
+      "class": "say",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "dialog": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "OPTION": 1
+      },
+      "skeleton": "basic",
+      "class": "say",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "remove_dialog": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "say",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_to_some_shape": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "shape",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_to_next_shape": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "DRIECTION": 0
+      },
+      "skeleton": "basic",
+      "class": "shape",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "add_effect_amount": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "EFFECT": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "effect",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_effect_amount": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "EFFECT": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "effect",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "erase_all_effects": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "effect",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_scale_size": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "scale",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_scale_size": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "scale",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "stretch_scale_size": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "DIMENSION": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "scale",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "reset_scale_size": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {},
+      "skeleton": "basic",
+      "class": "scale",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "flip_x": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "flip",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "flip_y": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "flip",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_object_index": {
+      "file": "block_looks.js",
+      "category": "looks",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LOCATION": 0
+      },
+      "skeleton": "basic",
+      "class": "z-index",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "move_direction": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "walk",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "bounce_wall": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "walk",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "move_x": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "move_relative",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "move_y": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "move_relative",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "move_xy_time": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE1": 0,
+        "VALUE2": 1,
+        "VALUE3": 2
+      },
+      "skeleton": "basic",
+      "class": "move_relative",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "locate_x": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "move_absolute",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "locate_y": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "move_absolute",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "locate_xy": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE1": 0,
+        "VALUE2": 1
+      },
+      "skeleton": "basic",
+      "class": "move_absolute",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "locate_xy_time": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE1": 0,
+        "VALUE2": 1,
+        "VALUE3": 2
+      },
+      "skeleton": "basic",
+      "class": "move_absolute",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "locate": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "move_absolute",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "locate_object_time": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "TARGET": 1
+      },
+      "skeleton": "basic",
+      "class": "move_absolute",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "rotate_relative": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "rotate",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "direction_relative": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "rotate",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "rotate_by_time": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "ANGLE": 1
+      },
+      "skeleton": "basic",
+      "class": "rotate",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "direction_relative_duration": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "DURATION": 0,
+        "AMOUNT": 1
+      },
+      "skeleton": "basic",
+      "class": "rotate",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "rotate_absolute": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "rotate_absolute",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "direction_absolute": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "rotate_absolute",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "see_angle_object": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "rotate_absolute",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "move_to_angle": {
+      "file": "block_moving.js",
+      "category": "moving",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "ANGLE": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "move_rotate",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_something_with_block": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "sound_play",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_something_second_with_block": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "SECOND": 1
+      },
+      "skeleton": "basic",
+      "class": "sound_play",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_from_to": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "START": 1,
+        "END": 2
+      },
+      "skeleton": "basic",
+      "class": "sound_play",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_something_wait_with_block": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "sound_wait",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_something_second_wait_with_block": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "SECOND": 1
+      },
+      "skeleton": "basic",
+      "class": "sound_wait",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_from_to_and_wait": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "START": 1,
+        "END": 2
+      },
+      "skeleton": "basic",
+      "class": "sound_wait",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_volume_change": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "sound_volume",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_volume_set": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "sound_volume",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_sound_speed": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "sound_speed",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_speed_change": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "sound_speed",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_speed_set": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "sound_speed",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "sound_silent_all": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "TARGET": 0
+      },
+      "skeleton": "basic",
+      "class": "sound_stop",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "play_bgm": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "bgm",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "stop_bgm": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "TARGET": 0
+      },
+      "skeleton": "basic",
+      "class": "bgm",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_sound_volume": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_string_field",
+      "class": "sound_volume",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_sound_duration": {
+      "file": "block_sound.js",
+      "category": "sound",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "sound_duration",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "messageAddButton": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_button",
+      "class": null,
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "when_run_button_click": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_event",
+      "class": "event",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "when_some_key_pressed": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 1
+      },
+      "skeleton": "basic_event",
+      "class": "event",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "mouse_clicked": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_event",
+      "class": "event",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "mouse_click_cancled": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_event",
+      "class": "event",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "when_object_click": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_event",
+      "class": "event",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "when_object_click_canceled": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_event",
+      "class": "event",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "when_message_cast": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 1
+      },
+      "skeleton": "basic_event",
+      "class": "message",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "message_cast": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "message",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "message_cast_wait": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "message",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "when_scene_start": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_event",
+      "class": "scene",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "start_scene": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_without_next",
+      "class": "scene",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "start_neighbor_scene": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "OPERATOR": 0
+      },
+      "skeleton": "basic_without_next",
+      "class": "scene",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "check_object_property": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 6,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "check_block_execution": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 4,
+      "statementCount": 1,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_loop",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "switch_scope": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_answer_submited": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "check_lecture_goal": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "check_variable_by_name": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "show_prompt": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "check_goal_success": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "positive_number": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "negative_number": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "wildcard_string": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "wildcard_boolean": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 0,
+      "statementCount": 0,
+      "paramsKeyMap": {},
+      "skeleton": "basic_boolean_field",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "register_score": {
+      "file": "block_start.js",
+      "category": "start",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "checker",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "text_read": {
+      "file": "block_text.js",
+      "category": "text",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "text",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "text_write": {
+      "file": "block_text.js",
+      "category": "text",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "text",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "text_append": {
+      "file": "block_text.js",
+      "category": "text",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "text",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "text_prepend": {
+      "file": "block_text.js",
+      "category": "text",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "text",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "text_change_effect": {
+      "file": "block_text.js",
+      "category": "text",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "EFFECT": 0,
+        "MODE": 1
+      },
+      "skeleton": "basic",
+      "class": "text",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "text_change_font": {
+      "file": "block_text.js",
+      "category": "text",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "FONT": 0
+      },
+      "skeleton": "basic",
+      "class": "text",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "text_change_font_color": {
+      "file": "block_text.js",
+      "category": "text",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "text",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "text_change_bg_color": {
+      "file": "block_text.js",
+      "category": "text",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "text",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "text_flush": {
+      "file": "block_text.js",
+      "category": "text",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic",
+      "class": "text",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "variableAddButton": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_button",
+      "class": null,
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "listAddButton": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_button",
+      "class": null,
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "ask_and_wait": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0
+      },
+      "skeleton": "basic",
+      "class": "ask",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_canvas_input_value": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 1,
+      "statementCount": 0,
+      "paramsKeyMap": null,
+      "skeleton": "basic_string_field",
+      "class": "ask",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_visible_answer": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "BOOL": 0
+      },
+      "skeleton": "basic",
+      "class": "ask",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "get_variable": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VARIABLE": 0
+      },
+      "skeleton": "basic_string_field",
+      "class": "variable",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_variable": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VARIABLE": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "variable",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "set_variable": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VARIABLE": 0,
+        "VALUE": 1
+      },
+      "skeleton": "basic",
+      "class": "variable",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "show_variable": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VARIABLE": 0
+      },
+      "skeleton": "basic",
+      "class": "variable_visibility",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "hide_variable": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VARIABLE": 0
+      },
+      "skeleton": "basic",
+      "class": "variable_visibility",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "value_of_index_from_list": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 5,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LIST": 1,
+        "INDEX": 3
+      },
+      "skeleton": "basic_string_field",
+      "class": "list_element",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "add_value_to_list": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "LIST": 1
+      },
+      "skeleton": "basic",
+      "class": "list",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "remove_value_from_list": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "VALUE": 0,
+        "LIST": 1
+      },
+      "skeleton": "basic",
+      "class": "list",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "insert_value_to_list": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "DATA": 0,
+        "LIST": 1,
+        "INDEX": 2
+      },
+      "skeleton": "basic",
+      "class": "list",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "change_value_list_index": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 4,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LIST": 0,
+        "INDEX": 1,
+        "DATA": 2
+      },
+      "skeleton": "basic",
+      "class": "list",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "length_of_list": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 3,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LIST": 1
+      },
+      "skeleton": "basic_string_field",
+      "class": "list",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "is_included_in_list": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 5,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LIST": 1,
+        "DATA": 3
+      },
+      "skeleton": "basic_boolean_field",
+      "class": "list",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "show_list": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LIST": 0
+      },
+      "skeleton": "basic",
+      "class": "list_visibility",
+      "isPrimitive": false,
+      "hasDef": true
+    },
+    "hide_list": {
+      "file": "block_variable.js",
+      "category": "variable",
+      "paramCount": 2,
+      "statementCount": 0,
+      "paramsKeyMap": {
+        "LIST": 0
+      },
+      "skeleton": "basic",
+      "class": "list_visibility",
+      "isPrimitive": false,
+      "hasDef": true
+    }
+  }
+}
