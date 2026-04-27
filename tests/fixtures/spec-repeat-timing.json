@@ -1,0 +1,64 @@
+{
+  "name": "반복하기 60fps 검증",
+  "variables": [
+    {
+      "id": "elapsed",
+      "name": "경과시간",
+      "variableType": "variable",
+      "value": "0",
+      "visible": true,
+      "x": -220,
+      "y": 120
+    },
+    {
+      "id": "done",
+      "name": "완료",
+      "variableType": "variable",
+      "value": "0",
+      "visible": true,
+      "x": -220,
+      "y": 80
+    }
+  ],
+  "objects": [
+    {
+      "id": "runner",
+      "name": "러너",
+      "entity": { "x": -200, "y": -100, "direction": 90 },
+      "script": [[
+        { "type": "when_run_button_click" },
+        {
+          "type": "choose_project_timer_action",
+          "params": [null, { "__field": "RESET" }, null, null]
+        },
+        {
+          "type": "choose_project_timer_action",
+          "params": [null, { "__field": "START" }, null, null]
+        },
+        {
+          "type": "repeat_basic",
+          "params": [180, null],
+          "statements": [[
+            { "type": "move_direction", "params": [1, null] }
+          ]]
+        },
+        {
+          "type": "choose_project_timer_action",
+          "params": [null, { "__field": "STOP" }, null, null]
+        },
+        {
+          "type": "set_variable",
+          "params": [
+            { "__field": "elapsed" },
+            { "type": "get_project_timer_value", "params": [null] },
+            null
+          ]
+        },
+        {
+          "type": "set_variable",
+          "params": [{ "__field": "done" }, 1, null]
+        }
+      ]]
+    }
+  ]
+}

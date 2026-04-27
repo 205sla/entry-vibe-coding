@@ -5,7 +5,6 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
-const sharp = require('sharp');
 const multer = require('multer');
 
 // All tar/hash helpers live in lib/ — single source of truth, shared with
@@ -17,8 +16,8 @@ const {
     forEachTarEntry,
     extractTarFile,
 } = require('./lib/tar-portable.js');
-
-const THUMB_MAX_PX = 96;
+// Asset bundling (image rasterize + thumb + tar layout) is shared with make-ent.
+const { createAssetBundler } = require('./lib/asset-bundler.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -173,73 +172,32 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
         // Remove internal session marker before packaging.
         if ('__sid' in project) delete project.__sid;
 
-        const dirs1 = [];     // temp/XX/
-        const dirs2 = [];     // temp/XX/YY/
-        const dirs3 = [];     // temp/XX/YY/{image,thumb,sound}/
-        const payloads = [];
-        const seen = new Set();
-        const cache = new Map();
+        // Shared bundler: handles dirs1/dirs2/dirs3 accumulation, SVG→PNG,
+        // 96px thumb, and dedup via cacheKey. See lib/asset-bundler.js.
+        const bundler = createAssetBundler();
+        const passthroughCache = new Map();
 
-        const addDir = (bucket, p) => {
-            if (seen.has(p)) return;
-            seen.add(p);
-            bucket.push({ name: p, data: Buffer.alloc(0), typeflag: '5' });
-        };
-
-        // Match playentry.org's export (see Downloads/260423_작품.ent):
-        //   image/<hash>.png  ← always PNG, SVGs get rasterized
-        //   thumb/<hash>.png  ← 96px PNG thumb with the same hash
-        //   sound/<hash>.<ext>
-        // Picture objects carry { id, dimension, filename, name, imageType,
-        // fileurl } — no thumbUrl. Entry's updateThumbnailView falls back to
-        // fileurl when thumbUrl is absent.
+        // Thin adapter: resolve URL → buffer, hand to the bundler.
+        // Passthrough for already-tar-embedded or absolute URLs (temp/…, http:,
+        // data:) — just echo back the URL with null filename.
         const bundleAsset = async (url, kind) => {
             if (!url) return null;
-            if (cache.has(url)) return cache.get(url);
+            if (passthroughCache.has(url)) return passthroughCache.get(url);
             if (/^(\.\/)?temp\//.test(url) || /^(https?:|data:)/.test(url)) {
                 const r = { fileurl: url, filename: null, ext: null };
-                cache.set(url, r);
+                passthroughCache.set(url, r);
                 return r;
             }
             const asset = resolveAsset(url);
             if (!asset) {
                 const r = { fileurl: url, filename: null, ext: null };
-                cache.set(url, r);
+                passthroughCache.set(url, r);
                 return r;
             }
-            const hash = entryStyleHash();
-            const d1 = hash.slice(0, 2), d2 = hash.slice(2, 4);
-            addDir(dirs1, `temp/${d1}/`);
-            addDir(dirs2, `temp/${d1}/${d2}/`);
-            addDir(dirs3, `temp/${d1}/${d2}/${kind}/`);
-
-            if (kind === 'image') {
-                let imageBuf = asset.buf;
-                try { imageBuf = await sharp(asset.buf).png().toBuffer(); }
-                catch (e) { console.warn('SVG→PNG rasterize failed for', url, '—', e.message); }
-                const fileurl = `temp/${d1}/${d2}/image/${hash}.png`;
-                payloads.push({ name: fileurl, data: imageBuf, typeflag: '0' });
-                addDir(dirs3, `temp/${d1}/${d2}/thumb/`);
-                const thumbPath = `temp/${d1}/${d2}/thumb/${hash}.png`;
-                try {
-                    const thumbBuf = await sharp(asset.buf)
-                        .resize(THUMB_MAX_PX, THUMB_MAX_PX, { fit: 'inside' })
-                        .png().toBuffer();
-                    payloads.push({ name: thumbPath, data: thumbBuf, typeflag: '0' });
-                } catch (e) {
-                    console.warn('thumb rasterize failed for', url, '—', e.message);
-                    payloads.push({ name: thumbPath, data: imageBuf, typeflag: '0' });
-                }
-                const r = { fileurl, filename: hash, ext: 'png' };
-                cache.set(url, r);
-                return r;
-            }
-
-            const fileurl = `temp/${d1}/${d2}/${kind}/${hash}.${asset.ext}`;
-            payloads.push({ name: fileurl, data: asset.buf, typeflag: '0' });
-            const r = { fileurl, filename: hash, ext: asset.ext };
-            cache.set(url, r);
-            return r;
+            const r = await bundler.bundle({
+                buf: asset.buf, ext: asset.ext, kind, cacheKey: url,
+            });
+            return { fileurl: r.fileurl, filename: r.hash, ext: r.ext };
         };
 
         for (const obj of project.objects) {
@@ -272,6 +230,7 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
             typeflag: '0'
         };
 
+        const { dirs1, dirs2, dirs3, payloads } = bundler.getFiles();
         const files = [
             { name: 'temp/', data: Buffer.alloc(0), typeflag: '5' },
             ...dirs1,

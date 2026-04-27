@@ -59,10 +59,10 @@
 
 | 단계 | 참고 |
 |------|------|
-| ① 설계 | [knowledge/04-script-and-blocks.md](knowledge/04-script-and-blocks.md) — 카테고리별 블록·params 형태, [knowledge/06-gotchas.md](knowledge/06-gotchas.md) — 함정 미리 회피 |
+| ① 설계 | [knowledge/04-script-and-blocks.md](knowledge/04-script-and-blocks.md) — 카테고리별 블록·params 형태 + 설계 패턴, [knowledge/07-runtime-quirks.md](knowledge/07-runtime-quirks.md) — Entry 엔진 주의점 |
 | ② spec 작성 | [knowledge/02-project-json.md](knowledge/02-project-json.md) — 최상위 스키마, [knowledge/03-objects-and-assets.md](knowledge/03-objects-and-assets.md) — Object/Picture 필드 |
 | ③ 생성 | `tools/make-ent.mjs`가 [knowledge/01-binary-format.md](knowledge/01-binary-format.md)의 tar 포맷을 실현 |
-| ④ 검증 | 실패 시 [knowledge/06-gotchas.md](knowledge/06-gotchas.md)에서 증상으로 검색 |
+| ④ 검증 | 실패 시 [knowledge/lessons.md](knowledge/lessons.md) (과거 해결 이슈) + [knowledge/07-runtime-quirks.md](knowledge/07-runtime-quirks.md) (엔진 동작) 참조 |
 
 ---
 
@@ -139,7 +139,7 @@ node -e "const r=require('./tools/block-registry.json').blocks;
       ],
       "sounds": [ ... ],                  // 선택
       "entity": { "x": 0, "y": -100, "scaleX": 0.4, "scaleY": 0.4 },
-      "scene": "7dwq",                    // 선택 (기본 7dwq)
+      "scene": "ab12",                    // 선택 (scenes[*].id 중 하나, 생략 시 첫 번째)
       "script": [
         [                                  // thread 1
           { "type": "when_run_button_click" },
@@ -161,7 +161,7 @@ node -e "const r=require('./tools/block-registry.json').blocks;
 | `params: [true]` | `params: [{type:"True", params:[]}]` |
 | `params: [{"__field":"mouse"}]` | `params: ["mouse"]` ← **bare string** (Dropdown 필드용) |
 | `fileurl: "/images/foo.svg"` | SVG → PNG rasterize → `temp/aa/bb/image/<hash>.png` 번들 |
-| `scenes`가 빈 배열 | `scenes: [{id: "7dwq", name: "장면 1"}]` 자동 |
+| `scenes` 생략 | `[{id: <shortId>, name: "장면 1"}]` 자동 (랜덤 4자 id) |
 | `interface` 생략 | `{canvasWidth: 640, menuWidth: 280, object: <첫 object id>}` 자동 |
 
 ### 필드(field) vs 블록(block) 슬롯 — 중요한 차이
@@ -293,13 +293,14 @@ npx playwright test --grep "foo.ent"
 
 ## 문제 발생 시 어디를 보나
 
-1. **증상별 원인 색인**: [knowledge/06-gotchas.md](knowledge/06-gotchas.md)
-2. **공식 문서 매핑**: [knowledge/00-official-sources.md](knowledge/00-official-sources.md) ([entrylabs/docs](https://github.com/entrylabs/docs))
-3. **각 블록의 정확한 스펙**: `entryjs/src/playground/blocks/block_*.js` 직접 확인 또는 `block-registry.json`
-4. **엔진 동작의 ground truth**: `entryjs/src/class/` (project.js, container.js, object.js, utils.js)
-5. **바이너리 포맷**: [knowledge/01-binary-format.md](knowledge/01-binary-format.md)
-6. **호스팅 (편집기) 문제**: [knowledge/05-host-editor.md](knowledge/05-host-editor.md)
-7. **이력**: [knowledge/CHANGELOG.md](knowledge/CHANGELOG.md)
+1. **과거 해결한 버그 (가드 링크)**: [knowledge/lessons.md](knowledge/lessons.md)
+2. **Entry 엔진 고유 동작**: [knowledge/07-runtime-quirks.md](knowledge/07-runtime-quirks.md)
+3. **공식 문서 매핑**: [knowledge/00-official-sources.md](knowledge/00-official-sources.md) ([entrylabs/docs](https://github.com/entrylabs/docs))
+4. **각 블록의 정확한 스펙**: `entryjs/src/playground/blocks/block_*.js` 직접 확인 또는 `block-registry.json`
+5. **엔진 동작의 ground truth**: `entryjs/src/class/` (project.js, container.js, object.js, utils.js)
+6. **바이너리 포맷**: [knowledge/01-binary-format.md](knowledge/01-binary-format.md)
+7. **호스팅 (편집기) 문제**: [knowledge/05-host-editor.md](knowledge/05-host-editor.md)
+8. **이력**: [knowledge/CHANGELOG.md](knowledge/CHANGELOG.md)
 
 ---
 

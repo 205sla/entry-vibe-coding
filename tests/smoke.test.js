@@ -1,5 +1,14 @@
 // Node smoke test — validates every .ent fixture structurally.
 // Run via `node --test tests/smoke.test.js`.
+//
+// Fixture discovery: auto-scans tests/fixtures/*.ent. Most fixtures are paired
+// with a spec-<name>.json that make-ent.mjs generated from. One exception:
+//
+//   known-good.ent
+//     — real playentry.org export (`01_정답의 리메이크`), no spec pair.
+//     Kept as a regression guard: our smoke parser must not choke on a
+//     genuine third-party .ent shape. If we break field handling, this is
+//     the first fixture that catches it.
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
@@ -49,11 +58,11 @@ function walkBlocks(threadList, registry, primitives, out, pathPrefix = '') {
             const loc = `${pathPrefix}thread[${t}][${b}]:${block.type}`;
 
             const reg = registry[block.type];
-            if (!reg && !primitives.has(block.type)) {
+            if (!reg && !primitives.has(block.type) && !isUserDefinedFuncType(block.type)) {
                 out.unknown.push({ type: block.type, path: loc });
             }
             // paramCount check — skip primitives (their params are literal strings, variable length)
-            if (reg && !primitives.has(block.type)) {
+            if (reg && !primitives.has(block.type) && !isUserDefinedFuncType(block.type)) {
                 const gotP = Array.isArray(block.params) ? block.params.length : 0;
                 if (gotP !== reg.paramCount) {
                     out.paramMismatches.push({ type: block.type, expected: reg.paramCount, got: gotP, path: loc });
@@ -98,6 +107,16 @@ const PRIMITIVE_TYPES = new Set([
     'get_variable', 'get_list', 'get_canvas_input_value',
     'get_boolean_value'
 ]);
+
+// User-defined function blocks have synthesized types based on the function's
+// id (e.g. `func_fib`) and parameter ids (e.g. `stringParam_pn00`). These are
+// generated dynamically by Entry.Func.generateBlock and don't appear in our
+// AST-extracted registry. Treat any matching name as primitive (variable params).
+function isUserDefinedFuncType(t) {
+    return /^func_[a-z0-9]+$/i.test(t) ||
+           /^stringParam_[a-z0-9]+$/i.test(t) ||
+           /^booleanParam_[a-z0-9]+$/i.test(t);
+}
 
 for (const entPath of listFixtures()) {
     const fname = path.basename(entPath);

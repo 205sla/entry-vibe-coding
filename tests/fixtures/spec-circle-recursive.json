@@ -1,0 +1,171 @@
+{
+  "name": "재귀로 그리는 원 + 방향키 이동",
+  "variables": [
+    { "id": "cx", "name": "원 중심 X", "value": "0", "visible": true,  "x": -220, "y": 120 },
+    { "id": "cy", "name": "원 중심 Y", "value": "0", "visible": true,  "x": -220, "y":  90 }
+  ],
+  "functions": [
+    {
+      "id": "drawstep",
+      "type": "normal",
+      "localVariables": [],
+      "useLocalVariables": false,
+      "content": [[
+        {
+          "id": "fcv0", "x": 50, "y": 30,
+          "type": "function_create",
+          "params": [
+            {
+              "id": "lbl0", "x": 0, "y": 0,
+              "type": "function_field_label",
+              "params": [{ "__field": "원호한단계" }, {
+                "id": "fst0", "x": 0, "y": 0,
+                "type": "function_field_string",
+                "params": [
+                  { "id": "fps0", "x": 0, "y": 0, "type": "stringParam_pn00", "params": [] },
+                  null
+                ]
+              }]
+            },
+            null
+          ],
+          "statements": [[
+            {
+              "type": "_if",
+              "params": [
+                {
+                  "type": "boolean_basic_operator",
+                  "params": [
+                    { "type": "stringParam_pn00", "params": [] },
+                    { "__field": "GREATER" },
+                    { "type": "number", "params": ["0"] }
+                  ]
+                },
+                null
+              ],
+              "statements": [[
+                { "type": "move_direction", "params": [
+                  { "type": "number", "params": ["6"] }, null
+                ]},
+                { "type": "direction_relative", "params": [
+                  { "type": "number", "params": ["-6"] }, null
+                ]},
+                { "type": "func_drawstep", "params": [
+                  { "type": "calc_basic", "params": [
+                    { "type": "stringParam_pn00", "params": [] },
+                    { "__field": "MINUS" },
+                    { "type": "number", "params": ["1"] }
+                  ]}
+                ]}
+              ]]
+            }
+          ]]
+        }
+      ]]
+    }
+  ],
+  "objects": [
+    {
+      "id": "drawer",
+      "name": "그리기 봇",
+      "pictures": [{
+        "id": "drawer_pic",
+        "fileurl": "/images/mascot/bot205-idle.svg",
+        "imageType": "svg",
+        "dimension": { "width": 200, "height": 240 }
+      }],
+      "entity": { "x": 0, "y": 0, "scaleX": 0.3, "scaleY": 0.3, "direction": 90 },
+      "script": [[
+        { "type": "when_run_button_click" },
+
+        { "type": "hide" },
+        { "type": "set_thickness", "params": [
+          { "type": "number", "params": ["3"] }, null
+        ]},
+        { "type": "set_color", "params": [
+          { "type": "color", "params": ["#2563eb"] }, null
+        ]},
+        { "type": "set_variable", "params": [
+          { "__field": "cx" }, { "type": "number", "params": ["0"] }, null
+        ]},
+        { "type": "set_variable", "params": [
+          { "__field": "cy" }, { "type": "number", "params": ["0"] }, null
+        ]},
+
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+
+
+            { "type": "_if", "params": [
+              { "type": "is_press_some_key", "params": [{ "__field": "39" }, null] },
+              null
+            ], "statements": [[
+              { "type": "change_variable", "params": [
+                { "__field": "cx" }, { "type": "number", "params": ["4"] }, null
+              ]}
+            ]]},
+            { "type": "_if", "params": [
+              { "type": "is_press_some_key", "params": [{ "__field": "37" }, null] },
+              null
+            ], "statements": [[
+              { "type": "change_variable", "params": [
+                { "__field": "cx" }, { "type": "number", "params": ["-4"] }, null
+              ]}
+            ]]},
+            { "type": "_if", "params": [
+              { "type": "is_press_some_key", "params": [{ "__field": "38" }, null] },
+              null
+            ], "statements": [[
+              { "type": "change_variable", "params": [
+                { "__field": "cy" }, { "type": "number", "params": ["4"] }, null
+              ]}
+            ]]},
+            { "type": "_if", "params": [
+              { "type": "is_press_some_key", "params": [{ "__field": "40" }, null] },
+              null
+            ], "statements": [[
+              { "type": "change_variable", "params": [
+                { "__field": "cy" }, { "type": "number", "params": ["-4"] }, null
+              ]}
+            ]]},
+
+
+            { "type": "stop_drawing" },
+            { "type": "brush_erase_all" },
+
+
+            { "type": "locate_xy", "params": [
+              {
+                "type": "calc_basic",
+                "params": [
+                  { "type": "get_variable", "params": [ "cx", null ] },
+                  { "__field": "PLUS" },
+                  { "type": "number", "params": ["57"] }
+                ]
+              },
+              { "type": "get_variable", "params": [ "cy", null ] },
+              null
+            ]},
+            { "type": "direction_absolute", "params": [
+              { "type": "number", "params": ["0"] }, null
+            ]},
+
+
+            { "type": "start_drawing" },
+            { "type": "func_drawstep", "params": [
+              { "type": "number", "params": ["60"] }
+            ]},
+            { "type": "stop_drawing" }
+          ]]
+        }
+      ]]
+    }
+  ],
+  "interface": {
+    "canvasWidth": 640,
+    "menuWidth": 280,
+    "object": "drawer"
+  }
+}

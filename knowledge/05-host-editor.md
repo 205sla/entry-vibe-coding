@@ -44,7 +44,7 @@ const initOption = {
 };
 Entry.creationChangedEvent = new Entry.Event(window);
 Entry.init(document.getElementById('workspace'), initOption);
-Entry.loadProject();   // 기본 starter (scene id '7dwq'로 시작)
+Entry.loadProject();   // 기본 starter — 빈 워크스페이스 + 엔트리봇 하나 (starter scene id는 '7dwq'지만 이후 clearProject로 지워지므로 .ent 측이 신경 쓸 필요 없음)
 ```
 
 구현: [`public/js/editor.js`](../public/js/editor.js).
@@ -96,6 +96,8 @@ Entry.loadProject();   // 기본 starter (scene id '7dwq'로 시작)
 스테이지 컨테이너가 없어서 크래시.
 
 인자 없이 부르면 Entry 내장 starter 프로젝트(엔트리봇 하나, scene id `'7dwq'`) 로드.
+이 id는 Entry 내부 구현 상수일 뿐이므로 `.ent`가 맞출 필요는 없다 —
+사용자 `.ent` 로드 전 `Entry.clearProject()`가 scene 상태를 싹 리셋하기 때문.
 
 ### 사용자 .ent 로드
 
@@ -252,3 +254,55 @@ function patchCreateJSSoundParsePath() {
 - npm 최신으로도 엔트리 엔진은 돌아간다(API drift 작음). 완전한 바이너리 round-trip 호환이
   중요하면 playentry.org 파일을 직접 복사해서 써야 하지만, 외부 호스트 금지 규칙과 충돌.
   우리는 npm latest + 위 패치로 타협.
+
+## 헤드리스 런타임 검증 — 이벤트 직접 dispatch
+
+Playwright 헤드리스에서 **클릭/키 기반 게임**을 검증하려면 실제 사용자 입력을 합성해야 한다.
+
+공용 부트 헬퍼 [`tools/lib/editor-harness.mjs`](../tools/lib/editor-harness.mjs)의 `bootEditor()` +
+`loadFixture()` 를 쓰고, 아래 dispatch 패턴을 `page.evaluate` 안에서 사용.
+
+### 클릭 — `Entry.dispatchEvent`
+
+Entry의 클릭 처리는 [`entity.js:90`](../../entryjs/src/class/entity.js#L90)에서
+`Entry.dispatchEvent('entityClick', this.entity)` 한 줄로 이벤트 버스에 쏜다.
+`when_object_click` 트리거는 이 이벤트를 구독
+([`block_start.js:229`](../../entryjs/src/playground/blocks/block_start.js#L229)).
+
+따라서 Playwright `page.evaluate` 안에서:
+```js
+try { Entry.engine.toggleRun(); } catch (_e) { /* tickEnabled 가끔 throw, 무시 */ }
+const entity = Entry.container.getAllObjects()[0].entity;
+for (let i = 0; i < 10; i++) {
+    Entry.dispatchEvent('entityClick', entity);
+    await new Promise(r => setTimeout(r, 100));
+}
+// 이제 entity.x/y, 변수 값 등을 검사
+```
+
+### 다른 이벤트 일반화
+
+| 사용자 동작 | Entry 이벤트 | 트리거 블록 |
+|-------------|--------------|-------------|
+| 오브젝트 클릭 | `entityClick` | `when_object_click` |
+| 오브젝트 클릭 해제 | `entityClickCanceled` | `when_object_click_canceled` |
+| 키 누름 | DOM KeyboardEvent → `Entry.pressedKeys[]` | `when_some_key_pressed`, `is_press_some_key` |
+| 신호 보내기 | `message_cast` 블록 자체 트리거 | `when_message_cast` |
+
+### 키 — DOM KeyboardEvent
+
+키는 이벤트 버스가 아니라 **document DOM 리스너**로 처리되므로 별도 규칙이 필요.
+자세한 규칙·근거·올바른/틀린 예는 [07-runtime-quirks.md §키 이벤트는 `document` + `event.code`](07-runtime-quirks.md#키-이벤트는-document--eventcode-로-dispatch) 참조.
+
+간단 레퍼런스:
+```js
+// 단발 탭
+document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowRight', key: 'ArrowRight' }));
+document.dispatchEvent(new KeyboardEvent('keyup',   { code: 'ArrowRight', key: 'ArrowRight' }));
+```
+
+### 관련 도구
+
+- [`tools/inspect.mjs`](../tools/inspect.mjs) `--click N`, `--key CODE N`, `--watch N` 플래그
+- [`tools/verify-platformer.mjs`](../tools/verify-platformer.mjs) — 방향키 hold + offset 변화 측정
+- [`tools/verify-healthbar-brush.mjs`](../tools/verify-healthbar-brush.mjs) — 변수 setValue로 상태 직접 조작

@@ -51,12 +51,12 @@
         };
         Entry.creationChangedEvent = new Entry.Event(window);
         Entry.init(document.getElementById('workspace'), initOption);
-        // Entry.loadProject() with no args hard-codes scene id '7dwq'
-        // (see entryjs/src/class/project.js:82). If a user later loads a .ent
-        // with a different scene id, Entry's stage still points at the old
-        // '7dwq' scene and addChildAt receives undefined. Load an empty
-        // starter whose scene id is also '7dwq' so subsequent loads don't
-        // collide with the initial default.
+        // Entry.loadProject() with no args loads Entry's built-in starter —
+        // a blank workspace with one default bot and scene id '7dwq'
+        // (entryjs/src/class/project.js:82). When the user later opens a .ent,
+        // loadEntFile() calls Entry.clearProject() first, which resets
+        // Entry.scene.scenes_ entirely — so the incoming .ent can carry any
+        // scene id (tested with 'zzzz', see tests/fixtures/scene-custom-id.ent).
         Entry.loadProject();
         setStatus('준비됨');
 

@@ -14,14 +14,14 @@
 //
 // Multiple flags combine. Server must be running (`npm start` or node tools/inspect.mjs --server).
 
-import { chromium } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
+import { bootEditor, loadFixture, DEFAULT_BASE_URL } from './lib/editor-harness.mjs';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT      = path.resolve(__dirname, '..');
-const BASE_URL  = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL  = DEFAULT_BASE_URL;
 
 // ---------- CLI parsing ----------
 
@@ -82,38 +82,21 @@ const fixtureName = path.basename(fixturePath, '.ent');
 
 // ---------- Run ----------
 
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
-
-const pageErrors = [];
-page.on('pageerror', e => pageErrors.push(e.message));
-
+let browser, page, pageErrors;
 try {
-    await page.goto(`${BASE}/editor.html`);
-    await page.waitForFunction(() => typeof Entry !== 'undefined', null, { timeout: 15_000 });
-    await page.waitForTimeout(2500);
-} catch {
-    console.error('error: could not reach editor. is the server running at ' + BASE + '?');
-    console.error('  start with: npm start  (or set BASE_URL env var)');
-    await browser.close();
+    ({ browser, page, pageErrors } = await bootEditor({
+        baseUrl: BASE,
+        viewport: { width: 1600, height: 1000 },
+    }));
+} catch (e) {
+    console.error('error:', e.message);
     process.exit(2);
 }
 
-// Load fixture
-const bytes = Array.from(fs.readFileSync(fixturePath));
-const loaded = await page.evaluate(async (bytes) => {
-    const blob = new Blob([new Uint8Array(bytes)]);
-    const fd = new FormData(); fd.append('ent', blob, 'x.ent');
-    const res = await fetch('/api/load', { method: 'POST', body: fd });
-    if (!res.ok) return { ok: false, status: res.status };
-    const project = await res.json();
-    Entry.clearProject();
-    Entry.loadProject(project);
-    await new Promise(r => setTimeout(r, 1500));
-    return { ok: true };
-}, bytes);
-if (!loaded.ok) {
-    console.error('error: /api/load failed', loaded);
+try {
+    await loadFixture(page, fixturePath);
+} catch (e) {
+    console.error('error:', e.message);
     await browser.close();
     process.exit(3);
 }

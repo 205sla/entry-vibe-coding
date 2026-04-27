@@ -50,5 +50,6 @@ public/lib/legacy-video
 !public/images/game/
 !public/images/game/**
 
-# inspect.mjs가 생성하는 스크린샷
+# tools/*.mjs 런타임 검증 스크립트가 생성하는 artifact (inspect, verify-*)
 tools/inspect-*.png
+tools/verify-*.png

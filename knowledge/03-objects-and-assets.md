@@ -13,7 +13,7 @@
   "selectedPictureId": "pic1",      // pictures[*].id 중 하나
   "objectType": "sprite",           // sprite | textBox
   "rotateMethod": "free",           // free | vertical | none
-  "scene": "7dwq",                  // scenes[*].id
+  "scene": "ab12",                  // scenes[*].id 중 하나
   "sprite": { "pictures": [...], "sounds": [...] },
   "entity": { ... },
   "lock": false

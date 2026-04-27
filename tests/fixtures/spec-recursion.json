@@ -1,0 +1,368 @@
+{
+  "name": "꼬리 재귀 vs 반복 + 호출 스택 한계",
+  "variables": [
+    { "id": "tail_n",      "name": "n",                   "value": "30",
+      "variableType": "slide", "minValue": 0, "maxValue": 50,
+      "visible": true,  "x": -220, "y": 130 },
+    { "id": "tail_result", "name": "결과(꼬리재귀)",       "value": "0", "visible": true,  "x": -220, "y": 100 },
+    { "id": "iter_result", "name": "결과(반복)",           "value": "0", "visible": true,  "x": -220, "y":  70 },
+    { "id": "tail_ms",     "name": "꼬리재귀 ms",          "value": "0", "visible": true,  "x":   60, "y": 130 },
+    { "id": "iter_ms",     "name": "반복 ms",              "value": "0", "visible": true,  "x":   60, "y": 100 },
+
+    { "id": "ret",         "name": "ret",                  "value": "0", "visible": false },
+    { "id": "fib_a",       "name": "fib_a",                "value": "0", "visible": false },
+    { "id": "fib_b",       "name": "fib_b",                "value": "1", "visible": false },
+    { "id": "fib_temp",    "name": "fib_temp",             "value": "0", "visible": false },
+
+    { "id": "bomb_n",      "name": "스택폭파 N",           "value": "1500", "visible": true, "x": 60, "y": 70 },
+    { "id": "bomb_started","name": "bomb_started",         "value": "0", "visible": false },
+    { "id": "naive_n",     "name": "지수재귀 N",           "value": "30",   "visible": true, "x": 60, "y": 40 },
+    { "id": "naive_started","name":"naive_started",        "value": "0",   "visible": false },
+    { "id": "naive_result","name": "지수재귀 결과",        "value": "0",   "visible": false }
+  ],
+  "messages": [
+    { "id": "bomb_test",  "name": "스택폭파테스트" },
+    { "id": "naive_test", "name": "지수재귀테스트" }
+  ],
+  "functions": [
+
+    {
+      "id": "fibtail",
+      "type": "value",
+      "localVariables": [],
+      "useLocalVariables": false,
+      "content": [[
+        {
+          "id": "ftcv0", "x": 50, "y": 30,
+          "type": "function_create_value",
+          "params": [
+            {
+              "id": "ftlbl", "x": 0, "y": 0,
+              "type": "function_field_label",
+              "params": [{ "__field": "꼬리피보나치" }, {
+                "id": "ftsf1", "x": 0, "y": 0,
+                "type": "function_field_string",
+                "params": [
+                  { "id": "ftp1", "x": 0, "y": 0, "type": "stringParam_pn00", "params": [] },
+                  {
+                    "id": "ftsf2", "x": 0, "y": 0,
+                    "type": "function_field_string",
+                    "params": [
+                      { "id": "ftp2", "x": 0, "y": 0, "type": "stringParam_pa00", "params": [] },
+                      {
+                        "id": "ftsf3", "x": 0, "y": 0,
+                        "type": "function_field_string",
+                        "params": [
+                          { "id": "ftp3", "x": 0, "y": 0, "type": "stringParam_pb00", "params": [] },
+                          null
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }]
+            },
+            null,
+            null,
+            { "type": "get_variable", "params": [ "ret", null ] }
+          ],
+          "statements": [[
+            {
+              "type": "if_else",
+              "params": [
+                {
+                  "type": "boolean_basic_operator",
+                  "params": [
+                    { "type": "stringParam_pn00", "params": [] },
+                    { "__field": "EQUAL" },
+                    { "type": "number", "params": ["0"] }
+                  ]
+                },
+                null
+              ],
+              "statements": [
+                [
+                  { "type": "set_variable", "params": [
+                    { "__field": "ret" },
+                    { "type": "stringParam_pa00", "params": [] },
+                    null
+                  ]}
+                ],
+                [
+                  { "type": "set_variable", "params": [
+                    { "__field": "ret" },
+                    {
+                      "type": "func_fibtail",
+                      "params": [
+                        {
+                          "type": "calc_basic",
+                          "params": [
+                            { "type": "stringParam_pn00", "params": [] },
+                            { "__field": "MINUS" },
+                            { "type": "number", "params": ["1"] }
+                          ]
+                        },
+                        { "type": "stringParam_pb00", "params": [] },
+                        {
+                          "type": "calc_basic",
+                          "params": [
+                            { "type": "stringParam_pa00", "params": [] },
+                            { "__field": "PLUS" },
+                            { "type": "stringParam_pb00", "params": [] }
+                          ]
+                        }
+                      ]
+                    },
+                    null
+                  ]}
+                ]
+              ]
+            }
+          ]]
+        }
+      ]]
+    },
+
+
+    {
+      "id": "fibnaive",
+      "type": "value",
+      "localVariables": [],
+      "useLocalVariables": false,
+      "content": [[
+        {
+          "id": "fncv0", "x": 50, "y": 30,
+          "type": "function_create_value",
+          "params": [
+            {
+              "id": "fnlbl", "x": 0, "y": 0,
+              "type": "function_field_label",
+              "params": [{ "__field": "지수재귀피보나치" }, {
+                "id": "fnsf1", "x": 0, "y": 0,
+                "type": "function_field_string",
+                "params": [
+                  { "id": "fnp1", "x": 0, "y": 0, "type": "stringParam_rn00", "params": [] },
+                  null
+                ]
+              }]
+            },
+            null,
+            null,
+            { "type": "get_variable", "params": [ "ret", null ] }
+          ],
+          "statements": [[
+            {
+              "type": "if_else",
+              "params": [
+                {
+                  "type": "boolean_basic_operator",
+                  "params": [
+                    { "type": "stringParam_rn00", "params": [] },
+                    { "__field": "LESS" },
+                    { "type": "number", "params": ["2"] }
+                  ]
+                },
+                null
+              ],
+              "statements": [
+                [
+                  { "type": "set_variable", "params": [
+                    { "__field": "ret" },
+                    { "type": "stringParam_rn00", "params": [] },
+                    null
+                  ]}
+                ],
+                [
+                  { "type": "set_variable", "params": [
+                    { "__field": "ret" },
+                    {
+                      "type": "calc_basic",
+                      "params": [
+                        { "type": "func_fibnaive", "params": [
+                          { "type": "calc_basic", "params": [
+                            { "type": "stringParam_rn00", "params": [] },
+                            { "__field": "MINUS" },
+                            { "type": "number", "params": ["1"] }
+                          ]}
+                        ]},
+                        { "__field": "PLUS" },
+                        { "type": "func_fibnaive", "params": [
+                          { "type": "calc_basic", "params": [
+                            { "type": "stringParam_rn00", "params": [] },
+                            { "__field": "MINUS" },
+                            { "type": "number", "params": ["2"] }
+                          ]}
+                        ]}
+                      ]
+                    },
+                    null
+                  ]}
+                ]
+              ]
+            }
+          ]]
+        }
+      ]]
+    },
+
+    {
+      "id": "fibiter",
+      "type": "value",
+      "localVariables": [],
+      "useLocalVariables": false,
+      "content": [[
+        {
+          "id": "ficv0", "x": 50, "y": 30,
+          "type": "function_create_value",
+          "params": [
+            {
+              "id": "filbl", "x": 0, "y": 0,
+              "type": "function_field_label",
+              "params": [{ "__field": "반복피보나치" }, {
+                "id": "fisf1", "x": 0, "y": 0,
+                "type": "function_field_string",
+                "params": [
+                  { "id": "fip1", "x": 0, "y": 0, "type": "stringParam_qn00", "params": [] },
+                  null
+                ]
+              }]
+            },
+            null,
+            null,
+            { "type": "get_variable", "params": [ "fib_a", null ] }
+          ],
+          "statements": [[
+            { "type": "set_variable", "params": [
+              { "__field": "fib_a" }, { "type": "number", "params": ["0"] }, null
+            ]},
+            { "type": "set_variable", "params": [
+              { "__field": "fib_b" }, { "type": "number", "params": ["1"] }, null
+            ]},
+            {
+              "type": "repeat_basic",
+              "params": [
+                { "type": "stringParam_qn00", "params": [] },
+                null
+              ],
+              "statements": [[
+                { "type": "set_variable", "params": [
+                  { "__field": "fib_temp" },
+                  { "type": "calc_basic", "params": [
+                    { "type": "get_variable", "params": [ "fib_a", null ] },
+                    { "__field": "PLUS" },
+                    { "type": "get_variable", "params": [ "fib_b", null ] }
+                  ]}, null
+                ]},
+                { "type": "set_variable", "params": [
+                  { "__field": "fib_a" },
+                  { "type": "get_variable", "params": [ "fib_b", null ] }, null
+                ]},
+                { "type": "set_variable", "params": [
+                  { "__field": "fib_b" },
+                  { "type": "get_variable", "params": [ "fib_temp", null ] }, null
+                ]}
+              ]]
+            }
+          ]]
+        }
+      ]]
+    }
+  ],
+  "objects": [
+    {
+      "id": "runner",
+      "name": "실행기",
+      "pictures": [{
+        "id": "runner_pic",
+        "fileurl": "/images/mascot/bot205-hello.svg",
+        "imageType": "svg",
+        "dimension": { "width": 200, "height": 240 }
+      }],
+      "entity": { "x": -50, "y": -60, "scaleX": 0.4, "scaleY": 0.4, "direction": 90 },
+      "script": [
+        [
+          { "type": "when_run_button_click" },
+
+
+          { "type": "choose_project_timer_action", "params": [null, { "__field": "RESET" }, null, null] },
+          { "type": "choose_project_timer_action", "params": [null, { "__field": "START" }, null, null] },
+          { "type": "set_variable", "params": [
+            { "__field": "tail_result" },
+            { "type": "func_fibtail", "params": [
+              { "type": "get_variable", "params": [ "tail_n", null ] },
+              { "type": "number", "params": ["0"] },
+              { "type": "number", "params": ["1"] }
+            ]},
+            null
+          ]},
+          { "type": "choose_project_timer_action", "params": [null, { "__field": "STOP" }, null, null] },
+          { "type": "set_variable", "params": [
+            { "__field": "tail_ms" },
+            { "type": "calc_basic", "params": [
+              { "type": "get_project_timer_value", "params": [null] },
+              { "__field": "MULTI" },
+              { "type": "number", "params": ["1000"] }
+            ]},
+            null
+          ]},
+
+
+          { "type": "choose_project_timer_action", "params": [null, { "__field": "RESET" }, null, null] },
+          { "type": "choose_project_timer_action", "params": [null, { "__field": "START" }, null, null] },
+          { "type": "set_variable", "params": [
+            { "__field": "iter_result" },
+            { "type": "func_fibiter", "params": [
+              { "type": "get_variable", "params": [ "tail_n", null ] }
+            ]},
+            null
+          ]},
+          { "type": "choose_project_timer_action", "params": [null, { "__field": "STOP" }, null, null] },
+          { "type": "set_variable", "params": [
+            { "__field": "iter_ms" },
+            { "type": "calc_basic", "params": [
+              { "type": "get_project_timer_value", "params": [null] },
+              { "__field": "MULTI" },
+              { "type": "number", "params": ["1000"] }
+            ]},
+            null
+          ]}
+        ],
+
+        [
+          { "type": "when_message_cast", "params": [null, { "__field": "bomb_test" }] },
+          { "type": "set_variable", "params": [
+            { "__field": "bomb_started" }, { "type": "number", "params": ["1"] }, null
+          ]},
+          { "type": "set_variable", "params": [
+            { "__field": "tail_result" },
+            { "type": "func_fibtail", "params": [
+              { "type": "get_variable", "params": [ "bomb_n", null ] },
+              { "type": "number", "params": ["0"] },
+              { "type": "number", "params": ["1"] }
+            ]},
+            null
+          ]}
+        ],
+
+        [
+          { "type": "when_message_cast", "params": [null, { "__field": "naive_test" }] },
+          { "type": "set_variable", "params": [
+            { "__field": "naive_started" }, { "type": "number", "params": ["1"] }, null
+          ]},
+          { "type": "set_variable", "params": [
+            { "__field": "naive_result" },
+            { "type": "func_fibnaive", "params": [
+              { "type": "get_variable", "params": [ "naive_n", null ] }
+            ]},
+            null
+          ]}
+        ]
+      ]
+    }
+  ],
+  "interface": {
+    "canvasWidth": 640,
+    "menuWidth": 280,
+    "object": "runner"
+  }
+}

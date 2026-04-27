@@ -31,17 +31,16 @@ import path from 'node:path';
 import url from 'node:url';
 import zlib from 'node:zlib';
 import { createRequire } from 'node:module';
-import sharp from 'sharp';
 import { uid } from 'uid';
 
-// Tar/hash helpers shared with server.js — single source in lib/tar-portable.js.
+// tar/hash/bundler helpers shared with server.js — single source in lib/.
 const require = createRequire(import.meta.url);
-const { entryStyleHash, makeTar } = require('../lib/tar-portable.js');
+const { makeTar } = require('../lib/tar-portable.js');
+const { createAssetBundler } = require('../lib/asset-bundler.js');
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const REGISTRY_PATH = path.resolve(__dirname, 'block-registry.json');
 const PUBLIC_DIR    = path.resolve(__dirname, '..', 'public');
-const THUMB_MAX_PX = 96;
 
 // Resolve a spec picture/sound reference to a bundlable absolute path.
 //   { path: "C:/…" }                  → absolute path (explicit)
@@ -176,74 +175,35 @@ function makeDefaultEntity(firstPicture) {
     };
 }
 
-async function buildAssets(_spec) {
-    const dirs1 = [], dirs2 = [], dirs3 = [], payloads = [];
-    const seen = new Set();
-    const addDir = (bucket, p) => {
-        if (seen.has(p)) return;
-        seen.add(p);
-        bucket.push({ name: p, data: Buffer.alloc(0), typeflag: '5' });
-    };
+function buildAssets(_spec) {
+    // Thin filesystem adapter over the shared bundler (lib/asset-bundler.js).
+    // bundleOne(absPath, kind) reads the file off disk, passes bytes to the
+    // bundler, and returns the same shape the legacy function returned so
+    // buildProject() keeps working unchanged.
+    const bundler = createAssetBundler();
     const bundleOne = async (absPath, kind) => {
         if (!fs.existsSync(absPath)) return null;
         const buf = fs.readFileSync(absPath);
-        const srcExt = (path.extname(absPath).slice(1) || 'bin').toLowerCase();
-        const hash = entryStyleHash();
-        const d1 = hash.slice(0, 2), d2 = hash.slice(2, 4);
-        addDir(dirs1, `temp/${d1}/`);
-        addDir(dirs2, `temp/${d1}/${d2}/`);
-        addDir(dirs3, `temp/${d1}/${d2}/${kind}/`);
-
-        // Images: rasterize everything to PNG to match playentry.org's export
-        // format (see Downloads/260423_작품.ent — only image/<hash>.png and
-        // thumb/<hash>.png appear in the tar; no SVG originals; picture
-        // objects carry `imageType: "png"` and `fileurl: .../image/<hash>.png`
-        // with NO thumbUrl field). Entry's updateThumbnailView falls back to
-        // fileurl for the object-list thumb when thumbUrl is absent.
-        if (kind === 'image') {
-            let imageBuf = buf, dimension = null;
-            try {
-                imageBuf = await sharp(buf).png().toBuffer();
-                const m = await sharp(buf).metadata();
-                dimension = { width: m.width || 100, height: m.height || 100 };
-            } catch {
-                // sharp couldn't read (e.g. odd SVG) — fall back to raw bytes
-                // and assume a reasonable default dimension.
-                dimension = { width: 200, height: 240 };
-            }
-            const fileurl = `temp/${d1}/${d2}/image/${hash}.png`;
-            payloads.push({ name: fileurl, data: imageBuf, typeflag: '0' });
-            addDir(dirs3, `temp/${d1}/${d2}/thumb/`);
-            const thumbPath = `temp/${d1}/${d2}/thumb/${hash}.png`;
-            try {
-                const thumbBuf = await sharp(buf)
-                    .resize(THUMB_MAX_PX, THUMB_MAX_PX, { fit: 'inside' })
-                    .png().toBuffer();
-                payloads.push({ name: thumbPath, data: thumbBuf, typeflag: '0' });
-            } catch {
-                // Reuse the image bytes as the thumb if resize failed.
-                payloads.push({ name: thumbPath, data: imageBuf, typeflag: '0' });
-            }
-            return { hash, fileurl, ext: 'png', dimension };
-        }
-
-        // Sounds: keep the original bytes + extension.
-        const fileurl = `temp/${d1}/${d2}/${kind}/${hash}.${srcExt}`;
-        payloads.push({ name: fileurl, data: buf, typeflag: '0' });
-        return { hash, fileurl, ext: srcExt, dimension: null };
+        const ext = (path.extname(absPath).slice(1) || 'bin').toLowerCase();
+        const r = await bundler.bundle({ buf, ext, kind });
+        return { hash: r.hash, fileurl: r.fileurl, ext: r.ext, dimension: r.dimension };
     };
-    return { bundleOne, dirs1, dirs2, dirs3, payloads };
+    return { bundleOne, getFiles: () => bundler.getFiles() };
 }
 
 export async function buildProject(spec) {
-    // Use '7dwq' for the first scene by default — Entry's built-in
-    // Entry.loadProject() (no args) starter hard-codes that id, and we want
-    // loaded .ent files to overlay cleanly onto that initial scene rather
-    // than forcing a scene switch (which trips addChildAt in EaselJS).
-    const specScenes = spec.scenes || [{ name: '장면 1', id: '7dwq' }];
+    // Scene ids are plain 4-char random (same style as objects/pictures).
+    // Entry's starter project uses '7dwq' (see entryjs src/class/project.js:82),
+    // but that's only an implementation detail of the no-args Entry.loadProject().
+    // When loading user .ent files we call Entry.clearProject() first
+    // (editor.js:loadEntFile), which resets Entry.scene.scenes_ entirely — so any
+    // scene id loads cleanly. Real playentry.org projects also have arbitrary
+    // scene ids (users delete the initial scene, add new ones, etc.).
+    // Regression guard: tests/fixtures/spec-scene-custom-id.json uses 'zzzz'.
+    const specScenes = spec.scenes || [{ name: '장면 1' }];
     const scenes = specScenes.map((s, i) => ({
         name: s.name || `장면 ${i + 1}`,
-        id: s.id || (i === 0 ? '7dwq' : shortId())
+        id: s.id || shortId()
     }));
 
     // Variables — supports all variableTypes from entrylabs/docs:
@@ -296,7 +256,7 @@ export async function buildProject(spec) {
         });
     }
 
-    const assets = await buildAssets(spec);
+    const assets = buildAssets(spec);
     const objects = [];
     for (const o of (spec.objects || [])) {
         const pictures = [];
@@ -391,7 +351,29 @@ export async function buildProject(spec) {
         hardwareLiteBlocks: spec.hardwareLiteBlocks || [],
         externalModules: spec.externalModules || [],
         externalModulesLite: spec.externalModulesLite || [],
-        functions: spec.functions || [],
+        // User-defined functions. Each function's `content` is a 2-D block array
+        // (same shape as object.script). Entry stores it as a JSON-stringified
+        // string at runtime, so we stringify it here. If the spec already passes
+        // a string, leave it alone.
+        // Type semantics:
+        //   - 'normal' for void functions (use function_create / func_<id> in callers)
+        //   - 'value'  for value-returning functions (function_create_value / func_<id>)
+        // Parameters declared with function_field_string become callable via the
+        // synthesized type `stringParam_<param_id>` both inside the body and
+        // at call sites' params slots.
+        functions: (spec.functions || []).map(fn => {
+            const out = {
+                id: fn.id || shortId(),
+                type: fn.type || 'normal',
+                localVariables: fn.localVariables || [],
+                useLocalVariables: !!fn.useLocalVariables,
+                content: typeof fn.content === 'string'
+                    ? fn.content
+                    : JSON.stringify((fn.content || []).map(thread =>
+                        (thread || []).map(normalizeBlock)))
+            };
+            return out;
+        }),
         messages: spec.messages || [],
         tables: spec.tables || [],
         // Entry uses interface.object as the initially-selected object id during load.
@@ -414,13 +396,14 @@ export async function buildProject(spec) {
         data: Buffer.from(JSON.stringify(project), 'utf8'),
         typeflag: '0'
     };
+    const { dirs1, dirs2, dirs3, payloads } = assets.getFiles();
     const files = [
         { name: 'temp/', data: Buffer.alloc(0), typeflag: '5' },
-        ...assets.dirs1,
+        ...dirs1,
         projectJson,
-        ...assets.dirs2,
-        ...assets.dirs3,
-        ...assets.payloads
+        ...dirs2,
+        ...dirs3,
+        ...payloads
     ];
     const gz = zlib.gzipSync(makeTar(files), { memLevel: 6 });
     return { buffer: gz, project };

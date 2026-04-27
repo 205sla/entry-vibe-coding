@@ -12,7 +12,7 @@ tar 내부에 있는 유일한 JSON 파일. 프로젝트의 모든 상태가 여
 | 키 | 타입 | 비고 |
 |----|------|------|
 | `name` | string | 프로젝트 이름 |
-| `scenes` | array | 장면 (최소 1개, 첫 id는 **`"7dwq"`** 권장 — [gotchas](06-gotchas.md#scene-id-7dwq-하드코딩)) |
+| `scenes` | array | 장면 (최소 1개, id는 4자 영숫자 아무거나. 호스트에서 `clearProject()` 선행만 보장되면 된다 — 자세한 건 [Scene 항](#scene)) |
 | `variables` | array | 변수·리스트·타이머·대답 공용 배열 |
 | `objects` | array | 오브젝트 |
 | `speed` | number | 초당 틱 (기본 60) |
@@ -48,15 +48,20 @@ tar 내부에 있는 유일한 JSON 파일. 프로젝트의 모든 상태가 여
 ## Scene
 
 ```json
-{ "id": "7dwq", "name": "장면 1" }
+{ "id": "ab12", "name": "장면 1" }
 ```
 
 | 필드 | 비고 |
 |------|------|
-| `id` | 4자 소문자 영숫자. **첫 scene은 `"7dwq"`** (Entry 기본 starter가 이 id로 고정됨; 다른 값 쓰면 편집기가 기존 `"7dwq"` 스테이지를 참조한 채로 새 scene을 못 찾아서 `addChildAt(undefined)`) |
+| `id` | 4자 소문자 영숫자. 아무 값이나 가능 (make-ent는 `shortId()`로 랜덤 생성). 호스트 편집기에서 `Entry.clearProject()`를 선행하면 버전/id에 관계없이 로드됨 — [자세한 배경](07-runtime-quirks.md#entryclearproject--loadproject-전-필수) |
 | `name` | 표시명 |
 
 `objects[*].scene`은 이 `id` 중 하나와 반드시 일치.
+
+> **참고**: Entry 내장 `Entry.loadProject()` (no args) starter는 scene id를
+> `"7dwq"`로 하드코딩 ([`entryjs/src/class/project.js:82`](../../entryjs/src/class/project.js#L82)).
+> 하지만 이 건 Entry가 내부적으로 쓰는 초기 프로젝트일 뿐 우리 `.ent`에 강제되는 값이 아니다.
+> playentry.org에 업로드된 실제 작품들의 scene id도 제각각이다 (장면 편집 과정에서 id 변경).
 
 ## Variable / List / Timer / Answer / Slide
 
@@ -131,15 +136,14 @@ tar 내부에 있는 유일한 JSON 파일. 프로젝트의 모든 상태가 여
 
 - `canvasWidth`: 스테이지 영역 폭. 기본 640.
 - `menuWidth`: 블록 메뉴 영역 폭. 공식 필드 — 생략 가능.
-- `object`: **현재 선택된 오브젝트의 id**. null 또는 존재하지 않는 id면 로드 중 크래시.
-  (→ [06-gotchas.md §addChildAt](06-gotchas.md#addchildatundefined))
+- `object`: **현재 선택된 오브젝트의 id**. null 또는 존재하지 않는 id면 로드 중 `addChildAt(undefined)` 크래시. make-ent는 자동으로 `objects[0].id` 채움 ([lessons.md](lessons.md)).
 
 ## 전체 예시 (최소)
 
 ```json
 {
   "name": "테스트",
-  "scenes": [{ "id": "7dwq", "name": "장면 1" }],
+  "scenes": [{ "id": "ab12", "name": "장면 1" }],
   "variables": [],
   "objects": [ /* ... Object 섹션 참조 ... */ ],
   "functions": [], "messages": [], "tables": [],

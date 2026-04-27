@@ -1,6 +1,6 @@
 # `.ent` 포맷 빠른 레퍼런스
 
-> 이 문서는 **요약**입니다. 정식 위키는 [`../knowledge/`](../knowledge/)를 보세요.
+> 이 문서는 **요약**입니다. 각 항목별 상세는 같은 디렉터리의 다른 `*.md` 파일을 보세요 ([README](README.md) 목차).
 
 `.ent` = **gzip + ustar tar**. 내부에 `temp/project.json` + 해시 샤딩된 에셋들.
 
@@ -32,7 +32,7 @@
 ```json
 {
   "name": "my game",
-  "scenes": [{ "id": "7dwq", "name": "장면 1" }],
+  "scenes": [{ "id": "ab12", "name": "장면 1" }],
   "variables": [],
   "objects": [
     {
@@ -42,7 +42,7 @@
       "selectedPictureId": "p1",
       "objectType": "sprite",
       "rotateMethod": "free",
-      "scene": "7dwq",
+      "scene": "ab12",
       "sprite": { "pictures": [/* ... */], "sounds": [] },
       "entity": { /* x, y, regX, regY, scaleX, scaleY, direction, width, height, visible */ },
       "lock": false
@@ -58,14 +58,14 @@
 ```
 
 놓치면 크래시 나는 것들:
-- 첫 scene id는 반드시 `"7dwq"` ([`knowledge/06-gotchas.md`](../knowledge/06-gotchas.md#scene-id-7dwq-하드코딩))
-- `interface.object`는 `objects[0].id` ([`knowledge/06-gotchas.md`](../knowledge/06-gotchas.md#addchildatundefined))
+- **사용자 `.ent` 로드 전 반드시 `Entry.clearProject()`** — 이게 scene id/version을 초월해서 매끄러운 로드를 보장하는 핵심 ([`07-runtime-quirks.md §clearProject`](07-runtime-quirks.md#entryclearproject--loadproject-전-필수))
+- `interface.object`는 `objects[0].id` — null이면 `addChildAt(undefined)`
 - `script`는 JSON.stringify된 문자열, 최소 `"[[]]"`
-- 두 번째 `Entry.loadProject` 전에 `Entry.clearProject()` 호출
+- scene id는 4자 영숫자 아무거나 — `"7dwq"` 강제 아님 (2026-04-24 정정)
 
 ## 블록 규칙 (요약)
 
-- `params` 슬롯 개수는 레지스트리 `paramCount`와 일치해야 함 ([`tools/block-registry.json`](../tools/block-registry.json))
+- `params` 슬롯 개수는 레지스트리 `paramCount`와 일치해야 함 ([`../tools/block-registry.json`](../tools/block-registry.json))
 - 값 래퍼 블록(`number`, `text`, `True`, `False`, `get_variable` 등)은 **leaf** — 재귀 정규화 금지
 - Dropdown 필드 값은 **bare string** (블록으로 감싸지 말 것) — `"mouse"`, `"player"`, `"EQUAL"` 등
 
@@ -73,14 +73,15 @@
 
 | 더 깊게 알려면 | |
 |---|---|
-| 바이너리 포맷 (tar/gzip 헤더 바이트) | [`knowledge/01-binary-format.md`](../knowledge/01-binary-format.md) |
-| project.json 스키마 + 변수/리스트/interface | [`knowledge/02-project-json.md`](../knowledge/02-project-json.md) |
-| Object·Entity·Picture·Sound 필드 | [`knowledge/03-objects-and-assets.md`](../knowledge/03-objects-and-assets.md) |
-| 블록 타입 레퍼런스 + params 구조 + 필드 vs 블록 | [`knowledge/04-script-and-blocks.md`](../knowledge/04-script-and-blocks.md) |
-| 편집기(entryjs) 오프라인 호스팅 | [`knowledge/05-host-editor.md`](../knowledge/05-host-editor.md) |
-| 증상별 트러블슈팅 | [`knowledge/06-gotchas.md`](../knowledge/06-gotchas.md) |
-| 엔트리랩스 공식 문서 인덱스 | [`knowledge/00-official-sources.md`](../knowledge/00-official-sources.md) |
-| 날짜별 학습 로그 | [`knowledge/CHANGELOG.md`](../knowledge/CHANGELOG.md) |
+| 바이너리 포맷 (tar/gzip 헤더 바이트) | [`01-binary-format.md`](01-binary-format.md) |
+| project.json 스키마 + 변수/리스트/interface | [`02-project-json.md`](02-project-json.md) |
+| Object·Entity·Picture·Sound 필드 | [`03-objects-and-assets.md`](03-objects-and-assets.md) |
+| 블록 타입 레퍼런스 + params 구조 + 필드 vs 블록 | [`04-script-and-blocks.md`](04-script-and-blocks.md) |
+| 편집기(entryjs) 오프라인 호스팅 | [`05-host-editor.md`](05-host-editor.md) |
+| Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [`07-runtime-quirks.md`](07-runtime-quirks.md) |
+| 과거에 해결한 버그 요약 (가드 링크) | [`lessons.md`](lessons.md) |
+| 엔트리랩스 공식 문서 인덱스 | [`00-official-sources.md`](00-official-sources.md) |
+| 날짜별 학습 로그 | [`CHANGELOG.md`](CHANGELOG.md) |
 
 ## 생성 툴
 
@@ -92,4 +93,4 @@ node tools/make-ent.mjs tests/fixtures/spec-<name>.json tests/fixtures/<name>.en
 npm run verify
 ```
 
-spec JSON 작성법은 [`../README.md`](../README.md)의 "② spec JSON" 섹션 참조.
+spec JSON 작성법은 저장소 루트의 [`../README.md`](../README.md) "② spec JSON" 섹션 참조.

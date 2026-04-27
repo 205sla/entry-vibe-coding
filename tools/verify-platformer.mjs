@@ -1,29 +1,23 @@
 // Runtime verification for platformer.ent (reach_something collision variant).
 // Drives the world scroll to position each block under the player, jumps, and
 // confirms player snaps to the right landing_y via collision detection.
-import { chromium } from '@playwright/test';
-import fs from 'node:fs';
+import { bootEditor, loadFixture } from './lib/editor-harness.mjs';
 
-const b = await chromium.launch();
-const page = await b.newPage({ viewport: { width: 1600, height: 1000 } });
-const errs = [];
-page.on('pageerror', e => errs.push(e.message));
+let b, page, errs;
+try {
+    ({ browser: b, page, pageErrors: errs } = await bootEditor({
+        viewport: { width: 1600, height: 1000 },
+    }));
+} catch (e) {
+    console.error('error:', e.message);
+    process.exit(2);
+}
 
-await page.goto('http://localhost:3000/editor.html');
-await page.waitForFunction(() => typeof Entry !== 'undefined');
-await page.waitForTimeout(2500);
-
-const bytes = Array.from(fs.readFileSync('tests/fixtures/platformer.ent'));
-await page.evaluate(async (bytes) => {
-    const blob = new Blob([new Uint8Array(bytes)]);
-    const fd = new FormData(); fd.append('ent', blob, 'platformer.ent');
-    const project = await (await fetch('/api/load', { method: 'POST', body: fd })).json();
-    Entry.clearProject();
-    Entry.loadProject(project);
-    await new Promise(r => setTimeout(r, 1500));
+await loadFixture(page, 'tests/fixtures/platformer.ent');
+await page.evaluate(async () => {
     try { Entry.engine.toggleRun(); } catch {}
     await new Promise(r => setTimeout(r, 400));
-}, bytes);
+});
 
 const snap = () => page.evaluate(() => {
     const byId = {};

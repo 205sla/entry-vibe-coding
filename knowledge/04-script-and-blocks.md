@@ -67,7 +67,7 @@ object.script = JSON.stringify([
 
 **중요**: 이 리터럴 블록들은 **leaf**다. `params` 안의 값은 이미 최종 리터럴 문자열 —
 절대 재귀 정규화하면 안 됨. 재귀하면 `"0"`이 다시 `{type:"text",...}`로 감싸져서
-`[object Object]`로 렌더됨 ([06-gotchas.md §리터럴 블록이 [object Object]로 표시됨](06-gotchas.md#리터럴-블록이-object-object로-표시됨)).
+`[object Object]`로 렌더됨 (구조적으로 해결됨 — [lessons.md](lessons.md) 참조).
 make-ent는 `PRIMITIVE_BLOCK_TYPES` 세트로 이 경계를 지킨다.
 
 ### 3. 중첩 블록
@@ -252,6 +252,226 @@ reg['repeat_basic']
 | `calc_rand`       | 5 | `LEFTHAND=1, RIGHTHAND=3` | 랜덤 정수. 슬롯 0,2,4는 null |
 | `calc_operation`  | 4 | `LEFTHAND=1, VALUE=3` | 제곱/루트/싸인 등 |
 | `get_date`        | 2 | `VALUE=0` | 현재 연/월/일/시/분/초 |
+
+### 장면 전환
+
+| type | params | paramsKeyMap | 비고 |
+|------|:------:|--------------|------|
+| `when_scene_start`     | 1 | — | 트리거: 현재 오브젝트가 속한 장면이 시작될 때. 장면 전환 → 재진입 시에도 매번 fire |
+| `start_scene`          | 2 | `VALUE=0` | 지정 장면으로 전환. **필드**: 대상 scene id (`{"__field": "play"}`) |
+| `start_neighbor_scene` | 2 | `OPERATOR=0` | next/previous 로 이동 |
+
+#### 장면 간 상태 전달 패턴
+
+장면이 바뀌어도 `variables` / `messages` 는 **전역** 으로 유지된다.
+- 이전 장면 결과를 다음 장면에 넘기려면 전역 variable에 저장 (예: `final_time`, `final_score`)
+- 장면 전환 시 초기화가 필요한 상태는 각 장면의 `when_scene_start` 스레드에서 명시적으로 set/reset
+- 장면 전환 시 이전 장면 클론은 자동 정리되지 않음 → `remove_all_clones` 또는 재생성 시 해결
+
+#### 3-장면 게임 플로우 예
+
+`tests/fixtures/spec-bullethell.json`:
+```
+menu(시작화면)
+  start_btn.when_object_click → set hp=3 → start_scene(play)
+
+play(게임화면)
+  player.when_scene_start:
+    hp=3, locate(0,-80), project timer RESET + START
+  player.when_scene_start (별 스레드): arrow-key 이동
+  player.when_scene_start (별 스레드): hp ≤ 0 감시 → STOP timer + 저장 + start_scene(result)
+  player.when_message_cast(hit): hp -= 1
+  bullet.when_scene_start: remove_all_clones, 반복 create_clone
+  bullet.when_clone_start: 플레이어 쪽 방향 + 이동 + reach_something → message_cast(hit) + delete_clone
+
+result(결과화면)
+  restart_btn.when_object_click → start_scene(menu)
+```
+
+### 주의: `dialog` + 숫자 값
+
+`dialog(text, '말하기')`의 text 슬롯에 **숫자를 반환하는 블록**(`get_variable` on numeric, `calc_basic` 결과 등)을 넣거나, `combine_something` 으로 합성해 숫자를 포함시키면:
+```
+Runtime Error: (this._text || "").replace is not a function
+```
+crash 발생 (Entry dialog의 `_text.replace(...)` 호출에서 number는 `.replace` 없음).
+
+**회피**:
+- 정적 문자열만 `dialog` 로 전달 (예: `"게임 오버!"`)
+- 숫자/동적 값은 `show_variable(var_id)` 로 무대에 상시 표시
+- 꼭 합성 텍스트를 말풍선으로 보여야 한다면 변수에 `combine_something("생존: ", var + "초")` 를 set_variable 로 저장한 뒤, 그 변수를 `get_variable` 로 전달 (이 과정에서 변수 value는 문자열로 저장됨)
+
+### 붓 (brush)
+
+sprite에 `createjs.Shape`로 연결된 별도 그래픽 레이어. **sprite를 `hide`해도 붓은 계속 렌더링**된다 — 그리는 주체(=스프라이트)를 숨기고 선만 남기는 패턴이 가능.
+
+| type | params | 비고 |
+|------|:------:|------|
+| `start_drawing` / `stop_drawing` | 1 | 이후 sprite 이동 시 선 추가/안 함. 없던 브러쉬는 `Entry.setBasicBrush(sprite)`로 자동 생성 |
+| `set_color`               | 2 | 첫 파라미터: `color` 프리미티브 (`{"type":"color","params":["#00c853"]}`) 또는 hex 문자열 |
+| `set_thickness`           | 2 | 굵기 (픽셀). 숫자 리터럴 OK |
+| `brush_erase_all`         | 1 | 전체 지우기 (모든 선 제거) |
+| `start_fill` / `stop_fill` / `set_fill_color` | 1/1/2 | 폐곡선 채우기용 |
+| `brush_stamp`             | 1 | 현재 sprite 이미지를 도장 찍듯 캔버스에 고정 |
+
+**그리기 원리**: `start_drawing` 시점에 `brush.moveTo(sprite.x, -sprite.y)`. 이후 `locate_xy` / `move_direction` 등으로 sprite가 움직이면 `brush.lineTo`가 호출되어 선이 이어짐. `stop_drawing` 호출 전까지 계속 누적.
+
+**매 프레임 다시 그리기 패턴** (체력바, HUD 등):
+```
+repeat_inf {
+    stop_drawing        // 이전 세그먼트 마감
+    brush_erase_all     // 전체 지우기
+    locate_xy(x0, y)    // 시작점 이동 (안 그림)
+    set_color(green)
+    start_drawing
+    locate_xy(x0 + hp*k, y)   // 굵은 선 = 막대
+    stop_drawing
+    set_color(red)
+    start_drawing
+    locate_xy(x_end, y)
+    stop_drawing
+}
+```
+
+빈 반복 1회 = 1 프레임(1/60s) 딜레이 → 60fps 갱신. `wait_second`는 넣지 말 것 ([07-runtime-quirks.md §반복하기 블록](07-runtime-quirks.md#반복하기-블록--1-프레임반복-60fps-암묵-틱) 참고).
+
+**증거 파일**: [`tests/fixtures/spec-healthbar-brush.json`](../tests/fixtures/spec-healthbar-brush.json) + [`tools/verify-healthbar-brush.mjs`](../tools/verify-healthbar-brush.mjs) (hp 100/50/10/0 스크린샷 + 픽셀 단조성 검증)
+
+## 플랫포머 발판 충돌 패턴 (`reach_something` 기반)
+
+Entry는 "어느 면에서 닿았는지" 정보 없이 `reach_something(block)`이 boolean만 반환.
+그래서 "위에서 착지했을 때만 발판 위에 올라서기"를 직접 코드로 결정해야 한다.
+
+### 매 프레임 순서
+
+1. 중력: `vy -= 0.6`, `move_y(vy)`
+2. 각 발판마다:
+    ```
+    _if (reach(발판) AND vy ≤ 0 AND landed == 0):
+        set y = landing_y(발판)     ← 미리 계산한 상수
+        set vy = 0
+        set on_ground = 1
+        set landed = 1              ← per-tick flag
+    ```
+3. 아무 발판도 안 닿았으면 바닥 fallback (예: y=-40) 또는 공중 유지
+4. 다음 tick 시작에서 `landed = 0` 으로 리셋
+
+### 핵심 아이디어
+
+- **`vy ≤ 0` 가드**: 위로 점프 중이면 snap 안 함 → 발판 아래서 부딪혀도 관통해 올라감 (Super Mario 식)
+- **`landed` per-tick flag**: 여러 발판이 겹칠 때 하나만 snap 처리 (단락 평가 없는 Entry 환경에서 필수)
+- **landing_y 상수**: 각 발판마다 미리 계산해 하드코딩
+- `boolean_and_or`는 단락 평가 없지만 ([07-runtime-quirks.md](07-runtime-quirks.md#boolean_and_or에-단락-평가short-circuit-없음)), `reach_something`/`vy`/`landed` 읽기는 부작용 없어 AND 사용 안전
+
+### landing_y 공식
+
+원본 이미지에 scale 적용된 스프라이트:
+- 블록 상단 = `block.y + (block_h × block_scale) / 2`
+- 플레이어 바닥 = `player.y - (player_h × player_scale) / 2`
+- 착지 조건: `player_bottom == block_top`
+    → `player_landing_y = block.y + (block_h × block_scale + player_h × player_scale) / 2`
+
+예: 블록 100×100 scale 0.5 (half=25), 플레이어 200×240 scale 0.4 (half=48)
+→ `player_landing_y = block.y + 73`
+
+### 시차 스크롤과 결합
+
+플레이어 x 고정 사이드스크롤러에서 `reach_something`은 **스크린 좌표 기준** 체크.
+월드 offset으로 발판이 스크롤되어 플레이어 아래로 올 때 자동으로 충돌 감지 동작.
+발판 아래 통과 → offset 계속 이동 → 발판이 플레이어 밖으로 → `reach=false` →
+중력이 다음 발판 또는 바닥으로 낙하시킴.
+
+### 참고 구현
+
+[`tests/fixtures/spec-platformer.json`](../tests/fixtures/spec-platformer.json) — 3 발판
+(y=-25/5/35), ground fallback y=-40. [`tools/verify-platformer.mjs`](../tools/verify-platformer.mjs) —
+각 발판별 착지 y 자동 검증 (4/4 통과).
+
+## 사용자 정의 함수 (`function_create` / `function_create_value`)
+
+Entry는 사용자 함수를 지원한다. 정의는 `project.functions[]`에 들어가고, 호출은
+**합성 타입** `func_<함수id>`로 한다.
+
+### project.functions 항목 shape
+
+```json
+{
+  "id": "fib",                         // 함수 id (4~32자 영숫자)
+  "type": "value",                     // "normal" (void) | "value" (값 반환)
+  "localVariables": [],
+  "useLocalVariables": false,
+  "content": "<JSON.stringify된 thread 배열>"
+}
+```
+
+`content`는 `object.script` 와 동일한 shape: 2-D 블록 배열을 stringify. make-ent.mjs는
+`functions[*].content`가 array 면 자동 stringify, string 이면 그대로 통과.
+
+### 함수 정의 thread 구조
+
+함수 본문은 `content[0][0]` 위치에 단 하나의 `function_create` (또는 `function_create_value`) 블록.
+
+```
+function_create_value:
+  params:
+    [0] function_field_label
+        params: ["함수 이름", function_field_string {  // 다음 파라미터 chain
+          params: [stringParam_<paramId>, null]        // 실제 파라미터 슬롯
+        }]
+    [1] null
+    [2] null
+    [3] <return value 표현식>     // value 함수 전용
+  statements:
+    [[ 함수 본문 블록들 ]]
+```
+
+- 파라미터 슬롯 타입은 **`stringParam_<unique4>`** (또는 boolean param 의 경우 `booleanParam_<unique4>`).
+- 본문 안에서 그 파라미터를 참조할 때도 **같은 합성 타입** `stringParam_<paramId>` 블록을 재사용 (`params: []`)
+- 호출자는 `func_<함수id>` 타입 블록의 params 슬롯에 인자 값 표현식을 채워 호출
+
+### 호출자 예
+
+```json
+{
+  "type": "set_variable",
+  "params": [
+    { "__field": "result" },
+    { "type": "func_fib", "params": [
+      { "type": "get_variable", "params": ["n_input", null] }
+    ]},
+    null
+  ]
+}
+```
+
+`set_variable`의 VALUE 슬롯에 `func_fib` 호출 결과가 들어간다.
+
+### 함정 — 라벨 슬롯에 bare string 필요
+
+`function_field_label`의 첫 params (라벨 텍스트)는 **bare string**이 들어가야 한다.
+make-ent의 normalizeBlock이 일반 string을 자동으로 `text` 블록으로 wrap하므로
+`{"__field": "함수이름"}` sentinel로 감싸 unwrap을 강제해야 한다. 그렇지 않으면
+워크스페이스에서 함수 이름 자리에 `[object Object]` 출력.
+
+### 함정 — 헤드리스 재실행 시 toggleStop 은 async
+
+`Entry.engine.toggleStop()`은 변수 snapshot을 비동기로 복원
+([`engine.js:715`](../../entryjs/src/class/engine.js#L715), `Promise.all` + `loadSnapshot`).
+다음 `toggleRun()` 전에 await 하지 않으면 변수가 막 복원된 상태와 새 setValue 호출이
+경합 → 두 번째 실행부터 빈 결과. 검증 스크립트는:
+```js
+await page.evaluate(async () => {
+    if (Entry.engine.state !== 'stop') await Entry.engine.toggleStop();
+});
+// 이제 변수 setValue
+// 이후 toggleRun
+```
+
+### 회귀 가드
+
+[`tests/fixtures/spec-fibonacci.json`](../tests/fixtures/spec-fibonacci.json) — `value` 타입
+함수 + 1개 파라미터. [`tools/verify-fibonacci.mjs`](../tools/verify-fibonacci.mjs) —
+fib(0)~fib(15) 결과 + 수열 리스트 자동 검증.
 
 ## 검증 — 잘못된 블록 잡기
 

@@ -1,0 +1,84 @@
+{
+  "name": "붓으로 체력바 그리기 (slide 변수)",
+  "variables": [
+    {
+      "id": "hp",
+      "name": "체력",
+      "variableType": "slide",
+      "value": "80",
+      "minValue": 0,
+      "maxValue": 100,
+      "visible": true,
+      "x": -220,
+      "y": 120
+    }
+  ],
+  "objects": [
+    {
+      "id": "bar",
+      "name": "체력바 붓",
+      "entity": { "x": -100, "y": 100, "direction": 90, "visible": false },
+      "script": [[
+        { "type": "when_run_button_click" },
+        { "type": "hide" },
+        {
+          "type": "set_thickness",
+          "params": [20, null]
+        },
+        {
+          "type": "repeat_inf",
+          "params": [null, null],
+          "statements": [[
+            { "type": "stop_drawing" },
+            { "type": "brush_erase_all" },
+
+            { "type": "locate_xy", "params": [-100, 100, null] },
+
+            {
+              "type": "set_color",
+              "params": [
+                { "type": "color", "params": ["#00c853"] },
+                null
+              ]
+            },
+            { "type": "start_drawing" },
+            {
+              "type": "locate_xy",
+              "params": [
+                {
+                  "type": "calc_basic",
+                  "params": [
+                    -100,
+                    { "__field": "PLUS" },
+                    {
+                      "type": "calc_basic",
+                      "params": [
+                        { "type": "get_variable", "params": [{ "__field": "hp" }, null] },
+                        { "__field": "MULTI" },
+                        2
+                      ]
+                    }
+                  ]
+                },
+                100,
+                null
+              ]
+            },
+            { "type": "stop_drawing" },
+
+            {
+              "type": "set_color",
+              "params": [
+                { "type": "color", "params": ["#e53935"] },
+                null
+              ]
+            },
+            { "type": "start_drawing" },
+            { "type": "locate_xy", "params": [100, 100, null] },
+            { "type": "stop_drawing" }
+          ]]
+        }
+      ]]
+    }
+  ]
+}

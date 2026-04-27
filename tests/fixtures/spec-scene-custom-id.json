@@ -1,0 +1,13 @@
+{
+  "name": "커스텀 scene id 테스트",
+  "scenes": [{ "id": "zzzz", "name": "내 장면" }],
+  "objects": [
+    {
+      "name": "테스트",
+      "script": [[
+        { "type": "when_run_button_click" },
+        { "type": "move_direction", "params": [10, null] }
+      ]]
+    }
+  ]
+}

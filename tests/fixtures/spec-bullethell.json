@@ -1,0 +1,299 @@
+{
+  "name": "탄막 피하기 (3 장면)",
+  "scenes": [
+    { "id": "menu", "name": "시작 화면" },
+    { "id": "play", "name": "게임 화면" },
+    { "id": "result", "name": "결과 화면" }
+  ],
+  "variables": [
+    {
+      "id": "hp",
+      "name": "체력",
+      "variableType": "variable",
+      "value": "3",
+      "visible": true,
+      "x": -220,
+      "y": 120
+    },
+    {
+      "id": "survive",
+      "name": "생존시간",
+      "variableType": "variable",
+      "value": "0",
+      "visible": true,
+      "x": 90,
+      "y": 120
+    }
+  ],
+  "messages": [
+    { "id": "hit", "name": "피격" }
+  ],
+  "objects": [
+
+    { "id": "menu_title",
+      "name": "타이틀",
+      "scene": "menu",
+      "pictures": [{
+        "id": "title_pic",
+        "fileurl": "/images/mascot/bot205-hello.svg",
+        "imageType": "svg",
+        "dimension": { "width": 200, "height": 240 }
+      }],
+      "entity": { "x": 0, "y": 50, "scaleX": 0.6, "scaleY": 0.6, "direction": 90 },
+      "script": [[
+        { "type": "when_scene_start" },
+        { "type": "dialog_time", "params": [
+          "탄막을 피해서 오래 살아남아라!", 3, { "__field": "speak" }, null ]}
+      ]]
+    },
+
+    { "id": "start_btn",
+      "name": "시작 버튼",
+      "scene": "menu",
+      "pictures": [{
+        "id": "start_btn_pic",
+        "fileurl": "/images/game/block.svg",
+        "imageType": "svg",
+        "dimension": { "width": 100, "height": 100 }
+      }],
+      "entity": { "x": 0, "y": -90, "scaleX": 1.6, "scaleY": 0.8, "direction": 90 },
+      "script": [
+        [
+          { "type": "when_scene_start" },
+          { "type": "dialog", "params": [
+            "게임 시작 (여기를 클릭)", { "__field": "speak" }, null ]}
+        ],
+        [
+          { "type": "when_object_click" },
+          { "type": "set_variable", "params": [ { "__field": "hp" }, 3, null ] },
+          { "type": "start_scene", "params": [ { "__field": "play" }, null ] }
+        ]
+      ]
+    },
+
+
+    { "id": "player",
+      "name": "플레이어",
+      "scene": "play",
+      "pictures": [{
+        "id": "player_pic",
+        "fileurl": "/images/mascot/bot205-idle.svg",
+        "imageType": "svg",
+        "dimension": { "width": 200, "height": 240 }
+      }],
+      "entity": { "x": 0, "y": -80, "scaleX": 0.35, "scaleY": 0.35, "direction": 90 },
+      "script": [
+
+        [
+          { "type": "when_scene_start" },
+          { "type": "set_variable", "params": [ { "__field": "hp" }, 3, null ] },
+          { "type": "locate_xy", "params": [ 0, -80, null ] },
+          { "type": "show" },
+          { "type": "choose_project_timer_action", "params": [null, { "__field": "RESET" }, null, null] },
+          { "type": "choose_project_timer_action", "params": [null, { "__field": "START" }, null, null] }
+        ],
+
+
+        [
+          { "type": "when_scene_start" },
+          { "type": "repeat_inf", "params": [null, null], "statements": [[
+
+            { "type": "_if", "params": [
+              { "type": "boolean_and_or", "params": [
+                { "type": "is_press_some_key", "params": [ { "__field": "37" }, null ] },
+                { "__field": "AND" },
+                { "type": "boolean_basic_operator", "params": [
+                  { "type": "coordinate_object", "params": [null, { "__field": "self" }, null, { "__field": "x" }] },
+                  { "__field": "GREATER" },
+                  -220
+                ]}
+              ]},
+              null
+            ], "statements": [[
+              { "type": "move_x", "params": [ -4, null ] }
+            ]]},
+
+            { "type": "_if", "params": [
+              { "type": "boolean_and_or", "params": [
+                { "type": "is_press_some_key", "params": [ { "__field": "39" }, null ] },
+                { "__field": "AND" },
+                { "type": "boolean_basic_operator", "params": [
+                  { "type": "coordinate_object", "params": [null, { "__field": "self" }, null, { "__field": "x" }] },
+                  { "__field": "LESS" },
+                  220
+                ]}
+              ]},
+              null
+            ], "statements": [[
+              { "type": "move_x", "params": [ 4, null ] }
+            ]]},
+
+            { "type": "_if", "params": [
+              { "type": "boolean_and_or", "params": [
+                { "type": "is_press_some_key", "params": [ { "__field": "38" }, null ] },
+                { "__field": "AND" },
+                { "type": "boolean_basic_operator", "params": [
+                  { "type": "coordinate_object", "params": [null, { "__field": "self" }, null, { "__field": "y" }] },
+                  { "__field": "LESS" },
+                  115
+                ]}
+              ]},
+              null
+            ], "statements": [[
+              { "type": "move_y", "params": [ 4, null ] }
+            ]]},
+
+            { "type": "_if", "params": [
+              { "type": "boolean_and_or", "params": [
+                { "type": "is_press_some_key", "params": [ { "__field": "40" }, null ] },
+                { "__field": "AND" },
+                { "type": "boolean_basic_operator", "params": [
+                  { "type": "coordinate_object", "params": [null, { "__field": "self" }, null, { "__field": "y" }] },
+                  { "__field": "GREATER" },
+                  -115
+                ]}
+              ]},
+              null
+            ], "statements": [[
+              { "type": "move_y", "params": [ -4, null ] }
+            ]]}
+          ]]}
+        ],
+
+
+        [
+          { "type": "when_scene_start" },
+          { "type": "repeat_inf", "params": [null, null], "statements": [[
+            { "type": "_if", "params": [
+              { "type": "boolean_basic_operator", "params": [
+                { "type": "get_variable", "params": [ { "__field": "hp" }, null ] },
+                { "__field": "LESS_OR_EQUAL" },
+                0
+              ]},
+              null
+            ], "statements": [[
+              { "type": "choose_project_timer_action", "params": [null, { "__field": "STOP" }, null, null] },
+              { "type": "set_variable", "params": [
+                { "__field": "survive" },
+                { "type": "get_project_timer_value", "params": [null] },
+                null
+              ]},
+              { "type": "start_scene", "params": [ { "__field": "result" }, null ] }
+            ]]}
+          ]]}
+        ],
+
+
+        [
+          { "type": "when_message_cast", "params": [null, { "__field": "hit" }] },
+          { "type": "change_variable", "params": [ { "__field": "hp" }, -1, null ] }
+        ]
+      ]
+    },
+
+
+    { "id": "bullet",
+      "name": "총알",
+      "scene": "play",
+      "pictures": [{
+        "id": "bullet_pic",
+        "fileurl": "/images/game/poop.svg",
+        "imageType": "svg",
+        "dimension": { "width": 100, "height": 100 }
+      }],
+      "entity": { "x": 0, "y": 200, "scaleX": 0.4, "scaleY": 0.4, "direction": 90, "visible": false },
+      "script": [
+
+        [
+          { "type": "when_scene_start" },
+          { "type": "hide" },
+          { "type": "remove_all_clones" },
+          { "type": "wait_second", "params": [1, null] },
+          { "type": "repeat_inf", "params": [null, null], "statements": [[
+            { "type": "create_clone", "params": [ { "__field": "self" }, null ] },
+            { "type": "wait_second", "params": [0.6, null] }
+          ]]}
+        ],
+
+
+        [
+          { "type": "when_clone_start" },
+          { "type": "show" },
+          { "type": "locate_xy", "params": [
+            { "type": "calc_rand", "params": [null, -220, null, 220, null] },
+            140,
+            null
+          ]},
+          { "type": "see_angle_object", "params": [ { "__field": "player" }, null ] },
+          { "type": "repeat_inf", "params": [null, null], "statements": [[
+            { "type": "move_direction", "params": [3, null] },
+
+            { "type": "_if", "params": [
+              { "type": "reach_something", "params": [ { "__field": "player" }, null ] },
+              null
+            ], "statements": [[
+              { "type": "message_cast", "params": [ { "__field": "hit" }, null ] },
+              { "type": "delete_clone" }
+            ]]},
+
+            { "type": "_if", "params": [
+              { "type": "boolean_basic_operator", "params": [
+                { "type": "coordinate_object", "params": [null, { "__field": "self" }, null, { "__field": "y" }] },
+                { "__field": "LESS" },
+                -150
+              ]},
+              null
+            ], "statements": [[
+              { "type": "delete_clone" }
+            ]]}
+          ]]}
+        ]
+      ]
+    },
+
+
+    { "id": "result_title",
+      "name": "결과",
+      "scene": "result",
+      "pictures": [{
+        "id": "result_pic",
+        "fileurl": "/images/mascot/bot205-idle.svg",
+        "imageType": "svg",
+        "dimension": { "width": 200, "height": 240 }
+      }],
+      "entity": { "x": 0, "y": 60, "scaleX": 0.5, "scaleY": 0.5, "direction": 90 },
+      "script": [[
+        { "type": "when_scene_start" },
+        { "type": "dialog", "params": [ "게임 오버! 생존시간을 확인하세요.", { "__field": "speak" }, null ] }
+      ]]
+    },
+
+    { "id": "restart_btn",
+      "name": "다시 하기",
+      "scene": "result",
+      "pictures": [{
+        "id": "restart_pic",
+        "fileurl": "/images/game/block.svg",
+        "imageType": "svg",
+        "dimension": { "width": 100, "height": 100 }
+      }],
+      "entity": { "x": 0, "y": -90, "scaleX": 1.6, "scaleY": 0.8, "direction": 90 },
+      "script": [
+        [
+          { "type": "when_scene_start" },
+          { "type": "dialog", "params": [
+            "다시 하기 (여기를 클릭)", { "__field": "speak" }, null ]}
+        ],
+        [
+          { "type": "when_object_click" },
+          { "type": "start_scene", "params": [ { "__field": "menu" }, null ] }
+        ]
+      ]
+    }
+  ],
+  "interface": {
+    "canvasWidth": 640,
+    "menuWidth": 280,
+    "object": "start_btn"
+  }
+}

@@ -1,0 +1,41 @@
+# Lessons — 해결된 버그의 짧은 기록
+
+이 저장소에서 겪었던 버그·함정 중 **구조적으로 해결되어 재발할 수 없는 것들**을
+한 줄씩, 가드(guard) 링크와 함께. 재발 시 바로 관련 파일을 찾을 수 있도록.
+
+원본 상세는 `CHANGELOG.md` 또는 `git log` 에서. 항목 포맷:
+`- [YYYY-MM-DD] 증상 한 줄 — 가드: <파일:줄 or 메커니즘>`
+
+---
+
+## 편집기 부팅
+
+- [2026-04-23] SoundJS `_parsePath`가 undefined src로 crash — 가드: [`public/js/editor.js`](../public/js/editor.js) `patchCreateJSSoundParsePath` (defensive wrapper)
+- [2026-04-23] preload-js npm dist 말미의 `;module.exports=window.createjs;`가 브라우저에서 `module is not defined` — 가드: [`scripts/setup.mjs`](../scripts/setup.mjs) perl strip
+- [2026-04-23] 하드웨어 모듈이 `ws://127.0.0.1:23518` 연결 실패 로그 스팸 — 가드: [`editor.js`](../public/js/editor.js) init option `hardwareEnable: false`
+- [2026-04-23] `/images/*`와 `/lib/entry-js/images/*` 404 (Entry가 두 경로 모두 요청) — 가드: [`scripts/setup.mjs`](../scripts/setup.mjs) 양쪽에 복사
+- [2026-04-23] `Entry.engine.toggleRun()`이 tickEnabled 에러로 간헐 crash (헤드리스) — 가드: [`tools/lib/editor-harness.mjs`](../tools/lib/editor-harness.mjs) try/catch 래핑
+
+## `.ent` 로드 · 렌더
+
+- [2026-04-23] 오브젝트 썸네일이 회색 박스 — 가드: [`lib/asset-bundler.js`](../lib/asset-bundler.js) thumbUrl 필드 생략 + PNG 래스터라이즈 (playentry 포맷 준수)
+- [2026-04-23] `addChildAt(undefined)` — `interface.object=null` 또는 `script="[]"` 때문 — 가드: [`tools/make-ent.mjs`](../tools/make-ent.mjs) 기본값 (`interface.object = objects[0].id`, `script` 최소 `"[[]]"`)
+- [2026-04-23] 이미지 404 (tar 업로드 시 SVG 원본 누락) — 가드: [`tools/make-ent.mjs`](../tools/make-ent.mjs) 자산 자동 번들링 (`fileurl: /…`를 `resolveLocalPath` → sharp → tar 포함)
+- [2026-04-23] SVG 이미지가 playentry.org 업로드 후 안 보임 — 가드: [`lib/asset-bundler.js`](../lib/asset-bundler.js) sharp로 모든 이미지 PNG 래스터라이즈
+- [2026-04-24] 첫 scene id가 `"7dwq"` 아니면 crash한다는 오래된 미신 — 정정: `clearProject()` 선행만 보장되면 무관. 가드: 회귀 fixture [`tests/fixtures/spec-scene-custom-id.json`](../tests/fixtures/spec-scene-custom-id.json) (`zzzz` id 로 로드 통과)
+
+## 블록 스크립트
+
+- [2026-04-23] 블록 `params` 개수가 registry와 불일치해 런타임 경고 블록 표시 — 가드: [`tests/smoke.test.js`](../tests/smoke.test.js) `walkBlocks` 검증 (registry paramCount vs spec params.length)
+- [2026-04-23] 필드 슬롯 (Dropdown) 에 text 블록 넣으면 매칭 실패 — 가드: [`tools/make-ent.mjs`](../tools/make-ent.mjs) `{"__field": "x"}` sentinel → `wrapParam` 에서 bare string 으로 언래핑
+- [2026-04-23] 리터럴 블록(`number`/`text`/`True` 등)의 params 가 재귀 래핑되어 `[object Object]` 렌더 — 가드: [`tools/make-ent.mjs`](../tools/make-ent.mjs) `PRIMITIVE_BLOCK_TYPES` set 으로 leaf 처리
+- [2026-04-24] `dialog` 블록 text 슬롯에 숫자 값을 넘기면 `this._text.replace is not a function` crash → 이 crash가 scene 전환도 망가뜨려 디버깅 어려움 — 가드: 정적 문자열만 dialog에, 숫자는 `show_variable` 로 분리 ([04-script-and-blocks.md §dialog + 숫자 값](04-script-and-blocks.md#주의-dialog--숫자-값))
+
+---
+
+## 재발 시 재구성 절차
+
+1. 가드 파일/줄이 **실제로 작동 중인지** 확인 (리팩터 중 제거됐을 수 있음)
+2. 가드가 망가졌으면 복원 또는 동등한 보호 장치 추가
+3. 새로운 실패 패턴이면 → [07-runtime-quirks.md](07-runtime-quirks.md)(Entry 엔진 고유 동작) 에 추가. 구조적으로 해결할 수 없는 활성 함정이 쌓이면 `06-gotchas.md`를 신설
+4. 해결 시 이 파일에 1줄로 요약

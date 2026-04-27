@@ -1,0 +1,163 @@
+{
+  "name": "함수로 만든 피보나치 수열",
+  "variables": [
+    { "id": "n_input",  "name": "입력 n",   "value": "10",
+      "variableType": "slide", "minValue": 0, "maxValue": 30,
+      "visible": true, "x": -220, "y": 120 },
+    { "id": "result",   "name": "결과",    "value": "0",
+      "visible": true,  "x": -220, "y":  90 },
+    { "id": "fib_a",    "name": "fib_a",   "value": "0", "visible": false },
+    { "id": "fib_b",    "name": "fib_b",   "value": "1", "visible": false },
+    { "id": "fib_temp", "name": "fib_temp","value": "0", "visible": false }
+  ],
+  "lists": [
+    { "id": "fib_seq", "name": "수열",
+      "isCloud": false, "visible": true,
+      "x": 90, "y": 30, "width": 120, "height": 200, "array": [] }
+  ],
+  "functions": [
+    {
+      "id": "fib",
+      "type": "value",
+      "localVariables": [],
+      "useLocalVariables": false,
+      "content": [[
+        {
+          "id": "fcv0", "x": 50, "y": 30,
+          "type": "function_create_value",
+          "params": [
+            {
+              "id": "lbl0", "x": 0, "y": 0,
+              "type": "function_field_label",
+              "params": [{ "__field": "피보나치" }, {
+                "id": "fst0", "x": 0, "y": 0,
+                "type": "function_field_string",
+                "params": [
+                  { "id": "fps0", "x": 0, "y": 0, "type": "stringParam_pn00", "params": [] },
+                  null
+                ]
+              }]
+            },
+            null,
+            null,
+            { "type": "get_variable", "params": [ "fib_a", null ] }
+          ],
+          "statements": [[
+            { "type": "set_variable", "params": [
+              { "__field": "fib_a" }, { "type": "number", "params": ["0"] }, null
+            ]},
+            { "type": "set_variable", "params": [
+              { "__field": "fib_b" }, { "type": "number", "params": ["1"] }, null
+            ]},
+            {
+              "type": "repeat_basic",
+              "params": [
+                { "type": "stringParam_pn00", "params": [] },
+                null
+              ],
+              "statements": [[
+                { "type": "set_variable", "params": [
+                  { "__field": "fib_temp" },
+                  { "type": "calc_basic", "params": [
+                    { "type": "get_variable", "params": [ "fib_a", null ] },
+                    { "__field": "PLUS" },
+                    { "type": "get_variable", "params": [ "fib_b", null ] }
+                  ]}, null
+                ]},
+                { "type": "set_variable", "params": [
+                  { "__field": "fib_a" },
+                  { "type": "get_variable", "params": [ "fib_b", null ] }, null
+                ]},
+                { "type": "set_variable", "params": [
+                  { "__field": "fib_b" },
+                  { "type": "get_variable", "params": [ "fib_temp", null ] }, null
+                ]}
+              ]]
+            }
+          ]]
+        }
+      ]]
+    }
+  ],
+  "objects": [
+    {
+      "id": "runner",
+      "name": "실행기",
+      "pictures": [{
+        "id": "runner_pic",
+        "fileurl": "/images/mascot/bot205-hello.svg",
+        "imageType": "svg",
+        "dimension": { "width": 200, "height": 240 }
+      }],
+      "entity": { "x": -50, "y": -40, "scaleX": 0.4, "scaleY": 0.4, "direction": 90 },
+      "script": [[
+        { "type": "when_run_button_click" },
+
+        {
+          "type": "repeat_basic",
+          "params": [
+            { "type": "length_of_list", "params": [null, { "__field": "fib_seq" }, null] },
+            null
+          ],
+          "statements": [[
+            { "type": "remove_value_from_list", "params": [
+              { "type": "number", "params": ["1"] },
+              { "__field": "fib_seq" },
+              null
+            ]}
+          ]]
+        },
+
+        { "type": "set_variable", "params": [
+          { "__field": "result" },
+          { "type": "func_fib", "params": [
+            { "type": "get_variable", "params": [ "n_input", null ] }
+          ]},
+          null
+        ]},
+
+        { "type": "set_variable", "params": [
+          { "__field": "fib_a" }, { "type": "number", "params": ["0"] }, null
+        ]},
+        { "type": "set_variable", "params": [
+          { "__field": "fib_b" }, { "type": "number", "params": ["1"] }, null
+        ]},
+        {
+          "type": "repeat_basic",
+          "params": [
+            { "type": "get_variable", "params": [ "n_input", null ] },
+            null
+          ],
+          "statements": [[
+            { "type": "add_value_to_list", "params": [
+              { "type": "get_variable", "params": [ "fib_a", null ] },
+              { "__field": "fib_seq" },
+              null
+            ]},
+            { "type": "set_variable", "params": [
+              { "__field": "fib_temp" },
+              { "type": "calc_basic", "params": [
+                { "type": "get_variable", "params": [ "fib_a", null ] },
+                { "__field": "PLUS" },
+                { "type": "get_variable", "params": [ "fib_b", null ] }
+              ]}, null
+            ]},
+            { "type": "set_variable", "params": [
+              { "__field": "fib_a" },
+              { "type": "get_variable", "params": [ "fib_b", null ] }, null
+            ]},
+            { "type": "set_variable", "params": [
+              { "__field": "fib_b" },
+              { "type": "get_variable", "params": [ "fib_temp", null ] }, null
+            ]}
+          ]]
+        }
+      ]]
+    }
+  ],
+  "interface": {
+    "canvasWidth": 640,
+    "menuWidth": 280,
+    "object": "runner"
+  }
+}
