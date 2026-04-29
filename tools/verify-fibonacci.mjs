@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 // 함수(function_create_value)로 정의된 피보나치 계산을 런타임에 검증.
+// Tier-1 데모: editor-harness + verify-harness 의 공유 헬퍼만 사용.
 //
-// 시나리오:
-//   1. fibonacci.ent 로드
-//   2. n_input = 0, 1, 5, 10, 15 각각 세팅 후 toggleRun
-//   3. '결과' 변수가 fib(n) 과 일치하는지 확인
-//   4. '수열' 리스트가 [fib(0), fib(1), ..., fib(n-1)] 과 일치하는지 확인
+// 시나리오: n ∈ {0, 1, 2, 5, 10, 15} 각 값에 대해 toggleRun → fib(n) 결과 +
+// 수열 리스트가 정확한지 확인.
 //
 // 사전 조건: npm start.
 
 import path from 'node:path';
 import url from 'node:url';
 import { bootEditor, loadFixture } from './lib/editor-harness.mjs';
+import {
+    runFresh, getVar, getList,
+    waitForVar, createReporter,
+} from './lib/verify-harness.mjs';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const FIXTURE   = path.resolve(__dirname, '..', 'tests/fixtures/fibonacci.ent');
@@ -29,14 +31,7 @@ function fibSeq(n) {
     return out;
 }
 
-let browser, page, errs;
-try {
-    ({ browser, page, pageErrors: errs } = await bootEditor());
-} catch (e) {
-    console.error('error:', e.message);
-    process.exit(2);
-}
-
+const { browser, page, pageErrors } = await bootEditor();
 try {
     await loadFixture(page, FIXTURE);
 } catch (e) {
@@ -45,64 +40,36 @@ try {
     process.exit(3);
 }
 
-async function setN(n) {
-    await page.evaluate((n) => {
-        const v = Entry.variableContainer.variables_.find(x => x.name_ === '입력 n');
-        v.setValue(n);
-    }, n);
-}
-async function getResult() {
-    return page.evaluate(() => {
-        const v = Entry.variableContainer.variables_.find(x => x.name_ === '결과');
-        return v ? +v.getValue() : null;
-    });
-}
-async function getSeq() {
-    return page.evaluate(() => {
-        const l = Entry.variableContainer.lists_.find(x => x.name_ === '수열');
-        if (!l) return [];
-        return (l.array_ || []).map(item => +item.data);
-    });
-}
-
-let pass = true;
-const log = (ok, msg) => { console.log(ok ? '  ✓' : '  ✗', msg); if (!ok) pass = false; };
-
+const t = createReporter();
 console.log('\n=== 함수 호출 결과 검증 ===');
-const cases = [0, 1, 2, 5, 10, 15];
-for (const n of cases) {
-    // 1) toggleStop() 은 async — 변수 snapshot 복원이 끝날 때까지 await.
-    //    ([entryjs/src/class/engine.js:715] toggleStop → Promise.all + loadSnapshot)
-    // 2) snapshot 복원 후 n_input 을 새 값으로 세팅 (이 값이 다음 run 의 snapshot 이 됨)
-    // 3) toggleRun() 으로 다시 시작
-    await page.evaluate(async () => {
-        if (Entry.engine.state !== 'stop') {
-            try { await Entry.engine.toggleStop(); } catch {}
-        }
-    });
-    await setN(n);
-    await page.evaluate(() => { try { Entry.engine.toggleRun(); } catch {} });
-    await page.waitForTimeout(800 + n * 50);
 
-    const got = await getResult();
-    const seq = await getSeq();
-    const expectedFib = fib(n);
-    const expectedSeq = fibSeq(n);
+for (const n of [0, 1, 2, 5, 10, 15]) {
+    // runFresh: stopEngine(스냅샷 복원 await) → setVar(새 값) → runEngine(새 스냅샷).
+    // 이 순서가 중요 — 토글스톱이 비동기로 변수를 복원하므로 set은 stop 이후, run 이전에.
+    await runFresh(page, { '입력 n': n });
+    // 폴링 두 단계: (1) result 변수 도달, (2) 시각화 리스트가 길이 n 도달.
+    // n=0이면 result는 시작값 0과 같아 폴링이 즉시 통과 → 짧은 대기로 대체.
+    if (n === 0) {
+        await page.waitForTimeout(500);
+    } else {
+        await waitForVar(page, '결과', v => +v === fib(n), {
+            timeoutMs: 3000 + n * 100,
+        }).catch(() => {});
+        // 두 번째 repeat_basic 이 list 를 채우는 데 60fps × n 프레임이 더 걸림
+        // (반복하기는 1 프레임/iter — knowledge/07-runtime-quirks.md 참조)
+        await page.waitForTimeout(200 + n * 30);
+    }
+
+    const got = +(await getVar(page, '결과'));
+    const seq = await getList(page, '수열');
 
     console.log(`\n  n=${n}`);
-    console.log(`    result: got ${got}, expected ${expectedFib}`);
-    log(got === expectedFib, `func_fib(${n}) === ${expectedFib}`);
-
-    console.log(`    seq:    got ${JSON.stringify(seq)}`);
-    console.log(`            expected ${JSON.stringify(expectedSeq)}`);
-    log(JSON.stringify(seq) === JSON.stringify(expectedSeq),
-        `수열 리스트가 fib 첫 ${n}개와 일치`);
+    t.eq(got, fib(n),         `func_fib(${n})`);
+    t.eq(seq, fibSeq(n),      `수열[0..${n})`);
 }
 
-console.log('\n=== 종합 ===');
-console.log(`pageErrors: ${errs.length}`);
-if (errs.length) for (const e of errs.slice(0, 5)) console.log(' -', e);
-console.log(pass ? '\n✓ 함수 정의 + 호출 + 재귀적 계산 모두 통과' : '\n✗ 일부 검증 실패');
+console.log(`\npageErrors: ${pageErrors.length}`);
+if (pageErrors.length) for (const e of pageErrors.slice(0, 5)) console.log(' -', e);
 
 await browser.close();
-process.exit(pass ? 0 : 4);
+process.exit(t.summary());
