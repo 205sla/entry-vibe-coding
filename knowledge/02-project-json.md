@@ -5,7 +5,7 @@ tar 내부에 있는 유일한 JSON 파일. 프로젝트의 모든 상태가 여
 ## 최상위 키
 
 [`entryjs/src/class/project.js:76`](../../entryjs/src/class/project.js#L76) `Entry.getStartProject()`와
-레퍼런스 [`Downloads/260423_작품.ent`](../../../Downloads/260423_작품.ent)에서 관찰한 내용을 합쳤다.
+레퍼런스 `C:\Users\young\Downloads\260423_작품.ent` (저장소 외부, 사용자 로컬)에서 관찰한 내용을 합쳤다.
 
 ### 필수
 

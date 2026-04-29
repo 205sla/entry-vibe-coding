@@ -12,6 +12,359 @@
 > - 플랫포머 발판 충돌 패턴 → `04-script-and-blocks.md §플랫포머 발판 충돌 패턴`
 > - 헤드리스 런타임 검증 → `05-host-editor.md §헤드리스 런타임 검증`
 
+## 2026-04-29 — 디펜스 게임 시리즈 회고 (frontier-guard Phase 1 → 3.2)
+
+7 단계 작업 통합 회고. 자세한 항목별 history 는 아래 각 phase 참조. 본 entry 는 cross-cutting 학습 정리 — 컨텍스트 리셋 후 재진입할 때 빠르게 컨텍스트 회복할 용도.
+
+### 작업 진행 단계
+
+| Phase | 추가 기능 | LoC 변화 | verify | 핵심 발견 |
+|---|---|---|---|---|
+| 1 (MVP) | 단일 라인 / 적 5 / 타워 2 (Archer) | spec ~250 | 18/18 | direction-as-id, when_message fan-out, 다중 cloneStart race |
+| 2 | Cannon (splash), Tank, 3 웨이브 데이터 주도 | +60 | 28/28 | 클론 타입 분기, splash AOE, multi-wave nested loop |
+| 2.1 | intro 장면, 데미지 플래시 | +50 | 35/35 | 다중 scene + sceneStart, last_hp 추적 + setEffect |
+| 3 | 빌드 슬롯 4, 메뉴, 골드, prep, 업그레이드 | +200 | 42/42 | when_message 가 template 발화 (catastrophic), wait_until 패턴 |
+| 3.1 | 공격 빔 시각화 (brush) | +30 | 44/44 | source→target brush 라인, findColoredPixels 검증 |
+| 3.2 | 슬롯 가운데 클릭 fix | +5 | 46/46 | sprite pixelPerfect, stage→canvas 좌표 변환 |
+
+최종: 12 오브젝트, 34 KB .ent, 46 자동 검증, 14 verify scripts 모두 회귀 없이 통과.
+
+### 발견된 critical 함정 (전부 [`07-runtime-quirks.md`](07-runtime-quirks.md) + [`lessons.md`](lessons.md))
+
+1. **`when_message` 핸들러가 클론에도 살아 있음** → fan-out spawn 지수적 증가
+2. **다중 `when_clone_start` 병렬 실행** → 클론 init 상태 race
+3. **`message_cast` 다중 리스너 동시 발화** → stale read race
+4. **`when_message` 가 template 에도 발화** → direction-as-id 시 invalid index lookup → scene 전체 silent 손상 (가장 catastrophic)
+5. **sprite pixelPerfect = source 알파 검사** → ring 가운데 transparent 클릭 무반응
+6. **`Entry.dispatchEvent` 는 hit-test 우회** → verify 가드만으론 실제 클릭 보장 안 됨
+7. **stage 논리 480×270 ≠ canvas 픽셀 640×360** → 좌표 변환 1:1 가정 fixture 마다 어긋남
+8. **`deleteClone` 후 후속 블록 무실행** → if_else 분기 필수
+
+### 수립된 패턴 (전부 [`04-script-and-blocks.md`](04-script-and-blocks.md))
+
+1. **direction-as-id** — 클론 좌표 unique 못할 때 entity.direction 으로 id 캐시
+2. **list 슬롯 broadcast** — 클론별 상태를 글로벌 list[id] 슬롯에
+3. **manager-as-spawner** — `createClone('other_id')` 직접 호출 (메시지 fan-out 회피)
+4. **multi-type 클론** — `enemy_type[id]` 슬롯 + 데이터 주도 stat 룩업 (`type_hp`, `type_size`)
+5. **데이터 주도 다중 웨이브** — `wave_counts[]` + `wave_types[]` flat list, manager nested loop
+6. **Splash AOE** — 타겟 좌표 캡처 → 활성 슬롯 재순회 + 반경 dmg
+7. **데미지 플래시** — `enemy_last_hp[id]` drop 감지 + `setEffect('brightness', 60)` 펄스
+8. **공격 빔 시각화** — manager 의 brush 가 매 cooldown source→target 라인, color/thickness 로 종류 구분
+9. **HUD 변화 감지** — `last_shown` 변수 비교로 flicker 회피
+10. **wait_until 패턴** — `repeat.inf + if cond stopRepeat`
+11. **빌드 슬롯 시스템** — 1 template + N 클론, 다중 picture, 메뉴 메시지 동기화
+12. **direction 범위 가드** — message handler 가 template 까지 발화하므로 `if_(coord('self','direction') <= N)` 가드 필수
+
+### 메타-패턴 (개발 프로세스 — [`04-script-and-blocks.md` §대규모 게임 빌드](04-script-and-blocks.md#대규모-게임-빌드--스코프-분할--bisect-디버깅--회귀-가드-레이어))
+
+1. **새 패턴 검증 ↔ 기능 추가 분리**: unfamiliar 인프라 (direction-as-id, brush 시각화 등) 는 작은 fixture 로 먼저 검증. 이후 기능 추가는 합쳐도 OK.
+2. **catastrophic bug 의 bisect 디버깅**: minimal handler (`setVar dbg1, 1`) 부터 점진 추가. dbg 변수 + dump 으로 어떤 블록이 손상 trigger 인지 격리.
+3. **회귀 가드 4 레이어**: `--check` (정적, 1 초) → 빌드 → smoke (로드) → runtime (playwright). 마지막 layer 는 `dispatchEvent` (핸들러 로직) + `page.mouse.click` (실제 hit-test) + `findColoredPixels` (시각) 의 조합.
+
+### 디펜스 게임 = 종합 reference fixture
+
+frontier-guard 는 위 12 패턴 + 8 함정 회피 + 다중 scene 모두 한 spec 안에. 새 게임 만들 때 시작점/참고 fixture 로 활용.
+
+- [`tests/fixtures/spec-frontier-guard.mjs`](../tests/fixtures/spec-frontier-guard.mjs) — 740 LoC, 12 objects
+- [`tools/verify-frontier-guard.mjs`](../tools/verify-frontier-guard.mjs) — 46 자동 검증 (정적 + 픽셀 + 좌표)
+- [`tools/screenshot-frontier-guard.mjs`](../tools/screenshot-frontier-guard.mjs) — 8 단계 시각 디버깅 도구
+
+## 2026-04-29 — 프론티어 가드 Phase 3.2 (slot 가운데 클릭 fix + 좌표 매핑 수정)
+
+- [x] **빈 슬롯 가운데 클릭 무반응 fix**. 사용자 보고: ring 모양 슬롯의 가운데가 시각적으로 비어있는데 클릭 안 됨. 원인: sprite 도 textBox 처럼 `pixelPerfect = true` ([entity.js:46](../../entryjs/src/class/entity.js#L46)) — source 픽셀 알파 검사. `ring(22, 16)` 의 가운데 16px 가 투명 → hit 실패. `setEffect('transparency', N)` 효과는 렌더링 단계라 source 알파에 영향 없음.
+  해결: `circle(20, '#94a3b8')` (filled disc) 로 변경 + `setEffect('transparency', 70)` 으로 시각 ghost. source 픽셀 전체 알파 ≥ 1, 가운데 클릭 가능.
+  정본: [`07-runtime-quirks.md` sprite pixelPerfect](07-runtime-quirks.md#sprite-도-pixelperfect--투명-픽셀-ring-가운데-등-클릭-안-됨).
+
+- [x] **클릭 회귀 가드 — 실제 stage point click**. `Entry.dispatchEvent('entityClick', e)` 는 pixel hit-test 우회 → verify 통과해도 실제 사용자 클릭이 실패할 수 있음. `page.mouse.click(px, py)` + canvas 좌표 변환으로 진짜 hit-test 검증 (Step 1b).
+  좌표 매핑: stage logical 480x270 → canvas (예: 640x360) 픽셀로 scale 후 DOM rect 적용. textbox-click 의 매핑 함수가 stage=canvas 1:1 가정해 작동했지만, 우리 fixture 의 canvas 가 다른 비율 → scale 적용 필요. clickStagePoint 헬퍼 수정.
+
+- [x] **검증 46/46 pass** (Phase 3.1 44 → Phase 3.2 46). Step 1b 의 빈 슬롯 가운데 픽셀 클릭 → menu_state=1 + building_slot=1 회귀 가드.
+
+## 2026-04-29 — 프론티어 가드 Phase 3.1 (공격 빔 시각화)
+
+- [x] **공격 빔 시각화** — manager 의 brush 가 매 cooldown cycle 마다 (tower_x, tower_y) → (target_x, target_y) 라인 그림. archer 노란 (`#fbbf24`, thickness 2), cannon 주황 (`#f97316`, thickness 3). cycle 시작 시 `eraseAll()` → 0.5 초 동안 visible 후 새 cycle 에서 redraw. 게임 종료 (win/lose) 시 별도 listener 가 `eraseAll`.
+- [x] **`drawBeam` 헬퍼** — `setColor` + `setThickness` + `locateXY(source)` + `startDraw` + `locateXY(target)` + `stopDraw`. archerTick / cannonTick 둘 다 사용.
+- [x] **검증**: `findColoredPixels(page, '#fbbf24')` 로 노란 빔, `'#f97316'` 으로 주황 빔 검출. cooldown 안에서 짧은 폴링으로 catch (44/44 pass).
+- [x] 정본: [`04-script-and-blocks.md` 공격 빔 시각화](04-script-and-blocks.md#공격-빔-시각화--manager-단일-sprite-의-brush-로-sourcetarget-라인).
+
+## 2026-04-29 — 프론티어 가드 Phase 3 (풀 빌드 시스템: 슬롯 + 골드 + 업그레이드 + 준비 시간)
+
+- [x] **Phase 3 풀 빌드 시스템** [`spec-frontier-guard.mjs`](../tests/fixtures/spec-frontier-guard.mjs).
+  Phase 2.1 의 자동 진행 → 플레이어가 능동적으로 타워를 배치/업그레이드하는 진짜 게임:
+  - **빌드 슬롯 4 개** (slot_template 1 + 4 클론, direction = id 1..4). 초기 비어있음 (`pic_empty` ring), 클릭 시 메뉴.
+  - **빌드 메뉴**: 3 textBox (`menu_btn1/2/cancel`). 슬롯 상태에 따라 동적 텍스트 — 빈 슬롯이면 "궁수 50G / 대포 80G / 취소", Lv1 슬롯이면 "업그레이드 40G / (숨김) / 취소". 메시지 (`open_menu` / `close_menu` / `refresh_slot`) 로 동기화.
+  - **골드 시스템**: 초기 100G, 적 처치 시 +10 (스웜) / +30 (탱크), 빌드/업그레이드 시 차감. HUD 변수 표시.
+  - **준비 단계**: 게임 시작 후 manager 가 `prep_done == 1` 까지 대기 (repeat.inf + stopRepeat). "✓ 준비 완료" 버튼 클릭 → 첫 웨이브 spawn 시작.
+  - **Lv2 업그레이드**: archer 8→12 dmg, cannon 4→7 dmg. 시각적으로 brightness +30. 데이터 주도 룩업 (`archer_dmg[level]`).
+  - **타워 타겟팅 리팩터**: manager 가 슬롯 4 개 순회, type/level 별 분기. 임시 변수 (`cur_tx, cur_ty, cur_dmg`) 로 dynamic stat 전달.
+  - 검증 42/42 pass — 슬롯 spawn, 메뉴 동작, 골드 부족 (구매 실패), 업그레이드, prep flow, 적 처치 골드 보상, WIN/LOSE.
+
+- [x] **새 함정 발견 + 회피**: **`when_message` 핸들러가 template 에도 발화 — direction-as-id 시 invalid index lookup 으로 scene 전체 손상**.
+  template 의 default direction (90) 으로 list 룩업 시 silent error → scene reset 같은 catastrophic 증상 (cloneCount → 0, 모든 변수 default, 클릭 핸들러 발화 안 함). bisect 디버깅으로 정확한 원인 (refresh_slot 의 template 발화) 식별. 회피: `if_(cmp(coord('self','direction'), '<=', SLOT_COUNT), [...])` 가드로 template 분기 차단.
+  정본: [`07-runtime-quirks.md` template 발화 가드](07-runtime-quirks.md#when_message-핸들러가-template-에도-발화--direction-as-id-시-invalid-index-lookup-으로-scene-전체-손상).
+
+- [x] **메뉴 닫힘 시 글로벌 상태 리셋**. menu_state / building_slot 은 close_menu 메시지 발신 시 manager 의 별도 listener 가 0 으로 reset — textBox 의 hide 와 분리한 글로벌 정리 책임.
+
+## 2026-04-29 — 프론티어 가드 Phase 2.1 (intro 장면 + 데미지 플래시)
+
+- [x] **intro 장면** — 제목 ("프론티어 가드") + 설명 (3 줄 게임 룰) + 시작 버튼 ("▶ 게임 시작", 녹색 textBox).
+  버튼 클릭 → `startScene('play')` 로 게임 진입. 모든 게임 오브젝트 (`hud_status`, `base`, `tower_*`, `enemy`, `manager`) 는 `scene: 'play'` + 트리거 `when.sceneStart()` (이전 `when.run()` 대체).
+- [x] **데미지 플래시** — 적이 공격받으면 brightness 60 으로 0.08 초 펄스. `enemy_last_hp` 리스트로 직전 tick hp 추적, forever 루프에서 `current < last` 면 `setEffect` 펄스 + `wait(0.08)` 스태거. 동시 다중 데미지 (cannon splash + archer 같은 tick) 도 setEffect (absolute) 라 누적 안 됨.
+  정본: [`04-script-and-blocks.md` 데미지 플래시](04-script-and-blocks.md#데미지-플래시--enemy_last_hp-리스트로-hp-drop-감지--seteffect-펄스).
+- [x] **검증 35/35 pass** (Phase 2 28 → Phase 2.1 35). intro 장면 sceneId 검증, 시작 버튼 텍스트 검증, 클릭 후 sceneId='play' 검증, brightness 60 직접 catch (10ms 폴링), last_hp ↔ hp sync 검증.
+- [x] **다중 클론 효과 누적 회피**: `setEffect('brightness', N)` 는 absolute (= `change_effect_amount`). `addEffect` (= `add_effect_amount`) 와 달리 펄스가 누적 안 됨 — 다중 hit 받아도 한 번의 펄스로 안전.
+
+## 2026-04-29 — 프론티어 가드 Phase 2 (확장 TD: cannon + tank + 3 웨이브)
+
+- [x] **Phase 2 확장** [`spec-frontier-guard.mjs`](../tests/fixtures/spec-frontier-guard.mjs).
+  Phase 1 (MVP — 적 5 / 타워 2) → Phase 2 (적 10 / 타워 3 / 3 웨이브 데이터 주도):
+  - **Cannon 타워** 추가 (tile-cyan): 타겟 발견 후 그 좌표 중심 SPLASH_RADIUS=50 내 모든 활성 적에 dmg 4. 군집에 강함, 단일 탱커엔 약함.
+  - **Tank 적** 추가 (ball-yellow, scale 0.55): hp 75 (3× swarm), 속도 0.6× swarm. 시각적 큰 노란 ball.
+  - **3 웨이브 데이터 시스템**: `WAVE_COUNTS = [3,3,4]` + `WAVE_TYPES` flat 리스트로 각 spawn 의 타입 표현. manager 의 nested `repeat.basic` 으로 순회. 웨이브 사이 4 초 휴식.
+  - **데이터 주도 stat**: `type_hp` / `type_size` 리스트로 인덱스 룩업. 클론 코드 변경 없이 새 적 타입 추가 가능.
+  - **HUD 웨이브 표시**: `hud_last_wave` 변수로 wave_idx 변화 감지 시에만 `writeText` (flicker 회피).
+  - 검증: 28/28 pass — id 충돌 회귀 가드, wave_types 일치 (10 슬롯), tank picId/scale/hp, cannon 구조, 활동 누적, WIN/LOSE 분기.
+
+- [x] **다중 클론 타입 패턴** ([`04-script-and-blocks.md` 클론 타입 분기](04-script-and-blocks.md#클론-타입-분기--enemy_type_listid--데이터-주도-stat-룩업)). `current_type` 변수 → `enemy_type_list[id]` slot 저장 → forever 루프에서 `valueAt('enemy_type', coord('self','direction'))` 으로 자기 타입 read → 분기. picture 토글은 `changeShape(getVar('current_type'))` 의 index 폴백으로 깔끔.
+
+- [x] **Splash AOE 패턴** ([`04-script-and-blocks.md` Splash AOE](04-script-and-blocks.md#splash-aoe--타겟-좌표-중심-반경-내-모든-활성-적)). 단일 타겟 발견 후 target 좌표 캡처 → 활성 슬롯 재순회 → splash radius 안 모두에 dmg. `findNearestEnemy` 의 `best_dist` 초기값을 `range_sq` 로 두면 사거리 필터 inline.
+
+- [x] **데이터 주도 다중 웨이브** ([`04-script-and-blocks.md` 다중 웨이브](04-script-and-blocks.md#데이터-주도-다중-웨이브--wave_counts--wave_types-flat-리스트)). `WAVE_COUNTS` (각 웨이브 적 수) + `WAVE_TYPES` (flat 적 타입 시퀀스). manager nested `repeat.basic` 으로 순회. 웨이브 별로 spawn_idx reset 안 함 — 끝까지 누적.
+
+- [x] **Splash 검증의 한계 발견**. JS 직접 클론 위치 조작 (`c.x = 0` + 리스트 강제 update) 으로 splash 다중 hit 측정 시도 → forever 루프가 매 틱 `enemy_x` 덮어써 효과 무효. 차선책: 구조 검증 (cannon 존재 + picture id) + 활동 검증 (n cd 안 hp drop 발생). 정확한 데미지 분리는 spec 만 확인 가능.
+
+## 2026-04-28 — 프론티어 가드 MVP (타워 디펜스) + 클론 함정 2 가지
+
+- [x] **프론티어 가드 MVP** [`spec-frontier-guard.mjs`](../tests/fixtures/spec-frontier-guard.mjs).
+  단일 라인 경로 + 적 5 마리 + 타워 2 대 (option a 미니 스코프). 검증 목표: 타겟팅 알고리즘 + 클론 id 패턴.
+  - 적: ball-red 클론 5 개. manager 가 2 초 간격 spawn. direction 속성 = 클론 id (1..5) — 글로벌 리스트의 슬롯 인덱스. forever 루프에서 매 틱 수동 step 이동 (`SPEED_PER_TICK = 1.5`) + 위치 broadcast + hp/도달 체크.
+  - 타워: tile-purple/cyan, 시각 전용. manager 의 forever 루프 (cooldown 0.4s) 가 양 타워에 대해 직렬로 `towerTick(tx,ty)`: list 5 슬롯 순회 → 가장 가까운 active 적 → 사거리 (130 px) 내면 hp 깎기.
+  - HUD: textBox "웨이브 1 — 적 5 마리" / "YOU WIN!" / "GAME OVER".
+  - 검증: 18/18 pass — id 충돌 회귀 가드, 클론 direction 유니크, 타워 데미지, 강제 처치 (hp=0 setListAt), WIN/LOSE 분기.
+
+- [x] **함정 1 (큰 버그): `when_message` 핸들러는 클론에도 살아있어 fan-out spawn 발생**.
+  enemy template 이 `when_message('spawn'), createClone('self')` 가지면 **기존 클론도 같은 핸들러 보유** → 메시지 1 회 발신에 (template + 기존 N 클론) × createClone = N+1 신규 클론. 첫 진단 dump 에서 cloneCount=3 vs next_id=2, 두 클론이 같은 direction (id 충돌). 회피: spawner (manager) 가 직접 `createClone('enemy')` 호출 — `create_clone` 의 dropdown 은 `'self'` 외 다른 sprite id 허용.
+  정본: [`07-runtime-quirks.md` when_message fan-out](07-runtime-quirks.md#when_message-핸들러는-클론에도-살아-있음--fan-out-spawn).
+
+- [x] **함정 2: 다중 `when_clone_start` 스크립트는 병렬 실행 → 클론 초기화 race**.
+  Script A 가 `turnAbs(getVar('next_id'))` 로 direction 캡처, Script B 가 `coord('self', 'direction')` 으로 슬롯 인덱스 read → B 가 A 보다 먼저 실행되면 default direction (90) 으로 슬롯 90 에 write (5-슬롯 리스트 범위 밖) → silently 무시. 회피: 단일 `when_clone_start` 로 통합. glide 의 부드러움 포기하고 매 틱 `moveX(SPEED_PER_TICK)` 수동 step.
+  정본: [`07-runtime-quirks.md` 다중 when_clone_start race](07-runtime-quirks.md#다중-when_clone_start-스크립트는-병렬-실행--클론-초기화-race).
+
+- [x] **DSL 추가**: `setListAt(listId, index, value)` (= `change_value_list_index`), `glideTo(sec, x, y)` (= `locate_xy_time`). 둘 다 클론별 상태/이동에 핵심. (단 frontier-guard 최종 spec 은 race 회피로 glideTo 대신 수동 moveX.)
+
+- [x] **direction-as-id 패턴 (positive)**. 클론들이 같은 좌표에서 시작해 같은 경로로 움직이는 시나리오 (TD/총알/이펙트) 는 좌표 식별 불가능 — `entity.direction` 을 per-clone id 캐시로 사용. 원형 sprite 면 시각 회전 무시 가능.
+  정본: [`04-script-and-blocks.md` direction 으로 id 저장](04-script-and-blocks.md#클론-정체-판정--direction-속성을-id-저장소로-좌표-불가능-시).
+
+## 2026-04-28 — `message_cast` 다중 리스너 race condition
+
+- [x] **`message_cast` 의 모든 리스너가 같은 frame 에 동시 시작 — 실행 순서 비보장**.
+  버그: `spec-fruit-hunt.mjs` 의 fruit_template 이 `when_message('new_stage')` 안에서 `target_idx` setVar. title 도 같은 메시지 listen 후 `target_idx` read → stale 값을 읽어 "찾아라: 사과" 라고 표시했지만 화면엔 다른 과일.
+  진단: 캡처한 화면에서 title 텍스트 ≠ 실제 spawn 된 target picture.
+  수정: 메시지 발신 전에 발신자가 변수 모두 갱신. 메시지 핸들러는 read-only.
+  정본: [`07-runtime-quirks.md` message_cast race](07-runtime-quirks.md#message_cast-핸들러는-동시-실행--같은-메시지-다중-리스너-race).
+- [x] **회귀 가드** [`verify-fruit-hunt.mjs`](../tools/verify-fruit-hunt.mjs) Step 1 — title text 의 과일 이름 ↔ target_idx 일치 검증. 19/19 pass.
+
+## 2026-04-28 — `change_to_some_shape` 매칭 우선순위 + DSL `if_else` paramCount 수정
+
+- [x] **`change_to_some_shape` 의 매칭은 id → name → index 순서** ([`object.js:342`](../../entryjs/src/class/object.js#L342) `getPicture`).
+  picture id 와 name 이 다르면 (예: `id='pic_apple'`, `name='fruit-apple'` — `assets()` 로 생성 시 흔함) 편집기 UI 가 name 만 보여 혼란. **인덱스 (1-base) 직접 전달** 이 가장 깔끔.
+- [x] **`spec-fruit-hunt.mjs` 리팩터** — `fruit_pics` list 제거, `changeShape(getVar('shape_idx'))` 직접. list 룩업 줄 + visual 혼란 해소. 18/18 그대로 통과.
+- [x] **DSL `if_else` paramCount 수정** — registry 는 3 슬롯 (`Block, Indicator, LineBreak`) 인데 DSL 이 2 슬롯만 채워서 warning 발생. `params: [_val(cond), null, null]` 로 정정.
+- [x] 정본: [`07-runtime-quirks.md` change_to_some_shape](07-runtime-quirks.md#change_to_some_shape-매칭-우선순위--id--name--index).
+
+## 2026-04-28 — 과일 사냥 (3×3 + 붓 타이머) + 클론 패턴 함정 2 가지
+
+- [x] **과일 사냥 게임** [`spec-fruit-hunt.mjs`](../tests/fixtures/spec-fruit-hunt.mjs).
+  3×3 격자에 9 과일 클론 (5 종 그라데이션 공 — 사과·바나나·포도·귤·수박). 매 라운드 정확히 2 개가 목표 — `target_pos1`/`pos2` 변수 + modulo 트릭으로 항상 다른 위치. 비-target 슬롯은 `rand(1,4) + (>= target_idx 면 +1)` 로 target 회피.
+  붓 타이머: 화면 상단에 매 프레임 erase + redraw, 시간 비례 막대 길이. <5 초 빨강 경고 + y 흔들림. `time_left = MAX_TIME - projectTimer.value() - penalty_total`.
+  정답 클릭 → score +100×combo, combo +1, targets_remaining -1. 2 개 다 맞히면 `new_stage` 메시지 → 클론 재생성 + 새 목표.
+  오답 클릭 → combo 0, penalty +2 (타이머 2 초 깎임).
+  검증: 18/18 pass — clone count, target picture id 정확히 2 개, score/combo/level 증가, deleteClone 으로 클론 감소, 페널티 누적, GAME OVER.
+
+- [x] **함정 1: `deleteClone()` 후 같은 스크립트의 후속 블록 안 실행**.
+  Entry 의 deleteClone 은 클론 컨텍스트를 즉시 소멸 → 그 뒤에 오는 sendMessage / setVar 등은 fire 안 됨.
+  해결: `if_else` 로 분기 — `if (cleared) sendMessage('new_stage'); else deleteClone()`. sendMessage 는 template 의 핸들러가 removeAllClones 로 정리.
+  정본: [`04-script-and-blocks.md` 함정](04-script-and-blocks.md#함정-deleteclone-후-같은-스크립트-후속-블록-안-실행).
+
+- [x] **함정 2: 클론은 글로벌 변수만 공유 → "내가 정답인가?" 판정 불가**.
+  Entry 클론에는 로컬 변수가 없고 `selectedPicture.id` 도 직접 못 읽음.
+  해결: **클론 좌표 = 고유 id 대용**. N 슬롯 그리드면 좌표 N 개가 모두 고유 → `coord('self', 'x')` / `coord('self', 'y')` 를 정답 위치 (`grid_x[target_pos+1]` 등) 와 비교.
+  정본: [`04-script-and-blocks.md` 클론 정체 판정](04-script-and-blocks.md#클론-정체-판정--클론-좌표--고유-id-대용).
+
+- [x] **5 종 fruit asset 추가** ([`tools/build-game-assets.mjs`](../tools/build-game-assets.mjs)): `fruit-apple/banana/grape/orange/watermelon` (각 색의 그라데이션 공). 라이브러리 이제 23 종.
+- [x] **DSL `mod(a, b)` / `quotient(a, b)` 헬퍼** — `quotient_and_mod` 블록 (paramsKeyMap LH=1, RH=3, OPERATOR=5).
+
+## 2026-04-28 — 바운스 볼: 이미지 마이그레이션 + 복제본 패턴
+
+- [x] **바운스 볼 — 벽돌·패들 모두 이미지 sprite 로 전환**.
+  벽돌: textBox bgColor → sprite `assets('brick-red'/'brick-orange'/'brick-green')`. 패들: textBox bgColor → sprite `assets('paddle-blue')`.
+  이전 18 벽돌 + 1 paddle = 19 textBox → 4 sprite (1 brick_template + 18 clones + 1 paddle + 1 ball + 1 status_msg).
+- [x] **벽돌 18 개 → 1 brick_template + 18 clones**.
+  template 의 `when_run` 스레드가 행별 `changeShape(pic_r/pic_o/pic_g)` + `locateXY` + `createClone('self')` 18 회 → 18 클론 생성. 각 클론은 `when_clone_start` 로 `show` + 충돌 감시 + `deleteClone()` (자기 제거).
+  spec LOC 절감 + 동작이 한 곳에 — 복제본은 같은 역할 반복 오브젝트의 표준 패턴.
+- [x] **클론 검증 메커니즘**: `Entry.container.getAllObjects()` 는 template 만 반환. 클론 갯수는 `template.clonedEntities.length`. verify-bounce-ball 이 이 패턴으로 18 클론 spawn 확인 + deleteClone 으로 감소 확인 (15/15 pass).
+- [x] 정본: [`04-script-and-blocks.md` 복제본 패턴](04-script-and-blocks.md#복제본-clone-패턴--같은-역할의-오브젝트가-반복될-때).
+
+## 2026-04-28 — 게임 이미지 라이브러리 (A 정적 + B 생성기)
+
+- [x] **Phase B: SVG 인라인 생성기** [`tools/lib/sprite-gen.mjs`](../tools/lib/sprite-gen.mjs).
+  `circle / rect / ring / regularPolygon / triangle / pentagon / hexagon / star / heart / shadedBall / beveledBrick`. 각 함수가 `{ svgString, dimension, imageType: 'svg' }` 반환.
+  make-ent 가 svgString 을 콘텐츠 해시(sha1) cacheKey 로 dedup → 같은 모양·색이 여러 곳에서 호출되어도 tar 안에는 한 번만 들어감.
+  통합: [`tools/make-ent.mjs`](../tools/make-ent.mjs) 의 picture 루프가 `p.svgString` 우선 검사 + `bundleBuf()` 신설.
+  DSL: `obj({ picture: gen.shadedBall(15, '#3b82f6') })` 한 줄로 전달 — `obj()` 가 자동 wrap.
+- [x] **Phase A: 정적 자산 라이브러리** [`public/images/game/`](../public/images/game/).
+  `tools/build-game-assets.mjs` (`npm run build:assets`) 이 sprite-gen 으로 18 개 SVG + `manifest.json` 생성. ball-blue/red/yellow, brick-red/orange/green/blue, paddle-blue/green, heart, star, coin, enemy-spike/bomb, bullet-blue/red, tile-purple/cyan.
+  spec 에서 [`assets('name')`](../tools/lib/game-assets.mjs) 헬퍼로 의미 있는 이름 → picture 객체 변환. 카탈로그에 없는 이름은 throw (오타 조기 발견).
+- [x] **데모: bounce-ball 의 공이 mascot bot205 → `assets('ball-blue')`**.
+  Verify 14/14 그대로 통과 (게임 로직 무관).
+- [x] **make-ent `bundleOne` cacheKey 추가** — 같은 file path 가 여러 picture 에서 참조되어도 tar 한 번 (기존엔 매번 새 hash 부여 → 사이즈 부풀음).
+- [x] 정본: [`03-objects-and-assets.md` 게임 이미지 라이브러리](03-objects-and-assets.md#게임-이미지-라이브러리--a-정적--b-생성기).
+
+## 2026-04-28 — 바운스 볼 (Breakout) 게임 + DSL `reach()` 슬롯 수정 + textBox 빈 text 폴백
+
+- [x] **바운스 볼 게임** [`spec-bounce-ball.mjs`](../tests/fixtures/spec-bounce-ball.mjs).
+  좌/우 화살표로 패들 이동, 공 위치 매 프레임 갱신, 벽·천장·벽돌·패들 반사. 6×3=18 벽돌 (행별 색).
+  벽돌은 `when_run` + `repeat.inf([if reach('ball'): score+10, send 'ball_bounce', hide, stopRepeat])` 패턴으로 자기 충돌 감시 + 한 번 hit 후 종료.
+  공은 메시지 두 종류: `ball_bounce` (dy 부호 반전, 벽돌용), `paddle_hit` (dy 양수 강제, 패들 더블 hit 방지).
+  검증: [`verify-bounce-ball.mjs`](../tools/verify-bounce-ball.mjs) — 21 오브젝트 + 이동 + 키 입력 + 벽돌 파괴 + 패들 hit + GAME OVER (14/14 pass).
+- [x] **DSL `reach()` 슬롯 위치 수정**.
+  `reach_something` 의 paramsKeyMap 은 `VALUE: 1` — `[Text 라벨, DropdownDynamic 타겟, Text 라벨]`. 기존 DSL 은 `[target, null]` (2 슬롯, 잘못된 위치) → `[null, target, null]` 으로 정정.
+  영향: DSL 로 작성된 fixture 는 `reach()` 가 정상. JSON 으로 작성된 기존 fixture (`spec-bullethell.json` 등) 는 raw 셰이프 그대로 — 별도 영향 없음 (단 spec-bullethell 의 2-슬롯 형태는 padding 후 idx 1 이 비어 정상 작동 안 했을 가능성).
+- [x] **textBox `text: ''` 는 객체 이름으로 폴백** ([`entity.js:142`](../../entryjs/src/class/entity.js#L142): `entityModel.text || parent.text || parent.name`).
+  빈 사각형이 필요하면 `text: ' '` (공백 1 개) 사용. 회귀 가드: `spec-bounce-ball.mjs` 의 18 벽돌 + 패들.
+
+## 2026-04-28 — 생김새 17 블록 미디어 아트 + picture 런타임 상태
+
+- [x] **생김새 카테고리 17 블록 전부 활용한 미디어 아트** [`spec-media-art.mjs`](../tests/fixtures/spec-media-art.mjs).
+  3×3 mascot 그리드 + textBox 타이틀. 각 셀이 효과 / 모양 / 크기 / 뒤집기 / z-order / dialog 사이클을 평행 실행.
+  검증: [`verify-media-art.mjs`](../tools/verify-media-art.mjs) — 17 블록 type 등장 + 3 시점 스크린샷 + entity 효과 누적 (23/23 pass).
+  스레드 평행화 패턴: `cell()` 헬퍼가 thread 배열 (`[[trigger, ...], [trigger, ...]]`) 또는 단일 thread 자동 판별.
+- [x] **DSL 생김새 13 블록 헬퍼 추가** ([`tools/lib/spec-dsl.mjs`](../tools/lib/spec-dsl.mjs)):
+  `addEffect / setEffect / clearEffects` (color/brightness/transparency),
+  `changeSize / setSize / stretch / resetSize`,
+  `nextShape / prevShape / changeShape`,
+  `flipX / flipY`, `zOrder('FRONT'|'FORWARD'|'BACKWARD'|'BACK')`, `removeDialog`.
+- [x] **런타임 picture id = `entity.picture.id`** (NOT `selectedPictureId`).
+  `selectedPictureId` 는 spec 초기값 고정. 헤드리스에서 현재 picture 읽을 때 주의.
+  정본: [`07-runtime-quirks.md` 현재 picture](07-runtime-quirks.md#현재-picture-는-entitypictureid--selectedpictureid-는-spec-의-초기값).
+
+## 2026-04-28 — textBox 클릭 hit-test (투명 vs hex bgColor) + 글상자 ask/answer 루프
+
+- [x] **textBox 클릭 영역 = bgColor 의 함수**. `bgColor='#xxxxxx'` 면 사각 전체, `'transparent'`/falsy 면 textObject 의 glyph 알파 픽셀만 (pixelPerfect=true).
+  실측: 5×5=25 점 그리드 → 투명 6/25 (24%, 70px ■■■), 불투명 25/25 (100%). 24px 작은 글자는 0/25 가능.
+  근거: [`entity.js:65`](../../entryjs/src/class/entity.js#L65) (`textObject.pixelPerfect=true`) + [`entity.js:1538`](../../entryjs/src/class/entity.js#L1538) (`bgObject.alpha = hasColor ? 1 : 0`).
+  **버튼 용도는 hex bgColor 필수**. 시각적 투명이 필요하면 scene 배경과 같은 hex.
+  새 fixture: [`spec-textbox-click.mjs`](../tests/fixtures/spec-textbox-click.mjs), verify: [`verify-textbox-click.mjs`](../tools/verify-textbox-click.mjs).
+  정본: [`07-runtime-quirks.md` textBox 클릭 영역](07-runtime-quirks.md#textbox-클릭-영역--bgcolor-에-따라-사각-전체-vs-glyph-픽셀만), [`04-script-and-blocks.md` 버튼 패턴](04-script-and-blocks.md#버튼-구현--textbox-가-sprite--dialog-보다-깔끔).
+- [x] **DSL `obj()` 가 `text` 필드 통과 + `writeText`/`appendText`/`flushText` 헬퍼 추가**.
+  textBox 오브젝트를 `obj('id', 'name', { objectType: 'textBox', text: '...', entity: { font, bgColor } })` 한 줄로 생성.
+- [x] **글상자 ask/answer 루프 데모**: [`spec-name-loop.mjs`](../tests/fixtures/spec-name-loop.mjs) — `repeat.inf([askWait, writeText(getInput)])`. 한 textBox 가 자기 자신에게 답을 출력. verify: [`verify-name-loop.mjs`](../tools/verify-name-loop.mjs).
+
+## 2026-04-25 — 종합 데모: 탄막 피하기 (붓 + 거리 충돌 + 랭킹 + 동적 배경)
+
+지금까지 구축한 모든 인프라(DSL, verify-harness, --check, 함수, 재귀, 브러쉬, 거리 충돌)를 한 fixture 로 통합 데모.
+
+- [x] 신규 [`tests/fixtures/spec-bullet-circle.mjs`](../tests/fixtures/spec-bullet-circle.mjs) — 10 오브젝트, 3 장면, 2 함수, 1 메시지, 2 cloud 리스트. **DSL 사용으로 수십개 블록을 평면 JS 로 작성**
+- [x] **새 패턴 1 — 원-원 거리² 충돌**: 두 중심 간 `(x1-x2)² + (y1-y2)² < (r1+r2)²` 비교. sqrt 없이 산술만. 사용자 정의 value 함수 `dsq` 로 캡슐화
+- [x] **새 패턴 2 — 동적 spawn rate**: spawner 가 `생존시간` 변수를 읽어 `spawn_count = 1 + floor(t/8)` 으로 시간 따라 동시 spawn 증가 (8/16/24/32/40/50초마다 +1). spawn 간격은 0.45 초로 고정
+- [x] **새 패턴 3 — 4 모서리 무작위 spawn + 플레이어 조준**: `random(1, 4)` 로 모서리 선택 후 `see_angle_object('player')` (보이지 않는 player anchor sprite 가 cx/cy 추적) 으로 조준
+- [x] **새 패턴 4 — 동적 주황 배경**: `bg_drawer` sprite 가 scene 시작 시 5 개 큰 부드러운 원을 다양한 색조 (peach-200/orange-300/orange-400) 로 brush 로 그림. drawstep 함수 재사용
+- [x] **랭킹**: `nickname` 일반 변수 + `대답` (variableType: 'answer') 별도. `ask_and_wait` → `get_canvas_input_value` → setVar('nickname'). 점수 정렬은 memory-ranking 의 insertion-sort 패턴 재사용
+- [x] DSL 확장: `seeAngle`, `combine` (5-슬롯 정렬), `insertAt` 추가
+- [x] [`tools/verify-bullet-circle.mjs`](../tools/verify-bullet-circle.mjs) — 6-단계 검증 (메뉴 → 게임 → 충돌 → 결과 → 랭킹 → 메뉴 복귀): **10/10 통과, 0 페이지 에러**
+- [x] **함정 발견**:
+  - `combine_something` 의 paramCount=5 (Text 라벨 0/2/4 + Block VALUE 1/3) — 짧게 쓰면 padding 후 슬롯 어긋남. `combine(a, b)` DSL helper 가 `[null, a, null, b, null]` 로 풀어줌
+  - `variableType: 'answer'` 변수를 임의 변수에 지정하면 ask_and_wait 가 답을 읽지 못함. `대답` 한 개만 두는 게 안전
+  - `findColoredPixels` 의 hex 모드는 closure 값이 page.evaluate 직렬화 후 사라짐 — 임계값을 함수 소스에 inline 해서 우회 (verify-harness 수정)
+- [x] 관련 문서: [04-script-and-blocks.md §원-원 거리 기반 충돌](04-script-and-blocks.md#원-원-거리-기반-충돌-reach_something-대체) 신설, [lessons.md](lessons.md) 에 함정 2 개 추가
+
+## 2026-04-24 (13차) — Tier-3 #8 + #9 + #10: fixture 정리 + canonical 매트릭스 + spec 트리 viz
+
+- [x] **#8 fixture 정리** — 22 spec → 14 spec (+ known-good = 15 fixture). 제거: `chase` (chase-hp 가 superset), `memory-pattern` (memory-ranking 이 superset), `random-walk`/`follow-mouse` (movement primitive 단순 데모, 다른 fixture 가 더 풍부), `dodge-poop`/`click-teleport` (각각 bullethell + 더 단순 패턴이 대체)
+- [x] 인입 ref 갱신: [`knowledge/01-binary-format.md`](01-binary-format.md) (tar 검사 예제 follow-mouse → move), [루트 `README.md`](../README.md) (오브젝트 디자인 예시), [`tests/fixtures/README.md`](../tests/fixtures/README.md) (학습 경로 표)
+- [x] **#9 canonical matrix 추가** — knowledge/README.md 에 "정본 매트릭스" 표 추가. 8 개 핵심 사실에 대해 정본 위치 + 다른 파일에서 한 줄로 줄이는 곳 명시. 새 사실 추가 시 이 표가 분기점
+- [x] **#10 spec 트리 viz** — [`tools/show-spec.mjs`](../tools/show-spec.mjs) 신설. spec 파일을 ASCII 트리로 출력. 예: `node tools/show-spec.mjs tests/fixtures/spec-fibonacci.mjs --object runner`. 필드 슬롯 `«변수id»`, 블록 슬롯 child, 통계 inline. spec 검토를 editor 안 띄우고 가능
+- [x] smoke: 21 → 15 (테스트 줄긴 했지만 모두 통과), verify:links 171 → 더 적게 (제거된 fixture 참조 줄음), 0 broken
+
+## 2026-04-24 (12차) — Tier-3 #7a: knowledge 링크 무결성 자동 검증
+
+knowledge 파일이 11개로 늘면서 cross-reference 부패가 우려되어 link checker 추가.
+
+- [x] 신규 [`tools/check-knowledge-links.mjs`](../tools/check-knowledge-links.mjs) — 13 개 markdown 파일을 스캔, 203 개 link 검증. 검사 항목:
+  - `[text](file)` — 상대 경로 타겟 파일 존재 여부
+  - `[text](file#anchor)` — 타겟 파일에 해당 heading 존재 여부 (alnum 정규화로 GitHub slug 변형에 너그럽게 매칭)
+  - 코드 펜스(```...```) 안 링크는 무시, `<!-- link-check: skip-rest-of-file -->` marker 부터 파일 끝까지 무시
+- [x] 첫 실행에서 12 개 깨진 링크 발견:
+  - 5 개 — 실제 깨진 링크 (Downloads/, 구 spec-fibonacci.json) → 텍스트로 변환하거나 새 위치로 갱신
+  - 7 개 — 의도적으로 stale 한 5차 이전 history (`06-gotchas.md` 참조) → CHANGELOG의 5차/4차 경계에 skip marker 삽입
+- [x] `npm run verify:links` 추가, 메인 `verify` 파이프라인이 smoke 직후 실행 (e2e/runtime 보다 빠르므로 빠른 피드백)
+
+### 효과
+
+다음 리팩터에서 파일 이동/삭제 시 깨진 링크가 자동으로 검출됨. 6차 (gotchas 분산) 같은 큰 구조 변경 후 7개 링크가 자동 검증 안 되어 한참 후에야 발견됐던 일을 방지.
+
+## 2026-04-24 (11차) — Tier-2 워크플로 자동화: --check + verify:runtime + fixture 색인
+
+10차 인프라 위에 작업 사이클을 빠르게 만드는 보완재.
+
+- [x] **#5 — `make-ent --check` flag**: spec 빌드 없이 검증만. 잡는 항목:
+  - 알 수 없는 블록 타입 (registry 에 없음)
+  - paramCount 초과 (실제 에러)
+  - paramCount 미달 (경고 — make-ent 가 padding)
+  - statementCount 초과 (실제 에러)
+  - **field 슬롯에 block 들어감** (경고 — 우리가 가장 자주 겪던 함정)
+  - exit 1 if errors, 0 otherwise
+- [x] **`validateSpec(spec)` export**: 다른 도구가 재사용 가능 (예: spec lint)
+- [x] **#4 — `npm run verify:runtime`**: [`tools/run-all-verify.mjs`](../tools/run-all-verify.mjs) 가
+  `tools/verify-*.mjs` 7 개를 순차 실행 + 서버 자동 기동/정리 + 결과 집계.
+  현재 실행: 7/7 통과, 총 98초. `npm run verify` 가 이제 smoke + e2e + runtime 다 포함
+- [x] **#6 — [`tests/fixtures/README.md`](../tests/fixtures/README.md)**: 22 fixture 색인.
+  패턴별 "정본" 매트릭스 + verify 스크립트 매핑 + DSL 마이그레이션 가이드 + 새 fixture
+  추가 8 단계 절차. 미래의 자기/협업자가 어디서 시작할지 즉시 알 수 있게
+
+### 작업 사이클 변화
+
+이전 (10번의 fixture 작성에서):
+```
+spec 작성 → make-ent → smoke → server up → 단일 verify → spec 수정 → 재빌드 → 재실행
+```
+한 사이클 평균 5–10분. 새 패턴은 더.
+
+이후:
+```
+spec 작성 (DSL)
+  → make-ent --check     ← 즉시 (1초)
+  → make-ent
+  → npm run verify:runtime  ← 회귀 자동 검출
+```
+한 사이클 평균 1–2분. 함정을 더 빨리 잡고, 다른 fixture 까지 깨졌는지 자동 확인.
+
+## 2026-04-24 (10차) — Tier-1 인프라 개선: 슬롯 타입 + DSL + verify-harness
+
+지난 9개 fixture 작성에서 가장 비싼 함정(`__field` vs bare string 5회 + 8단 중첩 JSON 작성 비용)을 근본적으로 줄이기 위한 3개 인프라 업그레이드.
+
+- [x] **#2 — block-registry 에 슬롯 타입 정보 추가**: [`tools/build-block-registry.mjs`](../tools/build-block-registry.mjs) 에 `extractParamShape` 추가. 274 블록 모두 파싱하여 각 param의 `{type, accept?, menu?, defaultType?}` 추출 (Block / Dropdown / DropdownDynamic / Keyboard / TextInput / Indicator / ...)
+- [x] **make-ent `wrapParam` 가 슬롯 타입을 인식**: 필드 타입(`Dropdown` / `DropdownDynamic` / `Keyboard` / `TextInput`) 슬롯에 bare string 이 들어오면 자동으로 통과 — `__field` sentinel 명시 없이도 정상 작동. `__field` 는 여전히 합성 타입(`stringParam_<id>`) 등 registry 에 없는 슬롯의 안전판으로 유효
+- [x] **#3 — `tools/lib/verify-harness.mjs` 신설**: 6개 verify 스크립트가 각자 재구현하던 헬퍼 통합:
+  - `runFresh(page, vars)` — toggleStop(async await) + setVar + toggleRun 안전 순서. `toggleStop` 이 비동기로 변수 snapshot 복원하므로 set 은 stop 이후, run 이전에 (8차 발견)
+  - `setVar` / `getVar` / `getList`
+  - `clickObject` / `sendMessage` / `holdKey` / `tapKey` (KEY_CODE_MAP 포함)
+  - `waitFor` / `waitForVar` 폴링
+  - `findColoredPixels` (green/red/blue/hex tolerance) — 이전 healthbar/circle 에 중복됐던 픽셀 분석
+  - `createReporter()` 미니 expect — `t.eq/t.ok/t.between` + 자동 summary
+- [x] **#1 — `tools/lib/spec-dsl.mjs` 신설**: spec 작성용 DSL. `setVar('hp', 0)` / `getVar` / `calc` / `cmp` / `if_` / `repeat.basic` / `fn.value(id, params, body, returnExpr)` / `call(id, ...args)` / `obj()` / `picture()` 등. 8단 중첩 JSON → 평면 JS
+- [x] **make-ent CLI 가 `.mjs` spec 지원**: `node make-ent.mjs spec.mjs out.ent` — dynamic import 후 default export 사용
+- [x] **데모: fibonacci 마이그레이션**: [`tests/fixtures/spec-fibonacci.mjs`](../tests/fixtures/spec-fibonacci.mjs) (76줄) ↔ 이전 `spec-fibonacci.json` (163줄). **53% LOC 감소**, 동일한 `.ent` 출력. [`tools/verify-fibonacci.mjs`](../tools/verify-fibonacci.mjs) 도 verify-harness 사용으로 122줄 → 75줄 (38% 감소). 12/12 assertion 통과
+- [x] 기존 22 fixture 의 `.json` spec 은 그대로 유지 (호환). 새 fixture 부터 `.mjs` + DSL 권장
+
+### 함의
+
+이전: `set_variable("hp", 0)` 작성 = `{type: "set_variable", params: [{__field: "hp"}, {type: "number", params: ["0"]}, null]}` (수동 JSON, `__field` 까먹으면 `[object Object]`).
+
+이후: `setVar('hp', 0)` (DSL 한 줄). registry 가 슬롯 0이 `DropdownDynamic` 임을 알아서 bare string 자동 처리.
+
+이 변경은 **이전 9개 fixture 의 모든 `__field` 디버깅 시간 (총 ~3시간) 을 향후 0 으로 만든다**.
+
 ## 2026-04-24 (9차) — 재귀로 매 프레임 원 그리기 (실전 적용)
 
 8차에서 검증한 "재귀 = 60fps 틱 우회" 원리를 실전 그래픽 예제로 적용.
@@ -40,7 +393,7 @@
 
 ## 2026-04-24 (7차) — 사용자 정의 함수 지원 (피보나치 fixture)
 
-- [x] 새 fixture [`tests/fixtures/spec-fibonacci.json`](../tests/fixtures/spec-fibonacci.json) — Entry의 `function_create_value` 로 정의된 반복 알고리즘 피보나치 함수. 입력은 slide 변수 (0-30), 결과는 visible 변수 + 수열 리스트
+- [x] 새 fixture `tests/fixtures/spec-fibonacci.json` (10차에서 [`.mjs`](../tests/fixtures/spec-fibonacci.mjs) 로 이관) — Entry의 `function_create_value` 로 정의된 반복 알고리즘 피보나치 함수. 입력은 slide 변수 (0-30), 결과는 visible 변수 + 수열 리스트
 - [x] make-ent.mjs `functions[]` 정식 지원: `content` 가 array 면 자동 stringify, 각 thread 의 블록은 `normalizeBlock` 처리. `id`/`type`/`localVariables`/`useLocalVariables` 기본값
 - [x] 함수 호출은 합성 타입 **`func_<함수id>`**, 파라미터 슬롯은 **`stringParam_<param4자id>`** / **`booleanParam_<id>`** — 둘 다 동적 합성이라 우리 block-registry에 안 들어감
 - [x] [`tests/smoke.test.js`](../tests/smoke.test.js) `walkBlocks` 가 `func_*` / `stringParam_*` / `booleanParam_*` 패턴을 unknown으로 보지 않게 화이트리스트 추가 (`isUserDefinedFuncType`)
@@ -87,6 +440,13 @@
 - [x] **7. `lib/asset-bundler.js` 신설** — `server.js /api/export`의 `bundleAsset`와 `tools/make-ent.mjs`의 `buildAssets.bundleOne`이 거의 동일한 SVG→PNG 래스터라이즈 + 96px 썸네일 + `temp/XX/YY/{image,thumb,sound}/` 레이아웃 로직을 각자 구현했던 것 공통 팩토리로 통합. `createAssetBundler({thumbMaxPx})` → `{ bundle, getFiles }`
 - [x] **8. `docs/ent-format.md` → `knowledge/quick-reference.md` 이관** — `docs/` 디렉터리에 파일 한 개만 있고 내용도 전부 `knowledge/`를 가리키는 포인터여서 지식 이중화. `knowledge/`로 통합
 - [x] 새 파일: `lib/asset-bundler.js` (~110 LOC), `tools/lib/editor-harness.mjs` (~60 LOC). 제거된 중복 코드는 약 200 LOC
+
+<!-- link-check: skip-rest-of-file -->
+<!--
+   아래 항목들은 5차 이전의 역사 기록입니다. `06-gotchas.md` 가 5차에서 폐지되어
+   이 섹션의 링크들은 의도적으로 깨져 있고, 파일 상단 안내 박스가 새 위치를 알려줍니다.
+   tools/check-knowledge-links.mjs 는 위 marker 아래 영역을 검사하지 않습니다.
+-->
 
 ## 2026-04-24 (3차) — scene id `"7dwq"` 하드코딩 제거
 

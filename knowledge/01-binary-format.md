@@ -155,7 +155,7 @@ function entryStyleHash() {
 
 ## 이미지 규칙 (중요)
 
-playentry.org 레퍼런스 [`Downloads/260423_작품.ent`](../../../Downloads/260423_작품.ent) 분석 결과:
+playentry.org 레퍼런스 `C:\Users\young\Downloads\260423_작품.ent` (저장소 외부, 사용자 로컬) 분석 결과:
 
 - **tar에는 PNG만** — SVG 원본 파일은 저장되지 않음.
 - SVG를 업로드해도 서버가 `sharp(svg).png()`로 래스터라이즈해 PNG만 남긴다.
@@ -172,11 +172,11 @@ playentry.org 레퍼런스 [`Downloads/260423_작품.ent`](../../../Downloads/26
 ```bash
 # 레이아웃 확인
 node -e "const z=require('zlib'),f=require('fs');const{forEachTarEntry}=require('./server.js');
-  const t=z.gunzipSync(f.readFileSync('tests/fixtures/follow-mouse.ent'));
+  const t=z.gunzipSync(f.readFileSync('tests/fixtures/move.ent'));
   forEachTarEntry(t,e=>console.log(e.type,e.name,'size='+e.data.length));"
 
 # 헤더 바이너리 확인
-xxd tests/fixtures/follow-mouse.ent | head -40
+xxd tests/fixtures/move.ent | head -40
 ```
 
 mode 필드(offset 100)가 디렉터리는 `30 30 30 37 35 35 20 00` ("000755 \0"),
