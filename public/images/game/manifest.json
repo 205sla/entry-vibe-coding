@@ -1,0 +1,163 @@
+{
+  "ball-blue": {
+    "path": "/images/game/ball-blue.svg",
+    "dimension": {
+      "width": 44,
+      "height": 44
+    }
+  },
+  "ball-red": {
+    "path": "/images/game/ball-red.svg",
+    "dimension": {
+      "width": 44,
+      "height": 44
+    }
+  },
+  "ball-yellow": {
+    "path": "/images/game/ball-yellow.svg",
+    "dimension": {
+      "width": 44,
+      "height": 44
+    }
+  },
+  "brick-red": {
+    "path": "/images/game/brick-red.svg",
+    "dimension": {
+      "width": 54,
+      "height": 22
+    }
+  },
+  "brick-orange": {
+    "path": "/images/game/brick-orange.svg",
+    "dimension": {
+      "width": 54,
+      "height": 22
+    }
+  },
+  "brick-green": {
+    "path": "/images/game/brick-green.svg",
+    "dimension": {
+      "width": 54,
+      "height": 22
+    }
+  },
+  "brick-blue": {
+    "path": "/images/game/brick-blue.svg",
+    "dimension": {
+      "width": 54,
+      "height": 22
+    }
+  },
+  "paddle-blue": {
+    "path": "/images/game/paddle-blue.svg",
+    "dimension": {
+      "width": 84,
+      "height": 16
+    }
+  },
+  "paddle-green": {
+    "path": "/images/game/paddle-green.svg",
+    "dimension": {
+      "width": 84,
+      "height": 16
+    }
+  },
+  "heart": {
+    "path": "/images/game/heart.svg",
+    "dimension": {
+      "width": 28,
+      "height": 28
+    }
+  },
+  "star": {
+    "path": "/images/game/star.svg",
+    "dimension": {
+      "width": 44,
+      "height": 44
+    }
+  },
+  "coin": {
+    "path": "/images/game/coin.svg",
+    "dimension": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  "enemy-spike": {
+    "path": "/images/game/enemy-spike.svg",
+    "dimension": {
+      "width": 36,
+      "height": 36
+    }
+  },
+  "enemy-bomb": {
+    "path": "/images/game/enemy-bomb.svg",
+    "dimension": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  "bullet-blue": {
+    "path": "/images/game/bullet-blue.svg",
+    "dimension": {
+      "width": 14,
+      "height": 14
+    }
+  },
+  "bullet-red": {
+    "path": "/images/game/bullet-red.svg",
+    "dimension": {
+      "width": 14,
+      "height": 14
+    }
+  },
+  "tile-purple": {
+    "path": "/images/game/tile-purple.svg",
+    "dimension": {
+      "width": 48,
+      "height": 48
+    }
+  },
+  "tile-cyan": {
+    "path": "/images/game/tile-cyan.svg",
+    "dimension": {
+      "width": 48,
+      "height": 48
+    }
+  },
+  "fruit-apple": {
+    "path": "/images/game/fruit-apple.svg",
+    "dimension": {
+      "width": 48,
+      "height": 48
+    }
+  },
+  "fruit-banana": {
+    "path": "/images/game/fruit-banana.svg",
+    "dimension": {
+      "width": 48,
+      "height": 48
+    }
+  },
+  "fruit-grape": {
+    "path": "/images/game/fruit-grape.svg",
+    "dimension": {
+      "width": 48,
+      "height": 48
+    }
+  },
+  "fruit-orange": {
+    "path": "/images/game/fruit-orange.svg",
+    "dimension": {
+      "width": 48,
+      "height": 48
+    }
+  },
+  "fruit-watermelon": {
+    "path": "/images/game/fruit-watermelon.svg",
+    "dimension": {
+      "width": 48,
+      "height": 48
+    }
+  }
+}

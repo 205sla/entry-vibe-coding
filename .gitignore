@@ -53,3 +53,7 @@ public/lib/legacy-video
 # tools/*.mjs 런타임 검증 스크립트가 생성하는 artifact (inspect, verify-*)
 tools/inspect-*.png
 tools/verify-*.png
+
+# verify / screenshot 도구의 단계별 캡처 디렉토리 (재생성 가능)
+tests/output/
+tests/fixtures/*-shots/

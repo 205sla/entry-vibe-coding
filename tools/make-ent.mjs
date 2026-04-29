@@ -30,6 +30,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
 import zlib from 'node:zlib';
+import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { uid } from 'uid';
 
@@ -118,7 +119,11 @@ function normalizeBlock(spec) {
     const params = new Array(paramCount).fill(null);
     if (Array.isArray(spec.params)) {
         for (let i = 0; i < Math.min(paramCount || spec.params.length, spec.params.length); i++) {
-            params[i] = wrapParam(spec.params[i]);
+            // Pass slot shape to wrapParam so field slots (Dropdown / DropdownDynamic /
+            // Keyboard / TextInput) can pass bare strings through verbatim, while
+            // block slots (Block / Output) wrap bare strings as text blocks.
+            const slotShape = reg && reg.params ? reg.params[i] : null;
+            params[i] = wrapParam(spec.params[i], slotShape);
         }
     }
     out.params = params;
@@ -136,25 +141,154 @@ function normalizeBlock(spec) {
     return out;
 }
 
+// Field-like slot types — these accept a bare string (the dropdown value /
+// keyboard code / literal label) and DO NOT wrap it as a text block.
+// Source: extracted from entryjs param descriptors in block-registry.json.
+const FIELD_SLOT_TYPES = new Set([
+    'Dropdown',         // static options, e.g. choose_project_timer_action[1]
+    'DropdownDynamic',  // dynamic menu (variables/lists/messages/scenes/...)
+    'Keyboard',         // keycode, e.g. is_press_some_key[0]
+    'TextInput',        // free-form literal label, e.g. function_field_label[0]
+]);
+
 // Wrap a param value into Entry's nested block-or-literal shape.
+//
+// `slotShape` is the registry-extracted slot descriptor (null if unknown),
+// shape `{ type: 'Block'|'Dropdown'|... , accept?, menu?, defaultType? }`.
+// When the slot is field-like, bare strings pass through verbatim.
+// When the slot is block-like (or unknown), bare strings wrap as text blocks
+// (so callers can write `params: [10]` to mean a literal-10 number block).
+//
+// The `{ "__field": "..." }` sentinel still works in any slot — explicit
+// unwrap, useful when registry info is missing or for synthesized types
+// like `stringParam_<id>` that aren't in the registry.
+//
 //   null                     → null (empty slot)
 //   number                   → { type: 'number', params: [String(n)] }
-//   string                   → { type: 'text',   params: [s] }
+//   string + Block slot      → { type: 'text',   params: [s] }
+//   string + field slot      → bare string "s" (Dropdown value / key code / label)
 //   boolean-ish              → { type: 'True'|'False', params: [] }
-//   { type }                 → pass through (Entry block)
-//   { __field: "mouse" }     → bare string "mouse" (Dropdown/DropdownDynamic
-//                              field value — must NOT be wrapped as a text
-//                              block, e.g. see_angle_object's target slot
-//                              or set_variable's VARIABLE slot which takes
-//                              a variable id like "abcd", not a text block)
-function wrapParam(v) {
+//   { __field: "mouse" }     → bare string "mouse" (always unwraps)
+//   { type: ... }            → pass through (Entry block, recursed via normalizeBlock)
+function wrapParam(v, slotShape = null) {
     if (v == null) return null;
-    if (typeof v === 'number') return { type: 'number', params: [String(v)] };
-    if (typeof v === 'string') return { type: 'text', params: [v] };
-    if (typeof v === 'boolean') return { type: v ? 'True' : 'False', params: [] };
     if (typeof v === 'object' && '__field' in v) return v.__field;
+    const isFieldSlot = slotShape && FIELD_SLOT_TYPES.has(slotShape.type);
+    if (typeof v === 'string') {
+        return isFieldSlot ? v : { type: 'text', params: [v] };
+    }
+    if (typeof v === 'number') return { type: 'number', params: [String(v)] };
+    if (typeof v === 'boolean') return { type: v ? 'True' : 'False', params: [] };
     if (typeof v === 'object' && v.type) return normalizeBlock(v);
     return v;
+}
+
+// -------- Spec validation (--check) ----------
+
+// Walk the spec's blocks (objects[*].script + functions[*].content) and report
+// issues without building. Faster feedback loop than smoke (which requires a
+// built .ent), and surfaces problems closer to where they're written.
+//
+// Returns an array of { severity: 'error' | 'warning', path, msg }.
+export function validateSpec(spec) {
+    const issues = [];
+    const blocks = loadRegistry().blocks;
+
+    // Synthesized at runtime by Entry.Func — not in our registry, but valid.
+    const isUserFuncType = (t) =>
+        /^func_[a-z0-9]+$/i.test(t) ||
+        /^stringParam_[a-z0-9]+$/i.test(t) ||
+        /^booleanParam_[a-z0-9]+$/i.test(t);
+
+    const FIELD_SLOTS = new Set(['Dropdown', 'DropdownDynamic', 'Keyboard', 'TextInput']);
+
+    function walkBlock(block, p) {
+        if (!block || typeof block !== 'object' || !block.type) return;
+
+        // Primitive value-wrappers: params are raw scalars, no recursion.
+        if (PRIMITIVE_BLOCK_TYPES.has(block.type)) return;
+
+        // User-defined function blocks (synthesized): just recurse into params/statements.
+        if (isUserFuncType(block.type)) {
+            (block.params || []).forEach((c, i) => {
+                if (c && typeof c === 'object' && c.type) walkBlock(c, `${p}.params[${i}]`);
+            });
+            (block.statements || []).forEach((th, ti) =>
+                (th || []).forEach((b, bi) => walkBlock(b, `${p}.statements[${ti}][${bi}]`)));
+            return;
+        }
+
+        const r = blocks[block.type];
+        if (!r) {
+            issues.push({ severity: 'error', path: p, msg: `unknown block type: ${block.type}` });
+            return;
+        }
+
+        // paramCount: spec authors often omit trailing nulls — we pad in normalizeBlock,
+        // so under-count is just a warning. Over-count is a real error.
+        const got = Array.isArray(block.params) ? block.params.length : 0;
+        if (got > r.paramCount) {
+            issues.push({ severity: 'error', path: p,
+                msg: `${block.type}: too many params (got ${got}, expected ${r.paramCount})` });
+        } else if (got < r.paramCount && got > 0) {
+            issues.push({ severity: 'warning', path: p,
+                msg: `${block.type}: paramCount under expected (got ${got}, expected ${r.paramCount}; will be padded with null)` });
+        }
+
+        // Slot-type vs value-type cross-check (the bug class we keep hitting).
+        if (r.params && Array.isArray(block.params)) {
+            for (let i = 0; i < Math.min(block.params.length, r.params.length); i++) {
+                const slot = r.params[i];
+                const val = block.params[i];
+                if (!slot || val == null) continue;
+                if (slot.type === 'Indicator' || slot.type === 'Text') continue;
+                if (typeof val === 'object' && '__field' in val) continue;  // explicit OK
+
+                if (FIELD_SLOTS.has(slot.type)) {
+                    if (typeof val === 'object' && val.type) {
+                        issues.push({ severity: 'warning', path: `${p}.params[${i}]`,
+                            msg: `${block.type}: field slot (${slot.type}${slot.menu ? ':' + slot.menu : ''}) got block ${val.type} — expected bare ${slot.menu ? slot.menu + ' id' : 'string'}` });
+                    }
+                }
+                // Block slots: any value works (primitives wrap, blocks recurse).
+            }
+        }
+
+        // statementCount: over is bad, under is OK (means empty branches).
+        const sgot = Array.isArray(block.statements) ? block.statements.length : 0;
+        if (sgot > r.statementCount) {
+            issues.push({ severity: 'error', path: p,
+                msg: `${block.type}: too many statements (got ${sgot}, expected ${r.statementCount})` });
+        }
+
+        // Recurse.
+        (block.params || []).forEach((c, i) => {
+            if (c && typeof c === 'object' && c.type) walkBlock(c, `${p}.params[${i}]`);
+        });
+        (block.statements || []).forEach((th, ti) =>
+            (th || []).forEach((b, bi) => walkBlock(b, `${p}.statements[${ti}][${bi}]`)));
+    }
+
+    // Object scripts.
+    (spec.objects || []).forEach((o, oi) => {
+        const tag = o.id ? `${oi}=${o.id}` : `${oi}`;
+        const threads = Array.isArray(o.script) ? o.script : [];
+        threads.forEach((th, ti) =>
+            (th || []).forEach((b, bi) =>
+                walkBlock(b, `objects[${tag}].script[${ti}][${bi}]`)));
+    });
+
+    // Function content (skip if already stringified — that path is for
+    // pre-built strings the author opted into).
+    (spec.functions || []).forEach((f, fi) => {
+        if (!Array.isArray(f.content)) return;
+        const tag = f.id ? `${fi}=${f.id}` : `${fi}`;
+        f.content.forEach((th, ti) =>
+            (th || []).forEach((b, bi) =>
+                walkBlock(b, `functions[${tag}].content[${ti}][${bi}]`)));
+    });
+
+    return issues;
 }
 
 // -------- Project assembly ----------
@@ -185,10 +319,18 @@ function buildAssets(_spec) {
         if (!fs.existsSync(absPath)) return null;
         const buf = fs.readFileSync(absPath);
         const ext = (path.extname(absPath).slice(1) || 'bin').toLowerCase();
-        const r = await bundler.bundle({ buf, ext, kind });
+        // path itself is the cacheKey — same file referenced N times → 1 tar entry.
+        const r = await bundler.bundle({ buf, ext, kind, cacheKey: 'path:' + absPath });
         return { hash: r.hash, fileurl: r.fileurl, ext: r.ext, dimension: r.dimension };
     };
-    return { bundleOne, getFiles: () => bundler.getFiles() };
+    // Bundle a Buffer / string directly. Used for sprite-gen output (svgString).
+    // cacheKey is content-addressed (sha1) so duplicate generated svgs dedup.
+    const bundleBuf = async (buf, ext, kind) => {
+        const cacheKey = ext + ':' + crypto.createHash('sha1').update(buf).digest('hex');
+        const r = await bundler.bundle({ buf, ext, kind, cacheKey });
+        return { hash: r.hash, fileurl: r.fileurl, ext: r.ext, dimension: r.dimension };
+    };
+    return { bundleOne, bundleBuf, getFiles: () => bundler.getFiles() };
 }
 
 export async function buildProject(spec) {
@@ -261,12 +403,20 @@ export async function buildProject(spec) {
     for (const o of (spec.objects || [])) {
         const pictures = [];
         for (const p of (o.pictures || [])) {
-            // Bundle into the tar whenever we can resolve the reference to a
-            // file under public/ (or an explicit `path`). The result is a
-            // self-contained .ent that works in any Entry editor — not just
-            // against this repo's server.
-            const localPath = resolveLocalPath(p);
-            const bundled = localPath ? await assets.bundleOne(localPath, 'image') : null;
+            // Bundle into the tar whenever we can resolve the reference. Three
+            // cases (in priority order):
+            //   1. svgString — generated SVG (sprite-gen). Bundle bytes directly,
+            //      content-hashed → duplicate generated SVGs dedup automatically.
+            //   2. path / fileurl resolves under public/ → read file, bundle.
+            //   3. external (http/data/temp/...) → leave fileurl as-is.
+            // Result is a self-contained .ent that works in any Entry editor.
+            let bundled = null;
+            if (typeof p.svgString === 'string' && p.svgString.length > 0) {
+                bundled = await assets.bundleBuf(Buffer.from(p.svgString, 'utf8'), 'svg', 'image');
+            } else {
+                const localPath = resolveLocalPath(p);
+                if (localPath) bundled = await assets.bundleOne(localPath, 'image');
+            }
             const fileurl = bundled ? bundled.fileurl : (p.fileurl || null);
             // Picture object shape matches playentry.org's output
             // (Downloads/260423_작품.ent): id, dimension, filename, name,
@@ -426,15 +576,51 @@ export async function writeEnt(spec, outPath) {
     return { outPath, size: buffer.length, objectCount: project.objects.length };
 }
 
-// CLI: `node tools/make-ent.mjs <spec.json> <out.ent>`
+// CLI usage:
+//   node tools/make-ent.mjs <spec.{json,mjs}> <out.ent>     build .ent
+//   node tools/make-ent.mjs --check <spec.{json,mjs}>       validate without building
+//
+// Spec source:
+//   .json → parsed as JSON literally
+//   .mjs / .js → dynamically imported; uses `default` export (or whole module)
+//                so authors can use the spec-DSL helpers (tools/lib/spec-dsl.mjs)
 if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}` ||
     process.argv[1] && process.argv[1].endsWith('make-ent.mjs')) {
-    const [specPath, outPath] = process.argv.slice(2);
-    if (!specPath || !outPath) {
-        console.error('usage: node tools/make-ent.mjs <spec.json> <out.ent>');
+    const args = process.argv.slice(2);
+    const checkOnly = args.includes('--check');
+    const positional = args.filter(a => !a.startsWith('--'));
+    const specPath = positional[0];
+    const outPath = positional[1];
+
+    if (!specPath || (!checkOnly && !outPath)) {
+        console.error('usage:');
+        console.error('  node tools/make-ent.mjs <spec.{json,mjs}> <out.ent>     build .ent');
+        console.error('  node tools/make-ent.mjs --check <spec.{json,mjs}>       validate only');
         process.exit(1);
     }
-    const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+
+    let spec;
+    if (/\.(mjs|js)$/i.test(specPath)) {
+        const abs = path.resolve(specPath);
+        const mod = await import(url.pathToFileURL(abs).href);
+        spec = mod.default || mod.spec || mod;
+    } else {
+        spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+    }
+
+    if (checkOnly) {
+        const issues = validateSpec(spec);
+        let errors = 0, warnings = 0;
+        for (const iss of issues) {
+            const tag = iss.severity === 'error' ? '✗ ERR' : '⚠ WARN';
+            console.log(`${tag}  ${iss.path}\n      ${iss.msg}`);
+            if (iss.severity === 'error') errors++; else warnings++;
+        }
+        const status = errors > 0 ? 'FAIL' : warnings > 0 ? 'OK with warnings' : 'OK';
+        console.log(`\n[make-ent --check] ${specPath}: ${status} — ${errors} error${errors === 1 ? '' : 's'}, ${warnings} warning${warnings === 1 ? '' : 's'}`);
+        process.exit(errors > 0 ? 1 : 0);
+    }
+
     const r = await writeEnt(spec, outPath);
     console.log('[make-ent] wrote', r.outPath, r.size, 'bytes,', r.objectCount, 'objects');
 }

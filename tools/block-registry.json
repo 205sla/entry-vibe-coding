@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-23T11:22:18.537Z",
+  "generatedAt": "2026-04-27T16:41:31.789Z",
   "entryjsPath": "C:\\Users\\young\\prg\\ENTRY\\entryjs",
   "blockCount": 274,
   "issues": [],
@@ -9,6 +9,11 @@
       "category": "ai_learning",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "ai_learning",
@@ -20,6 +25,11 @@
       "category": "ai_learning",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "ai_learning",
@@ -31,6 +41,11 @@
       "category": "ai_learning",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "ai_learning",
@@ -42,6 +57,11 @@
       "category": "ai_learning",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {},
       "skeleton": "basic",
       "class": "ai_learning",
@@ -53,6 +73,14 @@
       "category": "ai_learning",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MODE": 0
       },
@@ -66,6 +94,15 @@
       "category": "ai_learning",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "TEXT": 0
       },
@@ -79,6 +116,7 @@
       "category": "ai_learning",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": {},
       "skeleton": "basic_string_field",
       "class": "ai_learning",
@@ -90,6 +128,11 @@
       "category": "ai_learning",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic"
+        }
+      ],
       "paramsKeyMap": {
         "GROUP": 0
       },
@@ -103,6 +146,11 @@
       "category": "ai_learning",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic"
+        }
+      ],
       "paramsKeyMap": {
         "GROUP": 0
       },
@@ -116,6 +164,11 @@
       "category": "ai_learning",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "TEXT": 0
       },
@@ -129,6 +182,7 @@
       "category": "ai_learning",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": null,
       "skeleton": "basic_boolean_field",
       "class": "ai_learning",
@@ -140,6 +194,14 @@
       "category": "ai_learning",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VISIBLE": 0
       },
@@ -153,6 +215,14 @@
       "category": "ai_learning",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VISIBLE": 0
       },
@@ -166,6 +236,11 @@
       "category": "ai_learning",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "TYPE": 0
       },
@@ -179,6 +254,11 @@
       "category": "ai_learning_cluster",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "ai_learning",
@@ -190,6 +270,16 @@
       "category": "ai_learning_cluster",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -203,6 +293,14 @@
       "category": "ai_learning_cluster",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "CENTRIOD_TYPE": 0
       },
@@ -216,6 +314,7 @@
       "category": "ai_learning_cluster",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": {},
       "skeleton": "basic_string_field",
       "class": "ai_learning",
@@ -227,6 +326,16 @@
       "category": "ai_learning_cluster",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        }
+      ],
       "paramsKeyMap": {
         "K": 0,
         "ATTR": 1
@@ -241,6 +350,16 @@
       "category": "ai_learning_cluster",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1
       },
@@ -254,6 +373,24 @@
       "category": "ai_learning_cluster",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3
@@ -268,6 +405,32 @@
       "category": "ai_learning_cluster",
       "paramCount": 6,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -283,6 +446,40 @@
       "category": "ai_learning_cluster",
       "paramCount": 8,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -299,6 +496,48 @@
       "category": "ai_learning_cluster",
       "paramCount": 10,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -316,6 +555,56 @@
       "category": "ai_learning_cluster",
       "paramCount": 12,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -334,6 +623,11 @@
       "category": "ai_learning_decisiontree",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "ai_learning",
@@ -345,6 +639,19 @@
       "category": "ai_learning_decisiontree",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "OPTION": 0,
         "VALUE": 1
@@ -359,6 +666,14 @@
       "category": "ai_learning_decisiontree",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VISIBLE": 0
       },
@@ -372,6 +687,11 @@
       "category": "ai_learning_knn",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "ai_learning",
@@ -383,6 +703,16 @@
       "category": "ai_learning_knn",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -396,6 +726,16 @@
       "category": "ai_learning_knn",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1
       },
@@ -409,6 +749,24 @@
       "category": "ai_learning_knn",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3
@@ -423,6 +781,32 @@
       "category": "ai_learning_knn",
       "paramCount": 6,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -438,6 +822,40 @@
       "category": "ai_learning_knn",
       "paramCount": 8,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -454,6 +872,48 @@
       "category": "ai_learning_knn",
       "paramCount": 10,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -471,6 +931,56 @@
       "category": "ai_learning_knn",
       "paramCount": 12,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -489,6 +999,22 @@
       "category": "ai_learning_knn",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "CLASS": 2,
@@ -504,6 +1030,30 @@
       "category": "ai_learning_knn",
       "paramCount": 6,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -520,6 +1070,38 @@
       "category": "ai_learning_knn",
       "paramCount": 8,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -537,6 +1119,46 @@
       "category": "ai_learning_knn",
       "paramCount": 10,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -555,6 +1177,54 @@
       "category": "ai_learning_knn",
       "paramCount": 12,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -574,6 +1244,62 @@
       "category": "ai_learning_knn",
       "paramCount": 14,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -594,6 +1320,19 @@
       "category": "ai_learning_knn",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "CLASS": 2
@@ -608,6 +1347,27 @@
       "category": "ai_learning_knn",
       "paramCount": 5,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -623,6 +1383,35 @@
       "category": "ai_learning_knn",
       "paramCount": 7,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -639,6 +1428,43 @@
       "category": "ai_learning_knn",
       "paramCount": 9,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -656,6 +1482,51 @@
       "category": "ai_learning_knn",
       "paramCount": 11,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -674,6 +1545,59 @@
       "category": "ai_learning_knn",
       "paramCount": 13,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -693,6 +1617,11 @@
       "category": "ai_learning_logistic_regression",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "ai_learning",
@@ -704,6 +1633,19 @@
       "category": "ai_learning_logistic_regression",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "OPTION": 0,
         "VALUE": 1
@@ -718,6 +1660,14 @@
       "category": "ai_learning_logistic_regression",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "OPTIMIZER": 0
       },
@@ -731,6 +1681,11 @@
       "category": "ai_learning_regression",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "ai_learning",
@@ -742,6 +1697,19 @@
       "category": "ai_learning_regression",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "OPTION": 0,
         "VALUE": 1
@@ -756,6 +1724,16 @@
       "category": "ai_learning_regression",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1
       },
@@ -769,6 +1747,24 @@
       "category": "ai_learning_regression",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3
@@ -783,6 +1779,32 @@
       "category": "ai_learning_regression",
       "paramCount": 6,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -798,6 +1820,40 @@
       "category": "ai_learning_regression",
       "paramCount": 8,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -814,6 +1870,48 @@
       "category": "ai_learning_regression",
       "paramCount": 10,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -831,6 +1929,56 @@
       "category": "ai_learning_regression",
       "paramCount": 12,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "TextDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "ATTR1": 1,
         "ATTR2": 3,
@@ -849,6 +1997,7 @@
       "category": "ai_learning_regression",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": {},
       "skeleton": "basic_string_field",
       "class": "ai_learning",
@@ -860,6 +2009,11 @@
       "category": "ai_learning_svm",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "ai_learning",
@@ -871,6 +2025,19 @@
       "category": "ai_learning_svm",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "OPTION": 0,
         "VALUE": 1
@@ -885,6 +2052,11 @@
       "category": "ai_learning_svm",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "TEXT": 0
       },
@@ -898,6 +2070,20 @@
       "category": "ai_learning_svm",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        null,
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "KERNEL": 0,
         "OPTION": 1,
@@ -913,6 +2099,11 @@
       "category": "ai_utilize_media_pipe",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "media_pipe",
@@ -924,6 +2115,10 @@
       "category": "ai_utilize_media_pipe",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        null,
+        null
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -937,6 +2132,10 @@
       "category": "ai_utilize_media_pipe",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        null,
+        null
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -950,6 +2149,7 @@
       "category": "ai_utilize_media_pipe",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -963,6 +2163,10 @@
       "category": "ai_utilize_media_pipe",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        null,
+        null
+      ],
       "paramsKeyMap": {
         "TARGET": 0
       },
@@ -976,6 +2180,14 @@
       "category": "ai_utilize_media_pipe",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        null
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -989,6 +2201,14 @@
       "category": "ai_utilize_media_pipe",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "TARGET": 0,
         "TYPE": 1
@@ -1003,6 +2223,11 @@
       "category": "analysis",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_button",
       "class": null,
@@ -1014,6 +2239,18 @@
       "category": "analysis",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "PROPERTY": 1
@@ -1028,6 +2265,23 @@
       "category": "analysis",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "NUMBER": 1,
@@ -1043,6 +2297,23 @@
       "category": "analysis",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "NUMBER": 1,
@@ -1058,6 +2329,30 @@
       "category": "analysis",
       "paramCount": 5,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "NUMBER": 1,
@@ -1074,6 +2369,15 @@
       "category": "analysis",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0
       },
@@ -1087,6 +2391,15 @@
       "category": "analysis",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "PROPERTY": 1
@@ -1101,6 +2414,22 @@
       "category": "analysis",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "ROW": 1,
@@ -1116,6 +2445,17 @@
       "category": "analysis",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "COL": 1
@@ -1130,6 +2470,20 @@
       "category": "analysis",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "COL": 1,
@@ -1145,6 +2499,15 @@
       "category": "analysis",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "CHART_INDEX": 1
@@ -1159,6 +2522,20 @@
       "category": "analysis",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "SECOND": 1
@@ -1173,6 +2550,18 @@
       "category": "analysis",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "DropdownDynamic"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "CHART_INDEX": 1
@@ -1187,6 +2576,11 @@
       "category": "analysis",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {},
       "skeleton": "basic",
       "class": "analysis",
@@ -1198,6 +2592,22 @@
       "category": "analysis",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "FIELD1": 1,
@@ -1213,6 +2623,23 @@
       "category": "analysis",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "CELL": 1,
@@ -1228,6 +2655,16 @@
       "category": "analysis",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "CELL": 1
@@ -1242,6 +2679,26 @@
       "category": "analysis",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "tables"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "MATRIX": 0,
         "FIELD": 1,
@@ -1258,6 +2715,11 @@
       "category": "brush",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "stamp",
@@ -1269,6 +2731,11 @@
       "category": "brush",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "brush_control",
@@ -1280,6 +2747,11 @@
       "category": "brush",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "brush_control",
@@ -1291,6 +2763,11 @@
       "category": "brush",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "fill_control",
@@ -1302,6 +2779,11 @@
       "category": "brush",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "fill_control",
@@ -1313,6 +2795,15 @@
       "category": "brush",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -1326,6 +2817,11 @@
       "category": "brush",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "brush_color",
@@ -1337,6 +2833,15 @@
       "category": "brush",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -1350,6 +2855,16 @@
       "category": "brush",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -1363,6 +2878,16 @@
       "category": "brush",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -1376,6 +2901,16 @@
       "category": "brush",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -1389,6 +2924,16 @@
       "category": "brush",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -1402,6 +2947,11 @@
       "category": "brush",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "brush_clear",
@@ -1413,6 +2963,21 @@
       "category": "calc",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "LEFTHAND": 0,
         "OPERATOR": 1,
@@ -1428,6 +2993,27 @@
       "category": "calc",
       "paramCount": 5,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "LEFTHAND": 1,
         "RIGHTHAND": 3
@@ -1442,6 +3028,17 @@
       "category": "calc",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 1
       },
@@ -1455,6 +3052,21 @@
       "category": "calc",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "spritesWithSelf"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 1,
         "COORDINATE": 3
@@ -1469,6 +3081,30 @@
       "category": "calc",
       "paramCount": 6,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "LEFTHAND": 1,
         "RIGHTHAND": 3,
@@ -1484,6 +3120,22 @@
       "category": "calc",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "LEFTHAND": 1,
         "VALUE": 3
@@ -1498,6 +3150,11 @@
       "category": "calc",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_string_field",
       "class": "calc_timer",
@@ -1509,6 +3166,20 @@
       "category": "calc",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "ACTION": 1
       },
@@ -1522,6 +3193,20 @@
       "category": "calc",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "ACTION": 1
       },
@@ -1535,6 +3220,17 @@
       "category": "calc",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 1
       },
@@ -1548,6 +3244,18 @@
       "category": "calc",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "spritesWithMouse"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 1
       },
@@ -1561,6 +3269,7 @@
       "category": "calc",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": null,
       "skeleton": "basic_string_field",
       "class": "calc_user",
@@ -1572,6 +3281,7 @@
       "category": "calc",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": null,
       "skeleton": "basic_string_field",
       "class": "calc_user",
@@ -1583,6 +3293,18 @@
       "category": "calc",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "STRING": 1
       },
@@ -1596,6 +3318,18 @@
       "category": "calc",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "STRING": 1
       },
@@ -1609,6 +3343,25 @@
       "category": "calc",
       "paramCount": 5,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE1": 1,
         "VALUE2": 3
@@ -1623,6 +3376,26 @@
       "category": "calc",
       "paramCount": 5,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "LEFTHAND": 1,
         "RIGHTHAND": 3
@@ -1637,6 +3410,34 @@
       "category": "calc",
       "paramCount": 7,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "STRING": 1,
         "START": 3,
@@ -1652,6 +3453,22 @@
       "category": "calc",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "STRING": 0,
         "TARGET": 2
@@ -1666,6 +3483,25 @@
       "category": "calc",
       "paramCount": 5,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "LEFTHAND": 1,
         "RIGHTHAND": 3
@@ -1680,6 +3516,32 @@
       "category": "calc",
       "paramCount": 7,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "STRING": 1,
         "OLD_WORD": 3,
@@ -1695,6 +3557,24 @@
       "category": "calc",
       "paramCount": 5,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "STRING": 1,
         "CASE": 3
@@ -1709,6 +3589,12 @@
       "category": "calc",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "blockCount"
+        }
+      ],
       "paramsKeyMap": {
         "OBJECT": 0
       },
@@ -1722,6 +3608,23 @@
       "category": "calc",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        }
+      ],
       "paramsKeyMap": {
         "RED": 0,
         "GREEN": 1,
@@ -1737,6 +3640,15 @@
       "category": "calc",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "HEX": 0,
         "COLOR": 1
@@ -1751,6 +3663,12 @@
       "category": "calc",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "boolean"
+        }
+      ],
       "paramsKeyMap": {
         "BOOLEAN": 0
       },
@@ -1764,6 +3682,16 @@
       "category": "flow",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "SECOND": 0
       },
@@ -1777,6 +3705,16 @@
       "category": "flow",
       "paramCount": 2,
       "statementCount": 1,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -1790,6 +3728,15 @@
       "category": "flow",
       "paramCount": 2,
       "statementCount": 1,
+      "params": [
+        {
+          "type": "Indicator"
+        },
+        {
+          "type": "Block",
+          "accept": "Boolean"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_loop",
       "class": "repeat",
@@ -1801,6 +3748,18 @@
       "category": "flow",
       "paramCount": 3,
       "statementCount": 1,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "boolean"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "BOOL": 0,
         "OPTION": 1
@@ -1815,6 +3774,11 @@
       "category": "flow",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "repeat",
@@ -1826,6 +3790,11 @@
       "category": "flow",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "repeat",
@@ -1837,6 +3806,15 @@
       "category": "flow",
       "paramCount": 2,
       "statementCount": 1,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "boolean"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "BOOL": 0
       },
@@ -1850,6 +3828,18 @@
       "category": "flow",
       "paramCount": 3,
       "statementCount": 2,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "boolean"
+        },
+        {
+          "type": "Indicator"
+        },
+        {
+          "type": "LineBreak"
+        }
+      ],
       "paramsKeyMap": {
         "BOOL": 0
       },
@@ -1863,6 +3853,15 @@
       "category": "flow",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "boolean"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "BOOL": 0
       },
@@ -1876,6 +3875,14 @@
       "category": "flow",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "TARGET": 0
       },
@@ -1889,6 +3896,11 @@
       "category": "flow",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_without_next",
       "class": "terminate",
@@ -1900,6 +3912,11 @@
       "category": "flow",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_event",
       "class": "clone",
@@ -1911,6 +3928,15 @@
       "category": "flow",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "clone"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -1924,6 +3950,11 @@
       "category": "flow",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_without_next",
       "class": "clone",
@@ -1935,6 +3966,11 @@
       "category": "flow",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "clone",
@@ -1946,6 +3982,11 @@
       "category": "func",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_button",
       "class": null,
@@ -1957,6 +3998,11 @@
       "category": "func",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_text",
       "class": "properties",
@@ -1967,6 +4013,11 @@
       "category": "func",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_button",
       "class": "properties",
@@ -1978,6 +4029,18 @@
       "category": "func",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VARIABLE": 0,
         "VALUE": 1
@@ -1992,6 +4055,14 @@
       "category": "func",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VARIABLE": 0
       },
@@ -2005,6 +4076,22 @@
       "category": "func",
       "paramCount": 4,
       "statementCount": 1,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "param"
+        },
+        {
+          "type": "Indicator"
+        },
+        {
+          "type": "LineBreak"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        }
+      ],
       "paramsKeyMap": {
         "FIELD": 0,
         "VALUE": 3
@@ -2018,6 +4105,11 @@
       "category": "func",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "function_executor",
@@ -2028,6 +4120,7 @@
       "category": "func",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": null,
       "skeleton": "basic_string_field",
       "class": "function_executor",
@@ -2038,6 +4131,15 @@
       "category": "func",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextInput"
+        },
+        {
+          "type": "Output",
+          "accept": "param"
+        }
+      ],
       "paramsKeyMap": {
         "NAME": 0,
         "NEXT": 1
@@ -2052,6 +4154,16 @@
       "category": "func",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Output",
+          "accept": "param"
+        }
+      ],
       "paramsKeyMap": {
         "PARAM": 0,
         "NEXT": 1
@@ -2066,6 +4178,16 @@
       "category": "func",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "boolean"
+        },
+        {
+          "type": "Output",
+          "accept": "param"
+        }
+      ],
       "paramsKeyMap": {
         "PARAM": 0,
         "NEXT": 1
@@ -2080,6 +4202,7 @@
       "category": "func",
       "paramCount": 0,
       "statementCount": 0,
+      "params": null,
       "paramsKeyMap": null,
       "skeleton": "basic_string_field",
       "class": null,
@@ -2090,6 +4213,7 @@
       "category": "func",
       "paramCount": 0,
       "statementCount": 0,
+      "params": null,
       "paramsKeyMap": null,
       "skeleton": "basic_boolean_field",
       "class": null,
@@ -2100,6 +4224,15 @@
       "category": "func",
       "paramCount": 2,
       "statementCount": 1,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "param"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "FIELD": 0
       },
@@ -2112,6 +4245,11 @@
       "category": "judgement",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_boolean_field",
       "class": "boolean_input",
@@ -2123,6 +4261,11 @@
       "category": "judgement",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_boolean_field",
       "class": "boolean_input",
@@ -2134,6 +4277,14 @@
       "category": "judgement",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Keyboard"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2147,6 +4298,18 @@
       "category": "judgement",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "collision"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 1
       },
@@ -2160,6 +4323,21 @@
       "category": "judgement",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "TYPE": 2
@@ -2174,6 +4352,19 @@
       "category": "judgement",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        }
+      ],
       "paramsKeyMap": {
         "LEFTHAND": 0,
         "OPERATOR": 1,
@@ -2189,6 +4380,19 @@
       "category": "judgement",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "boolean"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "boolean"
+        }
+      ],
       "paramsKeyMap": {
         "LEFTHAND": 0,
         "OPERATOR": 1,
@@ -2204,6 +4408,18 @@
       "category": "judgement",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "boolean"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 1
       },
@@ -2217,6 +4433,11 @@
       "category": "judgement",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_boolean_field",
       "class": "boolean_input",
@@ -2228,6 +4449,11 @@
       "category": "judgement",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        }
+      ],
       "paramsKeyMap": {
         "DEVICE": 0
       },
@@ -2241,6 +4467,7 @@
       "category": "judgement",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": null,
       "skeleton": "basic_boolean_field",
       "class": "boolean_device",
@@ -2252,6 +4479,11 @@
       "category": "looks",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "visibility",
@@ -2263,6 +4495,11 @@
       "category": "looks",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "visibility",
@@ -2274,6 +4511,23 @@
       "category": "looks",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "SECOND": 1,
@@ -2289,6 +4543,18 @@
       "category": "looks",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "OPTION": 1
@@ -2303,6 +4569,11 @@
       "category": "looks",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "say",
@@ -2314,6 +4585,15 @@
       "category": "looks",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2327,6 +4607,14 @@
       "category": "looks",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "DRIECTION": 0
       },
@@ -2340,6 +4628,19 @@
       "category": "looks",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "EFFECT": 0,
         "VALUE": 1
@@ -2354,6 +4655,19 @@
       "category": "looks",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "EFFECT": 0,
         "VALUE": 1
@@ -2368,6 +4682,11 @@
       "category": "looks",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "effect",
@@ -2379,6 +4698,16 @@
       "category": "looks",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2392,6 +4721,16 @@
       "category": "looks",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2405,6 +4744,19 @@
       "category": "looks",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "DIMENSION": 0,
         "VALUE": 1
@@ -2419,6 +4771,11 @@
       "category": "looks",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {},
       "skeleton": "basic",
       "class": "scale",
@@ -2430,6 +4787,11 @@
       "category": "looks",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "flip",
@@ -2441,6 +4803,11 @@
       "category": "looks",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "flip",
@@ -2452,6 +4819,14 @@
       "category": "looks",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "LOCATION": 0
       },
@@ -2465,6 +4840,16 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2478,6 +4863,11 @@
       "category": "moving",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "walk",
@@ -2489,6 +4879,16 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2502,6 +4902,16 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2515,6 +4925,26 @@
       "category": "moving",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE1": 0,
         "VALUE2": 1,
@@ -2530,6 +4960,16 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2543,6 +4983,16 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2556,6 +5006,21 @@
       "category": "moving",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE1": 0,
         "VALUE2": 1
@@ -2570,6 +5035,26 @@
       "category": "moving",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE1": 0,
         "VALUE2": 1,
@@ -2585,6 +5070,15 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "spritesWithMouse"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2598,6 +5092,20 @@
       "category": "moving",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "spritesWithMouse"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "TARGET": 1
@@ -2612,6 +5120,16 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "angle"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2625,6 +5143,16 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "defaultType": "angle",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2638,6 +5166,21 @@
       "category": "moving",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "angle"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "ANGLE": 1
@@ -2652,6 +5195,21 @@
       "category": "moving",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "angle"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "DURATION": 0,
         "AMOUNT": 1
@@ -2666,6 +5224,16 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "defaultType": "angle",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2679,6 +5247,16 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "defaultType": "angle",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2692,6 +5270,15 @@
       "category": "moving",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "spritesWithMouse"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2705,6 +5292,21 @@
       "category": "moving",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "angle"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "ANGLE": 0,
         "VALUE": 1
@@ -2719,6 +5321,15 @@
       "category": "sound",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2732,6 +5343,20 @@
       "category": "sound",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "SECOND": 1
@@ -2746,6 +5371,25 @@
       "category": "sound",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "START": 1,
@@ -2761,6 +5405,15 @@
       "category": "sound",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2774,6 +5427,20 @@
       "category": "sound",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "SECOND": 1
@@ -2788,6 +5455,25 @@
       "category": "sound",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "START": 1,
@@ -2803,6 +5489,16 @@
       "category": "sound",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2816,6 +5512,16 @@
       "category": "sound",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2829,6 +5535,7 @@
       "category": "sound",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2842,6 +5549,16 @@
       "category": "sound",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2855,6 +5572,16 @@
       "category": "sound",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2868,6 +5595,14 @@
       "category": "sound",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "TARGET": 0
       },
@@ -2881,6 +5616,15 @@
       "category": "sound",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -2894,6 +5638,11 @@
       "category": "sound",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "TARGET": 0
       },
@@ -2907,6 +5656,11 @@
       "category": "sound",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_string_field",
       "class": "sound_volume",
@@ -2918,6 +5672,18 @@
       "category": "sound",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "sounds"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 1
       },
@@ -2931,6 +5697,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_button",
       "class": null,
@@ -2942,6 +5713,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_event",
       "class": "event",
@@ -2953,6 +5729,14 @@
       "category": "start",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        },
+        {
+          "type": "Keyboard"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 1
       },
@@ -2966,6 +5750,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_event",
       "class": "event",
@@ -2977,6 +5766,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_event",
       "class": "event",
@@ -2988,6 +5782,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_event",
       "class": "event",
@@ -2999,6 +5798,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_event",
       "class": "event",
@@ -3010,6 +5814,15 @@
       "category": "start",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "messages"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 1
       },
@@ -3023,6 +5836,15 @@
       "category": "start",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "messages"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3036,6 +5858,15 @@
       "category": "start",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "messages"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3049,6 +5880,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_event",
       "class": "scene",
@@ -3060,6 +5896,15 @@
       "category": "start",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "scenes"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3073,6 +5918,14 @@
       "category": "start",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "OPERATOR": 0
       },
@@ -3086,6 +5939,28 @@
       "category": "start",
       "paramCount": 6,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "sprites"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3099,6 +5974,21 @@
       "category": "start",
       "paramCount": 4,
       "statementCount": 1,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "allSprites"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "TextInput"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3112,6 +6002,15 @@
       "category": "start",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "sprites"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3125,6 +6024,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3138,6 +6042,20 @@
       "category": "start",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextInput"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3151,6 +6069,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextInput"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3164,6 +6087,14 @@
       "category": "start",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextInput"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3177,6 +6108,11 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextInput"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3190,6 +6126,9 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        null
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3203,6 +6142,9 @@
       "category": "start",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        null
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3216,6 +6158,7 @@
       "category": "start",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3229,6 +6172,7 @@
       "category": "start",
       "paramCount": 0,
       "statementCount": 0,
+      "params": [],
       "paramsKeyMap": {},
       "skeleton": "basic_boolean_field",
       "class": "checker",
@@ -3240,6 +6184,17 @@
       "category": "start",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "TextInput"
+        },
+        {
+          "type": "TextInput"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "checker",
@@ -3251,6 +6206,12 @@
       "category": "text",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "textBoxWithSelf"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3264,6 +6225,15 @@
       "category": "text",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3277,6 +6247,15 @@
       "category": "text",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3290,6 +6269,15 @@
       "category": "text",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3303,6 +6291,17 @@
       "category": "text",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "EFFECT": 0,
         "MODE": 1
@@ -3317,6 +6316,15 @@
       "category": "text",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "fonts"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "FONT": 0
       },
@@ -3330,6 +6338,15 @@
       "category": "text",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3343,6 +6360,15 @@
       "category": "text",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3356,6 +6382,11 @@
       "category": "text",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic",
       "class": "text",
@@ -3367,6 +6398,11 @@
       "category": "variable",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_button",
       "class": null,
@@ -3378,6 +6414,11 @@
       "category": "variable",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_button",
       "class": null,
@@ -3389,6 +6430,15 @@
       "category": "variable",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0
       },
@@ -3402,6 +6452,11 @@
       "category": "variable",
       "paramCount": 1,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": null,
       "skeleton": "basic_string_field",
       "class": "ask",
@@ -3413,6 +6468,14 @@
       "category": "variable",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Dropdown"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "BOOL": 0
       },
@@ -3426,6 +6489,15 @@
       "category": "variable",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "variables"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "VARIABLE": 0
       },
@@ -3439,6 +6511,19 @@
       "category": "variable",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "variables"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VARIABLE": 0,
         "VALUE": 1
@@ -3453,6 +6538,19 @@
       "category": "variable",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "variables"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VARIABLE": 0,
         "VALUE": 1
@@ -3467,6 +6565,15 @@
       "category": "variable",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "variables"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VARIABLE": 0
       },
@@ -3480,6 +6587,15 @@
       "category": "variable",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "variables"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VARIABLE": 0
       },
@@ -3493,6 +6609,26 @@
       "category": "variable",
       "paramCount": 5,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "lists"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "LIST": 1,
         "INDEX": 3
@@ -3507,6 +6643,19 @@
       "category": "variable",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "lists"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "LIST": 1
@@ -3521,6 +6670,20 @@
       "category": "variable",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "lists"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "VALUE": 0,
         "LIST": 1
@@ -3535,6 +6698,24 @@
       "category": "variable",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "lists"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "DATA": 0,
         "LIST": 1,
@@ -3550,6 +6731,24 @@
       "category": "variable",
       "paramCount": 4,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "lists"
+        },
+        {
+          "type": "Block",
+          "accept": "string",
+          "defaultType": "number"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "LIST": 0,
         "INDEX": 1,
@@ -3565,6 +6764,18 @@
       "category": "variable",
       "paramCount": 3,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "lists"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "LIST": 1
       },
@@ -3578,6 +6789,25 @@
       "category": "variable",
       "paramCount": 5,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "Text"
+        },
+        {
+          "type": "DropdownDynamic",
+          "menu": "lists"
+        },
+        {
+          "type": "Text"
+        },
+        {
+          "type": "Block",
+          "accept": "string"
+        },
+        {
+          "type": "Text"
+        }
+      ],
       "paramsKeyMap": {
         "LIST": 1,
         "DATA": 3
@@ -3592,6 +6822,15 @@
       "category": "variable",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "lists"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "LIST": 0
       },
@@ -3605,6 +6844,15 @@
       "category": "variable",
       "paramCount": 2,
       "statementCount": 0,
+      "params": [
+        {
+          "type": "DropdownDynamic",
+          "menu": "lists"
+        },
+        {
+          "type": "Indicator"
+        }
+      ],
       "paramsKeyMap": {
         "LIST": 0
       },

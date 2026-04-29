@@ -7,9 +7,12 @@
     "setup": "node scripts/setup.mjs",
     "start": "node server.js",
     "build:registry": "node tools/build-block-registry.mjs",
+    "build:assets": "node tools/build-game-assets.mjs",
     "test:smoke": "node --test tests/smoke.test.js",
     "test:e2e": "playwright test",
-    "verify": "npm run test:smoke && npm run test:e2e",
+    "verify:runtime": "node tools/run-all-verify.mjs",
+    "verify:links": "node tools/check-knowledge-links.mjs",
+    "verify": "npm run test:smoke && npm run verify:links && npm run test:e2e && npm run verify:runtime",
     "lint": "eslint ."
   },
   "dependencies": {

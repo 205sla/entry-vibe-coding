@@ -39,10 +39,36 @@ function extractBlocks(objectExpr) {
     return out;
 }
 
+// Extract a single param slot's shape from its ObjectExpression in source.
+// We capture only the keys that affect spec authoring/validation:
+//   - type: 'Block' | 'Dropdown' | 'DropdownDynamic' | 'Indicator' | 'Text' | ...
+//   - accept: 'string' | 'boolean' | 'param' (Block slot value type)
+//   - menu / menuName: variables | lists | messages | scenes | ... (DropdownDynamic source)
+//   - defaultType: number | text | … (default literal-block when the slot is empty)
+// Returns null for non-object literal entries (rare).
+function extractParamShape(elem) {
+    if (!elem || elem.type !== 'ObjectExpression') return null;
+    const shape = {};
+    for (const p of elem.properties) {
+        if (p.type !== 'Property') continue;
+        const k = p.key.name || (p.key.value && String(p.key.value));
+        if (!k) continue;
+        // Only take literal scalar values — ignore nested objects/expressions
+        // (color refs, callbacks etc). All keys we care about are strings.
+        if (p.value.type !== 'Literal') continue;
+        if (k === 'type')         shape.type = p.value.value;
+        else if (k === 'accept')  shape.accept = p.value.value;
+        else if (k === 'menuName' || k === 'menu') shape.menu = p.value.value;
+        else if (k === 'defaultType') shape.defaultType = p.value.value;
+    }
+    return Object.keys(shape).length ? shape : null;
+}
+
 function summarizeBlockDef(objExpr) {
     const meta = {
         paramCount: 0,
         statementCount: 0,
+        params: null,           // [{ type, accept?, menu?, defaultType? } | null]
         paramsKeyMap: null,
         skeleton: null,
         class: null,
@@ -54,6 +80,7 @@ function summarizeBlockDef(objExpr) {
         if (!k) continue;
         if (k === 'params' && p.value.type === 'ArrayExpression') {
             meta.paramCount = p.value.elements.length;
+            meta.params = p.value.elements.map(extractParamShape);
         } else if (k === 'statements' && p.value.type === 'ArrayExpression') {
             meta.statementCount = p.value.elements.length;
         } else if (k === 'paramsKeyMap' && p.value.type === 'ObjectExpression') {
