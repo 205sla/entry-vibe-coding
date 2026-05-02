@@ -40,6 +40,8 @@
 - [2026-04-28] `message_cast` 다중 리스너가 같은 frame 동시 발화 → 한 리스너가 변수 갱신, 다른 리스너가 stale 값 read — 가드: 발신자가 변수 모두 set 한 뒤 메시지 발신, 핸들러는 read-only ([`07-runtime-quirks.md` message_cast race](07-runtime-quirks.md#message_cast-핸들러는-동시-실행--같은-메시지-다중-리스너-race))
 - [2026-04-29] `when_message` 핸들러가 template (direction=90) 에도 발화 → direction-as-id 패턴에서 `valueAt('list', 90)` 범위 밖 lookup → silent error 로 scene 전체 손상 (cloneCount=0, 모든 변수 reset) — 가드: 핸들러 첫 블록에 `if_(cmp(coord('self','direction'), '<=', N), [...])` ([`07-runtime-quirks.md` template 발화 가드](07-runtime-quirks.md#when_message-핸들러가-template-에도-발화--direction-as-id-시-invalid-index-lookup-으로-scene-전체-손상))
 - [2026-04-28] `deleteClone()` 후 같은 스크립트 후속 블록 안 실행 (클론 컨텍스트 즉시 소멸) → sendMessage 등이 deleteClone 뒤에 있으면 무발화 — 가드: `if_else` 분기 (deleteClone 은 한 가지에만, 메시지는 다른 가지에) ([`04-script-and-blocks.md` deleteClone 함정](04-script-and-blocks.md#함정-deleteclone-후-같은-스크립트-후속-블록-안-실행))
+- [2026-04-29] 다중 클론이 같은 스크립트에서 글로벌 카운터 (`bul_i` 등) 로 슬롯 list 순회 → 본체 인터리브 실행으로 카운터 0 순간에 `valueAt(list, 0)` → "can not insert value to array" 엔진 정지 — 가드: 슬롯 순회를 `fn.value` 재귀 함수로 캡슐화 (동기 호출이라 atomic) ([`07-runtime-quirks.md` 다중 클론 repeat race](07-runtime-quirks.md#다중-클론의-repeatinf-본체--글로벌-scratch-변수-race))
+- [2026-05-02] 위 race 의 변종 — spawner 가 `repeat.basic(N, [changeVar(idx, 1), createClone, ...])` 로 N 클론 spawn, 각 클론의 cloneStart 가 `valueAt(list, idx)` 읽음. 여러 spawner 동시 작동 시 한쪽이 `setVar(idx, 0)` 으로 리셋한 직후 in-flight 클론이 인덱스 0 lookup → 동일 throw — 가드: 클론이 cloneStart 에서 자체 결정값 (`rand(0, 359)` 등) 으로 글로벌 lookup 회피 ([`07-runtime-quirks.md` cloneStart spawner race 변종](07-runtime-quirks.md#변종-when_clone_start-가-spawner-의-글로벌-카운터를-race-로-읽음))
 
 ## 클릭 hit-test / 좌표
 

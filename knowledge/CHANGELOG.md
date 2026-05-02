@@ -12,6 +12,35 @@
 > - 플랫포머 발판 충돌 패턴 → `04-script-and-blocks.md §플랫포머 발판 충돌 패턴`
 > - 헤드리스 런타임 검증 → `05-host-editor.md §헤드리스 런타임 검증`
 
+## 2026-04-29 — 뱀서라이크 확장팩 (`games/vampire-survival/` Phase A→E)
+
+MVP 슬림 → 기획서 90% 구현 완성판. 5 단계 추가 (적 변종, 피격감, 채찍, 보스+보물상자, 점수). spec ~1,100 → ~1,830 LoC, 18 → 26 오브젝트, 17 → 28 verify.
+
+| Phase | 추가 | 핵심 패턴 |
+|---|---|---|
+| A | 박쥐 + 골렘 (멀티 picture, type slot list) | 시간대별 type 풀, `changeShape(type)` 클론 시작, `valueAt('enemy_speed_t', type)` 매 tick 배수 |
+| B | 데미지 플래시 + 사망 파티클 | `enemy_last_hp` 슬롯 + brightness 펄스 (frontier-guard 패턴), 6 방향 angle table 파티클 |
+| C | 채찍 무기 + 메뉴 3 종 + 카드 5 종 | 단일 매니저 thread 좌/우 alternating, box collision (단일 thread → race 없음) |
+| D | 보스 + 보물상자 + boss bullet (라디얼 8 발) | 단일 인스턴스 sprite + 4 스레드 (spawn/move/attack/death), 별도 bb 슬롯 시스템, `fn.value` `fhb`/`fhp` 추가, 카드 5 회 연속 (treasure_picks_left) |
+| E | 점수 (kills*10 + level*50 + time + boss*500) + 랭킹 (insertion sort) | spec-bullet-circle 의 ranking 패턴 그대로, `대답` 변수 + `ask_and_wait` |
+
+기존 MVP 함정 (다중 클론 race) 가 Phase D 의 boss bullet 에 그대로 재발 → 같은 `fn.value` 패턴 (`fhb`, `fhp`) 으로 일관 해결.
+
+**병합 후 발견 (2026-05-02)** — 첫 레벨업 시 엔진 멈춤. 같은 race 의 **변종** 이 Phase B 의 사망 파티클에 잠복. spawner (적 사망 코드) 의 `setVar('p_spawn_idx', 0) → repeat.basic(6, [changeVar(psi, 1), createClone])` 와 클론의 cloneStart `valueAt('pat', psi)` 사이 race — 여러 적 동시 사망 시 한 적의 reset(0) 직후 다른 적의 in-flight 클론이 인덱스 0 lookup → throw. 1 차 race 와 다른 변종이라 회피 패턴도 다름: cloneStart 에서 자체 결정값 (`rand(0, 359)`) 사용. 정착: [`07-runtime-quirks.md` cloneStart 변종](07-runtime-quirks.md#변종-when_clone_start-가-spawner-의-글로벌-카운터를-race-로-읽음) sub-section + lessons.md.
+
+테스트 전략 메모: manager 가 `survival_time` 을 매 0.1s 덮어쓰므로 verify 에서 `setVar('시간', 121)` 이 즉시 reset. 보스 spawn 검증 시엔 `boss_active` 변수 직접 강제 설정으로 spawn watcher 우회. 보스 bullet 발사 검증은 movement thread 가 `boss_x` 를 -300 에서 이동시키며 bullet 이 즉시 화면 밖에서 spawn → despawn 하는 race 라 미세 검증 어려움 — `boss_atk_cd` 사이클 (증가 → 180 도달 → 0 reset) 으로 간접 확인.
+
+스트레스 (8 초 모든 무기 Lv5 + 보스 + 적 다중) 통과 — 엔진 정상, pageErrors 0.
+
+---
+
+## 2026-04-29 — 뱀서라이크 MVP (`games/vampire-survival/`)
+
+뱀서라이크 (Vampire Survivors 류) 3 분 슬림 게임 작품. 메뉴 → play (오라/지팡이 자동 공격, 좀비 슬롯, 카드 레벨업) → result. 17/17 verify 통과.
+
+새 함정 발견 + 위키 정착:
+- **다중 클론 같은 스크립트의 `repeat.inf` 본체에서 글로벌 카운터 race** — bullet 클론 N 개가 동시 비행 시 `bul_i` reset/increment 가 인터리브되어 list 인덱스 0 순간 발생, `Runtime Error: can not insert value to array` 로 엔진 정지. 회피: 슬롯 순회를 `fn.value` 재귀 함수에 위임 (동기 호출이라 atomic). 정착: [`07-runtime-quirks.md`](07-runtime-quirks.md#다중-클론의-repeatinf-본체--글로벌-scratch-변수-race) 새 섹션 + [`lessons.md`](lessons.md) 한 줄.
+
 ## 2026-04-29 — 디펜스 게임 시리즈 회고 (frontier-guard Phase 1 → 3.2)
 
 7 단계 작업 통합 회고. 자세한 항목별 history 는 아래 각 phase 참조. 본 entry 는 cross-cutting 학습 정리 — 컨텍스트 리셋 후 재진입할 때 빠르게 컨텍스트 회복할 용도.

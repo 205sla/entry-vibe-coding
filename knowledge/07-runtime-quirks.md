@@ -683,3 +683,104 @@ bullet-circle 처럼 `interface: { canvasWidth: 640, ... }` 명시 시 stage 논
 
 - [`tools/verify-frontier-guard.mjs`](../tools/verify-frontier-guard.mjs) `clickStagePoint` — 위 공식. Step 1b 슬롯 가운데 클릭 회귀 가드.
 - [`tools/verify-textbox-click.mjs`](../tools/verify-textbox-click.mjs) — stage=canvas 1:1 가정 (5×5 그리드 클릭). 본 fixture 는 단일 scene + 직접 좌표 매칭으로 작동.
+
+---
+
+## 다중 클론의 `repeat.inf` 본체 = 글로벌 scratch 변수 race
+
+같은 스크립트의 클론 N 개가 각자 `repeat.inf` 본체를 돌리면, Entry 의 executor 가 클론 본체를 **블록 단위로 인터리브** 실행. 본체가 슬롯 순회용 글로벌 카운터 (`i`, `bul_i` 등) 를 reset → increment → list lookup 하는 패턴이면, 한 클론의 `setVar('i', 0)` 와 다른 클론의 `valueAt('list', getVar('i'))` 가 교차 → `i` 가 순간 0 인 채 list 접근 → `Runtime Error: can not insert value to array` (block_variable.js:873) → 엔진 정지.
+
+### 실패 패턴
+
+```js
+// 같은 wand_template 클론 N 개가 각자 동시 실행
+when.cloneStart(),
+repeat.inf([
+    setVar('bul_i', 0),               // ← clone A 가 0 으로 reset
+    setVar('bul_hit', 0),
+    repeat.basic(MAX_ENEMIES, [
+        changeVar('bul_i', 1),         // ← clone B 는 아직 +1 전. 이 사이 A 가 다시 0 으로
+        if_(cmp(valueAt('enemy_active', getVar('bul_i')), '==', 1), [...]),
+        //              ↑ bul_i 가 0 인 순간 → throw
+    ]),
+])
+```
+
+단일 스레드 (player collision, aura tick, spawner) 는 같은 글로벌을 써도 race 없어서 안전. **여러 클론이 같은 스크립트를 도는 경우만** 함정.
+
+### 회피 패턴 — 슬롯 순회를 value 함수에 위임
+
+`fn.value` 호출은 동기 실행 → 한 호출이 끝나야 다음 호출 시작 → 글로벌 globals 가 호출 안에서 atomic. 재귀로 1..MAX 순회.
+
+```js
+const fbh = fn.value('fbh', ['x', 'y', 'idx'],
+    (x, y, idx) => [
+        if_(cmp(idx, '>', MAX_ENEMIES), [
+            setVar('fbh_ret', 0),
+        ], [
+            setVar('fbh_dx', calc(valueAt('enemy_x', idx), '-', x)),
+            setVar('fbh_dy', calc(valueAt('enemy_y', idx), '-', y)),
+            setVar('fbh_dsq', calc(
+                calc(getVar('fbh_dx'), '*', getVar('fbh_dx')),
+                '+',
+                calc(getVar('fbh_dy'), '*', getVar('fbh_dy')),
+            )),
+            if_(and_(
+                cmp(valueAt('enemy_active', idx), '==', 1),
+                cmp(getVar('fbh_dsq'), '<', BULLET_HIT_SQ),
+            ), [
+                setVar('fbh_ret', idx),
+            ], [
+                setVar('fbh_ret', call('fbh', x, y, calc(idx, '+', 1))),
+            ]),
+        ]),
+    ],
+    () => getVar('fbh_ret'),
+);
+
+// bullet 클론 본체에서 한 줄로 호출 — race 없음
+setVar('bul_hit', call('fbh', coord('self', 'x'), coord('self', 'y'), 1)),
+```
+
+`spec-bullet-circle.mjs` 의 `dsq` 함수도 동일 원리 — 다중 enemy 클론이 호출해도 글로벌 `dx`/`dy`/`ret` 가 atomic.
+
+### 변종: `when_clone_start` 가 spawner 의 글로벌 카운터를 race 로 읽음
+
+같은 race 의 다른 발현. spawner 가 `repeat.basic(N, [changeVar(idx, 1), createClone, ...])` 로 N 클론을 spawn 하고, 각 클론의 `cloneStart` 가 `valueAt('list', getVar('idx'))` 를 읽는 패턴. spawner 의 다음 iter 가 idx 갱신을 진행하는 동안 클론의 첫 블록이 idx 값을 캡처 — 어느 시점에 클론이 읽는지 보장 안 됨. 다중 spawner (예: 여러 적이 동시 사망 시 각자 파티클 spawn) 는 더 심각: 한 spawner 가 `setVar(idx, 0)` 로 리셋한 직후 다른 spawner 의 in-flight 클론이 idx=0 으로 list lookup → 인덱스 0 → throw.
+
+```js
+// 실패 패턴 — 적 사망 시 6 방향 파티클 spawn
+setVar('p_spawn_idx', 0),
+repeat.basic(6, [
+    changeVar('p_spawn_idx', 1),       // 1, 2, ..., 6
+    createClone('particle_template'),
+])
+
+// particle 클론 cloneStart:
+turnAbs(valueAt('particle_angles_t', getVar('p_spawn_idx')))
+//                                    ↑ 여러 적 동시 사망 시 다른 적의 reset(0) 캡처 → throw
+```
+
+### 회피 패턴 — 클론이 자체 결정값 갖기
+
+cloneStart 에서 글로벌 lookup 대신 **클론 스스로 값 결정**. 균일 6 방향이 random 6 방향이 되지만 시각 차이 미미.
+
+```js
+// particle 클론 cloneStart — 자체 random angle
+turnAbs(rand(0, 359)),
+```
+
+또는 spawner 가 클론별로 파라미터를 안전하게 전달해야 하면, **direction 을 캐리어로** 사용 (cloneStart 첫 블록에서 `coord('self','direction')` 으로 즉시 회수). 단 enemy/bb 처럼 direction 을 slot id 로 이미 쓰고 있으면 안 됨.
+
+### 일반화 (확장)
+
+- 단일 스레드 / 단일 클론 → 글로벌 scratch 안전 (예: spawner, manager)
+- 다중 클론 같은 스크립트 + list iteration **본체 내** → 반드시 `fn.value` 로 캡슐화 (위 1차 패턴)
+- 다중 클론 같은 스크립트 + cloneStart 가 spawner 의 카운터로 list lookup → 클론이 자체 결정값 (rand) 또는 direction-캐리어로 회피 (위 2차 변종)
+- list 접근 없는 단순 산술/위치 갱신 race → 시각 jank 만, 무시 가능
+
+### 증거
+
+- [`games/vampire-survival/spec.mjs`](../games/vampire-survival/spec.mjs) `fnFindBulletHit` — 1차: 재귀 함수로 슬롯 순회.
+- [`games/vampire-survival/spec.mjs`](../games/vampire-survival/spec.mjs) `particle_template` cloneStart — 2차: `turnAbs(rand(0, 359))` 로 클론 자체 random.
+- [`tests/fixtures/spec-bullet-circle.mjs`](../tests/fixtures/spec-bullet-circle.mjs) `dsq` — 동기 함수 race-free 패턴.
