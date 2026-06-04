@@ -69,6 +69,11 @@
 - 값 래퍼 블록(`number`, `text`, `True`, `False`, `get_variable` 등)은 **leaf** — 재귀 정규화 금지
 - Dropdown 필드 값은 **bare string** (블록으로 감싸지 말 것) — `"mouse"`, `"player"`, `"EQUAL"` 등
 
+## 변수 좌표 함정
+
+- **`x === 0` 또는 `y === 0` → bin-packer 폴백** ([`variable.js:127`](../../entryjs/src/class/variable/variable.js#L127) truthy check). 그리드/원형 배치 시 ±1 시프트나 0.5 오프셋으로 회피. 자세히는 [`07-runtime-quirks.md`](07-runtime-quirks.md) "변수 좌표 x=0 또는 y=0".
+- **Variable y > 0 = 화면 아래** (entity 와 부호 반대). entity 는 `setY` 에서 반전하지만 variable 은 안 함. 원형 배치 시 `y = cy - r*cos(θ)` (cos 앞 마이너스). 자세히는 [`07-runtime-quirks.md`](07-runtime-quirks.md) "Variable Y vs Entity Y".
+
 ## 어디를 더 읽을지
 
 | 더 깊게 알려면 | |

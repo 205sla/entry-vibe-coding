@@ -784,3 +784,112 @@ turnAbs(rand(0, 359)),
 - [`games/vampire-survival/spec.mjs`](../games/vampire-survival/spec.mjs) `fnFindBulletHit` — 1차: 재귀 함수로 슬롯 순회.
 - [`games/vampire-survival/spec.mjs`](../games/vampire-survival/spec.mjs) `particle_template` cloneStart — 2차: `turnAbs(rand(0, 359))` 로 클론 자체 random.
 - [`tests/fixtures/spec-bullet-circle.mjs`](../tests/fixtures/spec-bullet-circle.mjs) `dsq` — 동기 함수 race-free 패턴.
+
+---
+
+## Variable Y vs Entity Y — 부호 반대
+
+Entry 의 stage 좌표계는 entity (sprite) 와 variable 에서 **Y 부호 처리가 다름**. 같은 좌표값이 화면 위/아래 정반대로 매핑됨. 원형 배치·시계 같이 sin/cos 로 좌표 계산할 때 시계방향이 반시계방향으로 뒤집힘.
+
+### 동작 차이
+
+| 대상 | 저장 y | 화면상 위치 | 근거 |
+|------|--------|------------|------|
+| **Entity (sprite)** | y > 0 → **화면 위** | `this.object.y = -this.y + rndPosY` 로 반전 | [`entryjs/src/class/entity.js:273`](../../entryjs/src/class/entity.js#L273) |
+| **Variable** | y > 0 → **화면 아래** | `view_.y = this.getY()` 그대로 (반전 없음) | [`entryjs/src/class/variable/variable.js:255-256`](../../entryjs/src/class/variable/variable.js#L255) |
+
+stage container 자체는 `canvas.x/y = (320, 180)` 으로 중앙 이동 + `scaleX/Y = 2/1.5` 만 적용 ([`stage.js:46-48`](../../entryjs/src/class/stage.js#L46)) — Y flip 없음. entity 는 setY 에서 별도로 반전하지만 variable 은 반전 없이 createjs/PIXI 기본 (Y 아래 양수) 그대로.
+
+### 실측 (2026-05-18, headless chromium)
+
+`coord-test_001.ent` 의 변수 4 개 — 이름은 MATH 컨벤션 (y 양수 = 위) 가정으로 명명:
+
+| 변수 이름 | stage (x, y) | canvas pixel (x, y) | 실제 사분면 |
+|-----------|-------------|---------------------|------------|
+| `오른위`   | (+100, +100) | (453.3, 313.3) | 오른쪽-**아래** |
+| `왼위`     | (-100, +100) | (186.7, 313.3) | 왼쪽-**아래** |
+| `왼아래`   | (-100, -100) | (186.7, 46.7)  | 왼쪽-**위** |
+| `오른아래` | (+100, -100) | (453.3, 46.7)  | 오른쪽-**위** |
+
+canvas 중앙 = (320, 180). 변수의 stage y +100 → pixel y 313.3 → **중앙 아래**. 즉 변수에 한해서는 `y > 0 = 화면 아래`. entity 와 반대.
+
+### 회피 — 원형 배치 공식
+
+stage 좌표가 직관적인 **entity** (`y +` = 위) 기준으로 sin/cos 를 쓰면 sprite 는 시계방향, **변수 디스플레이는 반시계방향** 으로 돈다. variable 의 원형 배치는 cos 앞에 음수:
+
+```js
+// Entry direction (0=위, 90=오른쪽, 시계방향)
+// Entity 용
+x = cx + r * Math.sin(theta);
+y = cy + r * Math.cos(theta);   // y + = 화면 위 → 시계방향 OK
+
+// Variable 용 — cos 부호 반전
+x = cx + r * Math.sin(theta);
+y = cy - r * Math.cos(theta);   // y + = 화면 아래라서 부호 반대로
+```
+
+검증: [`games/name-circle/build.mjs`](../games/name-circle/build.mjs) `angleCoords` — 시침/분침/초침 시계방향 회전.
+
+### 증거
+
+- [`tools/verify-coord-test.mjs`](../tools/verify-coord-test.mjs) — variable 4 개 픽셀 위치 측정. canvas 중앙 (320, 180) 기준 사분면 판정.
+- [`games/coord-test/coord-test_001.ent`](../games/coord-test/) — 테스트 fixture.
+
+### 클릭 좌표 변환과의 차이
+
+상단 ["Stage 논리 좌표 vs canvas 렌더 픽셀"](#stage-논리-좌표-vs-canvas-렌더-픽셀--clickstagepoint-변환-공식) 항목의 `clickStagePoint(sx, sy)` 변환은 **entity 좌표 컨벤션** (`y + = 위`) 기준 — sprite 클릭 시뮬에 사용. variable 픽셀 위치를 알고 싶으면 위 공식의 `cy` 계산에서 부호 반전 빼야 함.
+
+---
+
+## 변수 좌표 x=0 또는 y=0 → bin-packer 폴백
+
+Variable 의 stored x 또는 y 가 정확히 0 이면 저장된 위치가 무시되고 `VariableBP` (binary packing) 자동 배치 위치로 떨어진다. 그리드/원형 배치 시 중앙 행/열만 흩어져 보임.
+
+### 원인
+
+[`entryjs/src/class/variable/variable.js:127`](../../entryjs/src/class/variable/variable.js#L127):
+
+```js
+const { x, y } = VariableBP.add(this.id_, this.x_, this.y_, ...);
+
+if (this.getX() && this.getY()) {     // ← truthy check (0 은 falsy)
+    this.setX(this.getX());
+    this.setY(this.getY());
+} else {
+    this.setX(x - 230);                // bin-packer 폴백
+    this.setY(y - 105);
+}
+```
+
+`getX()` 또는 `getY()` 가 0 이면 `0 && anything === 0` (falsy) → else 분기 → bin-packer 가 자동 배정한 위치 사용. `!= null` 가드여야 하는데 truthy check 라 0 만 망가짐.
+
+### 증상
+
+- 11 행 × 24px 간격 그리드를 `y = (5 - row) * 24` 로 만들면 row 5 만 y=0 → 그 행 26 개 변수만 다른 위치로 흩어져 나타남.
+- 360 변수 원 배치를 중심 (0, 0) + 반지름 r 로 하면 4 사분점 (0°, 90°, 180°, 270°) 중 (x, ±r) (0, ±r) 좌표 두 점이 falsy → 흩어짐.
+
+### 회피
+
+좌표가 0 이 안 되도록 작은 오프셋. 정수 그리드는 ±1 시프트, 원형 배치는 중심을 (0.5, 0.5) 같이 0.5 어긋나게.
+
+```js
+// 1) 11×N 그리드: Y_OFFSET=1 적용
+const Y_TOP = ((ROWS - 1) * Y_STEP) / 2 + 1;
+//                                          ↑ row 5 가 y=1 (truthy)
+
+// 2) 원형 배치: 중심 0.5 오프셋
+const CX = 0.5, CY = 0.5;
+// 0°: (0.5, ±120.5) — 정확한 0 회피
+
+// 3) 짝수 간격 그리드는 홀수 좌표 사용
+xValues = [];
+for (let x = -239; x <= 239; x += 2) xValues.push(x);
+// 모두 홀수 → 0 자연 제외
+```
+
+### 증거
+
+- [`games/bad-apple/build.mjs`](../games/bad-apple/build.mjs) `Y_OFFSET = 1` — 11 행 그리드에서 row 5 의 y=0 회피.
+- [`games/name-circle/build.mjs`](../games/name-circle/build.mjs) `CX = CY = 0.5` — 원형 배치에서 4 사분점의 x=0/y=0 회피.
+- [`games/name-row/build.mjs`](../games/name-row/build.mjs) — x = -239..+239 step 2 (홀수만) 로 x=0 자연 회피.
+- 빌드 어서션: `if (v.x === 0 || v.y === 0) throw` — 파라미터 변경 시 재발 가드.

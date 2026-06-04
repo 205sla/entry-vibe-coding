@@ -24,9 +24,9 @@
 ## 사실의 출처 (우선 순위)
 
 1. **[entrylabs/docs](https://github.com/entrylabs/docs)** — 공식 문서. 최고 권위. [00-official-sources.md](00-official-sources.md)에 인덱스.
-2. **엔트리 원본 소스** — `C:\Users\young\prg\ENTRY\entryjs\src\…`. 공식 문서에 없는 세부 동작의 ground truth.
+2. **엔트리 원본 소스** — `C:\Users\young\prg\ENTRY\upstream\entryjs\src\…`. 공식 문서에 없는 세부 동작의 ground truth.
 3. **공식 export 레퍼런스** — `C:\Users\young\Downloads\260423_작품.ent` (playentry.org에서 내려받은 정상 동작 파일).
-4. **형제 프로젝트 MYentry 커밋** — `C:\Users\young\prg\ENTRY\MYentry\server.js` 의 역사 (`git log`).
+4. **형제 프로젝트 MYentry 커밋** — `C:\Users\young\prg\ENTRY\apps\MYentry\server.js` 의 역사 (`git log`).
 
 주장 옆에는 가능하면 `파일:줄번호` 또는 `commit <hash>` 형태로 출처를 남긴다.
 공식 문서에 있는 사실은 그쪽을 1순위로 인용.

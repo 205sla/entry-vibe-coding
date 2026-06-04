@@ -12,6 +12,13 @@
 > - 플랫포머 발판 충돌 패턴 → `04-script-and-blocks.md §플랫포머 발판 충돌 패턴`
 > - 헤드리스 런타임 검증 → `05-host-editor.md §헤드리스 런타임 검증`
 
+## 2026-05-18 — Variable 좌표 quirk 2 종 (07-runtime-quirks.md)
+
+원형/그리드 변수 배치 작업 (`games/bad-apple`, `games/name-row`, `games/name-circle`) 에서 발견:
+
+- **Variable Y vs Entity Y — 부호 반대**: entity 는 `setY` 에서 `this.object.y = -this.y` 로 반전하지만 variable 은 `view_.y = getY()` 직접 사용 → variable 의 `y > 0` 은 화면 **아래**. 시계 fixture 가 반시계로 돌던 원인. 실측은 [`tools/verify-coord-test.mjs`](../tools/verify-coord-test.mjs) 와 [`games/coord-test/coord-test_001.ent`](../games/coord-test/).
+- **변수 좌표 x=0 또는 y=0 → bin-packer 폴백**: [`variable.js:127`](../../entryjs/src/class/variable/variable.js#L127) 의 `if (this.getX() && this.getY())` truthy check 때문에 정확히 0 인 좌표는 무시되고 자동 배치. 그리드 중앙 행/열만 흩어지는 증상. 회피는 ±1 시프트 또는 0.5 오프셋.
+
 ## 2026-04-29 — 뱀서라이크 확장팩 (`games/vampire-survival/` Phase A→E)
 
 MVP 슬림 → 기획서 90% 구현 완성판. 5 단계 추가 (적 변종, 피격감, 채찍, 보스+보물상자, 점수). spec ~1,100 → ~1,830 LoC, 18 → 26 오브젝트, 17 → 28 verify.
