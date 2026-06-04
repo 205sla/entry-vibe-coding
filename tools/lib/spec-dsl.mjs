@@ -54,10 +54,23 @@ export const getInput = () => ({ type: 'get_canvas_input_value', params: [] });
 export const setVar    = (id, value) => ({ type: 'set_variable',    params: [id, _val(value), null] });
 export const changeVar = (id, delta) => ({ type: 'change_variable', params: [id, _val(delta), null] });
 
+// ── 함수 지역 변수 (function local variables) ─────────────────────
+// playentry.org 포맷: 함수의 localVariables[{name,value,id}] (id=`<funcId>_<name>`),
+// useLocalVariables:true. 블록은 get_func_variable / set_func_variable 로 참조 —
+// VARIABLE 슬롯(DropdownDynamic)에 지역변수 id 를 bare string 으로.
+// **change_func_variable 블록은 엔트리에 없음** → 증감은 set + calc(get,+,delta) 합성.
+// 보통 직접 쓰기보다 fn.value/fn.normal 의 `locals` 인자 + L 접근자를 쓴다 (아래).
+export const getFuncVar    = (lid)        => ({ type: 'get_func_variable', params: [lid, null] });
+export const setFuncVar    = (lid, value) => ({ type: 'set_func_variable', params: [lid, _val(value), null] });
+export const changeFuncVar = (lid, delta) => ({ type: 'set_func_variable', params: [lid,
+    { type: 'calc_basic', params: [{ type: 'get_func_variable', params: [lid, null] }, 'PLUS', _val(delta)] }, null] });
+
 // List ops.
 export const addToList    = (value, listId) => ({ type: 'add_value_to_list',     params: [_val(value), listId, null] });
 export const removeFromList = (index, listId) => ({ type: 'remove_value_from_list', params: [_val(index), listId, null] });
 export const lengthOfList = (listId) => ({ type: 'length_of_list', params: [null, listId, null] });
+// 리스트에 값이 포함됐는지 (boolean). is_included_in_list: LIST=1, VALUE=3.
+export const isInList = (listId, value) => ({ type: 'is_included_in_list', params: [null, listId, null, _val(value), null] });
 export const valueAt      = (listId, index) => ({ type: 'value_of_index_from_list', params: [null, listId, null, _val(index), null] });
 export const insertAt     = (value, listId, index) => ({ type: 'insert_value_to_list', params: [_val(value), listId, _val(index), null] });
 // 리스트의 N 번째 항목을 X 로 바꾸기 — 클론별 상태를 인덱스 N 슬롯에 broadcast 할 때 핵심.
@@ -67,6 +80,20 @@ export const setListAt    = (listId, index, value) => ({ type: 'change_value_lis
 // String concat — `combine_something` has paramsKeyMap {VALUE1:1, VALUE2:3} with
 // Text slots at 0/2/4 (UI labels, leave null). Caller writes `combine(a, b)`.
 export const combine = (a, b) => ({ type: 'combine_something', params: [null, _val(a), null, _val(b), null] });
+
+// ── String ops (block_calc.js calc_string 계열) ───────────────────
+// 한글 처리(es-hangul 포팅)의 핵심 빌딩블록. Text 슬롯(짝수 인덱스)은 UI 라벨이라
+// null, Block 슬롯(홀수)에 값. 인덱스는 모두 1-based (char_at/substring).
+//   charAt(s, i)        → s 의 i 번째 글자          (char_at:       LEFTHAND=1, RIGHTHAND=3)
+//   substr(s, a, b)     → s 의 a~b 번째까지 부분문자열 (substring:   STRING=1, START=3, END=5)
+//   indexOf(s, sub)     → s 에서 sub 의 시작 위치(1-based, 없으면 0) (index_of_string: LEFTHAND=1, RIGHTHAND=3)
+//   strLen(s)           → s 의 글자 수              (length_of_string: STRING=1)
+//   replaceStr(s, o, n) → s 의 o 를 n 으로 바꾼 문자열 (replace_string: STRING=1, OLD=3, NEW=5)
+export const charAt     = (s, i)    => ({ type: 'char_at',          params: [null, _val(s), null, _val(i), null] });
+export const substr     = (s, a, b) => ({ type: 'substring',        params: [null, _val(s), null, _val(a), null, _val(b), null] });
+export const indexOf    = (s, sub)  => ({ type: 'index_of_string',  params: [null, _val(s), null, _val(sub), null] });
+export const strLen     = (s)       => ({ type: 'length_of_string', params: [null, _val(s), null] });
+export const replaceStr = (s, o, n) => ({ type: 'replace_string',   params: [null, _val(s), null, _val(o), null, _val(n), null] });
 
 // ── Math ─────────────────────────────────────────────────────────
 
@@ -251,23 +278,50 @@ export const askWait = (prompt) => ({ type: 'ask_and_wait', params: [String(prom
 //   (n) => calc(n, '+', 1)        // n is { type: 'stringParam_n', params: [] }
 //
 // This avoids manual `function_field_label` / `function_field_string` chains.
+//
+// **Function-local variables**: pass a `locals` array (names). They become the
+// function's `localVariables` (playentry.org format) and an accessor `L` is
+// passed as the LAST arg to body/return:
+//   L.get(name)         → read  (get_func_variable)
+//   L.set(name, v)      → write (set_func_variable)
+//   L.change(name, d)   → += d  (set + calc(get,+,d); no change_func_variable block)
+//   L.id(name)          → the raw `<funcId>_<name>` id
+//
+//   fn.value('dbl', ['n'],
+//       (n, L) => [ L.set('tmp', calc(n, '*', 2)) ],
+//       (n, L) => calc(L.get('tmp'), '+', 1),
+//       ['tmp'])                    // ← locals
 export const fn = {
-    value: (id, paramIds, bodyFn, returnFn) =>
-        _defineFunction(id, 'value', paramIds, bodyFn, returnFn),
-    normal: (id, paramIds, bodyFn) =>
-        _defineFunction(id, 'normal', paramIds, bodyFn, null),
+    value: (id, paramIds, bodyFn, returnFn, locals = []) =>
+        _defineFunction(id, 'value', paramIds, bodyFn, returnFn, locals),
+    normal: (id, paramIds, bodyFn, locals = []) =>
+        _defineFunction(id, 'normal', paramIds, bodyFn, null, locals),
 };
 
-function _defineFunction(id, type, paramIds, bodyFn, returnFn) {
+function _defineFunction(id, type, paramIds, bodyFn, returnFn, locals = []) {
     // Each param id becomes a stringParam_<id> synthesized type.
     const paramRefs = paramIds.map(pid => ({ type: `stringParam_${pid}`, params: [] }));
+
+    // Function-local variables — id is `<funcId>_<name>` so a given name maps to
+    // a distinct variable per function (no cross-function clobbering). `L` gives
+    // body/return blocks convenient get/set/change.
+    // 초기값은 **빈 문자열**: 숫자 0 으로 두면 엔트리가 변수를 숫자형으로 취급해
+    // set('') 가 '' → 0 으로 강제됨 (문자열 누적이 깨짐). 숫자 지역변수는 읽기 전에
+    // 항상 set 하므로 '' 초기값이 무해.
+    const localVariables = locals.map(name => ({ name, value: '', id: `${id}_${name}` }));
+    const L = {
+        get: (name) => getFuncVar(`${id}_${name}`),
+        set: (name, val) => setFuncVar(`${id}_${name}`, val),
+        change: (name, delta) => changeFuncVar(`${id}_${name}`, delta),
+        id: (name) => `${id}_${name}`,
+    };
 
     // Build the function_field_label → function_field_string chain for the
     // function definition's parameter declaration.
     const labelChain = _buildFieldChain(id, paramIds);
 
-    const body = bodyFn ? bodyFn(...paramRefs) : [];
-    const returnExpr = returnFn ? returnFn(...paramRefs) : null;
+    const body = bodyFn ? bodyFn(...paramRefs, L) : [];
+    const returnExpr = returnFn ? returnFn(...paramRefs, L) : null;
 
     const createBlock = type === 'value' ? 'function_create_value' : 'function_create';
     const defParams = type === 'value'
@@ -277,8 +331,8 @@ function _defineFunction(id, type, paramIds, bodyFn, returnFn) {
     return {
         id,
         type,
-        localVariables: [],
-        useLocalVariables: false,
+        localVariables,
+        useLocalVariables: localVariables.length > 0,
         content: [[
             {
                 id: `${id}_def`,
