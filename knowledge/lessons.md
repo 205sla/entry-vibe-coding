@@ -33,6 +33,8 @@
 - [2026-04-25] `combine_something` paramCount=5 — Text 라벨 슬롯이 0/2/4 위치 (UI 표시용 빈 라벨), VALUE 슬롯은 1/3 — `params: [valueA, valueB]` 처럼 짧게 쓰면 padding 후 슬롯 위치가 어긋나 결합 결과 깨짐. 가드: [`tools/lib/spec-dsl.mjs`](../tools/lib/spec-dsl.mjs) `combine(a, b)` helper 가 `[null, a, null, b, null]` 으로 알맞게 펼침
 - [2026-04-25] `variableType: 'answer'` 변수를 임의로 지정하면 ask_and_wait 가 답을 받지 못해 후속 setVar 가 무효 → 이후 list insert 가 빈 lookup 실패 — 가드: 사용자 변수는 일반 `'variable'` 타입으로, 별도 `variableType: 'answer'` (이름 `대답`) 변수 1 개만 두고 `get_canvas_input_value()` 로 읽어 setVar 로 옮길 것
 
+- [2026-06-04] 검색 자동완성이 **긴 문자열 입력 시** "can not insert value to array" 크래시 (편집기가 `repeat` 블록 빨갛게 표시) — `updateSuggestions` 의 `repeat 100`(반복=1프레임 양보)이 빠른 키 입력마다 동시 실행돼 전역 카운터 `si` 가 100 초과 → list 범위 밖. **클론 아닌** 이벤트 핸들러 재발화 race — 가드: 순회를 동기 재귀 `fn.value`(`scanSug`)로 위임 ([`07-runtime-quirks.md` repeat 글로벌 race](07-runtime-quirks.md#다중-클론의-repeatinf-본체--글로벌-scratch-변수-race))
+
 ## 클론 / 메시지 (디펜스 게임 시리즈)
 
 - [2026-04-28] `when_message('spawn'), createClone('self')` 패턴은 기존 클론도 핸들러 보유 → 메시지 1 회 발신에 N+1 클론 지수적 spawn — 가드: spawner 가 직접 `createClone('enemy')` (다른 sprite id), 클론은 `create_clone` 트리거 없음 ([`07-runtime-quirks.md` when_message fan-out](07-runtime-quirks.md#when_message-핸들러는-클론에도-살아-있음--fan-out-spawn))
@@ -42,6 +44,10 @@
 - [2026-04-28] `deleteClone()` 후 같은 스크립트 후속 블록 안 실행 (클론 컨텍스트 즉시 소멸) → sendMessage 등이 deleteClone 뒤에 있으면 무발화 — 가드: `if_else` 분기 (deleteClone 은 한 가지에만, 메시지는 다른 가지에) ([`04-script-and-blocks.md` deleteClone 함정](04-script-and-blocks.md#함정-deleteclone-후-같은-스크립트-후속-블록-안-실행))
 - [2026-04-29] 다중 클론이 같은 스크립트에서 글로벌 카운터 (`bul_i` 등) 로 슬롯 list 순회 → 본체 인터리브 실행으로 카운터 0 순간에 `valueAt(list, 0)` → "can not insert value to array" 엔진 정지 — 가드: 슬롯 순회를 `fn.value` 재귀 함수로 캡슐화 (동기 호출이라 atomic) ([`07-runtime-quirks.md` 다중 클론 repeat race](07-runtime-quirks.md#다중-클론의-repeatinf-본체--글로벌-scratch-변수-race))
 - [2026-05-02] 위 race 의 변종 — spawner 가 `repeat.basic(N, [changeVar(idx, 1), createClone, ...])` 로 N 클론 spawn, 각 클론의 cloneStart 가 `valueAt(list, idx)` 읽음. 여러 spawner 동시 작동 시 한쪽이 `setVar(idx, 0)` 으로 리셋한 직후 in-flight 클론이 인덱스 0 lookup → 동일 throw — 가드: 클론이 cloneStart 에서 자체 결정값 (`rand(0, 359)` 등) 으로 글로벌 lookup 회피 ([`07-runtime-quirks.md` cloneStart spawner race 변종](07-runtime-quirks.md#변종-when_clone_start-가-spawner-의-글로벌-카운터를-race-로-읽음))
+
+## 장면 / 초기화
+
+- [2026-06-04] 랜딩(첫) 장면 오브젝트의 init 을 `when_scene_start` 에만 걸면 시작 시 안 돎 (실행 시작은 `when_run_button_click` 만 발화, `when_scene_start` 는 `start_scene` 전환에서만 — engine.js:662 / block_start.js:631) → 변수 미설정('0')으로 로직 붕괴 — 가드: `when.run`+`when.sceneStart` 이중 트리거(`dualStart`), [`games/es-hangul/demo.mjs`](../games/es-hangul/demo.mjs) ([`07-runtime-quirks.md` when_scene_start 첫 장면](07-runtime-quirks.md#when_scene_start-는-시작-시-첫-장면에서-발화-안-함--start_scene-전환에서만))
 
 ## 클릭 hit-test / 좌표
 

@@ -17,6 +17,7 @@
 | Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [07-runtime-quirks.md](07-runtime-quirks.md) | Runtime quirks |
 | 과거 해결된 버그 요약 (가드 파일 링크) | [lessons.md](lessons.md) | Lessons |
 | 날짜별로 뭘 배웠는지 | [CHANGELOG.md](CHANGELOG.md) | History |
+| 초기 부트스트랩 지시문 확인 | [bootstrap-prompt.txt](bootstrap-prompt.txt) | Historical prompt |
 
 활성 함정 문서(`06-gotchas.md`)는 현재 **비어 있음** — 알려진 활성 함정이 없는 상태.
 구조적으로 해결 불가능한 새 함정이 발견되면 그때 이 파일을 신설.
@@ -67,6 +68,11 @@
 | 데미지 플래시 — `enemy_last_hp` drop 감지 + setEffect 펄스 | [04 §데미지 플래시](04-script-and-blocks.md#데미지-플래시--enemy_last_hp-리스트로-hp-drop-감지--seteffect-펄스) | (적 hit 시각 피드백 — 누적 안 되는 absolute 펄스) |
 | `when_message` 가 template 발화 — direction-as-id 시 invalid index lookup | [07 §template 발화 가드](07-runtime-quirks.md#when_message-핸들러가-template-에도-발화--direction-as-id-시-invalid-index-lookup-으로-scene-전체-손상) | (range 가드: `if_(coord('self','direction') <= N)`) |
 | 공격 빔 시각화 — brush source→target 라인 + cooldown erase | [04 §공격 빔 시각화](04-script-and-blocks.md#공격-빔-시각화--manager-단일-sprite-의-brush-로-sourcetarget-라인) | (TD/RTS — projectile 없이 attack 표현) |
+| `when_scene_start` 첫 장면 미발화 (시작은 `when_run_button_click` 만) | [07 §when_scene_start 첫 장면 미발화](07-runtime-quirks.md#when_scene_start-는-시작-시-첫-장면에서-발화-안-함--start_scene-전환에서만) | 04 (멀티 장면 데모), lessons |
+| 멀티 장면 데모 — 랜딩+홈+기능 / textBox 버튼 / self-only `text_write` | [04 §멀티 장면 데모](04-script-and-blocks.md#멀티-장면-데모--랜딩-장면--홈--기능-장면-startscene) | 07 (when_scene_start) |
+| 한글 자모 prefix 자동완성 (disassemble + `index_of`==1) | [04 §한글 자모 prefix 자동완성](04-script-and-blocks.md#한글-자모-prefix-자동완성-disassemble-매칭) | (es-hangul 데모 전용) |
+| textBox `regX`/`regY` 강제 0 · 가운데는 `textAlign:0`(1=왼쪽) · 고정폭은 `lineBreak:true` | [07 §textBox 정렬](07-runtime-quirks.md#textbox-정렬--regxregy-강제-0-가운데는-textalign0-1-아님) | 04 (멀티 장면 데모 — 버튼/박스) |
+| 붓 슬로우컬러 단색 배경 (`set_color` 가 동적 hex 문자열 허용 → PALETTE 리스트 순환) | [04 §붓 슬로우컬러 배경](04-script-and-blocks.md#붓으로-슬로우-컬러-단색-배경-글상자-투명--뒤에-깔기) | (es-hangul 데모) |
 
 **규칙**: 새 사실 추가 시 위 표에 한 줄 추가. 정본을 두 곳에 둘 일이 생기면 둘 중
 하나가 더 적합한 위치. 모호하면 07 (불변 동작) 또는 04 (블록·패턴) 우선.
