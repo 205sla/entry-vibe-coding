@@ -35,10 +35,11 @@
   실행돼 전역 `si` 가 100 초과(**클론 아닌 이벤트-핸들러 재발화 race**; 짧은 입력은 동시성이 적어 처음 못 잡음).
   순회를 **동기 재귀 `fn.value`(`scanSug`)**로 위임해 해결(07 race 섹션에 변종 + lessons). ② **textBox 정렬**:
   textBox 는 `regX` 강제 0(entity.js:364)이라 regX 로 못 옮김 + `textAlign` **0=가운데**(1=왼쪽, 착각함) +
-  `lineBreak:false` 면 자동 너비로 좌측 쏠림 → `lineBreak:true`+`textAlign:0`+`x:0`(canvasWidth:640 오프셋 탓에
-  -160 아닌 0이 가운데; 픽셀 centroid 측정으로 확인). 07 신규 섹션. ③ `_001~006` 정리(혼동 방지, `_007` 만 유지).
+  `lineBreak:false` 면 자동 너비로 좌측 쏠림 → `lineBreak:true`+`textAlign:0`. **textBox 는 `entity.x` 가
+  가운데 기준이라 폭 무관 `x:0` 이 가운데**(픽셀 centroid 측정). 07 신규 섹션. ③ 구버전 정리(최신만 유지).
 
-- **추가 개선**(요청 → `_008`, verify 19/19): ① 글상자 폭 확대(BOX_W 440, 가운데 x=160-W/2). ② **버튼 외 글상자 투명 + 붓 단색 배경**(각 장면 `bgDrawer` sprite, `zOrder('BACK')`, 화면 덮는 두꺼운 띠, **`set_color` 가 문자열 hex 블록 허용** → PALETTE 리스트로 어두운 톤 hue 를 아주 느리게 순환). ③ 추천 **300단어**(한국어 200 + 영어 100), **이중 쿼리**(q1=자모, q2=원문) OR 매칭 — 영문 `app`→apple, `tkrhk`→사과, 한글 `사`→사과. 04 자동완성 섹션에 영문/붓배경 정리.
+- **추가 개선**(요청 → 최신 `_009`, verify 19/19): ① 글상자 폭 확대(BOX_W 440; textBox 는 `entity.x` 가 가운데라 `x:0` 그대로 가운데). ② **버튼 외 글상자 투명 + 붓 단색 배경**(각 장면 `bgDrawer` sprite, `zOrder('BACK')`, 화면 덮는 두꺼운 띠, **`set_color` 가 문자열 hex 블록 허용** → PALETTE 리스트로 어두운 톤 hue 를 아주 느리게 순환). ③ 추천 **300단어**(한국어 200 + 영어 100), **이중 쿼리**(q1=자모, q2=원문) OR 매칭 — 영문 `app`→apple, `tkrhk`→사과, 한글 `사`→사과. 04 자동완성 섹션에 영문/붓배경 정리.
+- **정정**(`_009`): textBox 가운데정렬은 `entity.x` 가 **중심**이라 폭 무관 `x:0`. 앞서 적었던 "canvasWidth 오프셋 / `x=160-width/2`" 는 **오진**(측정 안 한 폭에 잘못된 공식 적용 → 60px 좌측 치우침). 07/04/README 정정, width 320·440 모두 `x:0` centroid=중앙 측정.
 
 ## 2026-05-18 — Variable 좌표 quirk 2 종 (07-runtime-quirks.md)
 

@@ -954,7 +954,8 @@ textBox 는 sprite 와 등록점(registration) 처리가 다르다. Entry 가 te
 **무조건 0 으로 강제**한다 — spec 에서 `regX` 를 줘도 무시된다.
 
 - `entityjs/src/class/entity.js:364` `setRegX`: `if (this.type === 'textBox') regX = 0;` (regY 도 L390 동일).
-- 그래서 **textBox 의 `entity.x` 는 글상자 좌측 가장자리** 기준. sprite 처럼 `regX = width/2` 로 중앙 정렬 불가.
+- 단 **위치 기준(`entity.x`)은 글상자의 가운데(중심)** 다 → regX 로 옮기는 게 아니라 **`x=0` 이면 폭과
+  무관하게 스테이지 가운데 정렬**. (실측: width 320·440 모두 `x:0` → 텍스트 픽셀 centroid = 캔버스 중앙.)
 
 **텍스트 가운데 정렬은 `textAlign`** 으로 (regX 아님):
 - `textAlign`: **0 = 가운데**, 1 = 왼쪽, 2 = 오른쪽 (`Entry.TEXT_ALIGN_CENTER = 0` 가 기본).
@@ -962,12 +963,10 @@ textBox 는 sprite 와 등록점(registration) 처리가 다르다. Entry 가 te
 - `setTextAlign` 끝에서 `setWidth(getMeasuredWidth())` 호출 → **`lineBreak:false` 면 width 가 내용 길이로
   자동 축소**(spec 의 고정 `width` 무시) → 짧은 내용이 좌측 고정점에 붙음. 고정 폭 유지는 `lineBreak:true`.
 
-**글상자를 스테이지 가운데 두기 (검증된 조합)**: `lineBreak:true` + 고정 `width` + `textAlign:0` + 위치 `x`.
-단 스테이지 논리좌표 ↔ 캔버스 픽셀 매핑이 `interface.canvasWidth` 에 따라 오프셋된다(예: `canvasWidth:640`
-설정 시 stage `x=0` 이 캔버스 중앙이 아니라 한쪽으로 치우침) → **`entity.x` 값만 보고 판단하지 말고
-렌더 픽셀 중심을 측정**(헤드리스에서 stage 캔버스의 박스 픽셀 centroid vs `canvas.width/2`)해 확인할 것.
+**글상자를 스테이지 가운데 두기**: `x:0` + `lineBreak:true`(고정 폭) + `textAlign:0`(글자 가운데) + 원하는 `width`.
+`entity.x` 가 중심이라 **폭을 바꿔도 `x:0` 그대로 가운데**(`x = -width/2` 같은 보정 불필요 — 그렇게 하면 오히려 한쪽으로 치우침).
 
 ### 증거
 
-- [`games/es-hangul/demo.mjs`](../games/es-hangul/demo.mjs) — 6장면 textBox 전부 `lineBreak:true`+`textAlign:0`+`width:320`+`x:0` 로 가운데(픽셀 centroid 320 = 640/2 측정 확인).
-- 시행착오: `regX:160`(무시됨)·`textAlign:1`(왼쪽)·`x:-160`(canvasWidth:640 오프셋 탓에 오히려 좌측 쏠림) 전부 실패 후 `x:0`+`textAlign:0` 으로 수렴.
+- [`games/es-hangul/demo.mjs`](../games/es-hangul/demo.mjs) — 글상자 전부 `x:0`+`lineBreak:true`+`textAlign:0`+`width:440`, 텍스트 centroid 320 = 640/2 측정.
+- 시행착오: `regX:160`(무시됨)·`textAlign:1`(왼쪽 정렬됨)·`x:-60`/`x:-160`(entity.x 가 중심이라 그만큼 왼쪽 쏠림) 실패 → `x:0`+`textAlign:0`. ⚠️ 폭 다른 케이스의 위치는 `entity.x` 만 믿지 말고 렌더 픽셀 centroid 로 검증.

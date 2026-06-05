@@ -10,8 +10,7 @@
 //
 // ⚠️ 순회는 동기 재귀 값함수 scanSug (repeat 프레임양보+전역 si 공유 race 회피, knowledge/07).
 // ⚠️ 루프 값함수(disassemble/convertQwertyToAlphabet)는 키 핸들러 **스레드 최상위에서만** 호출.
-// ⚠️ textBox 가운데정렬: regX 강제0이라 x=좌측가장자리 · 가운데는 textAlign:0(1=왼쪽) · 고정폭은 lineBreak:true.
-//    canvasWidth:640 오프셋 탓에 가운데 x = 160 - width/2 (픽셀 centroid 측정 확인). knowledge/07.
+// ⚠️ textBox 가운데정렬: entity.x 는 **가운데 기준** → x=0 이면 폭 무관 가운데. 텍스트는 textAlign:0(1=왼쪽), 고정폭 lineBreak:true. knowledge/07.
 // 배경: 버튼 외 글상자는 투명, 붓으로 어두운 네이비 단색을 깔고 색이 아주 느리게 순환(루프).
 //
 // Build:  node games/es-hangul/build-demo.mjs   → es-hangul-demo_NNN.ent
@@ -30,8 +29,8 @@ const cat = (...p) => p.reduce((a, b) => combine(a, b));
 const SEED = String.fromCharCode(0xE000);
 // 랜딩(search) 오브젝트: when.run(시작)+when.sceneStart(재진입) 이중 트리거. 비랜딩은 sceneStart만.
 const dualStart = (body) => [[when.run(), ...body], [when.sceneStart(), ...body]];
-// 가운데 정렬 글상자 폭/좌표 (textBox regX 강제0 → x=좌측가장자리; canvasWidth:640 오프셋 보정).
-const BOX_W = 440, BOX_X = 160 - BOX_W / 2;   // = -60 (픽셀 centroid 측정으로 확인)
+// 글상자 폭/좌표. textBox 는 **entity.x 가 가운데 기준** → x=0 이면 폭과 무관하게 스테이지 가운데 정렬.
+const BOX_W = 440, BOX_X = 0;
 
 // es-hangul 데이터 변수 id (spec.mjs 와 동일) + 데모 리스트 id.
 const QKEYS_ID = 'qky0', QJAMO_ID = 'qjm0';
