@@ -4,7 +4,7 @@ tar 내부에 있는 유일한 JSON 파일. 프로젝트의 모든 상태가 여
 
 ## 최상위 키
 
-[`entryjs/src/class/project.js:76`](../../../upstream/entryjs/src/class/project.js#L76) `Entry.getStartProject()`와
+[`entryjs/src/class/project.js:76`](../../entryjs/src/class/project.js#L76) `Entry.getStartProject()`와
 레퍼런스 `C:\Users\young\Downloads\260423_작품.ent` (저장소 외부, 사용자 로컬)에서 관찰한 내용을 합쳤다.
 
 ### 필수
@@ -38,7 +38,7 @@ tar 내부에 있는 유일한 JSON 파일. 프로젝트의 모든 상태가 여
 |----|------|------|
 | `category` | string | 분류 태그 (`game`, `art`, ...) |
 | `parent` | string | 부모 프로젝트 ID (리믹스). 우리는 쓰지 않음 |
-| `learning` | ID | AI Learning 모델 ID. 공식 [project-data typedef](https://github.com/entrylabs/docs/blob/master/source/entryjs/typedef/2024-03-15-project-data.md) 명시. `Entry.aiLearning.load(project.learning)`로 사용 ([`entryjs/src/util/utils.js:51`](../../../upstream/entryjs/src/util/utils.js#L51)) |
+| `learning` | ID | AI Learning 모델 ID. 공식 [project-data typedef](https://github.com/entrylabs/docs/blob/master/source/entryjs/typedef/2024-03-15-project-data.md) 명시. `Entry.aiLearning.load(project.learning)`로 사용 ([`entryjs/src/util/utils.js:51`](../../entryjs/src/util/utils.js#L51)) |
 
 ### playentry.org 전용 (커뮤니티 메타데이터, 우리는 쓰지 않음)
 
@@ -59,7 +59,7 @@ tar 내부에 있는 유일한 JSON 파일. 프로젝트의 모든 상태가 여
 `objects[*].scene`은 이 `id` 중 하나와 반드시 일치.
 
 > **참고**: Entry 내장 `Entry.loadProject()` (no args) starter는 scene id를
-> `"7dwq"`로 하드코딩 ([`entryjs/src/class/project.js:82`](../../../upstream/entryjs/src/class/project.js#L82)).
+> `"7dwq"`로 하드코딩 ([`entryjs/src/class/project.js:82`](../../entryjs/src/class/project.js#L82)).
 > 하지만 이 건 Entry가 내부적으로 쓰는 초기 프로젝트일 뿐 우리 `.ent`에 강제되는 값이 아니다.
 > playentry.org에 업로드된 실제 작품들의 scene id도 제각각이다 (장면 편집 과정에서 id 변경).
 

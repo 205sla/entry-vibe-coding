@@ -131,7 +131,7 @@ reg['repeat_basic']
 
 ### 카테고리별 파일 매핑
 
-엔트리의 블록 정의는 [`entryjs/src/playground/blocks/block_*.js`](../../../upstream/entryjs/src/playground/blocks)에 흩어져 있다.
+엔트리의 블록 정의는 [`entryjs/src/playground/blocks/block_*.js`](../../entryjs/src/playground/blocks)에 흩어져 있다.
 
 | 카테고리 | 파일 | 대표 블록 |
 |----------|------|-----------|
@@ -982,7 +982,7 @@ make-ent의 normalizeBlock이 일반 string을 자동으로 `text` 블록으로 
 ### 함정 — 헤드리스 재실행 시 toggleStop 은 async
 
 `Entry.engine.toggleStop()`은 변수 snapshot을 비동기로 복원
-([`engine.js:715`](../../../upstream/entryjs/src/class/engine.js#L715), `Promise.all` + `loadSnapshot`).
+([`engine.js:715`](../../entryjs/src/class/engine.js#L715), `Promise.all` + `loadSnapshot`).
 다음 `toggleRun()` 전에 await 하지 않으면 변수가 막 복원된 상태와 새 setValue 호출이
 경합 → 두 번째 실행부터 빈 결과. 검증 스크립트는:
 ```js

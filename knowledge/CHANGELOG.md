@@ -46,7 +46,7 @@
 원형/그리드 변수 배치 작업 (`games/bad-apple`, `games/name-row`, `games/name-circle`) 에서 발견:
 
 - **Variable Y vs Entity Y — 부호 반대**: entity 는 `setY` 에서 `this.object.y = -this.y` 로 반전하지만 variable 은 `view_.y = getY()` 직접 사용 → variable 의 `y > 0` 은 화면 **아래**. 시계 fixture 가 반시계로 돌던 원인. 실측은 [`tools/verify-coord-test.mjs`](../tools/verify-coord-test.mjs) 와 [`games/coord-test/coord-test_001.ent`](../games/coord-test/).
-- **변수 좌표 x=0 또는 y=0 → bin-packer 폴백**: [`variable.js:127`](../../../upstream/entryjs/src/class/variable/variable.js#L127) 의 `if (this.getX() && this.getY())` truthy check 때문에 정확히 0 인 좌표는 무시되고 자동 배치. 그리드 중앙 행/열만 흩어지는 증상. 회피는 ±1 시프트 또는 0.5 오프셋.
+- **변수 좌표 x=0 또는 y=0 → bin-packer 폴백**: [`variable.js:127`](../../entryjs/src/class/variable/variable.js#L127) 의 `if (this.getX() && this.getY())` truthy check 때문에 정확히 0 인 좌표는 무시되고 자동 배치. 그리드 중앙 행/열만 흩어지는 증상. 회피는 ±1 시프트 또는 0.5 오프셋.
 
 ## 2026-04-29 — 뱀서라이크 확장팩 (`games/vampire-survival/` Phase A→E)
 
@@ -136,7 +136,7 @@ frontier-guard 는 위 12 패턴 + 8 함정 회피 + 다중 scene 모두 한 spe
 
 ## 2026-04-29 — 프론티어 가드 Phase 3.2 (slot 가운데 클릭 fix + 좌표 매핑 수정)
 
-- [x] **빈 슬롯 가운데 클릭 무반응 fix**. 사용자 보고: ring 모양 슬롯의 가운데가 시각적으로 비어있는데 클릭 안 됨. 원인: sprite 도 textBox 처럼 `pixelPerfect = true` ([entity.js:46](../../../upstream/entryjs/src/class/entity.js#L46)) — source 픽셀 알파 검사. `ring(22, 16)` 의 가운데 16px 가 투명 → hit 실패. `setEffect('transparency', N)` 효과는 렌더링 단계라 source 알파에 영향 없음.
+- [x] **빈 슬롯 가운데 클릭 무반응 fix**. 사용자 보고: ring 모양 슬롯의 가운데가 시각적으로 비어있는데 클릭 안 됨. 원인: sprite 도 textBox 처럼 `pixelPerfect = true` ([entity.js:46](../../entryjs/src/class/entity.js#L46)) — source 픽셀 알파 검사. `ring(22, 16)` 의 가운데 16px 가 투명 → hit 실패. `setEffect('transparency', N)` 효과는 렌더링 단계라 source 알파에 영향 없음.
   해결: `circle(20, '#94a3b8')` (filled disc) 로 변경 + `setEffect('transparency', 70)` 으로 시각 ghost. source 픽셀 전체 알파 ≥ 1, 가운데 클릭 가능.
   정본: [`07-runtime-quirks.md` sprite pixelPerfect](07-runtime-quirks.md#sprite-도-pixelperfect--투명-픽셀-ring-가운데-등-클릭-안-됨).
 
@@ -231,7 +231,7 @@ frontier-guard 는 위 12 패턴 + 8 함정 회피 + 다중 scene 모두 한 spe
 
 ## 2026-04-28 — `change_to_some_shape` 매칭 우선순위 + DSL `if_else` paramCount 수정
 
-- [x] **`change_to_some_shape` 의 매칭은 id → name → index 순서** ([`object.js:342`](../../../upstream/entryjs/src/class/object.js#L342) `getPicture`).
+- [x] **`change_to_some_shape` 의 매칭은 id → name → index 순서** ([`object.js:342`](../../entryjs/src/class/object.js#L342) `getPicture`).
   picture id 와 name 이 다르면 (예: `id='pic_apple'`, `name='fruit-apple'` — `assets()` 로 생성 시 흔함) 편집기 UI 가 name 만 보여 혼란. **인덱스 (1-base) 직접 전달** 이 가장 깔끔.
 - [x] **`spec-fruit-hunt.mjs` 리팩터** — `fruit_pics` list 제거, `changeShape(getVar('shape_idx'))` 직접. list 룩업 줄 + visual 혼란 해소. 18/18 그대로 통과.
 - [x] **DSL `if_else` paramCount 수정** — registry 는 3 슬롯 (`Block, Indicator, LineBreak`) 인데 DSL 이 2 슬롯만 채워서 warning 발생. `params: [_val(cond), null, null]` 로 정정.
@@ -295,7 +295,7 @@ frontier-guard 는 위 12 패턴 + 8 함정 회피 + 다중 scene 모두 한 spe
 - [x] **DSL `reach()` 슬롯 위치 수정**.
   `reach_something` 의 paramsKeyMap 은 `VALUE: 1` — `[Text 라벨, DropdownDynamic 타겟, Text 라벨]`. 기존 DSL 은 `[target, null]` (2 슬롯, 잘못된 위치) → `[null, target, null]` 으로 정정.
   영향: DSL 로 작성된 fixture 는 `reach()` 가 정상. JSON 으로 작성된 기존 fixture (`spec-bullethell.json` 등) 는 raw 셰이프 그대로 — 별도 영향 없음 (단 spec-bullethell 의 2-슬롯 형태는 padding 후 idx 1 이 비어 정상 작동 안 했을 가능성).
-- [x] **textBox `text: ''` 는 객체 이름으로 폴백** ([`entity.js:142`](../../../upstream/entryjs/src/class/entity.js#L142): `entityModel.text || parent.text || parent.name`).
+- [x] **textBox `text: ''` 는 객체 이름으로 폴백** ([`entity.js:142`](../../entryjs/src/class/entity.js#L142): `entityModel.text || parent.text || parent.name`).
   빈 사각형이 필요하면 `text: ' '` (공백 1 개) 사용. 회귀 가드: `spec-bounce-ball.mjs` 의 18 벽돌 + 패들.
 
 ## 2026-04-28 — 생김새 17 블록 미디어 아트 + picture 런타임 상태
@@ -317,7 +317,7 @@ frontier-guard 는 위 12 패턴 + 8 함정 회피 + 다중 scene 모두 한 spe
 
 - [x] **textBox 클릭 영역 = bgColor 의 함수**. `bgColor='#xxxxxx'` 면 사각 전체, `'transparent'`/falsy 면 textObject 의 glyph 알파 픽셀만 (pixelPerfect=true).
   실측: 5×5=25 점 그리드 → 투명 6/25 (24%, 70px ■■■), 불투명 25/25 (100%). 24px 작은 글자는 0/25 가능.
-  근거: [`entity.js:65`](../../../upstream/entryjs/src/class/entity.js#L65) (`textObject.pixelPerfect=true`) + [`entity.js:1538`](../../../upstream/entryjs/src/class/entity.js#L1538) (`bgObject.alpha = hasColor ? 1 : 0`).
+  근거: [`entity.js:65`](../../entryjs/src/class/entity.js#L65) (`textObject.pixelPerfect=true`) + [`entity.js:1538`](../../entryjs/src/class/entity.js#L1538) (`bgObject.alpha = hasColor ? 1 : 0`).
   **버튼 용도는 hex bgColor 필수**. 시각적 투명이 필요하면 scene 배경과 같은 hex.
   새 fixture: [`spec-textbox-click.mjs`](../tests/fixtures/spec-textbox-click.mjs), verify: [`verify-textbox-click.mjs`](../tools/verify-textbox-click.mjs).
   정본: [`07-runtime-quirks.md` textBox 클릭 영역](07-runtime-quirks.md#textbox-클릭-영역--bgcolor-에-따라-사각-전체-vs-glyph-픽셀만), [`04-script-and-blocks.md` 버튼 패턴](04-script-and-blocks.md#버튼-구현--textbox-가-sprite--dialog-보다-깔끔).
@@ -453,7 +453,7 @@ spec 작성 (DSL)
   - `fibnaive(n)` 지수재귀 (비-꼬리, `fib(n-1) + fib(n-2)`)
 - [x] [`tools/verify-recursion.mjs`](../tools/verify-recursion.mjs) — fib(30) 측정: **꼬리재귀 0ms vs 반복 ~480ms** (>500× 차이). 둘 다 결과 832040 정확
 - [x] **per-frame budget 관찰**: fibnaive(28) = 832K 호출 = **11.5s** wall-clock (user 체감 "멈춤"). 25→3s, 22→0.7s 로 단조 증가. Entry 의 `funcRestExecute` (rAF 분할) 가 한 프레임에 처리 가능한 호출 수를 제한
-- [x] RangeError 경고 경로([`executors.js:60-62`](../../../upstream/entryjs/src/playground/executors.js#L60))는 **코드상 존재**하지만 우리 환경(Entry 1.x + V8)에서는 단순 깊이만으로는 발화 어려움 — 동기 stack overflow 대신 rAF 분할이 우선 작동. 그러나 실시간 사용 불가능한 정도로 느려지는 효과는 동일 (사용자 입장에서 "멈춤")
+- [x] RangeError 경고 경로([`executors.js:60-62`](../../entryjs/src/playground/executors.js#L60))는 **코드상 존재**하지만 우리 환경(Entry 1.x + V8)에서는 단순 깊이만으로는 발화 어려움 — 동기 stack overflow 대신 rAF 분할이 우선 작동. 그러나 실시간 사용 불가능한 정도로 느려지는 효과는 동일 (사용자 입장에서 "멈춤")
 - [x] 관련 문서: [07-runtime-quirks.md §함수 호출은 반복하기의 60fps 틱을 우회](07-runtime-quirks.md#함수-호출은-반복하기의-60fps-틱을-우회-꼬리-재귀-최적화) — 패턴 + 한계 + 실측 표
 
 ## 2026-04-24 (7차) — 사용자 정의 함수 지원 (피보나치 fixture)
@@ -516,7 +516,7 @@ spec 작성 (DSL)
 ## 2026-04-24 (3차) — scene id `"7dwq"` 하드코딩 제거
 
 - [x] **정정**: 이전에 "첫 scene id는 반드시 `\"7dwq\"`여야 한다"고 적은 것은 **과한 보수적 해석**이었음. 실측 결과 `Entry.clearProject()` 선행만 보장되면 scene id는 아무 4자 영숫자 OK
-- [x] 근거: `Entry.clearProject` → `Entry.scene.clear()` 가 `scenes_=[]` 과 `selectedScene=null`로 완전 리셋 ([`entryjs/src/class/scene.js:727`](../../../upstream/entryjs/src/class/scene.js#L727))
+- [x] 근거: `Entry.clearProject` → `Entry.scene.clear()` 가 `scenes_=[]` 과 `selectedScene=null`로 완전 리셋 ([`entryjs/src/class/scene.js:727`](../../entryjs/src/class/scene.js#L727))
 - [x] 실제 playentry.org 프로젝트도 scene id가 제각각 — 사용자가 장면을 삭제·재생성하면 id 바뀜 (starter `"7dwq"` 는 첫 로드 시에만)
 - [x] [`tools/make-ent.mjs`](../tools/make-ent.mjs) 변경: `specScenes || [{name:'장면 1', id:'7dwq'}]` → `[{name:'장면 1'}]`, id는 `shortId()`로 랜덤 생성
 - [x] 회귀 가드 fixture: [`tests/fixtures/spec-scene-custom-id.json`](../tests/fixtures/spec-scene-custom-id.json) (`"zzzz"` id로 정상 로드 + `Entry.scene.selectedScene.id === "zzzz"` 확인)
@@ -539,7 +539,7 @@ spec 작성 (DSL)
 - [x] **"반복하기" 블록(`repeat_basic`/`repeat_inf` 등)의 한 반복당 최소 1 프레임(=1/60s ≈ 16.67ms) 지연** — `Entry.FPS=60` 기본값 기준. 무거운 블록이 없으면 정확히 1 tick씩 진행
 - [x] 실측: 180회 `repeat_basic { move_direction(1) }` = **2.87s** (이론값 3.00s와 일치). 새 fixture [`tests/fixtures/spec-repeat-timing.json`](../tests/fixtures/spec-repeat-timing.json)
 - [x] **교정된 가설**: "반복 안의 `wait_second(0.02)`는 거의 무시 가능" → **틀림**. 같은 180회 반복이 **8.62s**로 약 3배 늘어남. 실질 반복당 ≈ 48ms (≈ 3 프레임)
-- [x] **원인 두 단계**: (1) `wait_second`는 Entry.TimeWaitManager의 setTimeout이 끝난 *다음 tick*에만 `timeFlag=0` → 20ms 대기가 2 프레임 소비. (2) 타이머 종료 시 `Entry.engine.isContinue = false` ([`block_flow.js:70`](../../../upstream/entryjs/src/playground/blocks/block_flow.js#L70)) → 현 tick의 남은 시간 양보 → 1 프레임 추가
+- [x] **원인 두 단계**: (1) `wait_second`는 Entry.TimeWaitManager의 setTimeout이 끝난 *다음 tick*에만 `timeFlag=0` → 20ms 대기가 2 프레임 소비. (2) 타이머 종료 시 `Entry.engine.isContinue = false` ([`block_flow.js:70`](../../entryjs/src/playground/blocks/block_flow.js#L70)) → 현 tick의 남은 시간 양보 → 1 프레임 추가
 - [x] **실용 지침**: 부드러운 이동이 목적이면 wait를 넣지 말고 `delta = desired_px_per_sec / 60` 로 작게 이동. wait는 게임 상태 전환 같은 의도적 일시정지에만
 - [x] 신규 도구: [`tools/verify-repeat-timing.mjs`](../tools/verify-repeat-timing.mjs) — 자동 판정 (경과시간이 예상 범위 내면 `✓`)
 - [x] 관련 문서: [06-gotchas.md §반복하기의 60fps 암묵 틱과 `wait_second`의 실제 비용](06-gotchas.md#반복하기의-60fps-암묵-틱과-wait_second의-실제-비용)
@@ -561,7 +561,7 @@ spec 작성 (DSL)
   (1) 타겟은 `document` (window 아님)
   (2) `event.code` (`'ArrowRight'`) — `event.keyCode`는 무시됨 (modern KeyboardEvent에서 read-only)
   (3) 누름 유지는 keydown만, 단발은 keydown+keyup 페어
-  [`entryjs/src/util/utils.js:810-823`](../../../upstream/entryjs/src/util/utils.js#L810)
+  [`entryjs/src/util/utils.js:810-823`](../../entryjs/src/util/utils.js#L810)
   + `Entry.Utils.inputToKeycode` at line 860
 - [x] [`tools/inspect.mjs`](../tools/inspect.mjs) `--key` 플래그 수정 — CODE_MAP으로 숫자 shorthand(37→ArrowLeft 등) 제공
 - [x] [`tools/verify-platformer.mjs`](../tools/verify-platformer.mjs) — 방향키 hold 상태 시뮬레이션 레퍼런스
@@ -571,7 +571,7 @@ spec 작성 (DSL)
 ## 2026-04-23 (7차) — 헤드리스 런타임 검증 테크닉
 
 - [x] `Entry.dispatchEvent('entityClick', entity)` 로 프로그래매틱 클릭 시뮬레이션 가능 — Playwright 캔버스 좌표 계산 없이 `when_object_click` 트리거 동작 검증
-- [x] 이벤트 이름 출처: [`entity.js:90`](../../../upstream/entryjs/src/class/entity.js#L90), 구독은 [`block_start.js:229`](../../../upstream/entryjs/src/playground/blocks/block_start.js#L229)
+- [x] 이벤트 이름 출처: [`entity.js:90`](../../entryjs/src/class/entity.js#L90), 구독은 [`block_start.js:229`](../../entryjs/src/playground/blocks/block_start.js#L229)
 - [x] 적용: `click-teleport.ent` 게임 (10번 클릭 시 순간이동) — 1~9 클릭은 카운터만 증가, 10번째에 reset + locate_xy(rand) 정상 동작 관찰
 - [x] 문서: [06-gotchas.md §헤드리스 런타임 검증](06-gotchas.md#헤드리스-런타임-검증--이벤트-직접-dispatch-패턴) — 일반화 표 포함 (entityClick / entityClickCanceled / keyPressed)
 - [x] `toggleRun()`의 tickEnabled throw는 항상 터지는 게 아니라 **간헐적** — try/catch로 감싸면 이벤트 버스는 정상 셋업되어 dispatchEvent가 먹힘
@@ -579,7 +579,7 @@ spec 작성 (DSL)
 ## 2026-04-23 (6차) — `boolean_and_or`에 단락 평가 없음
 
 - [x] **증상**: `repeat_while_true(pos ≤ len AND level ≤ list[pos])` 루프에서 `can not insert value to array` 런타임 에러
-- [x] **원인**: Entry `boolean_and_or.func`가 `getValues(['LEFTHAND','RIGHTHAND'])`로 **두 피연산자를 먼저 모두 평가** ([`block_judgement.js:boolean_and_or`](../../../upstream/entryjs/src/playground/blocks/block_judgement.js)). JavaScript `&&`의 단락 평가는 `return left && right` 시점에만 일어남. LEFT가 false여도 RIGHT의 `value_of_index_from_list(list, out_of_range)`가 먼저 throw (`block_variable.js:866`의 guard)
+- [x] **원인**: Entry `boolean_and_or.func`가 `getValues(['LEFTHAND','RIGHTHAND'])`로 **두 피연산자를 먼저 모두 평가** ([`block_judgement.js:boolean_and_or`](../../entryjs/src/playground/blocks/block_judgement.js)). JavaScript `&&`의 단락 평가는 `return left && right` 시점에만 일어남. LEFT가 false여도 RIGHT의 `value_of_index_from_list(list, out_of_range)`가 먼저 throw (`block_variable.js:866`의 guard)
 - [x] **해결**: AND 대신 순차 가드. `repeat_inf` 내부에 `_if(범위체크) → stop_repeat`를 먼저 두고, 두 번째 `_if(실제조건)` → 두 번째 if에 도달하면 범위 안전 보장
 - [x] memory-ranking.ent의 insertion-sort 루프에 적용 — 재생성 후 smoke 6/6 + e2e 13/13 통과
 - [x] 일반화: **모든 boolean 합성 연산자는 양쪽 항상 평가**. 부작용/예외 가능성이 있는 sub-expression은 nested `_if`로 반드시 분리

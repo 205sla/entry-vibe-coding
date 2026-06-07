@@ -7,6 +7,58 @@
 
 ---
 
+## 🚀 빠른 시작 — 엔트리 "만들기" 편집기 구성 → 첫 게임 → 테스트
+
+> "이 저장소로 ○○ 게임 만들어줘" 를 받은 사람(또는 AI)이 **처음** 해야 할 것.
+> 우리가 작업한 환경(오프라인 엔트리 편집기 + 헤드리스 검증)을 그대로 재현한다.
+
+### 0. 전제
+- **Node 18+**, **git** (git 은 entryjs 등 자동 클론에 필요)
+- 헤드리스 테스트(`verify:runtime`/`test:e2e`)를 돌리려면 **Playwright Chromium**:
+  ```bash
+  npx playwright install chromium
+  ```
+
+### 1. 설치 + 편집기 띄우기
+```bash
+git clone https://github.com/205sla/entry-vibe-coding
+cd entry-vibe-coding
+npm install
+npm run setup        # 엔트리 원본·외부 모듈·vendor 자동 구성 (아래 표) — 한 번만, idempotent
+npm start            # → http://localhost:3000
+```
+**`http://localhost:3000` 이 곧 엔트리 "만들기" 페이지(오프라인 편집기)** — 생성한 `.ent` 를
+로드·실행(▶)·수정·저장한다. 헤드리스 검증 스크립트도 이 서버에 붙어 동작한다.
+
+### 2. 필수 외부 의존성 — `npm run setup` 이 가져오는 것
+
+이 저장소에는 **엔트리 원본 엔진이 포함돼 있지 않다.** `setup` 이 아래를 끌어와 `public/lib/` 를 채운다
+([scripts/setup.mjs](scripts/setup.mjs)):
+
+| 의존성 | 출처 | setup 동작 |
+|--------|------|-----------|
+| **entryjs** (엔트리 원본 엔진·만들기 페이지) | **[github.com/entrylabs/entryjs](https://github.com/entrylabs/entryjs)** | 형제 `../entryjs` 있으면 사용, 없으면 `.setup-cache/` 로 **자동 클론** → `dist`·`extern`·`images` 복사. 블록 레지스트리 추출·소스 ground-truth 의 `src/` 도 여기 |
+| entry-tool · legacy-video | entrylabs **공개** repo | `dist/develop` 브랜치 자동 클론 |
+| **entry-paint · entry-lms · sound-editor** | entrylabs **내부**(공개 미러 없음) | ❌ 자동 불가 → 로컬 복사본 `../MYentry/public/lib/<pkg>` 를 링크. **없으면 setup 중단** |
+| vendor (jQuery·jQuery-UI·lodash·CreateJS·Velocity·CodeMirror·React·socket.io) | npm | 임시 설치 후 dist 파일만 `public/lib/vendor/` 로 복사 + preload-js 패치 |
+| mascot 이미지·커서 | `../MYentry/public/` | 복사 (없으면 스킵) |
+
+⚠️ **유일한 블로커 — `entry-paint`/`entry-lms`/`sound-editor`**: entrylabs 비공개 패키지라 공개 클론이 안 된다.
+이 셋의 로컬 복사본이 없는 **순수 외부 클론은 편집기가 완전히 부팅되지 않는다**(setup 이 명확한 에러로 중단).
+→ 현재 개발 환경엔 형제 `../MYentry/public/lib/` 에 있어 setup 이 자동 링크. 외부 배포 시엔 **entrylabs 측 공개
+또는 해당 패키지 사본 확보가 필요**(아래 "더 필요한 것" 참고).
+
+### 3. 작업 사이클 (spec → `.ent` → 테스트)
+```bash
+node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --check                       # ① 정적 검증 < 1초
+node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --out tests/fixtures/x.ent    # ② 빌드
+npm run verify:runtime -- --filter bounce-ball                                            # ③ 헤드리스 런타임 검증
+# 전체: npm run verify  (smoke + links + e2e + runtime)
+```
+편집기에서 눈으로 보려면 `npm start` 후 브라우저에서 생성한 `.ent` 를 불러온다. 상세 파이프라인·검증 레이어는 아래에.
+
+---
+
 ## 무엇을 하는가
 
 | 구성요소 | 역할 |
@@ -352,31 +404,41 @@ npm run verify   # smoke + verify:links + e2e + verify:runtime 순차
 
 ---
 
-## 처음 설치
+## 처음 설치 (상세) — `npm run setup` 이 하는 일
 
+설치 명령은 위 **🚀 빠른 시작** 참고. `setup` ([scripts/setup.mjs](scripts/setup.mjs)) 은 재실행 안전(idempotent):
+
+1. **entryjs dist·extern·images** — `../entryjs` 형제 있으면 사용, 없으면 `.setup-cache/entryjs` 로
+   [`entrylabs/entryjs`](https://github.com/entrylabs/entryjs) **자동 클론** 후 `../entryjs` 심볼릭 링크.
+   (블록 레지스트리 추출·소스 ground-truth 의 `src/` 도 이 경로. knowledge 문서의 소스 인용 링크는 `../entryjs/src/...` 기준.)
+2. **External modules** (entry-tool / entry-paint / entry-lms / sound-editor / legacy-video) —
+   `../MYentry/public/lib/*` 우선, 없으면 공개 GitHub `dist/develop` 클론 (entry-tool · legacy-video 만 공개).
+   **entry-paint·entry-lms·sound-editor 는 entrylabs 내부 → 공개 미러 없음 → 로컬 복사본 필요** (없으면 중단).
+3. **Mascot 이미지 + 커서** — `../MYentry/public/images/mascot/`·`../MYentry/public/media/` 복사.
+4. **Vendor npm 패키지** — jQuery / jQuery-UI / lodash / Velocity / CodeMirror / React / CreateJS 등을
+   임시 설치 후 dist 파일만 `public/lib/vendor/` 로.
+5. **preload-js 패치** — `;module.exports=window.createjs;` 제거 (`module is not defined` 방지).
+
+벤더만 스킵: `npm run setup -- --skip-vendor`. entryjs 버전이 바뀌어 블록이 어긋나면 `npm run build:registry` 로 레지스트리 재생성.
+
+### 헤드리스 테스트 준비
+
+`verify:runtime`·`test:e2e` 는 Playwright + Chromium 으로 실제 편집기를 띄워 검증:
 ```bash
-git clone https://github.com/205sla/entry-vibe-coding
-cd entry-vibe-coding
-npm install
-npm run setup           # public/lib/ 와 public/images/ 재구축 (한 번만)
-npm start               # → http://localhost:3000
+npx playwright install chromium     # 한 번만
 ```
 
-`npm run setup` ([scripts/setup.mjs](scripts/setup.mjs))이 자동으로:
+### 외부 배포 시 "더 필요한 것" (이 개발 환경 밖)
 
-1. **entryjs dist·extern·images** — `../entryjs` 형제 디렉터리가 있으면 복사, 없으면
-   `.setup-cache/entryjs`로 `entrylabs/entryjs` **자동 클론** 후 심볼릭 링크.
-2. **External modules** (entry-tool / entry-paint / entry-lms / sound-editor / legacy-video) —
-   `../MYentry/public/lib/*` 우선, 없으면 공개 GitHub 저장소에서 `dist/develop` 브랜치 클론
-   (entry-tool · legacy-video만 공개). entry-paint·entry-lms·sound-editor는 entrylabs 내부
-   패키지라 공개 미러가 없음 → 이 세 개는 **MYentry 같은 로컬 복사본 필요** (없으면 에러 메시지와 함께 중단).
-3. **Mascot 이미지 + 커서 파일** — `../MYentry/public/images/mascot/`·`../MYentry/public/media/`에서 복사.
-4. **Vendor npm 패키지** — jQuery / jQuery-UI / lodash / Velocity / CodeMirror / React / CreateJS
-   등을 `vendor-install/`에 임시 설치 후 필요한 dist 파일만 `public/lib/vendor/`로 복사.
-5. **preload-js 패치** — `;module.exports=window.createjs;` 접미사 제거
-   (브라우저에서 `module is not defined` 방지).
+순수 외부 클론만으로는 **편집기가 완전히 부팅되지 않을 수 있다.** 추가 확보가 필요한 것:
 
-재실행 안전 (idempotent). 벤더만 스킵: `npm run setup -- --skip-vendor`.
+1. ⚠️ **entry-paint · entry-lms · sound-editor (entrylabs 비공개)** — 최대 블로커. 공개 미러가 없어
+   자동 클론 불가 → entrylabs 공개본 또는 사본을 `../MYentry/public/lib/<pkg>` (또는 `public/lib/<pkg>`) 에
+   두어야 setup 통과 + 편집기 부팅. (현 환경엔 형제 `../MYentry` 에 있어 자동 링크됨.)
+2. **entryjs 버전 고정 (권장)** — setup 은 `entrylabs/entryjs` 최신을 클론. 블록 API 변화 시
+   `block-registry.json` 과 어긋날 수 있으니 특정 태그/커밋 고정 또는 `build:registry` 재실행.
+3. **Playwright Chromium** — 헤드리스 테스트용 (위).
+4. **미지원** — AI Learning · 하드웨어 · 확장 블록은 playentry.org 서버 필요 → 이 편집기에선 비활성.
 
 ## 명령어 치트시트
 
