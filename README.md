@@ -7,6 +7,20 @@
 
 ---
 
+## 📑 문서 구성
+
+| 분류 | 섹션 |
+|------|------|
+| **환경 구성·설치** | 🚀 빠른 시작 · **엔트리 원본(entryjs) 적응** · 처음 설치(상세) · 명령어 치트시트 |
+| **게임 제작 파이프라인** | 무엇을 하는가 · 파이프라인 · ① 게임 설계 · ② spec 작성(DSL/JSON) · ③ make-ent 내부 · ⑤ 검증 |
+| **레퍼런스·문제해결** | 실전 예시 카탈로그 · 문제 발생 시 · 외부 사용자용 요약 |
+| **심화 위키** | [knowledge/README.md](knowledge/README.md) — `.ent` 포맷·블록·런타임 함정·디자인 패턴 정본 |
+
+> **새로 시작한다면**: `🚀 빠른 시작` → `엔트리 원본(entryjs) 적응` 순으로 읽으면 환경이 선다.
+> **게임을 만든다면**: `파이프라인` 이후를 따라간다.
+
+---
+
 ## 🚀 빠른 시작 — 엔트리 "만들기" 편집기 구성 → 첫 게임 → 테스트
 
 > "이 저장소로 ○○ 게임 만들어줘" 를 받은 사람(또는 AI)이 **처음** 해야 할 것.
@@ -56,6 +70,39 @@ npm run verify:runtime -- --filter bounce-ball                                  
 # 전체: npm run verify  (smoke + links + e2e + runtime)
 ```
 편집기에서 눈으로 보려면 `npm start` 후 브라우저에서 생성한 `.ent` 를 불러온다. 상세 파이프라인·검증 레이어는 아래에.
+
+---
+
+## 엔트리 원본(entryjs) 적응 — 순정을 `.ent` 생성·테스트용으로
+
+엔트리 엔진([entrylabs/entryjs](https://github.com/entrylabs/entryjs)) **소스와 `dist` 자체는 순정(develop)** 을
+쓴다 — 이 저장소의 `dist/entry.min.js` 는 upstream 빌드와 **바이트 동일**(엔진 코드는 안 고침).
+다만 **순정을 그대로 드롭인하면 오프라인 부팅도, `.ent` 로드도, 헤드리스 테스트도 안 된다.**
+그래서 엔진을 건드리지 않고 **호스트 레이어(이 저장소)에서 아래 적응**을 적용한다.
+**새 entryjs 로 교체하거나 직접 entryjs 를 세팅할 때, 아래 지점만 맞추면 .ent 생성·테스트가 돌아간다.**
+
+### A. 부팅 적응 — 없으면 편집기가 안 뜬다
+
+| 적응 | 위치 | 왜 필요한가 |
+|------|------|-------------|
+| `window.PUBLIC_PATH_FOR_ENTRYJS = 'lib/entry-js/dist/'` | [`public/js/editor.js`](public/js/editor.js) | `entry.min.js` 가 async chunk(`522.*.js` 등) 를 찾는 경로 지정 |
+| `Entry.init(el, { type:'workspace', hardwareEnable:false, textCodingEnable:false, libDir:'', entryDir:'' })` | editor.js `initEntry` | **HW 동반앱(`localhost:23518` WebSocket) 연결 시도 차단**(콘솔 에러 폭주 방지) + 텍스트코딩 비활성 |
+| SoundJS `_parsePath` 방어 래핑 | editor.js `patchCreateJSSoundParsePath` | npm `soundjs` 1.x 가 src=undefined 사운드에서 `toString` throw(실제 playentry 0.6.0 은 무시) → 가드 |
+| preload-js 말미 `;module.exports=window.createjs;` 제거 | [`scripts/setup.mjs`](scripts/setup.mjs) `patchPreloadjs` | 브라우저에서 `module is not defined` 방지 |
+
+### B. 로드·테스트 적응 — `.ent` 왕복 + 헤드리스 검증
+
+| 적응 | 위치 | 왜 필요한가 |
+|------|------|-------------|
+| `.ent` 로드 전 **`Entry.clearProject()` 선행** 후 `Entry.loadProject(json)` | editor.js `loadEntFile` / [`tools/lib/editor-harness.mjs`](tools/lib/editor-harness.mjs) | `loadProject` 는 **덮어쓰지 않고 append** → starter 봇 잔존 + scene id 충돌 → `addChildAt(undefined)` crash 방지. (부수효과: scene id 자유) |
+| `/api/load`(.ent→project JSON) · `/api/export`(project→.ent) · `/api/ent-asset/:sid/*` | [`server.js`](server.js) | 편집기 ↔ 파일 왕복, tar 내부 에셋 서빙 |
+| `window.__myentryReady` Promise (Entry 준비 신호) | editor.js | 헤드리스 테스트가 "Entry 로드 완료" 를 await |
+| 키 이벤트 `document` + `event.code`, 클릭 `Entry.dispatchEvent('entityClick', e)` 로 주입 | [`tools/lib/verify-harness.mjs`](tools/lib/verify-harness.mjs) | playwright 로 실제 입력 시뮬 → 게임 플레이 검증 |
+
+> ⚠️ 위 적응은 **전부 호스트 코드(editor.js · setup.mjs · server.js · tools/lib)** 에 있고 **entryjs 소스는 고치지 않는다.**
+> entryjs 버전을 올릴 땐 이 A·B 지점만 동작 확인하면 된다.
+> **만약 특정 테스트를 위해 entryjs 소스/`dist` 패치가 필요해지면** → 패치를 `scripts/setup.mjs` 의 단계로 추가하고
+> 이 표에 한 줄 기록(순정 대비 diff 를 남겨 재현 가능하게).
 
 ---
 
