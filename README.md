@@ -53,7 +53,7 @@ npm start            # → http://localhost:3000
 | 의존성 | 콜드 클론에서의 출처 | setup 동작 |
 |--------|------|-----------|
 | **entryjs dist·extern·images** (엔진·만들기 페이지) | npm **`@entrylabs/entry`** (prebuilt dist 포함, 버전 핀) | 형제 `../entryjs` 에 **빌드된 dist 가 있으면** 그걸 사용(개발 머신), 없으면 npm 아티팩트 자동 다운로드(~87MB) → `dist`·`extern`·`images` 복사. **webpack 빌드는 어떤 경우에도 불필요** |
-| entryjs **소스** (`src/`) | [github.com/entrylabs/entryjs](https://github.com/entrylabs/entryjs) | 선택사항 — `npm run setup -- --with-entryjs-src` 로만 클론. `build:registry`·소스 ground-truth 인용에만 필요, 편집기 동작엔 불필요 |
+| entryjs **소스** (`src/`) | [github.com/entrylabs/entryjs](https://github.com/entrylabs/entryjs) | 선택사항 — `node scripts/setup.mjs --with-entryjs-src` 로만 클론. `build:registry`·소스 ground-truth 인용에만 필요, 편집기 동작엔 불필요 |
 | entry-tool | entrylabs **공개** repo | `dist/develop` 브랜치 자동 클론 (실패 시 정적 파일 다운로드 폴백) |
 | entry-paint · entry-lms · sound-editor · legacy-video | playentry.org · code.205.kr **정적 서빙** | 빌드가 공개 repo/npm 에 없는 패키지들 — 형제 `../MYentry` 있으면 링크, 없으면 편집기가 로드하는 **빌드 파일만 자동 다운로드** (legacy-video 의 GitHub repo 는 소스만 있어 클론으로는 부팅 불가) |
 | vendor (jQuery·jQuery-UI·lodash·CreateJS·Velocity·CodeMirror·React·socket.io) | npm | 임시 설치 후 dist 파일만 `public/lib/vendor/` 로 복사 + preload-js 패치 |
@@ -67,8 +67,9 @@ npm start            # → http://localhost:3000
 ```bash
 node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --check                       # ① 정적 검증 < 1초
 node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --out tests/fixtures/x.ent    # ② 빌드
-npm run verify:runtime -- --filter bounce-ball                                            # ③ 헤드리스 런타임 검증
+node tools/run-all-verify.mjs --filter bounce-ball                                        # ③ 헤드리스 런타임 검증
 # 전체: npm run verify  (smoke + links + e2e + runtime)
+# ⚠️ PowerShell 에선 `npm run x -- --flag` 의 `--` 가 삼켜진다 — 인자 필요하면 node 직접 호출
 ```
 편집기에서 눈으로 보려면 `npm start` 후 브라우저에서 생성한 `.ent` 를 불러온다. 상세 파이프라인·검증 레이어는 아래에.
 
@@ -460,7 +461,7 @@ npm run verify   # smoke + verify:links + e2e + verify:runtime 순차
    없으면 npm `@entrylabs/entry` (버전 핀, [setup.mjs](scripts/setup.mjs) 의 `ENTRY_NPM_VERSION_DEFAULT`) 를
    `npm pack` 으로 받아 `.setup-cache/` 에 풀고 복사. **소스만 있는 `../entryjs` 는 빌드 대상이 아니라 무시 대상** —
    이때도 npm 아티팩트를 쓴다.
-2. **entryjs 소스 (선택)** — `npm run setup -- --with-entryjs-src` 일 때만 `.setup-cache/entryjs` 로 클론 후
+2. **entryjs 소스 (선택)** — `node scripts/setup.mjs --with-entryjs-src` 일 때만 `.setup-cache/entryjs` 로 클론 후
    `../entryjs` 링크. `build:registry`·knowledge 문서의 소스 인용(`../entryjs/src/...`)에만 필요.
 3. **External modules** (entry-tool / entry-paint / entry-lms / sound-editor / legacy-video) —
    `../MYentry/public/lib/*` 우선 링크 → entry-tool·legacy-video 는 공개 GitHub `dist/develop` 클론 →
@@ -472,8 +473,9 @@ npm run verify   # smoke + verify:links + e2e + verify:runtime 순차
 6. **preload-js 패치** — `;module.exports=window.createjs;` 제거 (`module is not defined` 방지).
 7. **부팅 파일 검사** — `editor.html` 이 로드하는 필수 파일 전부 존재 확인. 여기가 OK 면 부팅 보장.
 
-벤더만 스킵: `npm run setup -- --skip-vendor`. entryjs 버전 핀을 올렸으면
-`npm run setup -- --with-entryjs-src` 후 `npm run build:registry` 로 레지스트리 재생성.
+벤더만 스킵: `node scripts/setup.mjs --skip-vendor`. entryjs 버전 핀을 올렸으면
+`node scripts/setup.mjs --with-entryjs-src` 후 `npm run build:registry` 로 레지스트리 재생성.
+(⚠️ setup 에 플래그를 줄 땐 `node scripts/setup.mjs` 직접 호출 — PowerShell 은 `npm run setup -- --flag` 의 인자를 삼킨다.)
 
 ### 헤드리스 테스트 준비
 
@@ -490,7 +492,7 @@ npx playwright install chromium     # 한 번만
 1. **인터넷 연결** — setup 이 npm 아티팩트(~87MB)·entry-tool GitHub·playentry.org/code.205.kr
    정적 파일을 받는다. 한 번 받으면 `.setup-cache/` 에 남아 재실행은 오프라인도 가능.
 2. **entryjs 버전 핀** — setup 은 `@entrylabs/entry` 를 고정 버전으로 받는다(재현성).
-   핀을 올려 블록 API 가 어긋나면 `npm run setup -- --with-entryjs-src` 후 `npm run build:registry`.
+   핀을 올려 블록 API 가 어긋나면 `node scripts/setup.mjs --with-entryjs-src` 후 `npm run build:registry`.
 3. **Playwright Chromium** — 헤드리스 테스트용 (위 `npx playwright install chromium`).
 4. **미지원** — AI Learning · 하드웨어 · 확장 블록은 playentry.org 서버 필요 → 이 편집기에선 비활성.
 5. **AI 에이전트로 작업한다면** — [CLAUDE.md](CLAUDE.md) 의 표준 절차·검증 사다리를 따른다.
@@ -501,7 +503,7 @@ npx playwright install chromium     # 한 번만
 # 의존성
 npm install
 npm run setup                     # prebuilt 아티팩트 자동 구성 — 빌드 없음
-npm run setup -- --with-entryjs-src   # + entryjs 소스 클론 (build:registry 용)
+node scripts/setup.mjs --with-entryjs-src   # + entryjs 소스 클론 (build:registry 용)
 npm run build:registry            # entryjs 업데이트 시 블록 레지스트리 재생성 (소스 필요)
 npm run build:assets              # public/images/game/*.svg + manifest.json 재생성
 

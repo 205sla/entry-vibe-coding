@@ -49,11 +49,13 @@ npx playwright install chromium    # 헤드리스 검증용 (한 번만)
 | L1 정적 | `node tools/make-ent.mjs <spec> --check` | `npm install`만 | 블록 type·paramCount·슬롯 wrap |
 | L2 smoke | `npm run test:smoke` | `npm install`만 | tar/JSON 구조, 에셋 실재 |
 | L3 부트+로드 | `npm run test:e2e` | setup + chromium | 편집기 부팅 console error 0, 전 fixture 로드 |
-| L4 런타임 플레이 | `npm run verify:runtime -- --filter <이름>` | setup + chromium | 실제 플레이: 변수 변화·클론·픽셀 |
+| L4 런타임 플레이 | `node tools/run-all-verify.mjs --filter <이름>` | setup + chromium | 실제 플레이: 변수 변화·클론·픽셀 |
 | L5 사람 눈 (선택) | `npm start` → http://localhost:3000 | setup | 편집기에서 `.ent` 열어 ▶ 실행 |
 
 - L3·L4가 **환경 문제**(chromium 설치 불가 등)로 막히면: L1+L2 통과한 `.ent`를 전달하되
   보고에 "런타임 검증 미수행 — 사유"를 명시한다. 사용자에게 검증 방식을 묻지 않는다.
+- ⚠️ `npm run <script> -- --flag` 는 PowerShell 이 `--` 를 삼켜 인자가 유실된다 —
+  필터 등 인자가 필요하면 위처럼 **`node tools/...` 직접 호출**을 쓴다.
 - L4 실패가 **게임 로직 문제**면: [knowledge/lessons.md](knowledge/lessons.md)(과거 해결 이슈)와
   [knowledge/07-runtime-quirks.md](knowledge/07-runtime-quirks.md)(엔진 함정)부터 확인.
 
@@ -65,7 +67,7 @@ npx playwright install chromium    # 헤드리스 검증용 (한 번만)
 | 블록 type/param 에러 | `tools/block-registry.json`에서 검색: `node -e "console.log(JSON.stringify(require('./tools/block-registry.json').blocks['move_direction'],null,2))"` |
 | Field 슬롯 드롭다운 매칭 실패 | `{"__field":"값"}` sentinel 사용 (README "필드 vs 블록 슬롯") |
 | 엔진 고유 동작이 이상 | [knowledge/07-runtime-quirks.md](knowledge/07-runtime-quirks.md) — 60fps 틱, message fan-out 등 |
-| entryjs **소스**가 필요 (레지스트리 재생성, 소스 인용) | `npm run setup -- --with-entryjs-src` — 그래도 빌드는 금지 |
+| entryjs **소스**가 필요 (레지스트리 재생성, 소스 인용) | `node scripts/setup.mjs --with-entryjs-src` — 그래도 빌드는 금지 |
 
 ## 지식 베이스 진입점
 

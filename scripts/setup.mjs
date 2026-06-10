@@ -13,11 +13,12 @@
 //      repo, but the built files are served by playentry.org / code.205.kr)
 //
 // Usage:
-//   npm run setup                        # full setup
-//   npm run setup -- --skip-vendor       # skip vendor npm install (faster re-run)
-//   npm run setup -- --with-entryjs-src  # also clone entryjs SOURCE to ../entryjs
-//                                        # (only needed for build:registry / source ground-truth)
-//   npm run setup -- --entry-version=4.0.20   # override pinned @entrylabs/entry version
+//   npm run setup                              # full setup
+//   node scripts/setup.mjs --skip-vendor       # skip vendor npm install (faster re-run)
+//   node scripts/setup.mjs --with-entryjs-src  # also clone entryjs SOURCE to ../entryjs
+//                                              # (only needed for build:registry / source ground-truth)
+//   node scripts/setup.mjs --entry-version=4.0.20  # override pinned @entrylabs/entry version
+// (flags via `npm run setup -- --flag` get swallowed by PowerShell — call node directly)
 
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';

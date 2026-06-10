@@ -12,6 +12,27 @@
 > - 플랫포머 발판 충돌 패턴 → `04-script-and-blocks.md §플랫포머 발판 충돌 패턴`
 > - 헤드리스 런타임 검증 → `05-host-editor.md §헤드리스 런타임 검증`
 
+## 2026-06-10 — 콜드 클론 완전 지원 (entryjs 빌드 제거) + CLAUDE.md
+
+다른 머신에서 "repo 링크 + ○○ 만들어줘" 만으로 동작하도록 setup 전면 개편. 배경: 외부 머신에서
+`../entryjs` 가 **소스만 있고 dist 가 없어** "entryjs 빌드(수십분) 필요" 로 오판, 검증을 사용자에게
+되물은 사례.
+
+- **entryjs dist 는 빌드 대상이 아니다**: npm `@entrylabs/entry` 가 **prebuilt dist/extern/images 를
+  포함**(Apache-2.0) → setup 이 `npm pack`+추출로 확보(버전 핀). upstream repo 는 `dist/` 를
+  gitignore 하므로 클론만으론 영원히 부팅 불가였음. 소스 클론은 `--with-entryjs-src` 옵션으로 격하
+  (build:registry 전용).
+- **비공개 모듈도 콜드 확보**: entry-paint·entry-lms 는 playentry.org 가, sound-editor·legacy-video 는
+  code.205.kr 이 빌드 파일을 정적 서빙 → 편집기가 로드하는 파일만 다운로드.
+  **entrylabs/legacy-video GitHub repo 는 소스-only(index.js 없음)** — 클론 폴백은 함정이었다.
+- **자가치유**: 모듈마다 필수 파일(`MODULE_REQUIRED`) 검증, 깨진 정션/소스-only 클론은 제거 후
+  다음 소스로. setup 말미 `verify editor boot files` 가 editor.html 의존 14파일 전수 검사.
+- **mascot 4 SVG + 커서 2 .cur 커밋**: 픽스처 8개가 참조 — 미커밋이면 콜드 재빌드 불가였음.
+- **[CLAUDE.md](../CLAUDE.md) 신설**: AI 에이전트 표준 절차 — entryjs 빌드 금지, 검증 사다리
+  L1~L5(막혀도 묻지 않고 가능한 데까지), `_001` 넘버링, PowerShell `npm run x -- --flag` 인자 유실 주의.
+- **검증**: temp 격리 클론(형제 없음)에서 setup→--check→빌드→smoke 23/23→e2e 24/24→runtime
+  21/21 전부 통과 (엔진 npm 4.0.20 vs 개발머신 4.0.22 skew 무해 확인).
+
 ## 2026-06-04 — es-hangul 데모 (검색 IME + 멀티 장면) + `when_scene_start` quirk
 
 [`games/es-hangul/demo.mjs`](../games/es-hangul/demo.mjs) → `es-hangul-demo_007.ent`
