@@ -34,8 +34,7 @@ public/images/**
 # npm dist 복사본 (preloadjs 패치 포함)
 public/lib/vendor/
 
-# cursor 파일
-public/media/
+# cursor 파일 (handclosed/handopen.cur)은 커밋 — 콜드 클론에서도 필요
 
 # ─── External module junctions (링크 타겟 커밋 불가) ──────────
 public/lib/entry-tool
@@ -49,6 +48,9 @@ public/lib/legacy-video
 !public/images/blank/**
 !public/images/game/
 !public/images/game/**
+# 205 mascot SVG — 픽스처 8개가 참조, 콜드 클론 재빌드에 필수
+!public/images/mascot/
+!public/images/mascot/**
 
 # tools/*.mjs 런타임 검증 스크립트가 생성하는 artifact (inspect, verify-*)
 tools/inspect-*.png

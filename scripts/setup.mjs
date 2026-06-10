@@ -2,15 +2,22 @@
 // One-shot setup: populate `public/lib/` and `public/images/` with everything
 // the offline Entry editor needs to boot. Safe to re-run (idempotent).
 //
+// Designed to work on a PURE EXTERNAL CLONE (no sibling repos, no entrylabs
+// account). Nothing is ever compiled — entryjs dist comes prebuilt from npm.
+//
 // Source priority for each asset:
-//   1. Sibling clone (../entryjs, ../MYentry) — preferred, zero network
-//   2. GitHub fetch (for entrylabs/entryjs, entrylabs/entry-tool, entrylabs/legacy-video)
-//   3. Clear error with instructions (for entrylabs/entry-paint, entry-lms, sound-editor —
-//      these packages are not publicly mirrored on GitHub; needs a local MYentry copy)
+//   1. Sibling clone (../entryjs with dist/, ../MYentry) — dev machine, zero network
+//   2. npm registry — @entrylabs/entry ships prebuilt dist/ + extern/ + images/
+//   3. GitHub dist branches (entrylabs/entry-tool, entrylabs/legacy-video)
+//   4. Static file download (entry-paint / entry-lms / sound-editor — no public
+//      repo, but the built files are served by playentry.org / code.205.kr)
 //
 // Usage:
-//   npm run setup                    # full setup
-//   npm run setup -- --skip-vendor   # skip vendor npm install (faster re-run)
+//   npm run setup                        # full setup
+//   npm run setup -- --skip-vendor       # skip vendor npm install (faster re-run)
+//   npm run setup -- --with-entryjs-src  # also clone entryjs SOURCE to ../entryjs
+//                                        # (only needed for build:registry / source ground-truth)
+//   npm run setup -- --entry-version=4.0.20   # override pinned @entrylabs/entry version
 
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
@@ -24,7 +31,46 @@ const CACHE     = path.join(ROOT, '.setup-cache');
 const ENTRYJS   = path.resolve(ROOT, '..', 'entryjs');
 const MYENTRY   = path.resolve(ROOT, '..', 'MYentry');
 
-const FLAGS = new Set(process.argv.slice(2));
+// Pinned @entrylabs/entry npm version. The npm package ships the SAME prebuilt
+// dist/ + extern/ + images/ that playentry.org runs — no webpack build needed,
+// ever. Bump deliberately; after bumping run `npm run build:registry` if block
+// APIs changed (needs --with-entryjs-src) and re-run `npm run verify`.
+const ENTRY_NPM_VERSION_DEFAULT = '4.0.20';
+
+// Static-file fallbacks for entrylabs packages that have no public repo/npm.
+// These exact files are what public/editor.html loads; playentry.org serves
+// them statically (and code.205.kr mirrors them, incl. sound-editor which
+// playentry does not expose at this path).
+const PLAYENTRY = 'https://playentry.org/lib/';
+const CODE205   = 'https://code.205.kr/lib/';
+const FILE_FALLBACKS = {
+    'entry-paint':  [
+        { rel: 'dist/static/js/entry-paint.js', sources: [PLAYENTRY, CODE205] },
+    ],
+    'entry-lms': [
+        { rel: 'dist/assets/app.js',  sources: [PLAYENTRY, CODE205] },
+        { rel: 'dist/assets/app.css', sources: [PLAYENTRY, CODE205] },
+    ],
+    'sound-editor': [
+        { rel: 'sound-editor.js', sources: [CODE205, PLAYENTRY] },
+    ],
+    // Normally cloned from GitHub dist branches; files listed as last-resort.
+    'entry-tool': [
+        { rel: 'dist/entry-tool.js',  sources: [PLAYENTRY, CODE205] },
+        { rel: 'dist/entry-tool.css', sources: [PLAYENTRY, CODE205] },
+    ],
+    'legacy-video': [
+        { rel: 'index.js', sources: [CODE205] },
+    ],
+};
+
+const ARGS  = process.argv.slice(2);
+const FLAGS = new Set(ARGS.filter(a => !a.includes('=')));
+const OPTS  = Object.fromEntries(ARGS.filter(a => a.includes('=')).map(a => {
+    const [k, v] = a.split('=');
+    return [k.replace(/^--/, ''), v];
+}));
+const ENTRY_NPM_VERSION = OPTS['entry-version'] || ENTRY_NPM_VERSION_DEFAULT;
 const IS_WIN = process.platform === 'win32';
 
 function log(msg) { console.log(msg); }
@@ -78,7 +124,29 @@ function fsCpSync(src, dst) {
     fs.cpSync(src, dst, { recursive: true, force: true });
 }
 
-// ---------- sibling vs GitHub ----------
+// ---------- network ----------
+
+async function downloadFile(urlStr, dest) {
+    const res = await fetch(urlStr, { redirect: 'follow' });
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${urlStr}`);
+    const buf = Buffer.from(await res.arrayBuffer());
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.writeFileSync(dest, buf);
+    return buf.length;
+}
+
+async function downloadWithFallback(relUnderLib, sources, dest) {
+    let lastErr;
+    for (const base of sources) {
+        try {
+            const n = await downloadFile(base + relUnderLib, dest);
+            return { url: base + relUnderLib, bytes: n };
+        } catch (e) { lastErr = e; }
+    }
+    throw lastErr || new Error('no sources for ' + relUnderLib);
+}
+
+// ---------- sibling vs GitHub vs npm ----------
 
 function which(cmd) {
     const r = spawnSync(IS_WIN ? 'where' : 'which', [cmd], { encoding: 'utf8' });
@@ -93,16 +161,53 @@ function gitClone(url, dest, { branch, depth = 1 } = {}) {
     execFileSync('git', args, { stdio: ['ignore', 'ignore', 'inherit'] });
 }
 
-async function ensureEntryjs() {
-    if (fs.existsSync(ENTRYJS)) return { note: 'sibling ' + ENTRYJS };
+// Fetch the prebuilt @entrylabs/entry npm tarball (dist/ + extern/ + images/),
+// extract into .setup-cache/entry-npm/package. NO compilation involved.
+function ensureEntryNpmArtifact() {
+    const pkgDir = path.join(CACHE, 'entry-npm', 'package');
+    if (fs.existsSync(path.join(pkgDir, 'dist', 'entry.min.js'))) return pkgDir;
+
+    fs.mkdirSync(path.join(CACHE, 'entry-npm'), { recursive: true });
+    const tgz = path.join(CACHE, `entrylabs-entry-${ENTRY_NPM_VERSION}.tgz`);
+    if (!fs.existsSync(tgz)) {
+        // ~87 MB download; npm uses its local cache when possible.
+        execFileSync('npm', ['pack', `@entrylabs/entry@${ENTRY_NPM_VERSION}`,
+            '--pack-destination', CACHE, '--loglevel=error'],
+        { stdio: ['ignore', 'ignore', 'inherit'], shell: IS_WIN });
+    }
+    // tar ships with Windows 10+, macOS, Linux.
+    execFileSync('tar', ['-xzf', tgz, '-C', path.join(CACHE, 'entry-npm')],
+        { stdio: ['ignore', 'ignore', 'inherit'] });
+    if (!fs.existsSync(path.join(pkgDir, 'dist', 'entry.min.js'))) {
+        throw new Error('npm artifact extracted but dist/entry.min.js missing');
+    }
+    return pkgDir;
+}
+
+// Where do entryjs dist/extern/images come from?
+//   1. sibling ../entryjs IF it actually has a built dist (dev machines)
+//   2. npm @entrylabs/entry prebuilt artifact (everyone else)
+// A source-only ../entryjs (no dist/) is NOT an error and does NOT mean you
+// should build it — the npm artifact is used instead.
+function resolveEntryAssetSource() {
+    if (fs.existsSync(path.join(ENTRYJS, 'dist', 'entry.min.js'))) {
+        return { dir: ENTRYJS, note: 'sibling ' + ENTRYJS };
+    }
+    const pkgDir = ensureEntryNpmArtifact();
+    return { dir: pkgDir, note: `npm @entrylabs/entry@${ENTRY_NPM_VERSION} (prebuilt)` };
+}
+
+// Optional: entryjs SOURCE tree at ../entryjs. Only build:registry and the
+// knowledge docs' source citations need it — the editor does not.
+async function ensureEntryjsSrc() {
+    if (fs.existsSync(path.join(ENTRYJS, 'src'))) return { note: 'sibling ' + ENTRYJS };
     fs.mkdirSync(CACHE, { recursive: true });
     const cached = path.join(CACHE, 'entryjs');
     if (!fs.existsSync(cached)) {
         gitClone('https://github.com/entrylabs/entryjs.git', cached);
     }
-    // Make the sibling path usable
-    fs.symlinkSync(cached, ENTRYJS, 'junction');
-    return { note: 'cloned to cache' };
+    if (!fs.existsSync(ENTRYJS)) fs.symlinkSync(cached, ENTRYJS, 'junction');
+    return { note: 'cloned to cache (source only — never build it; dist comes from npm)' };
 }
 
 async function fetchEntryTool(dst) {
@@ -208,43 +313,62 @@ async function patchPreloadjs() {
 
 // ---------- steps ----------
 
-async function copyEntryjsAssets() {
-    await cpDir(path.join(ENTRYJS, 'dist'),   path.join(ROOT, 'public/lib/entry-js/dist'));
-    await cpDir(path.join(ENTRYJS, 'extern'), path.join(ROOT, 'public/lib/entry-js/extern'));
+async function copyEntryAssets() {
+    const src = resolveEntryAssetSource();
+    await cpDir(path.join(src.dir, 'dist'),   path.join(ROOT, 'public/lib/entry-js/dist'));
+    await cpDir(path.join(src.dir, 'extern'), path.join(ROOT, 'public/lib/entry-js/extern'));
     // Entry references both /images/ and /lib/entry-js/images/ at runtime.
-    await cpDir(path.join(ENTRYJS, 'images'), path.join(ROOT, 'public/lib/entry-js/images'));
-    await cpDirMerge(path.join(ENTRYJS, 'images'), path.join(ROOT, 'public/images'));
+    await cpDir(path.join(src.dir, 'images'), path.join(ROOT, 'public/lib/entry-js/images'));
+    await cpDirMerge(path.join(src.dir, 'images'), path.join(ROOT, 'public/images'));
+    return { note: src.note };
 }
 
 async function linkExternalModules() {
     const modules = ['entry-tool', 'entry-paint', 'entry-lms', 'sound-editor', 'legacy-video'];
-    const missing = [];
+    const notes = [];
+    const failed = [];
     for (const m of modules) {
         const dst = path.join(ROOT, 'public/lib', m);
-        if (fs.existsSync(dst)) continue;
+        if (fs.existsSync(dst)) { notes.push(`${m}: present`); continue; }
 
+        // 1. Sibling MYentry copy (dev machines) — junction, zero network.
         if (fs.existsSync(MYENTRY)) {
             const siblingSrc = path.join(MYENTRY, 'public/lib', m);
             if (fs.existsSync(siblingSrc)) {
                 ensureSymlinkDir(siblingSrc, dst);
+                notes.push(`${m}: sibling`);
                 continue;
             }
         }
-        // Try public GitHub mirrors for modules that have them.
-        if (m === 'entry-tool') { await fetchEntryTool(dst); continue; }
-        if (m === 'legacy-video') { await fetchLegacyVideo(dst); continue; }
-        missing.push(m);
+        // 2. Public GitHub dist branches.
+        try {
+            if (m === 'entry-tool')   { await fetchEntryTool(dst);  notes.push(`${m}: github`); continue; }
+            if (m === 'legacy-video') { await fetchLegacyVideo(dst); notes.push(`${m}: github`); continue; }
+        } catch (e) {
+            // fall through to static-file download
+        }
+        // 3. Static-file download (playentry.org / code.205.kr serve the builds).
+        const files = FILE_FALLBACKS[m] || [];
+        try {
+            for (const f of files) {
+                await downloadWithFallback(`${m}/${f.rel}`, f.sources, path.join(dst, f.rel));
+            }
+            notes.push(`${m}: downloaded`);
+        } catch (e) {
+            failed.push(`${m} (${e.message})`);
+        }
     }
-    if (missing.length) {
+    if (failed.length) {
         throw new Error(
-            'Missing modules with no public mirror: ' + missing.join(', ') +
-            '\n    These are entrylabs internal packages. Obtain a local copy (e.g. sibling `../MYentry/public/lib/`) then re-run setup.'
+            'Could not obtain: ' + failed.join(', ') +
+            '\n    Check network access to playentry.org / code.205.kr, then re-run `npm run setup`.'
         );
     }
+    return { note: notes.join(', ') };
 }
 
 async function copyMYentryAssets() {
-    if (!fs.existsSync(MYENTRY)) return { note: 'MYentry sibling missing — skipped' };
+    if (!fs.existsSync(MYENTRY)) return { note: 'no sibling — repo-bundled mascot/cursor used' };
     const mascot = path.join(MYENTRY, 'public/images/mascot');
     if (fs.existsSync(mascot)) {
         await cpDir(mascot, path.join(ROOT, 'public/images/mascot'));
@@ -253,36 +377,70 @@ async function copyMYentryAssets() {
     if (fs.existsSync(media)) {
         await cpDir(media, path.join(ROOT, 'public/media'));
     }
-    return { note: 'mascot + media copied' };
+    return { note: 'mascot + media refreshed from sibling' };
+}
+
+// Final gate: every file editor.html <script>/<link> needs, plus key assets.
+// If this passes, `npm start` + headless verify WILL boot.
+async function verifyBootFiles() {
+    const required = [
+        'public/lib/entry-js/dist/entry.min.js',
+        'public/lib/entry-js/dist/entry.min.css',
+        'public/lib/entry-js/extern/lang/ko.js',
+        'public/lib/entry-js/extern/util/static.js',
+        'public/lib/entry-tool/dist/entry-tool.js',
+        'public/lib/entry-tool/dist/entry-tool.css',
+        'public/lib/entry-paint/dist/static/js/entry-paint.js',
+        'public/lib/entry-lms/dist/assets/app.js',
+        'public/lib/entry-lms/dist/assets/app.css',
+        'public/lib/sound-editor/sound-editor.js',
+        'public/lib/legacy-video/index.js',
+        'public/lib/vendor/jquery.min.js',
+        'public/lib/vendor/preloadjs-0.6.0.min.js',
+        'public/images/mascot/bot205-idle.svg',
+    ];
+    const missing = required.filter(r => !fs.existsSync(path.join(ROOT, r)));
+    if (missing.length) {
+        throw new Error('boot files missing:\n      - ' + missing.join('\n      - '));
+    }
+    return { note: `${required.length} boot files present` };
 }
 
 // ---------- main ----------
 
 async function main() {
-    log('\n[MYentry-game] setup starting\n');
+    log('\n[MYentry-game] setup starting' +
+        (FLAGS.has('--with-entryjs-src') ? ' (+entryjs src)' : '') + '\n');
 
     if (!which('git')) {
-        console.error(errMark('git command not found on PATH — required for fetching entryjs.'));
+        console.error(errMark('git command not found on PATH — required for fetching entry-tool/legacy-video.'));
         process.exit(1);
     }
 
-    await step('ensure entryjs (sibling or clone)',  ensureEntryjs);
-    await step('copy entryjs dist + extern + images', copyEntryjsAssets);
-    await step('link external modules',               linkExternalModules);
-    await step('copy MYentry mascot + cursor media',  copyMYentryAssets);
+    await step('entryjs dist + extern + images',          copyEntryAssets);
+    if (FLAGS.has('--with-entryjs-src')) {
+        await step('entryjs source tree (../entryjs)',    ensureEntryjsSrc);
+    }
+    await step('external modules (tool/paint/lms/…)',     linkExternalModules);
+    await step('refresh mascot + cursor from sibling',    copyMYentryAssets);
 
     if (!FLAGS.has('--skip-vendor')) {
-        await step('npm install vendor libs',         installVendor);
-        await step('copy vendor lib dist files',      copyVendorFiles);
-        await step('patch preload-js (module.exports)', patchPreloadjs);
+        await step('npm install vendor libs',             installVendor);
+        await step('copy vendor lib dist files',          copyVendorFiles);
+        await step('patch preload-js (module.exports)',   patchPreloadjs);
     } else {
         log('  (--skip-vendor): vendor install skipped');
     }
 
-    log('\n' + okMark('setup complete. `npm start` to launch http://localhost:3000') + '\n');
+    await step('verify editor boot files',                verifyBootFiles);
+
+    log('\n' + okMark('setup complete.'));
+    log('    npm start                → editor at http://localhost:3000');
+    log('    npx playwright install chromium   (once, for headless verify)');
+    log('    npm run verify           → smoke + links + e2e + runtime\n');
 }
 
 main().catch(() => {
-    console.error('\n' + errMark('setup failed'));
+    console.error('\n' + errMark('setup failed — fix the issue above and re-run `npm run setup` (idempotent).'));
     process.exit(1);
 });

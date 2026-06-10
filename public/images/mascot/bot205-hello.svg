@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
+  <defs>
+    <linearGradient id="bot205-hello-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f80ff" />
+      <stop offset="100%" stop-color="#fa5536" />
+    </linearGradient>
+  </defs>
+
+  <path d="M 80 170 L 80 210" stroke="#1b1e27" stroke-width="10" stroke-linecap="round" fill="none" />
+  <path d="M 120 170 L 120 210" stroke="#1b1e27" stroke-width="10" stroke-linecap="round" fill="none" />
+  
+  <rect x="65" y="210" width="30" height="14" rx="7" fill="#fa5536" stroke="#1b1e27" stroke-width="6" />
+  <rect x="105" y="210" width="30" height="14" rx="7" fill="#fa5536" stroke="#1b1e27" stroke-width="6" />
+
+  <rect x="90" y="100" width="20" height="15" fill="#1b1e27" />
+
+  <rect x="35" y="50" width="20" height="30" rx="6" fill="#fa5536" stroke="#1b1e27" stroke-width="6" />
+  <rect x="145" y="50" width="20" height="30" rx="6" fill="#fa5536" stroke="#1b1e27" stroke-width="6" />
+
+  <rect x="45" y="25" width="110" height="80" rx="20" fill="#4f80ff" stroke="#1b1e27" stroke-width="6" />
+
+  <rect x="60" y="40" width="80" height="50" rx="10" fill="#ffffff" stroke="#1b1e27" stroke-width="6" />
+
+  <path d="M 85 55 L 75 65 L 85 75 M 115 55 L 125 65 L 115 75" stroke="#1b1e27" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+
+  <circle cx="70" cy="75" r="4" fill="#fa5536" opacity="0.6" />
+  <circle cx="130" cy="75" r="4" fill="#fa5536" opacity="0.6" />
+
+  <rect x="55" y="110" width="90" height="65" rx="20" fill="#ffffff" stroke="#1b1e27" stroke-width="6" />
+
+  <circle cx="100" cy="142" r="18" fill="url(#bot205-hello-grad)" stroke="#1b1e27" stroke-width="4" />
+  <path d="M 94 135 L 88 142 L 94 149 M 100 150 L 104 134 M 108 135 L 114 142 L 108 149" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+
+  <path d="M 50 125 Q 25 105 35 75" stroke="#1b1e27" stroke-width="10" stroke-linecap="round" fill="none" />
+  <path d="M 150 125 Q 165 150 155 175" stroke="#1b1e27" stroke-width="10" stroke-linecap="round" fill="none" />
+
+  <circle cx="35" cy="75" r="10" fill="#fa5536" stroke="#1b1e27" stroke-width="6" />
+  <circle cx="155" cy="175" r="10" fill="#fa5536" stroke="#1b1e27" stroke-width="6" />
+
+  <path d="M 15 65 Q 25 55 35 50 M 10 85 Q 20 75 30 75" stroke="#1b1e27" stroke-width="4" stroke-linecap="round" fill="none" />
+</svg>

@@ -21,7 +21,8 @@ const BLOCKS_DIR = path.join(ENTRYJS, 'src', 'playground', 'blocks');
 const OUT_FILE   = path.join(ROOT, 'tools', 'block-registry.json');
 
 if (!fs.existsSync(BLOCKS_DIR)) {
-    console.error('[registry] entryjs not found at', ENTRYJS);
+    console.error('[registry] entryjs source not found at', ENTRYJS);
+    console.error('[registry] run `npm run setup -- --with-entryjs-src` first (source clone only — no build needed)');
     process.exit(1);
 }
 
