@@ -54,8 +54,8 @@ npm start            # → http://localhost:3000
 |--------|------|-----------|
 | **entryjs dist·extern·images** (엔진·만들기 페이지) | npm **`@entrylabs/entry`** (prebuilt dist 포함, 버전 핀) | 형제 `../entryjs` 에 **빌드된 dist 가 있으면** 그걸 사용(개발 머신), 없으면 npm 아티팩트 자동 다운로드(~87MB) → `dist`·`extern`·`images` 복사. **webpack 빌드는 어떤 경우에도 불필요** |
 | entryjs **소스** (`src/`) | [github.com/entrylabs/entryjs](https://github.com/entrylabs/entryjs) | 선택사항 — `npm run setup -- --with-entryjs-src` 로만 클론. `build:registry`·소스 ground-truth 인용에만 필요, 편집기 동작엔 불필요 |
-| entry-tool · legacy-video | entrylabs **공개** repo | `dist/develop` 브랜치 자동 클론 (실패 시 정적 파일 다운로드 폴백) |
-| entry-paint · entry-lms · sound-editor | playentry.org · code.205.kr **정적 서빙** | 공개 repo 가 없는 entrylabs 내부 패키지 — 형제 `../MYentry` 있으면 링크, 없으면 편집기가 로드하는 **빌드 파일만 자동 다운로드** |
+| entry-tool | entrylabs **공개** repo | `dist/develop` 브랜치 자동 클론 (실패 시 정적 파일 다운로드 폴백) |
+| entry-paint · entry-lms · sound-editor · legacy-video | playentry.org · code.205.kr **정적 서빙** | 빌드가 공개 repo/npm 에 없는 패키지들 — 형제 `../MYentry` 있으면 링크, 없으면 편집기가 로드하는 **빌드 파일만 자동 다운로드** (legacy-video 의 GitHub repo 는 소스만 있어 클론으로는 부팅 불가) |
 | vendor (jQuery·jQuery-UI·lodash·CreateJS·Velocity·CodeMirror·React·socket.io) | npm | 임시 설치 후 dist 파일만 `public/lib/vendor/` 로 복사 + preload-js 패치 |
 | mascot 이미지·커서 | **repo 에 커밋됨** | 형제 `../MYentry` 있으면 최신으로 갱신만 |
 

@@ -54,14 +54,26 @@ const FILE_FALLBACKS = {
     'sound-editor': [
         { rel: 'sound-editor.js', sources: [CODE205, PLAYENTRY] },
     ],
-    // Normally cloned from GitHub dist branches; files listed as last-resort.
+    // Normally cloned from the GitHub dist branch; files listed as last-resort.
     'entry-tool': [
         { rel: 'dist/entry-tool.js',  sources: [PLAYENTRY, CODE205] },
         { rel: 'dist/entry-tool.css', sources: [PLAYENTRY, CODE205] },
     ],
+    // entrylabs/legacy-video on GitHub is SOURCE-only (no built index.js) —
+    // download is the only cold-start path. playentry does not serve it.
     'legacy-video': [
         { rel: 'index.js', sources: [CODE205] },
     ],
+};
+
+// File that proves a module is actually usable (editor.html loads it).
+// A git clone or junction without this file counts as a failed acquisition.
+const MODULE_REQUIRED = {
+    'entry-tool':   'dist/entry-tool.js',
+    'entry-paint':  'dist/static/js/entry-paint.js',
+    'entry-lms':    'dist/assets/app.js',
+    'sound-editor': 'sound-editor.js',
+    'legacy-video': 'index.js',
 };
 
 const ARGS  = process.argv.slice(2);
@@ -218,14 +230,6 @@ async function fetchEntryTool(dst) {
     ensureSymlinkDir(cached, dst);
 }
 
-async function fetchLegacyVideo(dst) {
-    const cached = path.join(CACHE, 'legacy-video');
-    if (!fs.existsSync(cached)) {
-        gitClone('https://github.com/entrylabs/legacy-video.git', cached);
-    }
-    ensureSymlinkDir(cached, dst);
-}
-
 // ---------- vendor libs ----------
 
 const VENDOR_PKG = {
@@ -324,36 +328,43 @@ async function copyEntryAssets() {
 }
 
 async function linkExternalModules() {
-    const modules = ['entry-tool', 'entry-paint', 'entry-lms', 'sound-editor', 'legacy-video'];
     const notes = [];
     const failed = [];
-    for (const m of modules) {
+    for (const [m, required] of Object.entries(MODULE_REQUIRED)) {
         const dst = path.join(ROOT, 'public/lib', m);
-        if (fs.existsSync(dst)) { notes.push(`${m}: present`); continue; }
+        const usable = () => fs.existsSync(path.join(dst, required));
+        if (usable()) { notes.push(`${m}: present`); continue; }
+
+        // dst exists but is unusable (broken junction, source-only clone, …) —
+        // clear it so a working source can take its place. rmSync on a junction
+        // removes only the link, never the target's contents.
+        const dstStat = (() => { try { return fs.lstatSync(dst); } catch { return null; } })();
+        if (dstStat) fs.rmSync(dst, { recursive: true, force: true });
 
         // 1. Sibling MYentry copy (dev machines) — junction, zero network.
         if (fs.existsSync(MYENTRY)) {
             const siblingSrc = path.join(MYENTRY, 'public/lib', m);
             if (fs.existsSync(siblingSrc)) {
                 ensureSymlinkDir(siblingSrc, dst);
-                notes.push(`${m}: sibling`);
-                continue;
+                if (usable()) { notes.push(`${m}: sibling`); continue; }
+                fs.rmSync(dst, { recursive: true, force: true });
             }
         }
-        // 2. Public GitHub dist branches.
-        try {
-            if (m === 'entry-tool')   { await fetchEntryTool(dst);  notes.push(`${m}: github`); continue; }
-            if (m === 'legacy-video') { await fetchLegacyVideo(dst); notes.push(`${m}: github`); continue; }
-        } catch (e) {
-            // fall through to static-file download
+        // 2. Public GitHub dist branch (entry-tool only — legacy-video's repo is source-only).
+        if (m === 'entry-tool') {
+            try {
+                await fetchEntryTool(dst);
+                if (usable()) { notes.push(`${m}: github`); continue; }
+                fs.rmSync(dst, { recursive: true, force: true });
+            } catch { /* fall through to download */ }
         }
         // 3. Static-file download (playentry.org / code.205.kr serve the builds).
-        const files = FILE_FALLBACKS[m] || [];
         try {
-            for (const f of files) {
+            for (const f of FILE_FALLBACKS[m] || []) {
                 await downloadWithFallback(`${m}/${f.rel}`, f.sources, path.join(dst, f.rel));
             }
-            notes.push(`${m}: downloaded`);
+            if (usable()) { notes.push(`${m}: downloaded`); continue; }
+            throw new Error('downloaded but required file still missing');
         } catch (e) {
             failed.push(`${m} (${e.message})`);
         }
