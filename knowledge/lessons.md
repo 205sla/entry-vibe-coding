@@ -35,6 +35,9 @@
 
 - [2026-06-04] 검색 자동완성이 **긴 문자열 입력 시** "can not insert value to array" 크래시 (편집기가 `repeat` 블록 빨갛게 표시) — `updateSuggestions` 의 `repeat 100`(반복=1프레임 양보)이 빠른 키 입력마다 동시 실행돼 전역 카운터 `si` 가 100 초과 → list 범위 밖. **클론 아닌** 이벤트 핸들러 재발화 race — 가드: 순회를 동기 재귀 `fn.value`(`scanSug`)로 위임 ([`07-runtime-quirks.md` repeat 글로벌 race](07-runtime-quirks.md#다중-클론의-repeatinf-본체--글로벌-scratch-변수-race))
 
+- [2026-06-17] 글상자(textBox)에 투명도/효과(`set_effect`/`add_effect` `'transparency'`)를 적용하면 `Cannot set properties of undefined (setting 'alpha')` 런타임 에러로 **엔진 전체가 정지** — 같은 프레임의 다른 오브젝트 스크립트·키 이벤트(`when_some_key_pressed`)까지 멈춘다(증상이 엉뚱한 곳에 나타나 디버깅 어려움). textBox 의 textObject 는 sprite 처럼 effect 대상 객체가 없음. 가드: textBox 는 **색/`show`·`hide`** 로만 연출, 페이드 전환은 **sprite 풀스크린 오버레이**의 transparency 로 ([`games/online-match/spec.mjs`](../games/online-match/spec.mjs) `fader`)
+- [2026-06-17] textBox `textAlign` 상수가 직관과 반대 — **0=center / 1=left / 2=right** (`entry.js` `TEXT_ALIGN_CENTER=0`). `textAlign:1` 로 두면 좌측정렬돼 가운데로 안 옴. center 정렬은 `alignTextBox` 가 `textObject.x=0`(엔티티 로컬 원점)으로 두므로 `regX:0` 이면 stage x 에 중앙배치되고, `lineBreak:true` 로 width 자동축소를 막아야 안정적. 가드: [`tests/fixtures/spec-textbox-click.mjs`](../tests/fixtures/spec-textbox-click.mjs) 주석 정정 + [`games/online-match/spec.mjs`](../games/online-match/spec.mjs) `tbox`
+
 ## 클론 / 메시지 (디펜스 게임 시리즈)
 
 - [2026-04-28] `when_message('spawn'), createClone('self')` 패턴은 기존 클론도 핸들러 보유 → 메시지 1 회 발신에 N+1 클론 지수적 spawn — 가드: spawner 가 직접 `createClone('enemy')` (다른 sprite id), 클론은 `create_clone` 트리거 없음 ([`07-runtime-quirks.md` when_message fan-out](07-runtime-quirks.md#when_message-핸들러는-클론에도-살아-있음--fan-out-spawn))

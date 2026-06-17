@@ -23,7 +23,7 @@ const baseEntity = {
     font: '70px NanumGothic',
     colour: '#000000',
     lineBreak: true,
-    textAlign: 1,         // 0=left, 1=center, 2=right
+    textAlign: 1,         // ⚠️ 엔진 상수: 0=center, 1=left, 2=right (이 박스는 left). knowledge/lessons.md 참조
     visible: true,
 };
 
