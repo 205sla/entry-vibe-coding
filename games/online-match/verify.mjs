@@ -19,7 +19,7 @@ import {
 } from '../../tools/lib/verify-harness.mjs';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const FIXTURE   = path.resolve(__dirname, 'online-match_006.ent');
+const FIXTURE   = path.resolve(__dirname, 'online-match_007.ent');
 
 const readScene = (page) =>
     page.evaluate(() => { try { return Entry.scene.selectedScene.id; } catch { return null; } });
@@ -58,6 +58,25 @@ try {
     process.exit(3);
 }
 const t = createReporter();
+
+// ── z-order 구조 검증 (코드 아닌 리스트 순서로) ─────────────
+// 각 장면의 오브젝트를 z 순서(앞→뒤)로 읽어, 페이더가 맨 앞이고 결과창에서
+// 다시하기 버튼이 lose_tint 보다 앞(=클릭 가능)인지 확인.
+const zorder = await page.evaluate(() => {
+    const byScene = {};
+    Entry.container.objects_.forEach((o) => {
+        const sid = o.scene && o.scene.id;
+        if (!sid) return;
+        (byScene[sid] = byScene[sid] || []).push(o.id);   // objects_ 는 앞→뒤 순서
+    });
+    return byScene;
+});
+for (const [sid, ids] of Object.entries(zorder)) {
+    const faderId = ids.find((id) => id.endsWith('_fader'));
+    t.ok(ids[0] === faderId, `[${sid}] 페이더가 맨 앞(초기값): ${ids[0]}`);
+}
+t.ok(zorder.result.indexOf('replay_btn') < zorder.result.indexOf('lose_tint'),
+    '결과창: 다시하기 버튼이 lose_tint 보다 앞(클릭 가능)');
 
 // ── 공통 진입: start → game ────────────────────────────────
 await runFresh(page);
@@ -107,6 +126,7 @@ await gotoGame(page);
 await clickObject(page, 'btn_leave');
 await page.waitForTimeout(450);
 t.ok((await getVar(page, '잠금')) == 1, '상대 이탈 → 잠금=1(조작 차단)');
+await page.waitForTimeout(650);                 // 막+안내 정착 후 캡처(전환 직전)
 await shot(page, 'verify_8_opponent_left.png');
 await seeScene(page, 'result', 6000, 'result(forfeit)');
 t.ok((await getVar(page, '결과')) == 1 && (await getVar(page, '부전승')) == 1, '상대 이탈 → 부전승=승리');
@@ -130,6 +150,11 @@ await seeScene(page, 'result', 6000, 'result(lose)');
 t.ok((await getVar(page, '결과')) == 0, '상대 2승 → 최종 결과=패배');
 await page.waitForTimeout(1000);
 await shot(page, 'verify_10_result_lose.png');
+
+// 패배 결과에서 [다시 하기] 클릭 — lose_tint 가 막지 않는지(버그 회귀 가드) → start 복귀
+await clickObject(page, 'replay_btn');
+await seeScene(page, 'start', 4000, 'start(패배 후 다시하기)');
+t.ok((await readScene(page)) === 'start', '패배 결과에서 다시하기 클릭 동작(lose_tint 가림 해소)');
 
 // ── 페이지 에러 0 ──────────────────────────────────────────
 t.ok(pageErrors.length === 0, `페이지 에러 없음 (got ${pageErrors.length})`);

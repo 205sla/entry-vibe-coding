@@ -12,7 +12,7 @@ import {
 } from '../../tools/lib/verify-harness.mjs';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const FIXTURE   = path.resolve(__dirname, 'online-match-casual_001.ent');
+const FIXTURE   = path.resolve(__dirname, 'online-match-casual_002.ent');
 
 const readScene = (page) =>
     page.evaluate(() => { try { return Entry.scene.selectedScene.id; } catch { return null; } });
@@ -43,6 +43,21 @@ try {
     process.exit(3);
 }
 const t = createReporter();
+
+// z-order 구조 검증 — 페이더 맨 앞(코드 없이 리스트 순서) + 결과창 다시하기가 lose_tint 보다 앞.
+const zorder = await page.evaluate(() => {
+    const byScene = {};
+    Entry.container.objects_.forEach((o) => {
+        const sid = o.scene && o.scene.id;
+        if (sid) (byScene[sid] = byScene[sid] || []).push(o.id);
+    });
+    return byScene;
+});
+for (const [sid, ids] of Object.entries(zorder)) {
+    t.ok(ids[0] === ids.find((id) => id.endsWith('_fader')), `[${sid}] 페이더 맨 앞(초기값)`);
+}
+t.ok(zorder.result.indexOf('replay_btn') < zorder.result.indexOf('lose_tint'),
+    '결과창: 다시하기가 lose_tint 보다 앞(클릭 가능)');
 
 await runFresh(page);
 await page.waitForTimeout(900);

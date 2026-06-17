@@ -14,7 +14,7 @@
 // 재시작 루프 때문에 start 장면은 **dualStart**(when_run + when_scene_start) — ▶ 와 재진입 양쪽 대응.
 //
 // 화면 전환 효과 — ★ 캐주얼 게임 스타일 "슬라이드 와이프" 버전 ★
-//   (기본 흰색 페이드 버전은 spec.mjs / online-match_006.ent 로 따로 보존)
+//   (기본 흰색 페이드 버전은 spec.mjs / online-match_007.ent 로 따로 보존)
 //   컬러풀한 패널(주황→핑크 + 물방울)이 오른쪽에서 탄성 있게 들어와 화면을 덮고(cover),
 //   다음 장면에서 왼쪽으로 쓸려 나가며 드러낸다(reveal) → 전체적으로 좌측으로 넘기는 "페이지 전환".
 //   glideTo(locate_xy_time) 는 프레임 보간이라 움직임이 매끄럽고, cover 끝에 살짝 오버슈트로 탄성을 준다.
@@ -96,6 +96,9 @@ const RESULT_BG = bgPic(
     `</svg>`
 );
 
+// 페이드용 풀스크린 흰색 사각형 (현재 캐주얼 버전에선 미사용 — 페이드 버전 spec.mjs 와 공유 구조)
+const WHITE = rect(480, 270, '#ffffff');
+
 // 캐주얼 전환 패널 — 화면(480×270)보다 크게(500×280) 만들어 슬라이드 도중 빈틈이 없게.
 // 주황→핑크 그라데이션 + 반투명 물방울(Bouncy Ball 톤).
 const PANEL = {
@@ -139,22 +142,24 @@ const tbox = (x, y, w, h, fontPx, colour, align = 0) => ({
 });
 
 // 슬라이드 와이프 전환 오버레이(캐주얼).
-//   reveal: 장면 시작 시 패널이 화면을 덮은 채(x=0) → 왼쪽(x=-520)으로 쓸려 나가며 드러냄 → 숨김
+//   reveal: 패널이 화면을 덮은 채(x=0) → 왼쪽(x=-520)으로 쓸려 나가며 드러냄 → 숨김
 //   cover : leaveMsg 수신 시 오른쪽 밖(x=520) → 화면(x=0)으로 탄성 있게 덮고 → nextScene 이동
-// 두 장면 모두 같은 패널이 "좌측으로 흐르듯" 이어져 페이지 넘김처럼 보인다.
+// ★ z-order 는 코드가 아니라 리스트 순서로: export 의 faderFirst() 가 페이더를 맨 앞(인덱스 0)에 두고,
+//   초기 entity visible:true + x:0(덮은 위치) → 진입 첫 프레임부터 덮인 상태(깜빡임 제거). reveal 은 zOrder 불필요.
+//   cover 는 opp_left 로 앞에 온 막 위를 덮어야 하므로 zOrder('FRONT') 유지.
 // leaves: [[message, nextScene], ...] — 한 장면이 여러 목적지로 나갈 수 있다(예: game→mid/result).
 const fader = (id, scene, leaves = [], onStarts = [when.sceneStart]) => {
     const threads = onStarts.map((trig) => [
         trig(),
-        show(), zOrder('FRONT'),
-        locateXY(0, 0),                 // 패널이 화면을 덮은 상태로 시작
-        glideTo(0.32, -520, 0),         // 왼쪽으로 쓸려 나가며 새 장면 드러냄
-        hide(),                         // 클릭 막지 않도록 숨김
+        show(),                          // 맨 앞은 리스트 순서로 보장 → zOrder 불필요
+        locateXY(0, 0),                  // 화면 덮은 상태에서 시작
+        glideTo(0.32, -520, 0),          // 왼쪽으로 쓸려 나가며 새 장면 드러냄
+        hide(),                          // 클릭 막지 않도록 숨김
     ]);
     for (const [leaveMsg, nextScene] of leaves) {
         threads.push([
             when.message(leaveMsg),
-            show(), zOrder('FRONT'),
+            show(), zOrder('FRONT'),     // 떠날 때만: 런타임에 앞으로 온 막 위로 덮기
             locateXY(520, 0),            // 오른쪽 화면 밖에서
             glideTo(0.26, -12, 0),       // 살짝 지나치게 덮고(탄성 오버슈트)
             glideTo(0.08, 0, 0),         // 정확히 정착 → 전환
@@ -163,10 +168,16 @@ const fader = (id, scene, leaves = [], onStarts = [when.sceneStart]) => {
     }
     return obj(id, '전환', {
         scene, picture: PANEL,
-        entity: { x: 0, y: 0, scaleX: 1, scaleY: 1, direction: 90 },
+        // visible:true + x:0 → 진입 첫 프레임부터 덮은 상태(초기값으로 맨 앞·보임).
+        entity: { x: 0, y: 0, scaleX: 1, scaleY: 1, direction: 90, visible: true },
         threads,
     });
 };
+
+// 각 장면의 마지막 요소(=페이더)를 맨 앞으로 → 리스트 순서만으로 화면 최상단(코드 없이 초기값).
+const faderFirst = (arr) => [arr[arr.length - 1], ...arr.slice(0, -1)];
+// 결과 장면: 페이더는 맨 앞, lose_tint(인덱스 1)는 맨 뒤(=다시하기 버튼 뒤)로 보내 클릭 가림 해소.
+const reorderResult = (arr) => [arr[arr.length - 1], arr[0], ...arr.slice(2, -1), arr[1]];
 
 // 초기 장면용 이중 트리거 — ▶(when_run) 과 재진입(when_scene_start) 양쪽에서 깨운다.
 // 같은 활성화엔 둘 중 하나만 발화(초기=run, 재진입=scene_start)하므로 중복 실행 없음.
@@ -838,11 +849,12 @@ export default {
         { id: 'opp_left',      name: '상대이탈' },
     ],
     objects: [
-        ...startObjects,
-        ...matchObjects,
-        ...gameObjects,
-        ...midObjects,
-        ...resultObjects,
+        // 페이더를 각 장면 맨 앞(화면 최상단)으로 — 리스트 순서로 z 결정(코드 없이).
+        ...faderFirst(startObjects),
+        ...faderFirst(matchObjects),
+        ...faderFirst(gameObjects),
+        ...faderFirst(midObjects),
+        ...reorderResult(resultObjects),    // + lose_tint 를 버튼 뒤로
     ],
     interface: {
         canvasWidth: 640,

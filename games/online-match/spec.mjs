@@ -128,12 +128,15 @@ const tbox = (x, y, w, h, fontPx, colour, align = 0) => ({
 // 페이드 전환 오버레이.
 //   reveal: 장면 시작 시 흰 화면(투명도 0) → 투명(100) 으로 걷어냄 → 숨김
 //   cover : leaveMsg 수신 시 투명(100) → 흰 화면(0) 으로 덮고 nextScene 으로 이동
-// game 장면은 leaveMsg 없이 reveal 만(들어오는 전환).
+// ★ z-order 는 코드(zOrder)가 아니라 리스트 순서로: export 에서 faderFirst() 가 각 장면의
+//   페이더를 맨 앞(인덱스 0 = 화면 최상단)에 둔다 + 초기 entity visible:true → 장면 진입 첫
+//   프레임부터 이미 덮은 상태(zOrder 가 한 프레임 늦게 도는 깜빡임 제거). reveal 은 zOrder 불필요.
+//   cover 는 opp_left 로 런타임에 앞으로 온 막/안내 위를 확실히 덮어야 하므로 zOrder('FRONT') 유지.
 // leaves: [[message, nextScene], ...] — 한 장면이 여러 목적지로 나갈 수 있다(예: game→mid/result).
 const fader = (id, scene, leaves = [], onStarts = [when.sceneStart]) => {
     const threads = onStarts.map((trig) => [
         trig(),
-        show(), zOrder('FRONT'),
+        show(),                                             // 맨 앞은 리스트 순서로 보장 → zOrder 불필요
         setEffect('transparency', 0),                       // 불투명 = 화면 가림
         repeat.basic(20, [ addEffect('transparency', 5), wait(0.012) ]),  // 0→100 페이드 인
         hide(),                                             // 클릭 막지 않도록 숨김
@@ -141,7 +144,7 @@ const fader = (id, scene, leaves = [], onStarts = [when.sceneStart]) => {
     for (const [leaveMsg, nextScene] of leaves) {
         threads.push([
             when.message(leaveMsg),
-            show(), zOrder('FRONT'),
+            show(), zOrder('FRONT'),                            // 떠날 때만: 런타임에 앞으로 온 막 위로 덮기
             setEffect('transparency', 100),                     // 투명에서 시작
             repeat.basic(20, [ addEffect('transparency', -5), wait(0.012) ]), // 100→0 페이드 아웃(덮기)
             startScene(nextScene),
@@ -149,10 +152,16 @@ const fader = (id, scene, leaves = [], onStarts = [when.sceneStart]) => {
     }
     return obj(id, '전환', {
         scene, picture: WHITE,
-        entity: { x: 0, y: 0, scaleX: 1, scaleY: 1, direction: 90 },
+        // visible:true 명시 — 진입 첫 프레임부터 덮은 상태(초기값으로 맨 앞·보임).
+        entity: { x: 0, y: 0, scaleX: 1, scaleY: 1, direction: 90, visible: true },
         threads,
     });
 };
+
+// 각 장면의 마지막 요소(=페이더)를 맨 앞으로 → 리스트 순서만으로 화면 최상단(코드 없이 초기값).
+const faderFirst = (arr) => [arr[arr.length - 1], ...arr.slice(0, -1)];
+// 결과 장면: 페이더는 맨 앞, lose_tint(인덱스 1)는 맨 뒤(=다시하기 버튼 뒤)로 보내 클릭 가림 해소.
+const reorderResult = (arr) => [arr[arr.length - 1], arr[0], ...arr.slice(2, -1), arr[1]];
 
 // 초기 장면용 이중 트리거 — ▶(when_run) 과 재진입(when_scene_start) 양쪽에서 깨운다.
 // 같은 활성화엔 둘 중 하나만 발화(초기=run, 재진입=scene_start)하므로 중복 실행 없음.
@@ -824,11 +833,12 @@ export default {
         { id: 'opp_left',      name: '상대이탈' },
     ],
     objects: [
-        ...startObjects,
-        ...matchObjects,
-        ...gameObjects,
-        ...midObjects,
-        ...resultObjects,
+        // 페이더를 각 장면 맨 앞(화면 최상단)으로 — 리스트 순서로 z 결정(코드 없이).
+        ...faderFirst(startObjects),
+        ...faderFirst(matchObjects),
+        ...faderFirst(gameObjects),
+        ...faderFirst(midObjects),
+        ...reorderResult(resultObjects),    // + lose_tint 를 버튼 뒤로
     ],
     interface: {
         canvasWidth: 640,
