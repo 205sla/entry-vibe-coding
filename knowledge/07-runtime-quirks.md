@@ -186,7 +186,7 @@ Entry의 키 리스너는 **`document`에 직접** 붙어 있고 **`event.code`*
 
 ### 근거
 
-[`entryjs/src/util/utils.js:810-823`](../../entryjs/src/util/utils.js#L810):
+[`entryjs/src/util/utils.js:831-844`](../../entryjs/src/util/utils.js#L831):
 ```js
 Entry.pressedKeys = [];
 const func = (e) => {
@@ -197,7 +197,7 @@ const func = (e) => {
 addEntryEvent(doc, 'keydown', func);   // doc = document
 ```
 
-`inputToKeycode` ([utils.js:860](../../entryjs/src/util/utils.js#L860)):
+`inputToKeycode` ([utils.js:881](../../entryjs/src/util/utils.js#L881)):
 ```js
 let keyCode = event.code == undefined ? event.key : event.code;
 return Entry.KeyboardCode.codeToKeyCode[keyCode];
@@ -797,7 +797,7 @@ Entry 의 stage 좌표계는 entity (sprite) 와 variable 에서 **Y 부호 처�
 | 대상 | 저장 y | 화면상 위치 | 근거 |
 |------|--------|------------|------|
 | **Entity (sprite)** | y > 0 → **화면 위** | `this.object.y = -this.y + rndPosY` 로 반전 | [`entryjs/src/class/entity.js:273`](../../entryjs/src/class/entity.js#L273) |
-| **Variable** | y > 0 → **화면 아래** | `view_.y = this.getY()` 그대로 (반전 없음) | [`entryjs/src/class/variable/variable.js:255-256`](../../entryjs/src/class/variable/variable.js#L255) |
+| **Variable** | y > 0 → **화면 아래** | `view_.y = this.getY()` 그대로 (반전 없음) | [`entryjs/src/class/variable/variable.js:264-265`](../../entryjs/src/class/variable/variable.js#L264) |
 
 stage container 자체는 `canvas.x/y = (320, 180)` 으로 중앙 이동 + `scaleX/Y = 2/1.5` 만 적용 ([`stage.js:46-48`](../../entryjs/src/class/stage.js#L46)) — Y flip 없음. entity 는 setY 에서 별도로 반전하지만 variable 은 반전 없이 createjs/PIXI 기본 (Y 아래 양수) 그대로.
 
@@ -848,7 +848,7 @@ Variable 의 stored x 또는 y 가 정확히 0 이면 저장된 위치가 무시
 
 ### 원인
 
-[`entryjs/src/class/variable/variable.js:127`](../../entryjs/src/class/variable/variable.js#L127):
+[`entryjs/src/class/variable/variable.js:136`](../../entryjs/src/class/variable/variable.js#L136):
 
 ```js
 const { x, y } = VariableBP.add(this.id_, this.x_, this.y_, ...);

@@ -25,6 +25,46 @@ public/
 `entryjs/images`를 **두 군데**에 복사해야 한다는 점이 핵심 — Entry 코드가 `/images/block_icon/*.svg` 와
 `/lib/entry-js/images/btn_scene_add.png`를 **둘 다** 요청한다.
 
+## 엔진 사본의 버전 기준 — npm 핀과 실서비스의 격차
+
+`public/lib/entry-js/`는 `scripts/setup.mjs`가 npm `@entrylabs/entry` prebuilt tarball에서 받아온다.
+핀은 `scripts/setup.mjs:39` `ENTRY_NPM_VERSION_DEFAULT = '4.0.20'`.
+
+> **`upstream/entryjs`를 pull해도 이 사본은 바뀌지 않는다.** setup은 소스 트리가 아니라 npm에서
+> `dist/`를 받고, `apps/entryjs` 심볼릭 링크는 이 문서들의 소스 인용에만 쓰인다. 그래서 업스트림을
+> 최신으로 당겨도 `npm run test:smoke`·런타임 동작은 그대로다. (엔진 직접 빌드는 CLAUDE.md 절대규칙 1로 금지.)
+
+### 2026-07-31 실측 — playentry.org 실서비스와의 격차
+
+playentry.org에는 EntryJS 4.56.0(2026년 7월 업데이트)이 배포됐지만 우리 사본(4.0.20)에는 없다.
+
+| 7월 수정 심볼 | 실서비스 번들 | 우리 사본 |
+| --- | --- | --- |
+| `sanitizeCoordinate` (변수 표시창 좌표 ±10000 clamp) | 있음 | 0건 |
+| `runWithScrollPreserved` (모양·소리 목록 스크롤 보존) | 있음 | 0건 |
+| `_bindInputFieldFullScreenChange` (전체화면 대답 입력) | 있음 | 0건 |
+| `codingboxv2` (신규 하드웨어) | 있음 | 0건 |
+
+7월 것만 빠진 게 아니다. **5월 29일 prototype pollution Stored XSS 픽스(`668c3d6f8`)도 없다** —
+번들의 `filterReservedKeywords`가 `_reservedKeywords.has(t)`로 정규화 단계가 없는 옛 형태다
+(업스트림 현재 코드는 `typeof param === 'object'`일 때 `String(param)`으로 정규화한 뒤 조회).
+이 저장소는 자기가 만든 `.ent`만 여는 로컬 편집기라 저장형 XSS의 전달 경로가 없지만,
+npm에 새 버전이 올라와 `setup.mjs` 핀을 올릴 때 함께 해소되는 항목으로 기억해 둔다.
+
+**현재 무해하다.** 워크스페이스 `.ent` 193개(변수 8,668개) 전수 실측에서 최대 |좌표|가 307이라
+clamp 한계에 걸리는 자산이 없고, 이 저장소는 변수창 숨김을 좌표가 아니라 `visible:false` +
+`hide_variable`로 처리한다.
+
+**언제 문제가 되나**: 좌표로 변수창을 화면 밖에 숨긴 **외부 작품**을 로드할 때. 실서비스에서는
+clamp돼 화면에 나타나지만 우리 사본에서는 숨은 채로 보인다 — "playentry에서만 다르게 보인다"의 원인.
+
+**해소 조건**: 엔트리랩이 npm에 새 버전을 올려야 한다. `@entrylabs/entry` 최신 배포는
+`4.0.20`(2025-05-30)이고 develop의 `package.json`은 `4.0.22`다. 새 버전이 나오면
+`node scripts/setup.mjs --entry-version=<새버전>`으로 갱신하고, 이 표의 심볼을 다시 대조한다.
+
+전체 변경 목록·판정 근거: [`upstream/지식/entryjs-4.56.0-2026-07-update.md`](../../../upstream/지식/entryjs-4.56.0-2026-07-update.md)
+
+
 ## Entry.init 옵션
 
 ```js

@@ -67,7 +67,7 @@
 원형/그리드 변수 배치 작업 (`games/bad-apple`, `games/name-row`, `games/name-circle`) 에서 발견:
 
 - **Variable Y vs Entity Y — 부호 반대**: entity 는 `setY` 에서 `this.object.y = -this.y` 로 반전하지만 variable 은 `view_.y = getY()` 직접 사용 → variable 의 `y > 0` 은 화면 **아래**. 시계 fixture 가 반시계로 돌던 원인. 실측은 [`tools/verify-coord-test.mjs`](../tools/verify-coord-test.mjs) 와 [`games/coord-test/coord-test_001.ent`](../games/coord-test/).
-- **변수 좌표 x=0 또는 y=0 → bin-packer 폴백**: [`variable.js:127`](../../entryjs/src/class/variable/variable.js#L127) 의 `if (this.getX() && this.getY())` truthy check 때문에 정확히 0 인 좌표는 무시되고 자동 배치. 그리드 중앙 행/열만 흩어지는 증상. 회피는 ±1 시프트 또는 0.5 오프셋.
+- **변수 좌표 x=0 또는 y=0 → bin-packer 폴백**: [`variable.js:136`](../../entryjs/src/class/variable/variable.js#L136) 의 `if (this.getX() && this.getY())` truthy check 때문에 정확히 0 인 좌표는 무시되고 자동 배치. 그리드 중앙 행/열만 흩어지는 증상. 회피는 ±1 시프트 또는 0.5 오프셋.
 
 ## 2026-04-29 — 뱀서라이크 확장팩 (`games/vampire-survival/` Phase A→E)
 
@@ -537,7 +537,7 @@ spec 작성 (DSL)
 ## 2026-04-24 (3차) — scene id `"7dwq"` 하드코딩 제거
 
 - [x] **정정**: 이전에 "첫 scene id는 반드시 `\"7dwq\"`여야 한다"고 적은 것은 **과한 보수적 해석**이었음. 실측 결과 `Entry.clearProject()` 선행만 보장되면 scene id는 아무 4자 영숫자 OK
-- [x] 근거: `Entry.clearProject` → `Entry.scene.clear()` 가 `scenes_=[]` 과 `selectedScene=null`로 완전 리셋 ([`entryjs/src/class/scene.js:727`](../../entryjs/src/class/scene.js#L727))
+- [x] 근거: `Entry.clearProject` → `Entry.scene.clear()` 가 `scenes_=[]` 과 `selectedScene=null`로 완전 리셋 ([`entryjs/src/class/scene.js:731`](../../entryjs/src/class/scene.js#L731))
 - [x] 실제 playentry.org 프로젝트도 scene id가 제각각 — 사용자가 장면을 삭제·재생성하면 id 바뀜 (starter `"7dwq"` 는 첫 로드 시에만)
 - [x] [`tools/make-ent.mjs`](../tools/make-ent.mjs) 변경: `specScenes || [{name:'장면 1', id:'7dwq'}]` → `[{name:'장면 1'}]`, id는 `shortId()`로 랜덤 생성
 - [x] 회귀 가드 fixture: [`tests/fixtures/spec-scene-custom-id.json`](../tests/fixtures/spec-scene-custom-id.json) (`"zzzz"` id로 정상 로드 + `Entry.scene.selectedScene.id === "zzzz"` 확인)
@@ -582,7 +582,7 @@ spec 작성 (DSL)
   (1) 타겟은 `document` (window 아님)
   (2) `event.code` (`'ArrowRight'`) — `event.keyCode`는 무시됨 (modern KeyboardEvent에서 read-only)
   (3) 누름 유지는 keydown만, 단발은 keydown+keyup 페어
-  [`entryjs/src/util/utils.js:810-823`](../../entryjs/src/util/utils.js#L810)
+  [`entryjs/src/util/utils.js:831-844`](../../entryjs/src/util/utils.js#L831)
   + `Entry.Utils.inputToKeycode` at line 860
 - [x] [`tools/inspect.mjs`](../tools/inspect.mjs) `--key` 플래그 수정 — CODE_MAP으로 숫자 shorthand(37→ArrowLeft 등) 제공
 - [x] [`tools/verify-platformer.mjs`](../tools/verify-platformer.mjs) — 방향키 hold 상태 시뮬레이션 레퍼런스

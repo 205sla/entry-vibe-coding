@@ -73,6 +73,7 @@
 | 한글 자모 prefix 자동완성 (disassemble + `index_of`==1) | [04 §한글 자모 prefix 자동완성](04-script-and-blocks.md#한글-자모-prefix-자동완성-disassemble-매칭) | (es-hangul 데모 전용) |
 | textBox `entity.x`=가운데(폭 무관 `x:0`) · 글자 `textAlign:0`(1=왼쪽) · 고정폭 `lineBreak:true` · regX/regY 강제0 | [07 §textBox 정렬](07-runtime-quirks.md#textbox-정렬--regxregy-강제-0-가운데는-textalign0-1-아님) | 04 (멀티 장면 데모 — 버튼/박스) |
 | 붓 슬로우컬러 단색 배경 (`set_color` 가 동적 hex 문자열 허용 → PALETTE 리스트 순환) | [04 §붓 슬로우컬러 배경](04-script-and-blocks.md#붓으로-슬로우-컬러-단색-배경-글상자-투명--뒤에-깔기) | (es-hangul 데모) |
+| 엔진 사본 버전 기준 (npm 4.0.20 핀 vs 실서비스 격차 · pull이 사본을 안 바꾸는 이유) | [05 §엔진 사본의 버전 기준](05-host-editor.md#엔진-사본의-버전-기준-npm-핀과-실서비스의-격차) | (SSOT는 `upstream/지식/entryjs-4.56.0-2026-07-update.md`) |
 
 **규칙**: 새 사실 추가 시 위 표에 한 줄 추가. 정본을 두 곳에 둘 일이 생기면 둘 중
 하나가 더 적합한 위치. 모호하면 07 (불변 동작) 또는 04 (블록·패턴) 우선.
