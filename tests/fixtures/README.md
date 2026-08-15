@@ -20,7 +20,8 @@
 | **방향키 + 추격 + HP 변수 + 충돌 + 게임 오버** | [`chase-hp`](spec-chase-hp.json) | | |
 | **원-원 거리 충돌 + 시간 점수 + 클라우드 랭킹 + 동적 배경** | [`bullet-circle`](spec-bullet-circle.mjs) | ✓ | 종합 데모 (10 오브젝트, 3 장면, 2 함수) |
 | **공유 리스트 (`isCloud`) + ask_and_wait + insertion sort** | [`memory-ranking`](spec-memory-ranking.json) | | |
-| **시차 스크롤 플랫포머 + reach_something 충돌** | [`platformer`](spec-platformer.json) | | |
+| **시차 스크롤 플랫포머 + reach_something 충돌** | [`platformer`](spec-platformer.json) | | 발판 3~10 개까지. 수백 칸 스테이지는 아래 타일맵 쪽 |
+| **대규모 사이드스크롤 플랫포머 — 문자열 타일맵 + 서브스텝 스윕 충돌 + 클론 없는 액터** | (fixture 아님) [`games/brick-kingdom/spec.mjs`](../../games/brick-kingdom/spec.mjs) | ✓ | 356 열 × 9 행을 오브젝트 6 개로. 맵 = 리스트 한 개, 충돌 = AABB 질의, 적·아이템·발사체 = 고정 길이 병렬 리스트, 렌더 = 가시창만 `brush_stamp`. 설계 해설: [knowledge/04 §문자열 타일맵](../../knowledge/04-script-and-blocks.md#문자열-타일맵--서브스텝-스윕-충돌--사이드스크롤-플랫포머) |
 | **3 장면 게임 (메뉴 → 플레이 → 결과)** | [`bullethell`](spec-bullethell.json) | | |
 | **붓 + slide 변수로 동적 그래픽** | [`healthbar-brush`](spec-healthbar-brush.json) | | |
 | **반복하기 60fps 암묵 틱 측정** | [`repeat-timing`](spec-repeat-timing.json) | | `repeat-timing-wait` (wait 비교) |
@@ -79,6 +80,11 @@ export default {
 | `repeat-timing` | [`verify-repeat-timing.mjs`](../../tools/verify-repeat-timing.mjs) | 180회 repeat = 2.87s ≈ 3.00s (60fps) |
 
 전체 일괄 실행: `npm run verify:runtime`
+
+`games/*/verify.mjs` 는 이 표에 없다 (fixture 가 아니라 완성 게임). 실행은
+`node tools/run-all-verify.mjs --filter <이름>`. 방향키 hold 로 오래 플레이하는 검증은
+**시나리오마다 자식 프로세스로 격리**해야 한다 —
+작성 지침은 [knowledge/05 §액션 게임을 봇으로 플레이해서 검증](../../knowledge/05-host-editor.md#액션-게임을-봇으로-플레이해서-검증하기).
 
 ## Knowledge 페이지
 

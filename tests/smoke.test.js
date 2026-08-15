@@ -212,3 +212,61 @@ for (const entPath of listFixtures()) {
 test('fixtures exist', () => {
     assert.ok(listFixtures().length > 0, `no .ent fixtures found in ${FIXTURES_DIR}`);
 });
+
+// --- L1 validateSpec guards -------------------------------------------------
+// validateSpec is the cheapest layer that can catch whole classes of silent
+// failure. Each case below encodes a bug that once shipped a .ent which passed
+// --check, built fine, and then could not be opened at all.
+test('validateSpec rejects a value function call in statement position', async () => {
+    // Root cause of an unloadable .ent: Entry.loadProject dies with
+    // "appendChild ... parameter 1 is not of type 'Node'" and logs nothing.
+    const { validateSpec } = await import('../tools/make-ent.mjs');
+
+    const valueFn = { id: 'vf', type: 'value', content: [[]] };
+    const callBlock = { type: 'func_vf', params: [] };
+
+    const bad = validateSpec({
+        functions: [valueFn],
+        objects: [{ id: 'o', script: [[{ type: 'when_run_button_click', params: [] }, callBlock]] }],
+    });
+    const hit = bad.filter(i => i.severity === 'error' && /value function used as a statement/.test(i.msg));
+    assert.equal(hit.length, 1, `expected 1 error, got: ${JSON.stringify(bad, null, 2)}`);
+
+    // Same call inside a value slot is legitimate — must NOT be flagged.
+    const good = validateSpec({
+        functions: [valueFn],
+        objects: [{ id: 'o', script: [[
+            { type: 'when_run_button_click', params: [] },
+            { type: 'set_variable', params: [{ __field: 'sink' }, callBlock, null] },
+        ]] }],
+    });
+    assert.deepEqual(
+        good.filter(i => /value function used as a statement/.test(i.msg)), [],
+        `value-slot call must not be flagged: ${JSON.stringify(good, null, 2)}`);
+
+    // A `normal` function call IS a valid statement — must NOT be flagged.
+    const normalOk = validateSpec({
+        functions: [{ id: 'nf', type: 'normal', content: [[]] }],
+        objects: [{ id: 'o', script: [[
+            { type: 'when_run_button_click', params: [] },
+            { type: 'func_nf', params: [] },
+        ]] }],
+    });
+    assert.deepEqual(
+        normalOk.filter(i => /value function used as a statement/.test(i.msg)), [],
+        `normal function statement must not be flagged: ${JSON.stringify(normalOk, null, 2)}`);
+});
+
+test('validateSpec finds statement-position value calls nested in loops', async () => {
+    const { validateSpec } = await import('../tools/make-ent.mjs');
+    const issues = validateSpec({
+        functions: [{ id: 'vf', type: 'value', content: [[]] }],
+        objects: [{ id: 'o', script: [[
+            { type: 'when_run_button_click', params: [] },
+            { type: 'repeat_inf', params: [], statements: [[{ type: 'func_vf', params: [] }]] },
+        ]] }],
+    });
+    assert.equal(
+        issues.filter(i => /value function used as a statement/.test(i.msg)).length, 1,
+        `nested case missed: ${JSON.stringify(issues, null, 2)}`);
+});

@@ -64,7 +64,6 @@ clamp돼 화면에 나타나지만 우리 사본에서는 숨은 채로 보인�
 
 전체 변경 목록·판정 근거: [`upstream/지식/entryjs-4.56.0-2026-07-update.md`](../../../upstream/지식/entryjs-4.56.0-2026-07-update.md)
 
-
 ## Entry.init 옵션
 
 ```js
@@ -346,3 +345,79 @@ document.dispatchEvent(new KeyboardEvent('keyup',   { code: 'ArrowRight', key: '
 - [`tools/inspect.mjs`](../tools/inspect.mjs) `--click N`, `--key CODE N`, `--watch N` 플래그
 - [`tools/verify-platformer.mjs`](../tools/verify-platformer.mjs) — 방향키 hold + offset 변화 측정
 - [`tools/verify-healthbar-brush.mjs`](../tools/verify-healthbar-brush.mjs) — 변수 setValue로 상태 직접 조작
+
+## 액션 게임을 봇으로 "플레이해서" 검증하기
+
+변수를 정답 값으로 세팅하는 검증은 로직을 안 건드린다. 실제 플레이 가능성을 확인하려면
+**키 입력만으로 스테이지를 진행**해야 하는데, 그러면 봇이 사람과 같은 제약을 받는다. 실측으로
+확정한 규칙들 ([`games/brick-kingdom/verify.mjs`](../games/brick-kingdom/verify.mjs) 16 시나리오).
+
+### `page.evaluate` 왕복이 게임 시간을 잡아먹는다 — 센싱은 **한 번에**
+
+한 번의 `page.evaluate` 가 10~15 ms = 게임 0.6~0.9 프레임. 항목마다 따로 읽으면 루프 한 바퀴가
+쉽게 300 ms(18 프레임)를 넘고, 달리기 5 px/frame 이면 그 사이 **90 px** 을 지나간다.
+위치·상태·앞쪽 지형·앞쪽 적을 **한 evaluate 안에서** 모아 읽는다.
+
+```js
+async function sense(page) {
+    return page.evaluate(() => {
+        const V   = (n) => Number(Entry.variableContainer.variables_.find(x => x.name_ === n).getValue());
+        const LST = (n) => Entry.variableContainer.lists_.find(x => x.name_ === n).array_.map(o => o.data);
+        // px·py·state·grounded + lvl 행 문자열까지 한 번에 → 앞쪽 구멍/벽/적을 JS 쪽에서 계산
+        return { px: V('px'), py: V('py'), state: V('state'), rows: LST('lvl').map(String), /* … */ };
+    });
+}
+```
+
+되돌린 접근: 항목별로 읽었을 때 28 열 적에게 3 연속 사망. 밟기 직후 리스트를 4 번 나눠 읽으면
+왕복 60 ms 가 10 프레임(167 ms) 잠금 창을 잡아먹어 판정 결과가 매번 뒤집혔다.
+
+### 눌린 키는 **반대 키를 놓기 전에는** 방향이 안 바뀐다
+
+`ArrowRight` 를 hold 한 상태로 `ArrowLeft` 를 누르면 Right 가 계속 이긴다 (게임이 두 키를
+따로 검사하므로). 방향을 바꿀 때마다 전 방향을 `keyup` 하는 `release()` 를 부른다.
+
+```js
+async function release(page) {
+    for (const c of ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','KeyX','KeyZ']) await up(page, c);
+}
+```
+
+증상: 아이템을 쫓아가는 루프가 반대 방향으로 흘러가 구멍에 빠졌다 (`col 44 → 60`).
+
+### 프레임 단위 잠금 창 안에는 키를 걸 수 없다
+
+가속이 `0.074 px/frame` 이면 10 프레임 잠금 동안 이동량은 `≈ 3.7 px` 다. 접촉 판정 폭이
+26 px 이면 **그 창 안에 반대편으로 갈 수 없다** — 봇이 아무리 빨라도 물리가 막는다.
+이런 판정(셸 차기 방향 등)은 봇이 통제하려 하지 말고 **게임 규칙에 맞춰 상황을 만든다**
+(방향을 뒤집는 대신, 가려는 방향에 표적을 미리 배치).
+
+### 트리거 거리는 추측하지 말고 스윕한다
+
+"적 앞 몇 px 에서 점프하나" 같은 값은 실측으로만 정해진다. 마주 걸어오는 적 기준 스윕:
+
+| 발동 거리 | 결과 |
+|---|---|
+| 165 px | 일찍 뛰어 적 **앞**에 착지 → 측면 피격 사망 |
+| 120 px | 3 연속 구간에서 2 회 밟기 성공 ← 채택 |
+| 100 px | 늦게 뛰어 적 **뒤**에 착지 (3/3 실패) |
+
+창이 좁은 것 자체는 게임 결함이 아니다 — 원작과 같은 정밀도다.
+
+### 분기 우선순위: 지형이 적보다 먼저
+
+"앞에 적이 있으면 점프" 를 지형 판정보다 먼저 두면, **닿을 수 없는 위치의 적**(언덕 위 등)에
+접근하려다 벽에 붙어 영원히 멈춘다 (실측: `col=91.7` 고정, 적은 활성 범위 밖이라 얼어붙음).
+`grounded && 앞 칸이 더 높음` 이면 적 분기를 건너뛴다.
+
+### 못 한 것은 조건을 지우지 말고 근거와 함께 남긴다
+
+봇이 못 하는 검사를 삭제·완화하면 회귀 가드가 사라진다. 대신 ① 같은 성질을 확인하는 **다른
+지점**으로 검사를 옮기고(탈락시킨 후보와 이유를 주석에), ② 그래도 남는 실패는
+"봇 정밀도 문제 / 게임 로직 문제" 를 **측정값으로 구분해** 문서에 적는다.
+[`games/brick-kingdom/README.md`](../games/brick-kingdom/README.md) 의 실패 귀속 표가 그 형식.
+
+### 키 hold 검증은 시나리오마다 프로세스를 격리한다
+
+같은 프로세스에서 브라우저를 ~10 회 재부팅하면 키 이벤트가 게임에 도달하지 않는다 —
+[07 §헤드리스 검증에서 브라우저를 ~10 회 재부팅하면](07-runtime-quirks.md#헤드리스-검증에서-브라우저를-10-회-재부팅하면-키-이벤트가-게임에-도달하지-않는다).

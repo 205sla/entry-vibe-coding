@@ -865,6 +865,159 @@ Entry는 "어느 면에서 닿았는지" 정보 없이 `reach_something(block)`�
 (y=-25/5/35), ground fallback y=-40. [`tools/verify-platformer.mjs`](../tools/verify-platformer.mjs) —
 각 발판별 착지 y 자동 검증 (4/4 통과).
 
+### 발판이 수십~수백 개면 이 패턴을 쓰지 않는다
+
+위 패턴은 **발판마다 오브젝트 1 개 + `landing_y` 상수**가 필요해서 3~10 개까지가 실용 한계다.
+NES 급 스크롤 스테이지(수백 칸)에는 아래 [문자열 타일맵 + 서브스텝 스윕](#문자열-타일맵--서브스텝-스윕-충돌--사이드스크롤-플랫포머)
+을 쓴다 — 오브젝트 수가 맵 크기와 무관해진다.
+
+## 문자열 타일맵 + 서브스텝 스윕 충돌 — 사이드스크롤 플랫포머
+
+`reach_something` 발판 패턴이 감당 못 하는 규모(수백 칸 × 여러 행)의 스테이지를 만드는 방법.
+핵심은 **맵을 오브젝트가 아니라 데이터로 두고**, 충돌을 엔진에 묻지 않고 직접 계산하는 것.
+
+### 맵 표현 — 리스트 한 개, 행 = 문자열
+
+```js
+lists: [{ id: 'lvl', array: [
+    '................................',   // 행 0 (화면 상단)
+    '...........?BB?.................',
+    '............................PP..',
+    '################################',   // 행 8 (바닥)
+]}],
+```
+
+- 한 칸 = 문자 1 개. `#`=흙 `=`=돌 `B`=벽돌 `?`=보상 `u`=소진 `P/p`=파이프 `c`=코인 `F`=깃대 `.`=공기.
+- 읽기 = `char_at(valueAt('lvl', r+1), c+1)` (둘 다 1-based).
+  **범위 밖은 `throw`** 하므로 반드시 가드 — [07 §char_at·substring 은 범위를 벗어나면 throw](07-runtime-quirks.md#char_at--substring-은-범위를-벗어나면-throw--문자열-타일맵에-가드-필수).
+- 쓰기(벽돌 파괴 등) = `substring` 좌/우 + `combine`. **`replace_string` 은 같은 문자를 전부
+  바꿔서 못 쓴다** (같은 07 섹션).
+- 원본 맵을 `lvl_src` 로 따로 들고 있으면 재시작이 `setListAt` 복사 한 번이다.
+
+### 충돌 — AABB 겹침 질의 + 서브스텝 스윕
+
+발판마다 검사하는 대신, **"이 사각형이 단단한 타일과 겹치나"** 를 묻는 값함수 하나를 만든다.
+
+```
+sd(ch)          → 문자가 단단한가 (1/0)
+sa(x, y)        → 월드 픽셀 → 그 칸이 단단한가         : quotient(x,TILE), quotient(y,TILE) → ta → sd
+bh(x, y, w, h)  → AABB 가 단단한 타일과 겹치나         : 모서리 4 점 + 좌우 변 중앙 2 점
+```
+
+히트박스가 타일보다 작으면 (예: 20×44 vs TILE 32) 한 변에 타일 경계가 2 개 이상 걸릴 수 없어
+**6 점 샘플로 충분**하다. 히트박스가 타일보다 크면 변마다 샘플을 늘려야 한다.
+
+이동은 한 번에 옮기지 않고 **`SUBSTEP` px 씩 나눠 전진하며 매 조각마다 `bh`** 를 본다
+(꼬리재귀 값함수 — [반복 블록은 프레임을 먹는다](07-runtime-quirks.md#함수-호출은-반복하기의-60fps-틱을-우회-꼬리-재귀-최적화)).
+막히면 그 자리에서 멈추고 속도를 0 으로. 이게 고속 낙하의 **바닥 관통(터널링)** 을 막는다.
+
+```js
+const fnMoveY = fn.value('my', ['remain', 'dir'], (remain, dir, L) => [
+    if_(cmp(remain, '<=', 0), [L.set('done', 1)], [
+        L.set('step', P.SUBSTEP),
+        if_(cmp(remain, '<', P.SUBSTEP), [L.set('step', remain)]),
+        L.set('ny', calc(getVar('py'), '+', calc(L.get('step'), '*', dir))),
+        if_(cmp(call('bh', getVar('px'), L.get('ny'), W, getVar('box_h')), '==', 1), [
+            if_(cmp(dir, '>', 0), [                      // 아래로 → 착지
+                setVar('grounded', 1), setVar('vy', 0),
+                setVar('py', calc(quotient(calc(L.get('ny'), '+', 1), TILE), '*', TILE)),
+            ], [                                          // 위로 → 머리박기
+                setVar('vy', 0), setVar('bumped', 1),
+                setVar('hit_c', quotient(getVar('px'), TILE)),
+                setVar('hit_r', quotient(calc(L.get('ny'), '-', getVar('box_h')), TILE)),
+            ]),
+            L.set('done', 1),
+        ], [
+            setVar('py', L.get('ny')),
+            L.set('done', call('my', calc(remain, '-', L.get('step')), dir)),   // 꼬리재귀
+        ]),
+    ]),
+], (remain, dir, L) => L.get('done'), ['done', 'step', 'ny', 'h']);
+```
+
+**착지 스냅 공식**: `py` 를 **발 위치(= 몸의 하단 경계, 배타적)** 로 정의하면
+`py = quotient(ny + 1, TILE) * TILE` 한 줄로 타일 상단에 정확히 붙는다. 이 정의 때문에
+`bh` 의 하단 샘플은 `py` 가 아니라 **`py - 1`** 을 봐야 한다 — `py` 를 쓰면
+`quotient(py, TILE)` 이 지면 행을 가리켜 "항상 충돌"이 되고 **걷기가 멈춘다**.
+
+머리박기 지점(`hit_c`/`hit_r`)을 기록해 두면 블록 반응(벽돌 파괴·보상 지급)을 이동 코드와
+분리해서 처리할 수 있다.
+
+### 렌더 — 타일 오브젝트 0 개, 가시창만 stamp
+
+맵이 커도 오브젝트는 늘리지 않는다. `world` sprite 하나가 매 프레임 `eraseAll` 후
+**가시창 칸만** 문자별 `changeShape` + `stamp`. 예산은 프레임당 ~250 칸
+([07 §brush_stamp 타일 렌더러](07-runtime-quirks.md#brush_stamp-타일-렌더러--매-프레임-252-칸-재그리기도-62fps-스크롤-게임-예산)).
+
+카메라는 변수 `cam_x` 하나. 화면 좌표 = 월드 − `cam_x`. 부드러운 스크롤을 위해
+`cam_col = quotient(cam_x, TILE)` / `cam_frac = mod(cam_x, TILE)` 로 쪼개, 칸은 열 단위로
+돌면서 `cam_frac` 만큼 밀어 그린다. 역스크롤 금지는 목표값이 현재보다 클 때만 대입.
+
+### 액터 — 클론 대신 고정 길이 병렬 리스트
+
+적·아이템·발사체를 클론으로 두면 [클론 초기화 race](07-runtime-quirks.md#다중-when_clone_start-스크립트는-병렬-실행--클론-초기화-race) ·
+[template 발화](07-runtime-quirks.md#when_message-핸들러가-template-에도-발화--direction-as-id-시-invalid-index-lookup-으로-scene-전체-손상) ·
+[글로벌 scratch race](07-runtime-quirks.md#다중-클론의-repeatinf-본체--글로벌-scratch-변수-race) 를 전부 상대해야 한다.
+타일맵 게임에서는 어차피 충돌을 직접 계산하므로 **클론이 줄 이점(개별 `reach_something`)이 없다** —
+그러면 클론을 안 쓰는 쪽이 구조적으로 안전하다.
+
+| 클론 방식 | 리스트 방식 |
+|---|---|
+| 상태가 클론 속성에 흩어짐 | `en_x`/`en_y`/`en_vx`/`en_state`/`en_timer`/`en_kind` 같은 인덱스 |
+| 스폰/제거로 개수가 변함 | **고정 길이** — 슬롯 재사용 (`en_state=3` = 죽음) |
+| 재시작 = `removeAllClones` + 재스폰 | 재시작 = `setListAt` 으로 원위치 덮어쓰기 |
+| 개수 증가 버그가 생길 수 있음 | `add_value_to_list` 를 아예 안 써서 **길이가 자랄 수 없음** |
+
+갱신은 꼬리재귀 값함수 하나가 인덱스를 훑고, 그리기도 같은 방식으로 화면 안 슬롯만 stamp.
+**활성 범위 가드**(`-M < en_x - cam_x < SCR_W + M`)를 넣으면 화면 밖 액터는 계산도 안 한다 —
+단, 이건 검증 봇에게 함정이 된다: 멈춰서 적을 기다릴 수 없고 카메라가 밀려야 적이 움직인다.
+
+### 스크래치 변수는 스레드별 전용으로
+
+`player` 와 `world` 가 각자 `repeat.inf` 를 돌면 **글로벌 변수 하나를 여러 용도로 돌려쓰는 순간
+프레임 중간에 서로 덮어쓴다** (클론이 아니어도 발생). `cam_tmp`/`box_h`/`max_spd`/`accel` 처럼
+용도별 전용 이름을 쓰고, 스레드 경계를 넘는 값은 이름에 소유자를 남긴다 —
+[lessons.md](lessons.md) 2026-07-31 항목.
+
+### 타일 크기는 **한 곳**에서 유도한다 — 검증 코드까지
+
+타일 스케일은 나중에 바뀐다. 원작 대비 세로 행 수가 안 맞거나 렌더 예산이 남으면 조정하게 되는데,
+그때 **"현재 타일 크기를 전제로 박아둔 숫자"가 전부 조용한 버그가 된다.** brick-kingdom 이
+TILE 32 → 24 로 옮길 때 실제로 걸린 곳:
+
+| 박혀 있던 값 | 무엇이었나 |
+|---|---|
+| `ROW0_Y = 137` | `-HALF_H + TILE/2 + (ROWS-1)*TILE` 의 계산 결과 |
+| `HITBOX_W/H = 20/44`, `SUBSTEP = 4`, `CAM_MAX_STEP = 12`, `ENEMY_ACTIVE_MARGIN = 64` | 전부 32px 격자 기준 길이 |
+| 적 왕복 진폭 `±48px` | 1.5 칸 |
+| verify 의 `const TILE = 32` 사본 | 게임과 별도로 복제된 격자 |
+
+그래서 배율은 **상수 하나(`S`)와 그로부터의 유도**로만 둔다. 속도·중력만 곱하고 길이를 놓치는
+게 흔한 실수다 — `physics.mjs` 는 길이 상수도 `L = (base) => Math.round(base * S)` 로 만든다.
+스프라이트 `scale` 도 기본값에 의존하지 말고 명시한다: 기본값에 맡기면 타일만 작아지고
+캐릭터는 옛 크기로 남는다.
+
+⚠️ **검증 쪽 사본이 특히 위험하다.** 단정에 옛 값이 남으면 실패하지 않고 **헐거워져서 통과한다** —
+`MAX_FALL` 이 12 → 9 로 줄었는데 `maxVy <= 12.01` 을 보고 있으면 그 단정은 아무것도 안 지킨다.
+verify 도 게임과 같은 모듈에서 `TILE`/`GROUND`/`ROWS`/`PHYS` 를 import 해야 한다.
+단, `page.evaluate` 안은 별 컨텍스트라 import 가 안 보이므로 **인자로 넘긴다**:
+
+```js
+await page.evaluate(([TILE, ROWS]) => { /* ... */ }, [TILE, ROWS]);
+```
+
+체감이 배율에 안전한지 확인하는 방법: **칸 단위로 환산해서 비교한다.** brick-kingdom 은
+`S` 를 2 → 1.5 로 바꿨을 때 최대 점프가 112px 로 줄었지만 4.7 칸으로 그대로였다
+(속도와 중력이 같은 배율로 스케일되므로 칸 단위 궤적이 보존된다).
+
+### 참고 구현
+
+[`games/brick-kingdom/`](../games/brick-kingdom/) — 356 열 × 12 행 스테이지, 오브젝트 6 개,
+적·아이템·발사체 전부 리스트, 평지에서 프레임당 45 스탬프. spec 1,699 줄 / verify 16 시나리오.
+물리 상수는 [`games/brick-kingdom/physics.mjs`](../games/brick-kingdom/physics.mjs) 에 분리
+(TILE 은 [`levels.mjs`](../games/brick-kingdom/levels.mjs), 렌더 예산 실측은
+[07 §렌더 예산은 그린 칸으로](07-runtime-quirks.md)).
+
 ## 원-원 거리 기반 충돌 (`reach_something` 대체)
 
 `reach_something` 은 Entry 내장 충돌이지만 **bounding-box 기반** — 원형 객체에는 부정확.
@@ -971,6 +1124,35 @@ function_create_value:
 ```
 
 `set_variable`의 VALUE 슬롯에 `func_fib` 호출 결과가 들어간다.
+
+### ⚠️ 함정 — value 함수 호출을 **문장 위치**에 두면 `.ent` 가 로드되지 않는다
+
+`fn.value` 로 만든 함수의 호출(`func_<id>`)은 **반드시 값 슬롯**에 있어야 한다.
+스레드에 문장처럼 나란히 두면 — 부수효과만 쓰고 반환값을 버리려는 자연스러운 코드 —
+`Entry.loadProject` 가 블록 렌더 단계에서 죽는다:
+
+```
+TypeError: Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'
+```
+
+3중으로 침묵한다: `--check` 통과, 빌드 성공(정상 크기 `.ent`), 로드 실패 시 console 단서
+없음. 편집기에서 프로젝트가 **아예 열리지 않으므로** 사람 눈 확인(L5)도 불가능하다.
+
+```js
+// ✗ 로드 불가 — 문장 위치
+threads: [[ when.run(), call('st', 7, 4, txt('.')) ]]
+
+// ✓ 값 슬롯에 sink — 반환값이 필요 없어도 변수에 버린다
+threads: [[ when.run(), setVar('sink', call('st', 7, 4, txt('.'))) ]]
+```
+
+부수효과 전용 함수라면 애초에 `fn.normal` 로 정의하는 게 맞다 (`function_create`,
+호출이 문장으로 유효). `fn.value` 를 쓰는 이유가 "재귀 + 동기 실행"이라면 위처럼
+sink 변수 하나를 두면 된다.
+
+**가드**: [`tools/make-ent.mjs`](../tools/make-ent.mjs) `validateSpec` → `walkStatement` 가
+statement 위치의 `func_<id>`(spec.functions 에서 `type: 'value'`)를 L1 **error** 로 잡는다.
+`spec.functions` 를 보고 판정하므로, 함수 정의가 다른 파일에 있어도 같은 spec 안에 있으면 잡힌다.
 
 ### 함정 — 라벨 슬롯에 bare string 필요
 

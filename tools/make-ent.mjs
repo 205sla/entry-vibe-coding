@@ -194,6 +194,15 @@ export function validateSpec(spec) {
     const issues = [];
     const blocks = loadRegistry().blocks;
 
+    // Value functions used as a statement break Entry.loadProject outright
+    // (appendChild TypeError inside the block-rendering pass) — the project
+    // becomes unloadable with no console clue. A value call must sit in a value
+    // slot; if the return value is unwanted, sink it into a scratch variable.
+    const valueFuncTypes = new Set(
+        (spec.functions || [])
+            .filter(f => f && f.id && f.type === 'value')
+            .map(f => `func_${f.id}`));
+
     // Synthesized at runtime by Entry.Func — not in our registry, but valid.
     const isUserFuncType = (t) =>
         /^func_[a-z0-9]+$/i.test(t) ||
@@ -201,6 +210,17 @@ export function validateSpec(spec) {
         /^booleanParam_[a-z0-9]+$/i.test(t);
 
     const FIELD_SLOTS = new Set(['Dropdown', 'DropdownDynamic', 'Keyboard', 'TextInput']);
+
+    // A block sitting directly in a thread (statement position).
+    function walkStatement(block, p) {
+        if (block && typeof block === 'object' && valueFuncTypes.has(block.type)) {
+            issues.push({ severity: 'error', path: p,
+                msg: `${block.type}: value function used as a statement — the .ent will fail to load `
+                   + `(appendChild TypeError in Entry.loadProject). Put the call in a value slot, `
+                   + `e.g. setVar('sink', call('...')).` });
+        }
+        walkBlock(block, p);
+    }
 
     function walkBlock(block, p) {
         if (!block || typeof block !== 'object' || !block.type) return;
@@ -214,7 +234,7 @@ export function validateSpec(spec) {
                 if (c && typeof c === 'object' && c.type) walkBlock(c, `${p}.params[${i}]`);
             });
             (block.statements || []).forEach((th, ti) =>
-                (th || []).forEach((b, bi) => walkBlock(b, `${p}.statements[${ti}][${bi}]`)));
+                (th || []).forEach((b, bi) => walkStatement(b, `${p}.statements[${ti}][${bi}]`)));
             return;
         }
 
@@ -266,7 +286,7 @@ export function validateSpec(spec) {
             if (c && typeof c === 'object' && c.type) walkBlock(c, `${p}.params[${i}]`);
         });
         (block.statements || []).forEach((th, ti) =>
-            (th || []).forEach((b, bi) => walkBlock(b, `${p}.statements[${ti}][${bi}]`)));
+            (th || []).forEach((b, bi) => walkStatement(b, `${p}.statements[${ti}][${bi}]`)));
     }
 
     // Object scripts.
@@ -275,7 +295,7 @@ export function validateSpec(spec) {
         const threads = Array.isArray(o.script) ? o.script : [];
         threads.forEach((th, ti) =>
             (th || []).forEach((b, bi) =>
-                walkBlock(b, `objects[${tag}].script[${ti}][${bi}]`)));
+                walkStatement(b, `objects[${tag}].script[${ti}][${bi}]`)));
     });
 
     // Function content (skip if already stringified — that path is for
@@ -285,7 +305,7 @@ export function validateSpec(spec) {
         const tag = f.id ? `${fi}=${f.id}` : `${fi}`;
         f.content.forEach((th, ti) =>
             (th || []).forEach((b, bi) =>
-                walkBlock(b, `functions[${tag}].content[${ti}][${bi}]`)));
+                walkStatement(b, `functions[${tag}].content[${ti}][${bi}]`)));
     });
 
     return issues;
