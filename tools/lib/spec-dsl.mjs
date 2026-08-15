@@ -93,6 +93,8 @@ export const charAt     = (s, i)    => ({ type: 'char_at',          params: [nul
 export const substr     = (s, a, b) => ({ type: 'substring',        params: [null, _val(s), null, _val(a), null, _val(b), null] });
 export const indexOf    = (s, sub)  => ({ type: 'index_of_string',  params: [null, _val(s), null, _val(sub), null] });
 export const strLen     = (s)       => ({ type: 'length_of_string', params: [null, _val(s), null] });
+// 로그인한 playentry 계정의 닉네임. 비로그인이면 빈 문자열이라 길이 검사로 가드한다.
+export const getNickname = ()       => ({ type: 'get_nickname', params: [] });
 export const replaceStr = (s, o, n) => ({ type: 'replace_string',   params: [null, _val(s), null, _val(o), null, _val(n), null] });
 
 // ── Math ─────────────────────────────────────────────────────────
@@ -149,6 +151,8 @@ export const move      = (n)    => ({ type: 'move_direction', params: [_val(n), 
 export const moveX     = (n)    => ({ type: 'move_x',         params: [_val(n), null] });
 export const moveY     = (n)    => ({ type: 'move_y',         params: [_val(n), null] });
 export const locateXY  = (x, y) => ({ type: 'locate_xy',      params: [_val(x), _val(y), null] });
+export const locateX   = (x)    => ({ type: 'locate_x',       params: [_val(x), null] });
+export const locateY   = (y)    => ({ type: 'locate_y',       params: [_val(y), null] });
 // N 초 동안 (x,y) 로 부드럽게 이동 — locate_xy_time. 블로킹 (다른 스크립트는 병렬 실행).
 //   paramsKeyMap: VALUE1=seconds(0), VALUE2=x(1), VALUE3=y(2).
 export const glideTo   = (sec, x, y) => ({ type: 'locate_xy_time', params: [_val(sec), _val(x), _val(y), null] });
@@ -173,6 +177,12 @@ export const stopDraw  = () => ({ type: 'stop_drawing',  params: [null] });
 export const eraseAll  = () => ({ type: 'brush_erase_all', params: [null] });
 export const setColor  = (hex) => ({ type: 'set_color', params: [color(hex), null] });
 export const setThickness = (n) => ({ type: 'set_thickness', params: [_val(n), null] });
+// 현재 모양을 도장처럼 캔버스에 고정. 타일맵 렌더의 핵심 (한 오브젝트가 모양을 바꿔가며
+// N 칸을 찍으면 오브젝트 1 개로 화면 전체 타일을 그린다).
+// ⚠️ stamp 는 붓 라인과 달리 sprite 의 `visible` 을 따른다 — hide 상태면 아무것도 안 찍힌다.
+// eraseAll() 이 stamp 도 함께 지우므로 매 프레임 erase→redraw 사이클이 성립한다.
+// 근거·실측: knowledge/07-runtime-quirks.md §brush_stamp 타일 렌더러
+export const stamp = () => ({ type: 'brush_stamp', params: [null] });
 
 // Looks (생김새 카테고리). 17 블록 전부 커버.
 export const show = () => ({ type: 'show', params: [null] });
@@ -226,6 +236,15 @@ export function if_(cond, then_, else_) {
 export const stopRepeat = () => ({ type: 'stop_repeat', params: [null] });
 export const wait = (sec) => ({ type: 'wait_second', params: [_val(sec), null] });
 
+// 조건이 참이 될 때까지 기다리기 — 폴링 대기의 표준 수단(확장 로드 대기, 상대 입장 대기).
+// ⚠️ 조건 슬롯에 `continue_repeat` 를 넣는 커뮤니티 트릭은 금지 (knowledge/07 참고).
+export const waitUntil = (cond) => ({ type: 'wait_until_true', params: [_val(cond), null] });
+
+// 코드 멈추기.
+//   'all' 모든 코드 · 'thisOnly' 자신의 모든 코드 · 'thisThread' 자신의 이 코드
+//   'otherThread' 자신의 다른 코드 · 'other_objects' 다른 오브젝트의 코드
+export const stopObject = (target = 'all') => ({ type: 'stop_object', params: [target, null] });
+
 // Clones.
 export const createClone = (target = 'self') => ({ type: 'create_clone', params: [target, null] });
 export const deleteClone = () => ({ type: 'delete_clone', params: [null] });
@@ -245,6 +264,9 @@ export const when = {
 // ── Scene / message control ──────────────────────────────────────
 
 export const startScene = (sceneId) => ({ type: 'start_scene', params: [sceneId, null] });
+// 다음/이전 장면으로. 장면 id 를 몰라도 되지만 spec 의 scenes 배열 순서에 묶인다.
+export const nextScene = () => ({ type: 'start_neighbor_scene', params: ['next', null] });
+export const prevScene = () => ({ type: 'start_neighbor_scene', params: ['prev', null] });
 export const sendMessage = (id) => ({ type: 'message_cast', params: [id, null] });
 export const sendMessageWait = (id) => ({ type: 'message_cast_wait', params: [id, null] });
 
@@ -291,14 +313,21 @@ export const askWait = (prompt) => ({ type: 'ask_and_wait', params: [String(prom
 //       (n, L) => [ L.set('tmp', calc(n, '*', 2)) ],
 //       (n, L) => calc(L.get('tmp'), '+', 1),
 //       ['tmp'])                    // ← locals
+//
+// **표시명 분리**: 기본 표시명은 `id` 그대로다. 편집기에 보일 이름이 id 로 쓸 수 없는
+// 문자를 포함하면 (`$입장` 같은 확장 후킹용 이름) `opts.label` 로 분리한다 — id 는
+// ASCII 로 두고 (블록 타입이 `func_<id>` 라 `--check` 의 `/^func_[a-z0-9]+$/i` 를 통과해야
+// 한다) 표시명만 바꾼다.
+//
+//   fn.normal('eoJoin', ['id'], () => [], [], { label: '$입장' })
 export const fn = {
-    value: (id, paramIds, bodyFn, returnFn, locals = []) =>
-        _defineFunction(id, 'value', paramIds, bodyFn, returnFn, locals),
-    normal: (id, paramIds, bodyFn, locals = []) =>
-        _defineFunction(id, 'normal', paramIds, bodyFn, null, locals),
+    value: (id, paramIds, bodyFn, returnFn, locals = [], opts = {}) =>
+        _defineFunction(id, 'value', paramIds, bodyFn, returnFn, locals, opts),
+    normal: (id, paramIds, bodyFn, locals = [], opts = {}) =>
+        _defineFunction(id, 'normal', paramIds, bodyFn, null, locals, opts),
 };
 
-function _defineFunction(id, type, paramIds, bodyFn, returnFn, locals = []) {
+function _defineFunction(id, type, paramIds, bodyFn, returnFn, locals = [], opts = {}) {
     // Each param id becomes a stringParam_<id> synthesized type.
     const paramRefs = paramIds.map(pid => ({ type: `stringParam_${pid}`, params: [] }));
 
@@ -318,7 +347,7 @@ function _defineFunction(id, type, paramIds, bodyFn, returnFn, locals = []) {
 
     // Build the function_field_label → function_field_string chain for the
     // function definition's parameter declaration.
-    const labelChain = _buildFieldChain(id, paramIds);
+    const labelChain = _buildFieldChain(id, paramIds, opts.label);
 
     const body = bodyFn ? bodyFn(...paramRefs, L) : [];
     const returnExpr = returnFn ? returnFn(...paramRefs, L) : null;
@@ -345,7 +374,7 @@ function _defineFunction(id, type, paramIds, bodyFn, returnFn, locals = []) {
     };
 }
 
-function _buildFieldChain(funcId, paramIds) {
+function _buildFieldChain(funcId, paramIds, label) {
     // Innermost: the last param's function_field_string with null next.
     // Build from right-to-left.
     let chain = null;
@@ -361,12 +390,14 @@ function _buildFieldChain(funcId, paramIds) {
             ],
         };
     }
-    // Wrap with function_field_label (literal name + chain).
+    // Wrap with function_field_label (literal name + chain). The label is the
+    // name shown in the editor — and the string Entry Online's extension matches
+    // on when it hooks `$입장` / `$나가기` (it reads function_field_label params).
     return {
         id: `${funcId}_lbl`,
         x: 0, y: 0,
         type: 'function_field_label',
-        params: [{ __field: funcId }, chain],
+        params: [{ __field: label == null ? funcId : String(label) }, chain],
     };
 }
 

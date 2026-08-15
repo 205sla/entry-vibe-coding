@@ -15,6 +15,7 @@
 | 블록 type 이름 / params 쉐이프 / 필드 vs 블록 슬롯 / 설계 패턴 (플랫포머·HUD) | [04-script-and-blocks.md](04-script-and-blocks.md) | Reference + Guide |
 | 편집기가 안 뜨거나 콘솔 에러 / 헤드리스 테스트 | [05-host-editor.md](05-host-editor.md) | Guide |
 | Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [07-runtime-quirks.md](07-runtime-quirks.md) | Runtime quirks |
+| **온라인 대전 작품**을 만들 때 (Entry Online 확장 계약·동기화 설계) | [08-entry-online.md](08-entry-online.md) | Reference + Guide |
 | 과거 해결된 버그 요약 (가드 파일 링크) | [lessons.md](lessons.md) | Lessons |
 | 날짜별로 뭘 배웠는지 | [CHANGELOG.md](CHANGELOG.md) | History |
 | 초기 부트스트랩 지시문 확인 | [bootstrap-prompt.txt](bootstrap-prompt.txt) | Historical prompt |
@@ -73,7 +74,19 @@
 | 한글 자모 prefix 자동완성 (disassemble + `index_of`==1) | [04 §한글 자모 prefix 자동완성](04-script-and-blocks.md#한글-자모-prefix-자동완성-disassemble-매칭) | (es-hangul 데모 전용) |
 | textBox `entity.x`=가운데(폭 무관 `x:0`) · 글자 `textAlign:0`(1=왼쪽) · 고정폭 `lineBreak:true` · regX/regY 강제0 | [07 §textBox 정렬](07-runtime-quirks.md#textbox-정렬--regxregy-강제-0-가운데는-textalign0-1-아님) | 04 (멀티 장면 데모 — 버튼/박스) |
 | 붓 슬로우컬러 단색 배경 (`set_color` 가 동적 hex 문자열 허용 → PALETTE 리스트 순환) | [04 §붓 슬로우컬러 배경](04-script-and-blocks.md#붓으로-슬로우-컬러-단색-배경-글상자-투명--뒤에-깔기) | (es-hangul 데모) |
+| `brush_stamp` 렌더 예산 (프레임당 ~250 칸) | [07 §brush_stamp 타일 렌더러](07-runtime-quirks.md#brush_stamp-타일-렌더러--매-프레임-252-칸-재그리기도-62fps-스크롤-게임-예산) | 04 (타일맵 렌더 안에서) |
+| `char_at`/`substring` 범위 밖 `throw` · `replace_string` 전량 치환 | [07 §char_at·substring throw](07-runtime-quirks.md#char_at--substring-은-범위를-벗어나면-throw--문자열-타일맵에-가드-필수) | 04 (맵 표현 안에서), lessons |
+| 문자열 타일맵 + 서브스텝 스윕 충돌 (대규모 사이드스크롤 플랫포머) | [04 §문자열 타일맵 + 서브스텝 스윕](04-script-and-blocks.md#문자열-타일맵--서브스텝-스윕-충돌--사이드스크롤-플랫포머) | 04 (§발판 충돌 패턴에서 규모 한계 링크) |
+| 헤드리스 브라우저 ~10 회 재부팅 후 키 이벤트 미도달 | [07 §브라우저 ~10 회 재부팅](07-runtime-quirks.md#헤드리스-검증에서-브라우저를-10-회-재부팅하면-키-이벤트가-게임에-도달하지-않는다) | 05 (봇 플레이 검증 안에서), lessons |
+| 액션 게임 봇 플레이 검증 (센싱 왕복·키 hold·트리거 스윕) | [05 §액션 게임을 봇으로 플레이해서 검증](05-host-editor.md#액션-게임을-봇으로-플레이해서-검증하기) | (verify 작성 가이드 — 04 §회귀 가드 레이어의 L4 세부) |
+| 렌더 예산은 **그린 칸**으로 센다 (순회는 공짜) · 타일 크기별 실측표 · 성능 비교는 케이스마다 브라우저 재기동 | [07 §렌더 예산은 그린 칸으로](07-runtime-quirks.md#brush_stamp-렌더-예산은-방문-칸이-아니라-그린-칸으로-센다--타일-크기를-바꾸면-다시-재야-한다) | 07 §brush_stamp(단발 실측), 기획 Phase2-4 §4 |
+| 타일 배율은 상수 하나에서 유도 (길이 상수 누락·verify 사본이 단정을 헐겁게 만듦) | [04 §타일 크기는 한 곳에서 유도](04-script-and-blocks.md#타일-크기는-한-곳에서-유도한다--검증-코드까지) | lessons |
 | 엔진 사본 버전 기준 (npm 4.0.20 핀 vs 실서비스 격차 · pull이 사본을 안 바꾸는 이유) | [05 §엔진 사본의 버전 기준](05-host-editor.md#엔진-사본의-버전-기준-npm-핀과-실서비스의-격차) | (SSOT는 `upstream/지식/entryjs-4.56.0-2026-07-update.md`) |
+
+| 글상자에 효과 블록 → 스레드 사망 (`entity.effect` 는 sprite 에만 초기화) | [07 §효과 블록과 글상자](07-runtime-quirks.md#효과-블록change_effect_amount-등을-글상자에-걸면-스레드가-죽는다) | (잠김/열림은 오브젝트 2개 show/hide), lessons |
+| 장면 재진입 시 `when_scene_start` 들이 지난 판 값을 먼저 읽음 (오브젝트 간 순서 미보장) | [07 §장면 재진입 순서](07-runtime-quirks.md#장면을-다시-들어가면-when_scene_start-들이-지난-판의-값을-먼저-읽는다) | 08 (§3.3 관찰 가능한 조건), lessons |
+| 클론 초기값은 **엔티티 상속**으로 (전역+`when_clone_start` 는 한 프레임 다중 생성 시 겹침) | [07 §회피 패턴 2 — 엔티티 상속](07-runtime-quirks.md#회피-패턴-2--엔티티-상속으로-넘기기-자리모양이-목적일-때) | 08 (§3.4 렌더러), lessons |
+| Entry Online 계약(빈 함수·예약 변수) · 쓰기 소유권 · 상태 기반 렌더러 · 서버 없이 검증 | [08-entry-online.md](08-entry-online.md) | 07 (개별 엔진 함정), `games/hexo` |
 
 **규칙**: 새 사실 추가 시 위 표에 한 줄 추가. 정본을 두 곳에 둘 일이 생기면 둘 중
 하나가 더 적합한 위치. 모호하면 07 (불변 동작) 또는 04 (블록·패턴) 우선.

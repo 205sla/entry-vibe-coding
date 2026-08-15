@@ -770,6 +770,33 @@ cloneStart 에서 글로벌 lookup 대신 **클론 스스로 값 결정**. 균�
 turnAbs(rand(0, 359)),
 ```
 
+### 회피 패턴 2 — **엔티티 상속**으로 넘기기 (자리·모양이 목적일 때)
+
+클론은 만들어지는 순간의 엔티티 상태(좌표·모양·크기·보임)를 그대로 복사한다. 그래서
+"이 클론을 어디에 어떤 모양으로 둘 것인가" 가 목적이라면 전역을 거칠 이유가 없다 —
+**템플릿을 그 상태로 맞춘 뒤 복제**하면 된다. 한 프레임에 여러 개를 만들어도 서로 안 섞인다.
+
+```js
+// 스포너(템플릿 자신의 스레드에서): 칸마다 모양·자리를 맞추고 복제
+changeShape(color),
+locateXY(valueAt('posx', i), valueAt('posy', i)),
+createClone('self'),
+
+// 클론: 물려받은 상태 그대로 보이기만 한다
+[ when.cloneStart(), show() ],
+```
+
+**실패했던 형태** (2026-08-15, hexo): 전역 `그릴칸`·`그릴색` 에 담고 `when_clone_start` 에서
+읽었더니, 한 번에 도착한 돌 3 개가 **전부 마지막 칸에 겹쳐** 그려졌다. `create_clone` 은
+동기적으로 엔티티를 복사하지만 `when_clone_start` 스크립트는 나중에 실행되므로, 그때는
+전역이 이미 마지막 값이다. 클론 수·`getClonedEntities().length` 는 정상이라 **숫자로는
+멀쩡해 보이고 화면만 틀리다** — 좌표 집합의 크기(`new Set(clones.map(c => x+','+y)).size`)를
+세는 회귀 가드가 필요하다.
+
+⚠️ 단, 블록은 **실행 중인 오브젝트**에 작용한다. `locateXY`/`changeShape` 를 함수 안에서
+쓰면 그 함수를 호출한 오브젝트가 움직인다 — 이 패턴은 템플릿 자신의 스레드(또는 템플릿이
+부르는 함수) 안에서만 성립한다.
+
 또는 spawner 가 클론별로 파라미터를 안전하게 전달해야 하면, **direction 을 캐리어로** 사용 (cloneStart 첫 블록에서 `coord('self','direction')` 으로 즉시 회수). 단 enemy/bb 처럼 direction 을 slot id 로 이미 쓰고 있으면 안 됨.
 
 ### 일반화 (확장)
@@ -970,3 +997,403 @@ textBox 는 sprite 와 등록점(registration) 처리가 다르다. Entry 가 te
 
 - [`games/es-hangul/demo.mjs`](../games/es-hangul/demo.mjs) — 글상자 전부 `x:0`+`lineBreak:true`+`textAlign:0`+`width:440`, 텍스트 centroid 320 = 640/2 측정.
 - 시행착오: `regX:160`(무시됨)·`textAlign:1`(왼쪽 정렬됨)·`x:-60`/`x:-160`(entity.x 가 중심이라 그만큼 왼쪽 쏠림) 실패 → `x:0`+`textAlign:0`. ⚠️ 폭 다른 케이스의 위치는 `entity.x` 만 믿지 말고 렌더 픽셀 centroid 로 검증.
+
+---
+
+## `wait_until_true` 조건 속 `continue_repeat` = 반복 딜레이 소멸 (동기 루프 트릭)
+
+반복 바디 **마지막 블록**으로 `~이(가) 될 때까지 기다리기(참이 아니다(이번 반복 건너뛰기))`
+— `wait_until_true(boolean_not(continue_repeat))` — 를 두면
+["반복하기 = 1 프레임/반복"](#반복하기-블록--1-프레임반복-60fps-암묵-틱) 의 프레임 양보가 사라져
+**전체 반복이 한 틱 안에 동기 실행**된다. 커뮤니티 트릭 — statement 블록인 `continue_repeat` 가
+boolean 슬롯에 들어간 비정상 조립이라 편집기 드래그로는 못 만들고 project.json 레벨에서만
+구성 가능(로드 후 렌더링·실행은 정상).
+
+### 메커니즘 (근거 소스)
+
+정상 딜레이의 정체: 바디 마지막 블록이 끝나면 `scope.block === null` → `_callStack.pop()` 으로
+반복 블록에 복귀할 때 `isLooped` 불일치 → `break` = execute() 종료 = 다음 프레임까지 대기
+([`executors.js:125-132`](../../entryjs/src/playground/executors.js#L125)).
+
+트릭은 이 "정상 종료 → pop" 경로 자체를 우회한다:
+
+1. `wait_until_true` 실행 시 param 은 **동기 평가** — `Scope.run` 이 func 호출 **전에**
+   `getParams()` 로 중첩 블록을 즉시 실행 ([`scope.js:192`](../../entryjs/src/playground/scope.js#L192), [`:36-46`](../../entryjs/src/playground/scope.js#L36)).
+2. 그 안의 `continue_repeat.func` = `this.executor.continueLoop()`
+   ([`block_flow.js:348`](../../entryjs/src/playground/blocks/block_flow.js#L348)) —
+   **콜스택을 반복 블록 scope 까지 즉석에서 되감고**(`executor.scope` 교체) `Entry.STATIC.BREAK`(=2) 를
+   **값으로** 반환 ([`executors.js:227-241`](../../entryjs/src/playground/executors.js#L227)).
+3. `boolean_not(2)` = false → `wait_until_true` 는 `return script` — 자신의 (이미 교체되기 전)
+   **낡은 scope 객체** ([`block_flow.js:548-555`](../../entryjs/src/playground/blocks/block_flow.js#L548)).
+4. executor 의 returnVal 분기(Promise / undefined·null·PASS / CONTINUE / `=== this.scope` / BREAK)
+   중 **아무것도 매칭 안 됨** — `this.scope` 는 2에서 이미 반복 블록으로 교체됐으므로
+   `returnVal === this.scope` 도 false → `while(true)` 가 **같은 틱에서** 다음 iteration 을 계속
+   ([`executors.js:117-146`](../../entryjs/src/playground/executors.js#L117)). `iterCount` 소진 시에만
+   `callReturn()`(undefined) 로 정상 탈출.
+
+`boolean_not` 은 **필수**: `continue_repeat` 를 BOOL 에 직접 넣으면 값 2(truthy) → `callReturn()`
+→ executor 가 `this.scope.block.getNextBlock()` 을 계산하는데 scope 가 이미 반복 블록이라
+**반복 다음 블록으로 탈출**해버린다. 일반 흐름 블록 중에선 `wait_until_true` 가 유일한 호스트
+(`_if` 는 false 면 `callReturn()` → 같은 탈출 문제) — 단 아래 변종처럼 **항상-대기 블록이면
+무엇이든 호스트가 된다** (트릭 가족).
+
+### 실측 (2026-07-22, headless chromium — `Entry.block.move_direction.func` 후킹 타임스탬프)
+
+외부 작품 "sin,cos 없이 원그리기 예제의 리메이크" (반복 360회: 이동+1° 회전) A/B:
+
+| 변형 | 360회(원 1바퀴) 소요 | 호출 간격 중앙값 |
+|------|----:|----:|
+| 트릭 원본 | **10 ms** (360개 한 틱 배치, span ≈5ms) | 0 ms |
+| 트릭 블록 제거 | 5,744 ms | 16 ms (1 프레임) |
+| `continue_repeat`→`False` 만 교체 | 5,742 ms | 16 ms |
+
+세 번째 변형이 결정타 — `wait_until_true` 존재가 아니라 **`continue_repeat` 가 원인** (574배).
+관찰 2.5초간 move 56,520회 = 외곽 `repeat_inf`(정상 양보 유지)가 **매 프레임 원 1개 전체**를
+지우고 다시 그림. page error 0.
+
+### 변종 — 항상-대기 하드웨어 블록 운반체 (.eo 유통 스니펫, 2026-07-22 실측)
+
+호스트 조건의 일반형: **「continue_repeat 를 심을 param 슬롯이 있고, func 가 분기표 어디에도
+안 걸리는 값(자신의 낡은 scope)을 반환」**. 유통 스니펫
+`Talebot_Move(continue_repeat, continue_repeat)` (하드웨어 테일봇 이동 블록,
+[`block_talebot.js:111-144`](../../entryjs/src/playground/blocks/hardware/block_talebot.js#L111)) 이 그 예:
+
+- 하드웨어 대기 상태머신 — 기기 무연결이면 `portData.done` 이 영영 안 와 **매 호출 `return script`**
+  → `boolean_not` 래퍼 불필요, 조건 없이 항상 성립.
+- `getParams()` 는 슬롯 종류를 안 가림 — **드롭다운(방향) 자리의 continue_repeat 도** Block
+  인스턴스면 평가·실행됨. 두 번째(거리 슬롯) continue_repeat 는 최상위 반복에선 no-op
+  (첫 번째가 스택을 이미 되감아 `_callStack` 이 비면 즉시 PASS 반환 — [`executors.js:228-232`](../../entryjs/src/playground/executors.js#L228)).
+- 하드웨어 블록 정의는 entryjs 에 상시 내장 — 기기 없이도 실행됨(블록 메뉴 노출만 연결 필요).
+- 실측: 트릭 이식 시 360회 **14ms**(원본 트릭과 동일 스케일), **정상 파라미터(0, 10)면 1회 호출
+  후 영원 대기**(무응답 대기 본성 — 루프가 1회차에서 정지). page error 0.
+
+### 변종 2 — 별개 메커니즘: maze 모드 `ai_repeat_until_reach` 밀반입 (isLooped 미설정 루프)
+
+유통 .ent "딜레이 없는 반복분(재귀함수x)": continue_repeat 가족이 아니라 **주니어 미로 코스웨어
+전용**(`mode: 'maze'`) 반복 블록을 일반 작품 JSON 에 밀반입한 것
+([`block_entry.js:7387-7412`](../../entryjs/src/playground/block_entry.js#L7387)).
+
+- func 가 `stepInto(바디)` 만 하고 **`script.isLooped = true` 를 설정하지 않음** + 반복 횟수/조건도
+  없음. executor 의 프레임 양보는 pop 복귀 시 **isLooped 불일치**에서만 발동하므로
+  `undefined !== undefined` = false → **양보 자체가 없는 동기 무한 반복** (분기표 미아 트릭과
+  무관한, 플래그 누락 경로).
+- 미로 모드에선 대기·애니메이션을 Ntry 미로 엔진이 담당해 양보가 필요 없던 설계 — 일반 executor
+  로 가져오면 무양보 루프가 된다.
+- 탈출은 바디 안 `stop_repeat` 뿐. 이 블록은 `class` 자체가 없어 `breakLoop()` 가 class 'repeat'
+  를 못 찾고 **스택 바닥까지 pop** → 결과적으로 루프 밖으로 나감(최상위일 때). 탈출 조건이 영영
+  안 맞으면 **즉시 탭 freeze** (repeat_inf 조합보다 더 즉발).
+- 실측(2026-07-22): 스탬프 격자 채우기 — `move_direction` 1,296회 전체 **22ms**, 8ms 초과 간격
+  **0회**(전 호출 단일 연속 실행 = 틱 하나), `stop_repeat` 정상 탈출, page error 0.
+- 금지 정책 동일 적용.
+
+### ⛔ 작품 제작 사용 금지 (사용자 정책 2026-07-22)
+
+**이 트릭을 우리 .ent 제작(바이브 코딩)에 쓰지 않는다** — 분석·리버스엔지니어링 전용 지식.
+반복 고속화가 필요하면 정식 수단인 [`fn.value` 꼬리 재귀](#함수-호출은-반복하기의-60fps-틱을-우회-꼬리-재귀-최적화)
+(동기 실행) 또는 per-frame delta 설계를 쓴다. 금지 이유:
+
+- **비공식 동작** — executor 분기의 빈틈(비지원 조립)에 의존. 엔진 개편 시 언제든 깨질 수 있음.
+- 편집기에서 정상 조립 불가(statement-in-boolean) → 작품을 열어본 사람이 재현·수정 불가.
+- `repeat_inf` + 트릭 = `while(true)` 탈출 조건 소멸 → **탭 freeze**. 유한 반복에서만 성립.
+- DSL(make-ent)도 이 조립을 지원하지 않음.
+
+### 증거
+
+- 실측 방법: 편집기 하네스로 .ent 로드 → `move_direction.func` 래핑해 `performance.now()` 로그
+  → 호출 간격/배치 분석. 컨트롤 2종은 project.json 수술(트릭 블록 제거 / `continue_repeat` 노드만
+  `False` 로 교체) 후 재패킹.
+- npm prebuilt dist 에도 `continueLoop` 존재 확인 — 소스/배포 엔진 동일 동작.
+
+---
+
+## `brush_stamp` 타일 렌더러 — 매 프레임 252 칸 재그리기도 62fps (스크롤 게임 예산)
+
+타일 기반 스크롤 게임(플랫포머)에서 "타일 하나 = 오브젝트 하나"는 오브젝트 수가 폭발한다.
+대안은 **단일 sprite 가 매 프레임 가시창 전체를 다시 그리는 것**이고, 실측 결과 이 방식은
+Entry 에서 넉넉하게 60fps 를 유지한다.
+
+### 실측 (2026-07-31, headless chromium, 480×270 stage, TILE=24 → 가시창 21×12=252 칸)
+
+| 렌더 방식 | 그린 칸/프레임 | 실효 fps | 비고 |
+|---|---|---|---|
+| 붓 라인 (희소 맵) | 46 | 62.2 | 바닥 2 줄 + 산발 벽돌 |
+| 붓 라인 (전면 solid) | 252 | 62.0 | 최악 케이스 |
+| `brush_stamp` (전면 solid) | 252 | 62.4 | 실제 스프라이트 이미지 |
+
+### stamp 예산의 실제 한계는 **칸 수 ~250/프레임**
+
+타일을 잘게 쪼개면 (= 가시창 칸 수가 늘면) 예산을 넘긴다. 같은 480×270 화면에서:
+
+| TILE | 가시창 | 그린 칸/프레임 | 실효 fps |
+|---|---|---|---|
+| 32px | 16×10 | 160 (전면 solid) | **62.4** |
+| 24px | 21×12 | 252 (전면 solid) | **62.4** |
+| 16px | 31×18 | 558 (전면 solid) | **41.7** ✗ |
+| 16px | 31×18 | 111 (지상 현실 밀도) | 62.5 |
+
+즉 **stamp 호출 ~250 회/프레임이 60fps 경계**다. 그 위는 프레임을 떨군다.
+16px 타일도 희소한 지상 스테이지(111 칸)면 60fps 가 나오지만, 지하처럼 화면이 꽉 차면
+무너진다 → **타일 크기는 최악 케이스(가시창 전면 solid) 기준으로 정해야 한다.**
+도트 그림을 정수배 확대(1 도트 = 2px, 16 도트 타일 → 32px)하면 선명함을 유지하면서
+칸 수를 1/4 로 줄일 수 있다.
+
+즉 **가시창 전량 재그리기는(칸 수가 250 이하라면) 프레임 예산을 거의 쓰지 않는다.**
+전제는 순회를 **꼬리재귀 value 함수**로 하는 것 — `repeat` 로 하면 1 칸 = 1 프레임이라
+252 프레임(≈4 초)이 걸려 애초에 불가능하다 (위 [함수 호출은 반복하기의 60fps 틱을 우회](#함수-호출은-반복하기의-60fps-틱을-우회-꼬리-재귀-최적화)).
+
+### 붓 라인 vs `brush_stamp` — 타일에는 stamp
+
+- **붓 라인은 정사각 타일을 못 만든다.** `brush_thick(24)` 로 24px 폭 선을 그으면 선 끝이
+  **round cap** 이라 두께/2 만큼 양쪽으로 넘친다. 24×24 칸을 그렸는데 실측 커버 면적이
+  칸당 784px(28×28 상당) — 인접 칸을 덮는 overdraw. 색 블록 프로토타이핑용으로만 쓸 것.
+- **`brush_stamp` (pc=1)** 은 현재 sprite 이미지를 그대로 캔버스에 찍는다 → 진짜 픽셀아트
+  타일. `change_to_some_shape` 로 모양을 바꿔가며 찍으면 한 오브젝트가 N 종 타일을 렌더한다.
+
+### ⚠️ stamp 는 sprite 의 `visible` 을 따른다 (붓 라인과 다름)
+
+붓 라인은 `hide` 한 sprite 에서도 계속 보이지만, **stamp 는 `visible:false` 면 아무것도
+찍히지 않는다** (픽셀 0, `entity.stamps` 길이는 정상 증가 → 조용한 실패).
+
+```js
+// ✗ stamp 가 화면에 안 나옴 (stamps 배열은 채워지므로 디버깅이 헷갈린다)
+entity: { visible: false }
+
+// ✓ visible:true 로 두고, 그리기가 끝나면 sprite 본체만 화면 밖으로 치운다
+entity: { visible: true }
+// … 타일 순회 stamp …
+locateXY(0, -400)          // 커서 sprite 자체는 화면 밖
+```
+
+### `brush_erase_all` 은 stamp 도 지운다 — 누수 없음
+
+`entity.stamps` 는 매 프레임 `eraseAll` → 재그리기 사이클에서 **252 에서 더 늘지 않는다**
+(실측: 252 → 252). `removeStamps()` 가 배열을 비우므로 누적 누수는 없다
+([`entity.js:1636`](../../entryjs/src/class/entity.js#L1636), 호출부 [`block_brush.js:651`](../../entryjs/src/playground/blocks/block_brush.js#L651)).
+
+### 증거
+
+- [`games/brick-kingdom/`](../games/brick-kingdom/) 스파이크 — 붓/stamp 각 방식의 fps·픽셀·stamps 길이 실측
+
+## `char_at` · `substring` 은 범위를 벗어나면 **`throw`** — 문자열 타일맵에 가드 필수
+
+`0` 이나 빈 문자열을 반환하지 않고 **예외를 던진다**. 인자가 1-based 라는 점과 겹쳐
+off-by-one 이 곧 스레드 정지로 이어진다.
+
+```js
+// entryjs/src/playground/blocks/block_calc.js:1852 (char_at)
+const index = script.getNumberValue('RIGHTHAND', script) - 1;
+if (index < 0 || index > str.length - 1) { throw new Error(); }   // ← 값이 아니라 예외
+
+// 같은 파일:1992 (substring)
+if (start < 0 || end < 0 || start > strLen || end > strLen) { throw new Error(); }
+```
+
+`substring` 은 추가로 **`start`/`end` 를 정렬해서** 쓴다 (`Math.min`/`Math.max` + `end+1`) —
+즉 `substring(s, 5, 3)` 은 빈 문자열이 아니라 3~5 구간을 돌려준다. "시작 > 끝이면 빈 문자열"
+을 가정한 코드는 조용히 틀린 값을 얻는다.
+
+**증상이 어렵다**: 예외는 그 스레드만 죽이고 다른 오브젝트는 계속 돌아간다. 콘솔에는
+`Error` 한 줄만 남고 어느 블록인지 나오지 않는다. 문자열 타일맵(행 = 문자열, 칸 = 문자)에서
+캐릭터가 맵 경계로 나가는 순간 물리 스레드만 정지 → "화면은 살아 있는데 조작이 안 먹는다".
+
+**가드**: 좌표 → 문자 변환 함수에서 **범위를 먼저 검사하고** 밖이면 상수를 돌려준다.
+`and_` 는 단락 평가가 없으므로 ([§boolean_and_or](#boolean_and_or에-단락-평가short-circuit-없음))
+한 조건씩 **중첩 `if_`** 로 쌓아야 한다 — `and_(r>=0, r<ROWS, …)` 로 묶으면 밖에 있는 값으로
+`char_at` 이 이미 평가돼 던진다.
+
+```js
+// games/brick-kingdom/spec.mjs — fnTileAt
+L.set('out', txt('#')),                    // 기본값 = 벽 (경계 밖으로 못 나감)
+if_(cmp(r, '>=', 0), [ if_(cmp(r, '<', ROWS), [
+  if_(cmp(c, '>=', 0), [ if_(cmp(c, '<', WORLD_COLS), [
+    L.set('out', charAt(valueAt('lvl', calc(r, '+', 1)), calc(c, '+', 1))),
+  ])])])]),
+```
+
+### 한 칸만 바꾸려면 `replace_string` 이 아니라 `substring` + `combine`
+
+`replace_string` 은 `split(old).join(new)` 다 ([`block_calc.js:2261`](../../entryjs/src/playground/blocks/block_calc.js#L2261))
+— **같은 문자를 전부** 바꾼다. 타일 한 칸(벽돌 파괴, 보상 블록 소진)을 교체하는 데 쓰면
+그 행의 모든 벽돌이 함께 사라진다. 정답은 좌/우를 잘라 이어붙이기:
+
+```js
+L.set('left',  substr(row, 1, c)),                        // 1-based, c 까지
+L.set('right', substr(row, calc(c, '+', 2), strLen(row))),
+setListAt('lvl', r + 1, combine(combine(L.get('left'), ch), L.get('right'))),
+```
+
+`c` 가 행의 첫/끝 칸이면 `substring` 인자가 범위를 벗어나므로, 이 헬퍼도 위 가드 안에서만
+부른다.
+
+### 증거
+
+- [`games/brick-kingdom/spec.mjs`](../games/brick-kingdom/spec.mjs) `fnTileAt`(가드) · `fnSetTile`(한 칸 교체)
+- 문자열 타일맵 설계 전체는 [04 §문자열 타일맵 + 서브스텝 스윕](04-script-and-blocks.md#문자열-타일맵--서브스텝-스윕-충돌--사이드스크롤-플랫포머)
+
+## 헤드리스 검증에서 브라우저를 ~10 회 재부팅하면 키 이벤트가 게임에 도달하지 않는다
+
+한 Node 프로세스에서 `bootEditor()` → 검증 → `close()` 를 반복하면 **10 번째 부팅쯤부터**
+`document.dispatchEvent(KeyboardEvent)` 가 무시된다. 게임은 정상 실행 중(`state` 전이·프레임
+카운터 증가)인데 플레이어만 스폰 좌표에서 한 칸도 안 움직인다.
+
+- 같은 시나리오를 **단독 실행하면 통과**한다 → 게임 결함이 아니라 **하네스 누적 문제**다.
+- 클릭(`Entry.dispatchEvent('entityClick')`)은 계속 먹는다 — 이벤트 버스는 살아 있고
+  `document` DOM 리스너 경로만 끊긴다 ([§키 이벤트는 `document` + `event.code`](#키-이벤트는-document--eventcode-로-dispatch)).
+- 원인은 특정하지 못했다 (추정: 닫힌 페이지의 리스너가 남아 `Entry.pressedKeys` 소유가
+  흐려지는 문제). 진단보다 격리가 싸서 격리를 택했다.
+
+**대응 — 시나리오마다 자식 프로세스**. 부수 효과로 하나가 hang 해도 나머지가 진행되고,
+실패 시나리오를 `--only N` 으로 단독 재현할 수 있다.
+
+```js
+// games/brick-kingdom/verify.mjs — runAllIsolated()
+for (let i = 0; i < SCENARIOS.length; i++) {
+    await new Promise((resolve) => {
+        const ch = spawn(process.execPath, [process.argv[1], '--only', String(i)],
+                         { stdio: ['ignore', 'pipe', 'pipe'] });
+        ch.on('close', resolve);
+    });
+}
+```
+
+키 입력이 없는 검증(변수 관찰·클릭·픽셀)은 한 프로세스로 충분하다 — `tools/run-all-verify.mjs`
+가 지금까지 문제없던 이유다. **방향키 hold 로 장시간 플레이하는 검증만** 이 격리가 필요하다.
+
+### 증거
+
+- [`games/brick-kingdom/verify.mjs`](../games/brick-kingdom/verify.mjs) `runAllIsolated` (주석에 실측 기록)
+
+## brush_stamp 렌더 예산은 **방문 칸이 아니라 그린 칸**으로 센다 — 타일 크기를 바꾸면 다시 재야 한다
+
+`brush_stamp` 타일 렌더러의 예산을 "프레임당 N 칸" 하나로 관리하면 **타일 크기를 줄일 때
+틀린다.** 2026-07-31 brick-kingdom Phase 2-1 에서 TILE 32/24/20 을 밀도 4 단계로 실측했다
+(케이스마다 브라우저 재기동, 3 회 반복 중앙값).
+
+| TILE | 행 | empty (stamp 0) | sparse | dense | solid |
+| --- | --- | --- | --- | --- | --- |
+| 32 | 9 | 62.5 | 62.5 (46 칸) | 62.5 (87 칸) | 62.3 (144 칸) |
+| 24 | 12 | 62.5 | 62.5 (54 칸) | 61.8 (120 칸) | 56.8 (252 칸) |
+| 20 | 13 | 62.5 | 59.6 (69 칸) | 53.5 (151 칸) | 44.5 (325 칸) |
+
+**순회는 사실상 공짜다.** `empty`(맵이 전부 공기 → `stamp` 0 회, 순회만) 는 방문 칸이
+135 → 312 로 2.3 배 늘어도 세 크기 모두 62.5fps 다. 꼬리재귀 순회·`char_at`·좌표 계산이
+아니라 **`stamp` 호출이 비용의 전부**다. 그래서 빈 칸이 많은 실제 레벨은 가시창 크기와
+거의 무관하고, 예산은 그린 칸으로 세면 된다.
+
+⚠️ **그런데 stamp 당 비용이 타일 크기에 따라 다르다.** 20/sparse 는 69 칸에 59.6fps 인데
+24/dense 는 117 칸에 62.3fps 다 — 칸이 더 적은데 더 느리다. 칸 수만으로는 설명되지 않는다.
+원인은 규명하지 않았다(20 을 다른 이유로 탈락시켜 더 파지 않았다). **결론: 타일 크기를 바꿀
+때는 그 크기에서 다시 측정한다.** 옛 크기의 "N 칸 = 60fps" 경계를 이식하면 안 된다.
+
+### 측정 방법 — 케이스마다 브라우저를 새로 띄운다
+
+첫 회차에서 한 브라우저로 12 케이스를 연달아 쟀더니 뒤 케이스가 누적 열화를 뒤집어써서
+**타일 크기의 영향과 구분되지 않았다** (그 회차 20/empty 62.5 → 격리 후 58.7~62.5,
+24/solid 는 회차별 62.0/54.4 로 흔들림). 같은 파일 §브라우저 ~10 회 재부팅과 같은 계열이다.
+성능 비교는 케이스마다 새 브라우저 + 반복 측정 + 중앙값이어야 성립한다.
+
+### 증거
+
+- `games/brick-kingdom/기획/Phase2-4-계획.md` §4 (측정 표·결정 기록)
+- 기존 단발 실측(252 칸 62fps)은 이 문서 §brush_stamp 타일 렌더러
+
+---
+
+## 효과 블록(`change_effect_amount` 등)을 **글상자에 걸면 스레드가 죽는다**
+
+`효과 정하기 / 효과 주기 / 효과 모두 지우기` 를 `objectType:'textBox'` 오브젝트에 쓰면
+`Runtime Error: Cannot set properties of undefined (setting 'alpha')` 로 그 스레드가 즉시
+멈춘다. 버튼을 반투명하게 만들어 "잠김" 을 표현하려는 흔한 요구에서 바로 밟는다.
+
+### 원인 — `entity.effect` 를 sprite 에만 초기화한다
+
+[`entity.js:42-48`](../../entryjs/src/class/entity.js#L42) 의 생성자는
+`this.type === 'sprite'` 분기에서만 `this.setInitialEffectValue()` 를 부른다. 이어지는
+`else if (this.type === 'textBox')` 분기([:49](../../entryjs/src/class/entity.js#L49))에는
+그 호출이 **없다** — 글상자 엔티티는 `this.effect` 가 `undefined` 인 채로 살아간다.
+
+블록 쪽은 그걸 모르고 바로 대입한다
+([`block_looks.js:615-617`](../../entryjs/src/playground/blocks/block_looks.js#L615)):
+
+```js
+} else if (effect === 'transparency') {
+    sprite.effect.alpha = 1 - effectValue / 100;   // ← sprite.effect 가 undefined
+```
+
+`this.object` 는 글상자에도 있으므로(컨테이너) 원인이 `object` 가 아니라 **`effect`** 라는
+점이 헷갈린다. 에러 메시지의 `alpha` 도 `object.alpha` 가 아니라 `effect.alpha` 다.
+
+### 증상이 넓게 번진다
+
+관찰(2026-08-15): 로비 첫 프레임에 이 블록이 도는 스레드 하나가 죽자 **작품 전체가 멈춘
+것처럼** 보였다 — 다른 오브젝트의 클릭 핸들러도 반응하지 않고, 장면 전환도 되지 않았다.
+"버튼이 안 눌린다" 로 보이지만 실제 원인은 다른 오브젝트의 효과 블록 한 줄이다.
+
+### 회피 — 상태를 **오브젝트 2개의 show/hide** 로 표현
+
+같은 자리에 활성/비활성 글상자를 겹쳐 두고 조건에 따라 하나만 보인다. `bgColor` 는
+런타임에 바꾸는 블록이 없으므로 어차피 색이 다른 두 오브젝트가 필요하다.
+
+```js
+// 열림 버튼 — 조건이 맞을 때만 보인다
+threads: [ ...dualStart(() => [ repeat.inf([
+    if_(cmp(getVar('ext'), '!=', 0), [ show() ], [ hide() ]), wait(0.2),
+])]) ]
+// 잠김 버튼 — 같은 좌표, 반대 조건, 회색 bgColor
+```
+
+투명도가 꼭 필요하면 글상자 대신 **sprite** 로 만든다(sprite 는 `effect` 가 초기화돼 있다).
+
+### 증거
+
+- [`games/hexo/spec.mjs`](../games/hexo/spec.mjs) `btnOnline` / `btnOnlineLocked` — 2 오브젝트 회피
+- [`games/hexo/verify.mjs`](../games/hexo/verify.mjs) §1 — 두 버튼의 `visible` 을 직접 단언(회귀 가드)
+- 시행착오: `setEffect('transparency', 55)` 를 글상자 버튼에 걸었더니 pageErrors 1 +
+  로비 전체 무반응 → 효과 제거 후 36/36 통과
+
+
+---
+
+## 장면을 다시 들어가면 `when_scene_start` 들이 **지난 판의 값을 먼저 읽는다**
+
+한 장면의 여러 오브젝트에 걸린 `when_scene_start` 는 같은 프레임에 일제히 깨어나고
+**실행 순서는 보장되지 않는다**. 그래서 "A 오브젝트가 초기화하고 B 오브젝트가 그 값을
+읽는" 구성은 재진입 때 깨진다 — B 가 먼저 깨면 **지난 판이 남긴 값**을 읽는다.
+
+### 실패 예 (2026-08-15, hexo)
+
+```js
+// 진행 오브젝트 — 승부가 나면 결과 장면으로
+[ when.sceneStart(), waitUntil(cmp(getVar('승자'), '!=', 0)), wait(1.3), startScene('result') ],
+// 돌 오브젝트 — 판을 세우며 승자를 0 으로 되돌린다
+[ when.sceneStart(), /* … */ setVar('승자', 0), /* … */ ],
+```
+
+두 번째 대국에 들어가면 진행 오브젝트가 먼저 깨어 **지난 판의 `승자`(=1)** 를 보고
+`waitUntil` 을 즉시 통과한다. 1.3 초 뒤 결과 장면으로 튀어 대국이 저절로 끝난다.
+
+**증상이 늦게·불규칙하게 나온다**: 1.3 초라는 지연 때문에 짧은 판은 우연히 통과하고,
+플레이가 조금만 느려지면 갑자기 "게임이 혼자 끝난다". 오브젝트 순서를 바꾸면 증상이
+사라지기도 해서 원인을 엉뚱한 곳에서 찾게 된다.
+
+### 회피 — **장면이 바뀌기 전에** 초기화한다
+
+장면 전환을 일으키는 쪽(버튼 핸들러 등)에서 미리 지운다. 아직 다른 장면이므로 새 장면의
+어떤 핸들러보다도 확실히 먼저다.
+
+```js
+const resetGame = () => [ setVar('승자', 0), setVar('상태', 0) ];
+
+[ when.objectClick(), ...resetGame(), startScene('game') ],
+```
+
+같은 장면 안에서 순서를 맞추려 하지 말 것 — 오브젝트 간 우선순위를 지정하는 수단이 없다.
+한 오브젝트 안의 여러 스레드도 마찬가지이므로, 순서가 중요하면 **한 스레드에 순차로** 둔다.
+
+### 증거
+
+- [`games/hexo/spec.mjs`](../games/hexo/spec.mjs) `resetGame()` — 로비·대기 양쪽 입구에서 호출
+- [`games/hexo/verify.mjs`](../games/hexo/verify.mjs) §6 — 재진입 후 2.2 초가 지나도 대국
+  장면에 머무는지 확인(1.3 초 지연보다 길게 기다려야 잡힌다)
+- 진단 흔적: 모든 오브젝트의 `script.executors.length` 가 0 이고 `Entry.engine.state` 는
+  `run` → 스레드가 죽은 게 아니라 **장면이 바뀐** 것. 장면 id 를 같이 찍어야 구분된다.

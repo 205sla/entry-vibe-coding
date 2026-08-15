@@ -110,6 +110,76 @@ export function heart(size, fill = '#ef4444') {
     return svg(d, d, `<path d="${path}" fill="${fill}"/>`);
 }
 
+// 육각형 테두리만 (커서·하이라이트용). fill 없음 — 클릭 대상으로는 쓰지 말 것
+// (pixelPerfect hit-test 가 투명 픽셀을 통과시킨다. knowledge/07 참고).
+export function hexOutline(radius, stroke = '#000', strokeWidth = 3) {
+    const d = (radius + PAD + strokeWidth) * 2;
+    const cx = d / 2;
+    const pts = [];
+    for (let i = 0; i < 6; i++) {
+        const a = (Math.PI * 2 * i) / 6 - Math.PI / 2;
+        pts.push(`${(cx + radius * Math.cos(a)).toFixed(2)},${(cx + radius * Math.sin(a)).toFixed(2)}`);
+    }
+    return svg(d, d,
+        `<polygon points="${pts.join(' ')}" fill="none" ` +
+        `stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round"/>`);
+}
+
+// ── 육각 격자 (벌집 판) ───────────────────────────────────────────
+//
+// pointy-top + **odd-r offset** — 홀수 행이 반 칸 오른쪽으로 밀린다.
+// `size` = 중심에서 꼭짓점까지. 셀 폭 W = √3·size, 행 간격 = 1.5·size.
+//
+// ⚠️ 판 이미지를 그리는 좌표와 게임 블록이 돌을 놓는 좌표가 **반드시 같아야** 한다.
+// 그래서 기하 계산은 `hexLayout()` 한 곳에만 두고 `hexBoard()` 와 spec 이 함께 쓴다.
+// spec 쪽에서 상수를 다시 적어 넣으면 반 칸씩 어긋난다.
+export function hexLayout(cols, rows, size) {
+    const W = Math.sqrt(3) * size;   // 셀 폭 (가로 이웃 간격)
+    const RH = 1.5 * size;           // 행 간격
+    return {
+        cols, rows, size, W, RH,
+        width: cols * W + W / 2,
+        height: (rows - 1) * RH + 2 * size,
+        // 셀 중심 — SVG 좌표계(좌상단 원점, y 아래로 증가). 행·열은 1-base.
+        cx: (r, c) => W / 2 + (c - 1) * W + (r % 2) * (W / 2),
+        cy: (r) => size + (r - 1) * RH,
+    };
+}
+
+// 벌집 판 이미지. 셀 하나하나를 그리되 **path 하나**로 합쳐 요소 수를 1 로 유지한다
+// (143 칸 × polygon = SVG 파싱 부담, 굳이 나눌 이유 없음).
+export function hexBoard(cols, rows, size, opts = {}) {
+    const {
+        fill = '#fdf3d8', stroke = '#caa96e', strokeWidth = 1.2,
+        bg = null, bgRadius = 10,
+    } = opts;
+    const L = hexLayout(cols, rows, size);
+    const hw = L.W / 2;                     // 꼭짓점 가로 반폭
+    const parts = [];
+    for (let r = 1; r <= rows; r++) {
+        for (let c = 1; c <= cols; c++) {
+            const x = L.cx(r, c), y = L.cy(r);
+            parts.push(
+                `M${(x).toFixed(2)},${(y - size).toFixed(2)}` +
+                `L${(x + hw).toFixed(2)},${(y - size / 2).toFixed(2)}` +
+                `L${(x + hw).toFixed(2)},${(y + size / 2).toFixed(2)}` +
+                `L${(x).toFixed(2)},${(y + size).toFixed(2)}` +
+                `L${(x - hw).toFixed(2)},${(y + size / 2).toFixed(2)}` +
+                `L${(x - hw).toFixed(2)},${(y - size / 2).toFixed(2)}Z`
+            );
+        }
+    }
+    const backdrop = bg
+        ? `<rect x="0" y="0" width="${L.width.toFixed(2)}" height="${L.height.toFixed(2)}" ` +
+          `rx="${bgRadius}" fill="${bg}"/>`
+        : '';
+    return svg(
+        Number(L.width.toFixed(2)), Number(L.height.toFixed(2)),
+        `${backdrop}<path d="${parts.join('')}" fill="${fill}" ` +
+        `stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round"/>`
+    );
+}
+
 // ── Composite / decorated ────────────────────────────────────────
 
 // 그라데이션 공 — radial gradient 로 입체감.
