@@ -1,28 +1,36 @@
-// 육각형 육목 (HeXO 엔트리판) — Phase 1: 로비 + 로컬 대국 + 결과
+// 육각형 육목 (HeXO 엔트리판) — 무한 판 + 로컬/온라인 대전
 //
 // 기획: 기획/설계.md · 원본: https://hexo.did.science/ (규칙만 차용, 구현은 엔트리 최적화)
 //
 // 규칙
-//   · 13열 × 11행 벌집 판(고정). 육각 3축 중 하나에 자기 돌 6개 연속이면 승리.
+//   · 무한 육각 판. 육각 3축 중 하나에 자기 돌 6개 연속이면 승리.
 //   · 오프닝 균형: 선공(노랑)은 중앙에 1개만 자동 착수 → 이후 양쪽 매 턴 2개씩.
-//   · 원본의 "8칸 근접 제한"은 없앴다 — 유한 판이 같은 역할을 한다.
 //
-// 엔트리 최적화 3축 (기획 §0)
-//   1. 판은 **배경 이미지 1장**. 칸을 오브젝트로 깔지 않는다.
-//   2. **기하 계산은 전부 빌드 타임**. 이웃표(nbr)·칸 좌표(posx/posy)를 리스트로 구워
-//      런타임 블록에는 나눗셈·나머지·삼각함수가 하나도 없다.
-//   3. 승리 판정은 **방금 놓은 돌 주변만** 3축 양방향으로 훑는다(최대 30칸).
-//      순회는 `fn.value` 꼬리재귀 — `repeat` 는 1회에 1프레임이라 쓸 수 없다
-//      (knowledge/07 §반복하기 블록).
+// 좌표계 — **축좌표(axial) q, r**
+//   오프셋(행·열)에서는 이웃 계산에 행 홀짝 보정이 붙는데, 무한 판에서는 좌표가 음수로
+//   내려가면서 그 보정이 틀리기 쉽다. 축좌표는 6방향이 **상수 오프셋**이라 보정이 없다.
+//     E(+1,0) W(-1,0) · SE(0,+1) NW(0,-1) · NE(+1,-1) SW(-1,+1)
+//   승리 3축 = 위 세 쌍. 화면 좌표는 x = W·(q + r/2), y = -RH·r.
 //
-// 동기화 준비 (Phase 2~3)
-//   `$` 접두 변수·리스트가 Entry Online 확장의 동기화 대상이다. 지금은 방에 입장하지
-//   않으므로 전송되지 않고, 로컬 대국이 같은 변수를 그대로 쓴다 → 온라인은 "지금 내가
-//   놓을 수 있나"(`$턴 == 내슬롯`) 한 줄만 바뀐다.
+// 저장 — **착수 기록(sparse)**, 격자 배열이 아니다
+//   무한 판은 배열로 담을 수 없다. `$수` 리스트에 놓인 돌만 `키*10 + 색` 으로 쌓는다.
+//   키 = (q+512)*1024 + (r+512) → 항상 0 이상이라 나눗셈·나머지가 단순해진다.
+//   빈 칸 조회는 리스트 훑기(꼬리재귀)지만 돌이 수십 개라 격자 전체 스캔보다 싸다.
+//   ⚠️ 리스트 append 는 여럿이 동시에 하면 유실된다 — **턴제라서** 안전하다(knowledge/08 §2).
+//
+// 엔트리 최적화
+//   1. 판은 **배경 이미지 1장**이고 **움직이지 않는다**. 화면 좌표를 뷰 기준 상대값으로
+//      계산하므로 어느 칸이 가운데로 와도 같은 격자 위에 떨어진다 — 스크롤은 돌이
+//      움직이는 것으로 표현된다.
+//   2. 순회는 전부 `fn.value` 꼬리재귀. `repeat` 는 1회에 1프레임이라 쓸 수 없다.
+//   3. 다시 그리는 건 **뷰나 착수 수가 바뀔 때만**. 매 프레임 재배치하지 않는다.
+//
+// 온라인은 "지금 내가 놓을 수 있나"(`$턴 == 내슬롯`) 한 줄만 다르다 → knowledge/08.
 
 import {
-    when, repeat, if_, cmp, calc, getVar, setVar, changeVar, wait, waitUntil, stopRepeat,
-    valueAt, setListAt, lengthOfList, show, hide, locateXY, changeShape,
+    when, repeat, if_, cmp, calc, or_, quotient, mod, getVar, setVar, changeVar,
+    wait, waitUntil, stopRepeat,
+    valueAt, addToList, removeFromList, lengthOfList, show, hide, locateXY, changeShape,
     combine, txt, strLen, getNickname, isPressed, createClone, removeAllClones,
     startScene, writeText, fn, call,
     obj, scene as makeScene, pictureFromGen,
@@ -35,107 +43,66 @@ import { hexBoard, hexLayout, hexagon, hexOutline } from '../../tools/lib/sprite
 //  online.205.kr 에 이 작품을 등록한 **Entry Online 계정 ID**.
 //  형식: 영소문자·숫자·밑줄 3~20자 (확장의 normalizeOwnerId 규칙).
 //  값이 비어 있거나 형식이 틀리면 확장이 INVALID_OWNER_ID 로 입장을 거부하고,
-//  대기 화면이 "입장할 수 없습니다" 로 멈춘다.
+//  대기 화면이 그대로 멈춘다.
 //
 //  .ent 를 다시 만들지 않고 고치려면: 엔트리 편집기에서 `대기` 장면의
 //  `안내` 오브젝트 → `$입장( ... )` 블록 안의 글자를 바꾸면 된다.
 // ══════════════════════════════════════════════════════════════════
 const EO_OWNER_ID = 'change_me';
 
-// ── 판 기하 (빌드 타임에만 존재) ──────────────────────────────────
+// ── 화면에 깔리는 격자 (판 이미지) ────────────────────────────────
 
-const COLS = 13, ROWS = 11, SIZE = 13;
-const CELLS = COLS * ROWS;                       // 143
-const CENTER_R = (ROWS + 1) / 2, CENTER_C = (COLS + 1) / 2;   // 6, 7
-const IDX = (r, c) => (r - 1) * COLS + c;
-const CENTER = IDX(CENTER_R, CENTER_C);          // 72
+const VIEW_COLS = 13, VIEW_ROWS = 11, SIZE = 13;
+const L = hexLayout(VIEW_COLS, VIEW_ROWS, SIZE);
+const W = L.W, RH = L.RH;
 
-const L = hexLayout(COLS, ROWS, SIZE);
-const BOARD_PIC = hexBoard(COLS, ROWS, SIZE, {
+const BOARD_PIC = hexBoard(VIEW_COLS, VIEW_ROWS, SIZE, {
     fill: '#26324a', stroke: '#3c4b66', strokeWidth: 1.1,
     bg: '#161d2c', bgRadius: 12,
 });
 const BW = BOARD_PIC.dimension.width, BH = BOARD_PIC.dimension.height;
+const BOARD_Y = -5;
 
-const BOARD_Y = -5;                              // 판 중심 y (위 차례표시 / 아래 조작안내 자리 확보)
-const X0 = -BW / 2 + L.W / 2;                    // 짝수 행 1열의 stage x
-const Y0 = BOARD_Y + BH / 2 - SIZE;              // 1행의 stage y
+// 뷰 원점 칸(= 화면 한가운데 칸)이 놓이는 stage 좌표.
+// 판 이미지의 가운데 육각형과 정확히 맞아야 돌이 칸 위에 앉는다.
+const CENTRE_ROW = (VIEW_ROWS + 1) / 2, CENTRE_COL = (VIEW_COLS + 1) / 2;
+const ORIGIN_X = -BW / 2 + L.cx(CENTRE_ROW, CENTRE_COL);
+const ORIGIN_Y = BOARD_Y + BH / 2 - L.cy(CENTRE_ROW);
 
-const posOf = (r, c) => [
-    X0 + (c - 1) * L.W + (r % 2) * (L.W / 2),
-    Y0 - (r - 1) * L.RH,
-];
+// 커서가 이 밖으로 나가려 하면 뷰가 한 칸 따라간다(= 무한 스크롤).
+const LIMX = 112, LIMY = 78;
+// 판 이미지를 벗어난 돌은 그리지 않는다.
+const CLIPX = 140, CLIPY = 100;
 
-// 이웃 방향 — 1=E 2=W 3=SE 4=NW 5=SW 6=NE.
-// odd-r offset(홀수 행이 반 칸 오른쪽)에서 유도한 식. 부호 하나 틀리면 승리 판정이
-// 조용히 어긋나므로 아래 빌드 타임 어서션으로 기하학적으로 검증한다.
-const STEP = {
-    1: (r, c) => [r, c + 1],
-    2: (r, c) => [r, c - 1],
-    3: (r, c) => [r + 1, c + (r % 2)],
-    4: (r, c) => [r - 1, c - 1 + (r % 2)],
-    5: (r, c) => [r + 1, c - 1 + (r % 2)],
-    6: (r, c) => [r - 1, c + (r % 2)],
-};
-const inBoard = (r, c) => r >= 1 && r <= ROWS && c >= 1 && c <= COLS;
+// 착수 기록 인코딩 — 키를 0 이상으로 유지해 quotient/mod 를 단순하게 쓴다.
+const KOFF = 512, KSPAN = 1024;
+const MAX_MOVES = 1000;   // 동기화 리스트 상한(1024)에 닿기 전에 무승부 처리
 
-const POSX = [], POSY = [];
-for (let r = 1; r <= ROWS; r++) {
-    for (let c = 1; c <= COLS; c++) {
-        const [x, y] = posOf(r, c);
-        POSX.push(Number(x.toFixed(3)));
-        POSY.push(Number(y.toFixed(3)));
-    }
-}
-
-// nbr[(dir-1)*CELLS + cell] = 이웃 칸 번호, 판 밖이면 0.
-const NBR = [];
-for (let dir = 1; dir <= 6; dir++) {
-    for (let r = 1; r <= ROWS; r++) {
-        for (let c = 1; c <= COLS; c++) {
-            const [nr, nc] = STEP[dir](r, c);
-            NBR.push(inBoard(nr, nc) ? IDX(nr, nc) : 0);
-        }
-    }
-}
-
-// ── 빌드 타임 어서션 — 이웃표가 진짜 "인접"인지 기하로 확인 ────────
-// 이웃이라고 주장하는 두 칸의 중심 거리는 정확히 셀 폭 W 여야 한다.
-// 그리고 dir 과 그 반대 방향은 서로를 가리켜야 한다(대칭).
+// ── 빌드 타임 검산 — 격자·화면 대응이 어긋나면 여기서 잡는다 ──────
 {
-    const OPP = { 1: 2, 2: 1, 3: 4, 4: 3, 5: 6, 6: 5 };
-    let checked = 0;
-    for (let dir = 1; dir <= 6; dir++) {
-        for (let cell = 1; cell <= CELLS; cell++) {
-            const nx = NBR[(dir - 1) * CELLS + cell - 1];
-            if (nx === 0) continue;
-            const dx = POSX[nx - 1] - POSX[cell - 1];
-            const dy = POSY[nx - 1] - POSY[cell - 1];
-            const dist = Math.hypot(dx, dy);
-            if (Math.abs(dist - L.W) > 0.02) {
-                throw new Error(`이웃표 오류: dir=${dir} cell=${cell} 거리=${dist.toFixed(3)} (기대 ${L.W.toFixed(3)})`);
-            }
-            if (NBR[(OPP[dir] - 1) * CELLS + nx - 1] !== cell) {
-                throw new Error(`이웃표 비대칭: dir=${dir} cell=${cell} → ${nx}`);
-            }
-            checked++;
+    const rel = (q, r) => [W * (q + r / 2), -RH * r];
+    // 6 방향 이웃은 모두 셀 폭만큼 떨어져 있어야 한다.
+    for (const [dq, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, -1], [-1, 1]]) {
+        const [x, y] = rel(dq, dr);
+        const d = Math.hypot(x, y);
+        if (Math.abs(d - W) > 0.01) {
+            throw new Error(`축좌표 이웃 오류: (${dq},${dr}) 거리 ${d.toFixed(3)} ≠ ${W.toFixed(3)}`);
         }
     }
-    // 각 축이 판을 가로지르는 6연속을 만들 수 있는지 (판이 육목에 충분히 큰지)
-    for (const dir of [1, 3, 5]) {
-        let best = 0;
-        for (let cell = 1; cell <= CELLS; cell++) {
-            let n = 1, cur = cell;
-            for (;;) {
-                const nx = NBR[(dir - 1) * CELLS + cur - 1];
-                if (nx === 0) break;
-                n++; cur = nx;
-            }
-            best = Math.max(best, n);
-        }
-        if (best < 6) throw new Error(`축 ${dir} 최대 길이 ${best} < 6 — 판이 너무 작다`);
+    // ↑↓ 지그재그가 실제로 제자리로 돌아오는지 (홀짝 번갈아 NE/NW)
+    const up = (q, r) => (((r % 2) + 2) % 2 === 0 ? [q + 1, r - 1] : [q, r - 1]);
+    const down = (q, r) => (((r % 2) + 2) % 2 === 0 ? [q, r + 1] : [q - 1, r + 1]);
+    for (let r = -4; r <= 4; r++) {
+        const [uq, ur] = up(0, r);
+        const [bq, br] = down(uq, ur);
+        if (bq !== 0 || br !== r) throw new Error(`↑↓ 왕복 불일치: r=${r}`);
+        const [x] = rel(uq - 0, ur - r);
+        if (Math.abs(Math.abs(x) - W / 2) > 0.01) throw new Error(`↑ 가로 이동량 이상: r=${r}`);
     }
-    if (checked < CELLS * 3) throw new Error(`이웃 검사 수 이상: ${checked}`);
+    // 스크롤 한계 안의 커서는 항상 판 안에 있어야 한다.
+    if (ORIGIN_X + LIMX > BW / 2 || ORIGIN_X - LIMX < -BW / 2) throw new Error('LIMX 가 판 밖');
+    if (LIMY + Math.abs(ORIGIN_Y - BOARD_Y) > BH / 2) throw new Error('LIMY 가 판 밖');
+    if (CLIPX <= LIMX || CLIPY <= LIMY) throw new Error('그리기 범위가 스크롤 한계보다 좁다');
 }
 
 // ── 색·글꼴 ──────────────────────────────────────────────────────
@@ -186,15 +153,15 @@ const resetGame = () => [
 // 8Hz 로 상대에게 방송된다.
 
 const variables = [
-    // 동기화되는 대국 상태 — 지금 턴인 쪽만 쓴다 (기획 §5 쓰기 소유권)
-    { id: 'turn',  name: '$턴',      value: '1',  visible: false, x: 10,  y: 10 },
-    { id: 'left',  name: '$남은돌',   value: '1',  visible: false, x: 10,  y: 34 },
-    { id: 'last1', name: '$최근수1',  value: '0',  visible: false, x: 10,  y: 58 },
-    { id: 'last2', name: '$최근수2',  value: '0',  visible: false, x: 10,  y: 82 },
-    { id: 'winner', name: '$승자',    value: '0',  visible: false, x: 10,  y: 106 },
-    { id: 'ply',   name: '$수순',     value: '0',  visible: false, x: 10,  y: 130 },
-    { id: 'nick1', name: '$닉네임1',  value: ' ',  visible: false, x: 10,  y: 154 },
-    { id: 'nick2', name: '$닉네임2',  value: ' ',  visible: false, x: 10,  y: 178 },
+    // 동기화되는 대국 상태 — 지금 턴인 쪽만 쓴다 (knowledge/08 §2 쓰기 소유권)
+    { id: 'turn',   name: '$턴',      value: '1', visible: false, x: 10, y: 10 },
+    { id: 'left',   name: '$남은돌',   value: '1', visible: false, x: 10, y: 34 },
+    { id: 'last1',  name: '$최근수1',  value: '0', visible: false, x: 10, y: 58 },
+    { id: 'last2',  name: '$최근수2',  value: '0', visible: false, x: 10, y: 82 },
+    { id: 'winner', name: '$승자',     value: '0', visible: false, x: 10, y: 106 },
+    { id: 'ply',    name: '$수순',     value: '0', visible: false, x: 10, y: 130 },
+    { id: 'nick1',  name: '$닉네임1',  value: ' ', visible: false, x: 10, y: 154 },
+    { id: 'nick2',  name: '$닉네임2',  value: ' ', visible: false, x: 10, y: 178 },
 
     // 확장이 값을 써 주는 예약 이름. 이름·종류가 정확해야 하며 확장은 없으면 만들지 않는다.
     { id: 'ext',   name: '$확장프로그램', value: '0', visible: false, x: 150, y: 10 },
@@ -202,151 +169,121 @@ const variables = [
     { id: 'roomn', name: '$방인원수',     value: '0', visible: false, x: 150, y: 58 },
 
     // 로컬 전용 (동기화 안 함)
-    { id: 'cr',      name: '커서행',   value: String(CENTER_R), visible: false, x: 300, y: 10 },
-    { id: 'cc',      name: '커서열',   value: String(CENTER_C), visible: false, x: 300, y: 34 },
-    { id: 'myslot',  name: '내슬롯',   value: '1', visible: false, x: 300, y: 58 },
-    { id: 'mode',    name: '모드',     value: '0', visible: false, x: 300, y: 82 },
-    { id: 'state',   name: '상태',     value: '0', visible: false, x: 300, y: 106 },
-    { id: 'placed',  name: '놓인수',   value: '0', visible: false, x: 300, y: 130 },
-    { id: 'held',    name: '누름유지', value: '0', visible: false, x: 300, y: 202 },
-    { id: 'sink',    name: '버림',     value: '0', visible: false, x: 300, y: 226 },
-    { id: 'hint',    name: '안내',     value: '0', visible: false, x: 420, y: 10 },
-    { id: 'cleared', name: '지움감지', value: '0', visible: false, x: 420, y: 34 },
-    { id: 'walk',    name: '이탈승',   value: '0', visible: false, x: 420, y: 58 },
+    { id: 'cq',     name: '커서q',   value: '0', visible: false, x: 300, y: 10 },
+    { id: 'cr',     name: '커서r',   value: '0', visible: false, x: 300, y: 34 },
+    { id: 'vq',     name: '뷰q',     value: '0', visible: false, x: 300, y: 58 },
+    { id: 'vr',     name: '뷰r',     value: '0', visible: false, x: 300, y: 82 },
+    { id: 'myslot', name: '내슬롯',   value: '1', visible: false, x: 300, y: 106 },
+    { id: 'mode',   name: '모드',     value: '0', visible: false, x: 300, y: 130 },
+    { id: 'state',  name: '상태',     value: '0', visible: false, x: 300, y: 154 },
+    { id: 'held',   name: '누름유지', value: '0', visible: false, x: 300, y: 178 },
+    { id: 'sink',   name: '버림',     value: '0', visible: false, x: 300, y: 202 },
+    { id: 'hint',   name: '안내',     value: '0', visible: false, x: 420, y: 10 },
+    { id: 'walk',   name: '이탈승',   value: '0', visible: false, x: 420, y: 34 },
+    { id: 'stones', name: '돌수',     value: '0', visible: false, x: 420, y: 58 },
+    // 마지막으로 화면에 그린 상태 — 이 셋이 그대로면 다시 그릴 이유가 없다.
+    { id: 'dvq', name: '그린뷰q',  value: '999999', visible: false, x: 420, y: 82 },
+    { id: 'dvr', name: '그린뷰r',  value: '999999', visible: false, x: 420, y: 106 },
+    { id: 'dn',  name: '그린돌수', value: '-1',     visible: false, x: 420, y: 130 },
 ];
 
 const lists = [
-    // 대국판 — 0=빈칸 1=노랑 2=파랑. 143칸 ≈ 300바이트로 동기화 캡(1024항목·56KB)과 무관.
-    { id: 'board', name: '$보드', array: Array(CELLS).fill(0), visible: false, x: 10, y: 10 },
+    // 착수 기록 — 항목 하나가 돌 하나(`키*10 + 색`). 무한 판이라 격자를 담지 않는다.
+    { id: 'moves', name: '$수', array: [], visible: false, x: 10, y: 10 },
     // 확장 예약 리스트(방 모드에서 슬롯별 "연결"/"끊김")
-    { id: 'conn',  name: '$유저연결상태', array: [], visible: false, x: 120, y: 10 },
-    // 화면에 **이미 그린** 돌의 사본(로컬 전용). 판과 이 표의 차이가 곧 "새로 그릴 돌"이다.
-    // 상대가 놓은 돌은 `$보드` 로만 도착하므로 이 diff 가 유일한 렌더 경로다.
-    { id: 'mirror', name: '그린판', array: Array(CELLS).fill(0), visible: false, x: 60, y: 10 },
-    // 빌드 타임에 구운 상수표 — 런타임 기하 계산 0
-    { id: 'nbr',   name: '이웃표', array: NBR,  visible: false, x: 230, y: 10 },
-    { id: 'posx',  name: '칸X',   array: POSX, visible: false, x: 340, y: 10 },
-    { id: 'posy',  name: '칸Y',   array: POSY, visible: false, x: 400, y: 10 },
+    { id: 'conn', name: '$유저연결상태', array: [], visible: false, x: 120, y: 10 },
 ];
+
+// ── 좌표 헬퍼 (빌드 타임에 블록 트리를 만든다) ────────────────────
+// 같은 트리를 두 슬롯에 재사용하면 안 되므로 매번 새로 만든다.
+
+const keyOf = (q, r) => calc(calc(calc(q, '+', KOFF), '*', KSPAN), '+', calc(r, '+', KOFF));
+const dqExpr = () => calc(getVar('cq'), '-', getVar('vq'));
+const drExpr = () => calc(getVar('cr'), '-', getVar('vr'));
+// 뷰 원점 기준 상대 화면 좌표
+const relX = (dq, dr) => calc(W, '*', calc(dq, '+', calc(dr, '/', 2)));
+const relY = (dr) => calc(-RH, '*', dr);
+const curX = () => relX(dqExpr(), drExpr());
+const curY = () => relY(drExpr());
 
 // ── 함수 ─────────────────────────────────────────────────────────
 
-// 커서가 가리키는 칸 번호. 매번 새 블록 트리를 만든다(같은 객체를 두 슬롯에 재사용 금지).
-const cidx = () => calc(calc(calc(getVar('cr'), '-', 1), '*', COLS), '+', getVar('cc'));
-
-// 판 비우기 — 143칸을 꼬리재귀로. repeat 로 하면 143프레임(≈2.4초) 걸린다.
-// 온라인에서는 **선공(슬롯 1)만** 부른다. 후공까지 부르면 상대가 놓은 판을 지운다.
-const fnClearBoard = fn.value('clrb', ['i'],
-    (i, V) => [
+// (q,r) 칸의 색. 없으면 0. 착수 기록을 훑는다 — 놓인 돌 수만큼만 돈다.
+const fnCellAt = fn.value('cellat', ['q', 'r', 'i'],
+    (q, r, i, V) => [
         V.set('o', 0),
-        if_(cmp(i, '<=', CELLS), [
-            setListAt('board', i, 0),
-            V.set('o', call('clrb', calc(i, '+', 1))),
-        ]),
-    ],
-    (i, V) => V.get('o'),
-    ['o']);
-
-// 화면 사본 비우기 — 다음 렌더 패스가 판 전체를 다시 그리게 만든다(로컬 전용).
-const fnClearMirror = fn.value('clrm', ['i'],
-    (i, V) => [
-        V.set('o', 0),
-        if_(cmp(i, '<=', CELLS), [
-            setListAt('mirror', i, 0),
-            V.set('o', call('clrm', calc(i, '+', 1))),
-        ]),
-    ],
-    (i, V) => V.get('o'),
-    ['o']);
-
-// 렌더러 — `$보드` 와 `그린판` 의 차이만큼 돌 클론을 만들고, 판 위의 돌 개수를 돌려준다.
-// 상대가 놓은 돌이 화면에 나타나는 유일한 경로이며, 패치를 한 번 놓쳐도 다음 패스가
-// 스스로 메운다(상태 기반이라 자가 치유).
-//
-// 143칸 순회를 `repeat` 로 하면 143프레임이라 불가능하다 — 값 함수 꼬리재귀는 한 틱에
-// 동기 실행된다(knowledge/07). 누산은 재귀 호출 **앞**에서 읽어야 한다: 안쪽 호출이
-// 같은 지역변수를 덮어쓰므로 `calc(V.get('n'), '+', call(...))` 의 좌항 평가 순서에 기댄다.
-const fnDraw = fn.value('draw', ['i'],
-    (i, V) => [
-        V.set('n', 0),
-        if_(cmp(i, '<=', CELLS), [
-            V.set('b', valueAt('board', i)),
-            if_(cmp(V.get('b'), '!=', valueAt('mirror', i)), [
-                setListAt('mirror', i, V.get('b')),
-                if_(cmp(V.get('b'), '!=', 0), [
-                    // 템플릿을 목표 칸의 모양·자리로 맞춘 **뒤** 복제한다. 클론은 생성 시점의
-                    // 상태를 그대로 물려받으므로, 한 프레임에 여러 개를 만들어도 서로 안 섞인다.
-                    // 전역 변수(그릴칸)에 담아 `when_clone_start` 에서 읽으면 마지막 값 하나로
-                    // 전부 겹쳐 그려진다 — 실제로 밟은 버그다(knowledge/07 클론 초기화 race).
-                    changeShape(V.get('b')),
-                    locateXY(valueAt('posx', i), valueAt('posy', i)),
-                    createClone('self'),
-                ], [
-                    // 돌이 사라진 칸 — 클론 하나만 지울 방법이 없으니 전체 재그리기를 예약한다.
-                    setVar('cleared', 1),
-                ]),
+        if_(cmp(i, '<=', lengthOfList('moves')), [
+            V.set('v', valueAt('moves', i)),
+            if_(cmp(quotient(V.get('v'), 10), '==', keyOf(q, r)), [
+                V.set('o', mod(V.get('v'), 10)),
+            ], [
+                V.set('o', call('cellat', q, r, calc(i, '+', 1))),
             ]),
-            if_(cmp(V.get('b'), '!=', 0), [V.set('n', 1)]),
-            V.set('n', calc(V.get('n'), '+', call('draw', calc(i, '+', 1)))),
         ]),
     ],
-    (i, V) => V.get('n'),
-    ['n', 'b']);
+    (q, r, i, V) => V.get('o'),
+    ['o', 'v']);
 
-// cell 에서 dir 방향으로 이어지는 같은 색 돌의 개수(자기 자신 제외, 최대 5).
-// 이웃표 덕분에 나머지 연산이 없고, 리스트 접근 전에 `nx > 0` 를 **중첩 if_** 로 막는다
-// (and_ 는 단락 평가가 없어 한 줄로 묶으면 범위 밖 접근이 먼저 터진다 — knowledge/07).
-const fnRun = fn.value('runlen', ['cell', 'col', 'dir', 'n'],
-    (cell, col, dir, n, V) => [
-        V.set('nx', valueAt('nbr', calc(calc(calc(dir, '-', 1), '*', CELLS), '+', cell))),
+// (q,r) 에서 (dq,dr) 방향으로 이어지는 같은 색 돌 수(자기 자신 제외, 최대 5).
+// 축좌표라 방향이 상수 오프셋이다 — 행 홀짝 보정이 없다.
+const fnRun = fn.value('runlen', ['q', 'r', 'dq', 'dr', 'col', 'n'],
+    (q, r, dq, dr, col, n, V) => [
         V.set('o', n),
         if_(cmp(n, '<', 5), [
-            if_(cmp(V.get('nx'), '>', 0), [
-                if_(cmp(valueAt('board', V.get('nx')), '==', col), [
-                    V.set('o', call('runlen', V.get('nx'), col, dir, calc(n, '+', 1))),
-                ]),
+            V.set('nq', calc(q, '+', dq)),
+            V.set('nr', calc(r, '+', dr)),
+            if_(cmp(call('cellat', V.get('nq'), V.get('nr'), 1), '==', col), [
+                V.set('o', call('runlen', V.get('nq'), V.get('nr'), dq, dr, col, calc(n, '+', 1))),
             ]),
         ]),
     ],
-    (cell, col, dir, n, V) => V.get('o'),
-    ['nx', 'o']);
+    (q, r, dq, dr, col, n, V) => V.get('o'),
+    ['o', 'nq', 'nr']);
 
-// cell 을 지나는 3축 중 하나라도 6연속이면 1.
-// 자기 자신(1) + 양방향 합 ≥ 5 → 6개.
-const fnWin = fn.value('winat', ['cell', 'col'],
-    (cell, col, V) => [
+// (q,r) 을 지나는 3축 중 하나라도 6연속이면 1. 자기 자신(1) + 양방향 합 ≥ 5.
+const fnWin = fn.value('winat', ['q', 'r', 'col'],
+    (q, r, col, V) => [
         V.set('o', 0),
-        V.set('a', calc(call('runlen', cell, col, 1, 0), '+', call('runlen', cell, col, 2, 0))),
+        V.set('a', calc(call('runlen', q, r, 1, 0, col, 0), '+', call('runlen', q, r, -1, 0, col, 0))),
         if_(cmp(V.get('a'), '>=', 5), [V.set('o', 1)]),
-        V.set('a', calc(call('runlen', cell, col, 3, 0), '+', call('runlen', cell, col, 4, 0))),
+        V.set('a', calc(call('runlen', q, r, 0, 1, col, 0), '+', call('runlen', q, r, 0, -1, col, 0))),
         if_(cmp(V.get('a'), '>=', 5), [V.set('o', 1)]),
-        V.set('a', calc(call('runlen', cell, col, 5, 0), '+', call('runlen', cell, col, 6, 0))),
+        V.set('a', calc(call('runlen', q, r, 1, -1, col, 0), '+', call('runlen', q, r, -1, 1, col, 0))),
         if_(cmp(V.get('a'), '>=', 5), [V.set('o', 1)]),
     ],
-    (cell, col, V) => V.get('o'),
+    (q, r, col, V) => V.get('o'),
     ['o', 'a']);
 
-// 돌 놓기 — 판에 기록하고 클론 하나를 만든다.
-// createClone 은 반드시 대상 id('stone')를 명시한다. 'self' 로 두면 이 함수를 부른
-// 오브젝트(커서 등)가 복제된다.
-// 돌 놓기 — **판에 쓰기만** 한다. 화면에 올리는 일은 렌더러 하나만 한다.
-// 내 돌과 상대 돌이 같은 경로로 그려지므로 "내 화면에만 보이는 돌" 같은 어긋남이 없다.
-const fnPlace = fn.normal('place', ['cell', 'color'],
-    (cell, color) => [
-        setListAt('board', cell, color),
+// 착수 기록 비우기(새 대국). 리스트를 통째로 지우는 블록이 없어 앞에서부터 걷어낸다.
+const fnClearMoves = fn.value('clrmv', ['x'],
+    (x, V) => [
+        V.set('o', 0),
+        if_(cmp(lengthOfList('moves'), '>', 0), [
+            removeFromList(1, 'moves'),
+            V.set('o', call('clrmv', 0)),
+        ]),
+    ],
+    (x, V) => V.get('o'),
+    ['o']);
+
+// 돌 놓기 — **기록만** 한다. 화면에 올리는 일은 렌더러 하나만 한다.
+// 내 돌과 상대 돌이 같은 경로로 그려져 "내 화면에만 보이는 돌"이 생기지 않는다.
+const fnPlace = fn.normal('place', ['q', 'r', 'col'],
+    (q, r, col) => [
+        addToList(calc(calc(keyOf(q, r), '*', 10), '+', col), 'moves'),
         setVar('last2', getVar('last1')),
-        setVar('last1', cell),
+        setVar('last1', keyOf(q, r)),
     ]);
 
 // 착수 시도 — 대국 규칙 전부가 여기 모인다.
-const fnTry = fn.normal('tryp', ['cell'],
-    (cell) => [
+const fnTry = fn.normal('tryp', ['q', 'r'],
+    (q, r) => [
         if_(cmp(getVar('state'), '==', 1), [
             // 온라인은 `$턴 == 내슬롯`, 로컬은 매 턴 내슬롯을 $턴에 맞춰 두므로 항상 참.
             if_(cmp(getVar('turn'), '==', getVar('myslot')), [
-                if_(cmp(valueAt('board', cell), '==', 0), [
-                    call('place', cell, getVar('turn')),
-                    if_(cmp(call('winat', cell, getVar('turn')), '==', 1), [
+                if_(cmp(call('cellat', q, r, 1), '==', 0), [
+                    call('place', q, r, getVar('turn')),
+                    if_(cmp(call('winat', q, r, getVar('turn')), '==', 1), [
                         setVar('winner', getVar('turn')),
                         setVar('state', 2),
                     ], [
@@ -359,7 +296,8 @@ const fnTry = fn.normal('tryp', ['cell'],
                                 setVar('myslot', getVar('turn')),
                             ]),
                         ]),
-                        if_(cmp(getVar('placed'), '>=', CELLS), [
+                        // 무한 판이라 판이 찰 일은 없지만 동기화 리스트 상한은 있다.
+                        if_(cmp(lengthOfList('moves'), '>=', MAX_MOVES), [
                             setVar('winner', 3),
                             setVar('state', 2),
                         ]),
@@ -368,6 +306,50 @@ const fnTry = fn.normal('tryp', ['cell'],
             ]),
         ]),
     ]);
+
+// 커서가 화면 끝에 닿으면 뷰가 한 칸 따라간다 = 무한 스크롤.
+// 세로를 먼저 맞추고 가로를 다시 계산한다 — 뷰 r 이 바뀌면 가로 위치도 반 칸 움직인다.
+//
+// 마지막에 커서를 **바로** 옮긴다. 이동 분기 뒤에는 키 반복을 막는 0.11초 대기가 있어서,
+// 위치 갱신을 루프 끝에 두면 눌렀을 때 커서가 그만큼 늦게 따라온다.
+// ⚠️ 커서 오브젝트의 스레드에서만 부를 것 — 블록은 실행 중인 오브젝트에 작용한다.
+const fnFitView = fn.normal('fitview', [],
+    () => [
+        if_(cmp(curY(), '>', LIMY), [changeVar('vr', -1)]),
+        if_(cmp(curY(), '<', -LIMY), [changeVar('vr', 1)]),
+        if_(cmp(curX(), '>', LIMX), [changeVar('vq', 1)]),
+        if_(cmp(curX(), '<', -LIMX), [changeVar('vq', -1)]),
+        locateXY(calc(ORIGIN_X, '+', curX()), calc(ORIGIN_Y, '+', curY())),
+    ]);
+
+// 렌더러 — 착수 기록을 훑어 **화면 안에 드는 돌만** 그린다.
+// ⚠️ 돌 오브젝트의 스레드에서만 부를 것: 블록은 실행 중인 오브젝트에 작용하므로
+// 다른 오브젝트가 부르면 그 오브젝트가 움직이고 복제된다.
+const fnDraw = fn.value('draw', ['i'],
+    (i, V) => [
+        V.set('o', 0),
+        if_(cmp(i, '<=', lengthOfList('moves')), [
+            V.set('v', valueAt('moves', i)),
+            V.set('k', quotient(V.get('v'), 10)),
+            V.set('dq', calc(quotient(V.get('k'), KSPAN), '-', calc(KOFF, '+', getVar('vq')))),
+            V.set('dr', calc(mod(V.get('k'), KSPAN), '-', calc(KOFF, '+', getVar('vr')))),
+            V.set('x', relX(V.get('dq'), V.get('dr'))),
+            V.set('y', relY(V.get('dr'))),
+            // 판 밖은 그리지 않는다. and_ 는 단락 평가가 없어 중첩 if_ 로 쌓는다.
+            if_(cmp(V.get('x'), '>=', -CLIPX), [if_(cmp(V.get('x'), '<=', CLIPX), [
+                if_(cmp(V.get('y'), '>=', -CLIPY), [if_(cmp(V.get('y'), '<=', CLIPY), [
+                    // 템플릿을 목표 모양·자리로 맞춘 뒤 복제 — 클론이 그 상태를 물려받는다.
+                    // 전역에 담아 when_clone_start 에서 읽으면 한 프레임에 만든 것들이 겹친다.
+                    changeShape(mod(V.get('v'), 10)),
+                    locateXY(calc(ORIGIN_X, '+', V.get('x')), calc(ORIGIN_Y, '+', V.get('y'))),
+                    createClone('self'),
+                ])]),
+            ])]),
+            V.set('o', call('draw', calc(i, '+', 1))),
+        ]),
+    ],
+    (i, V) => V.get('o'),
+    ['o', 'v', 'k', 'dq', 'dr', 'x', 'y']);
 
 // Entry Online 확장 후킹 지점 — 본문은 비어 있어야 한다. 확장이 이 함수의 호출을
 // 가로채 방에 입장/퇴장한다. 표시명에 `$` 가 들어가야 하므로 id 와 label 을 분리한다.
@@ -411,8 +393,7 @@ const btnLocal = obj('btnlocal', '로컬 플레이', {
 // 확장이 125ms 마다 이 값을 다시 쓰므로 계속 폴링하면 설치 후 새로고침에서 저절로 풀린다.
 //
 // ⚠️ 잠금 표현에 투명도 효과를 쓸 수 없다 — 엔트리는 `entity.effect` 를 **sprite 에만**
-// 초기화해서(entity.js:42-48, textBox 분기엔 setInitialEffectValue 호출이 없다) 글상자에
-// 효과 블록을 걸면 `Cannot set properties of undefined (setting 'alpha')` 로 스레드가 죽는다.
+// 초기화해서(entity.js:42-48) 글상자에 효과 블록을 걸면 스레드가 죽는다.
 // 그래서 잠김/열림을 **버튼 오브젝트 2개**의 show/hide 로 표현한다.
 const btnOnline = obj('btnonline', '온라인 플레이', {
     scene: SC_LOBBY, objectType: 'textBox', text: '온라인 플레이',
@@ -457,7 +438,7 @@ const lobbyHint = obj('lobbyhint', '안내문', {
                     if_(cmp(getVar('hint'), '==', 2), [
                         writeText(txt('상대가 나가서 대국이 끝났습니다.')),
                     ], [
-                        writeText(txt('방향키로 칸 이동  ·  스페이스로 착수')),
+                        writeText(txt('방향키로 칸 이동  ·  스페이스로 착수  ·  판은 끝없이 이어집니다')),
                     ]),
                 ]),
                 wait(0.2),
@@ -544,6 +525,8 @@ const gameBg = obj('gamebg', '게임배경', {
     threads: [[]],
 });
 
+// 판 이미지는 **움직이지 않는다**. 화면 좌표를 뷰 기준 상대값으로 계산하므로 어느 칸이
+// 가운데로 와도 격자 위에 정확히 떨어진다 — 스크롤은 돌이 움직이는 것으로 표현된다.
 const boardObj = obj('board_img', '판', {
     scene: SC_GAME, picture: BOARD_PIC,
     entity: { x: 0, y: BOARD_Y, scaleX: 1, scaleY: 1, direction: 90, visible: true },
@@ -552,8 +535,7 @@ const boardObj = obj('board_img', '판', {
 
 // 돌 — 템플릿은 숨겨 두고 클론만 화면에 나온다.
 // 대국 초기화도 이 오브젝트가 맡는다. removeAllClones 는 **자기 클론만** 지우므로
-// (block_flow.js) 돌 오브젝트가 직접 불러야 하고, 판 비우기·중앙 착수와 순서가
-// 어긋나면 갓 놓은 중앙 돌이 지워진다 → 한 스레드에 순차로 둔다.
+// (block_flow.js) 돌 오브젝트가 직접 불러야 한다.
 const stone = obj('stone', '돌', {
     scene: SC_GAME,
     pictures: [
@@ -563,37 +545,35 @@ const stone = obj('stone', '돌', {
     entity: { x: 0, y: -400, scaleX: 1, scaleY: 1, direction: 90, visible: false },
     threads: [
         // 초기화와 렌더러를 **한 스레드**에 순서대로 둔다. 별도 스레드로 두면
-        // removeAllClones 가 방금 놓은 중앙 돌을 지우는 순서 사고가 난다.
+        // removeAllClones 가 방금 놓은 돌을 지우는 순서 사고가 난다.
         [when.sceneStart(),
             setVar('state', 0),
             removeAllClones(),
-            setVar('sink', call('clrm', 1)),
-            setVar('cleared', 0),
-            setVar('placed', 0),
-            setVar('cr', CENTER_R),
-            setVar('cc', CENTER_C),
+            setVar('cq', 0), setVar('cr', 0),
+            setVar('vq', 0), setVar('vr', 0),
             setVar('held', 0),
+            // 그린 상태를 무효화해 첫 패스에서 반드시 다시 그리게 한다.
+            setVar('dvq', 999999), setVar('dvr', 999999), setVar('dn', -1),
 
             // 판을 세우는 쪽은 하나뿐이다 — 로컬이면 나, 온라인이면 선공(슬롯 1).
             // 후공까지 초기화하면 상대가 세운 판을 지워 버린다.
             if_(cmp(getVar('mode'), '==', 0), [setVar('myslot', 1)]),
             if_(cmp(getVar('myslot'), '==', 1), [
-                setVar('sink', call('clrb', 1)),
+                setVar('sink', call('clrmv', 0)),
                 setVar('winner', 0),
                 setVar('last1', 0),
                 setVar('last2', 0),
-                // 오프닝: 선공(노랑)은 중앙에 1개만. 이후 후공부터 매 턴 2개.
-                call('place', CENTER, 1),
+                // 오프닝: 선공(노랑)은 중앙(0,0)에 1개만. 이후 후공부터 매 턴 2개.
+                call('place', 0, 0, 1),
                 setVar('turn', 2),
                 setVar('left', 2),
                 setVar('ply', 1),
             ], [
                 // 후공은 **선공이 세운 판이 실제로 도착할 때까지** 기다린다.
                 // 수순 같은 카운터로 판단하면 지난 대국의 값이 남아 있어 앞질러 시작한다 —
-                // "판 위의 돌이 정확히 1개" 는 눈에 보이는 사실이라 흔들리지 않는다.
+                // "기록된 돌이 정확히 1개" 는 눈에 보이는 사실이라 흔들리지 않는다.
                 repeat.inf([
-                    setVar('placed', call('draw', 1)),
-                    if_(cmp(getVar('placed'), '==', 1), [stopRepeat()]),
+                    if_(cmp(lengthOfList('moves'), '==', 1), [stopRepeat()]),
                     wait(0.1),
                 ]),
             ]),
@@ -601,15 +581,21 @@ const stone = obj('stone', '돌', {
             if_(cmp(getVar('mode'), '==', 0), [setVar('myslot', getVar('turn'))]),
             setVar('state', 1),
 
-            // 렌더러 — 상대가 놓은 돌이 화면에 나타나는 유일한 경로.
+            // 렌더러 — 상대가 놓은 돌이 화면에 나타나는 유일한 경로이자,
+            // 뷰가 움직였을 때 판 전체를 다시 앉히는 경로다.
             repeat.inf([
-                setVar('placed', call('draw', 1)),
-                if_(cmp(getVar('cleared'), '==', 1), [
-                    setVar('cleared', 0),
+                setVar('stones', lengthOfList('moves')),
+                if_(or_(or_(
+                    cmp(getVar('vq'), '!=', getVar('dvq')),
+                    cmp(getVar('vr'), '!=', getVar('dvr'))),
+                    cmp(getVar('stones'), '!=', getVar('dn'))), [
                     removeAllClones(),
-                    setVar('sink', call('clrm', 1)),
+                    setVar('sink', call('draw', 1)),
+                    setVar('dvq', getVar('vq')),
+                    setVar('dvr', getVar('vr')),
+                    setVar('dn', getVar('stones')),
                 ]),
-                wait(0.08),
+                wait(0.06),
             ])],
 
         // 자리와 모양은 복제될 때 이미 물려받았다 — 여기서 전역을 읽으면 race 가 난다.
@@ -620,6 +606,11 @@ const stone = obj('stone', '돌', {
 
 // 커서 — 방향키 이동과 스페이스 착수. 두 스레드로 나눠 이동 대기(wait)가
 // 착수 입력을 막지 않게 한다.
+//
+// ↑↓ 를 축좌표에서 한 방향으로 고정하면 계속 한쪽으로 밀린다. 행 홀짝에 따라
+// NE/NW 를 번갈아 밟으면 화면에서는 **곧게 위아래로** 움직이는 것처럼 보인다.
+// 엔트리의 나머지 연산은 floor 기반(`left - right*floor(left/right)`)이라
+// 음수 r 에서도 홀짝이 정확하다.
 const cursor = obj('cursor', '커서', {
     scene: SC_GAME, picture: hexOutline(CURSOR_R, '#ffffff', 2.4),
     entity: { x: 0, y: BOARD_Y, scaleX: 1, scaleY: 1, direction: 90, visible: true },
@@ -629,23 +620,29 @@ const cursor = obj('cursor', '커서', {
             repeat.inf([
                 if_(cmp(getVar('state'), '==', 1), [
                     if_(isPressed(37), [
-                        if_(cmp(getVar('cc'), '>', 1), [changeVar('cc', -1)]),
+                        changeVar('cq', -1),
+                        call('fitview'),
                         wait(0.11),
                     ]),
                     if_(isPressed(39), [
-                        if_(cmp(getVar('cc'), '<', COLS), [changeVar('cc', 1)]),
+                        changeVar('cq', 1),
+                        call('fitview'),
                         wait(0.11),
                     ]),
                     if_(isPressed(38), [
-                        if_(cmp(getVar('cr'), '>', 1), [changeVar('cr', -1)]),
+                        if_(cmp(mod(getVar('cr'), 2), '==', 0), [changeVar('cq', 1)]),
+                        changeVar('cr', -1),
+                        call('fitview'),
                         wait(0.11),
                     ]),
                     if_(isPressed(40), [
-                        if_(cmp(getVar('cr'), '<', ROWS), [changeVar('cr', 1)]),
+                        if_(cmp(mod(getVar('cr'), 2), '!=', 0), [changeVar('cq', -1)]),
+                        changeVar('cr', 1),
+                        call('fitview'),
                         wait(0.11),
                     ]),
                 ]),
-                locateXY(valueAt('posx', cidx()), valueAt('posy', cidx())),
+                locateXY(calc(ORIGIN_X, '+', curX()), calc(ORIGIN_Y, '+', curY())),
             ])],
 
         // 스페이스는 눌린 순간 한 번만 — 키 반복으로 두 점이 연달아 놓이면 안 된다.
@@ -654,7 +651,7 @@ const cursor = obj('cursor', '커서', {
                 if_(isPressed(32), [
                     if_(cmp(getVar('held'), '==', 0), [
                         setVar('held', 1),
-                        call('tryp', cidx()),
+                        call('tryp', getVar('cq'), getVar('cr')),
                     ]),
                 ], [
                     setVar('held', 0),
@@ -691,9 +688,9 @@ const hudHelp = obj('hudhelp', '조작안내', {
             repeat.inf([
                 if_(cmp(getVar('mode'), '==', 1), [
                     if_(cmp(getVar('myslot'), '==', 1), [
-                        writeText(txt('나 = 노랑(선공)   ·   방향키 이동   ·   스페이스 착수')),
+                        writeText(txt('나 = 노랑(선공)   ·   끝까지 가면 판이 따라 움직입니다')),
                     ], [
-                        writeText(txt('나 = 파랑(후공)   ·   방향키 이동   ·   스페이스 착수')),
+                        writeText(txt('나 = 파랑(후공)   ·   끝까지 가면 판이 따라 움직입니다')),
                     ]),
                 ], [
                     writeText(txt('방향키 이동  ·  스페이스 착수  ·  한 축에 6개를 먼저 이으면 승리')),
@@ -708,8 +705,12 @@ const gameFlow = obj('gameflow', '진행', {
     scene: SC_GAME, objectType: 'textBox', text: ' ',
     entity: tbox(-460, -260, 20, 20, 10, MUTED, { visible: false }),
     threads: [
+        // `$승자` 를 본다 — **진 쪽에서도** 결과 장면으로 넘어가야 하기 때문이다.
+        // 로컬 변수인 `상태` 는 이긴 쪽에서만 2 가 되므로 그것만 보면 패자는 대국 화면에
+        // 남는다. 여기서 `상태` 를 2 로 올려 패자의 입력도 함께 잠근다.
         [when.sceneStart(),
-            waitUntil(cmp(getVar('state'), '==', 2)),
+            waitUntil(cmp(getVar('winner'), '!=', 0)),
+            setVar('state', 2),
             wait(1.3),
             startScene(SC_RESULT)],
 
@@ -815,8 +816,7 @@ export default {
     variables,
     lists,
     functions: [
-        fnClearBoard, fnClearMirror, fnDraw,
-        fnRun, fnWin, fnPlace, fnTry,
+        fnCellAt, fnRun, fnWin, fnClearMoves, fnPlace, fnTry, fnFitView, fnDraw,
         fnJoin, fnLeave,
     ],
     objects: [
