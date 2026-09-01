@@ -13,7 +13,7 @@
 | `project.json` 최상위 키가 뭐가 필요한지 | [02-project-json.md](02-project-json.md) | Reference |
 | 오브젝트·이미지 필드 / 이미지를 tar에 포함시키는 법 | [03-objects-and-assets.md](03-objects-and-assets.md) | Reference |
 | 블록 type 이름 / params 쉐이프 / 필드 vs 블록 슬롯 / 설계 패턴 (플랫포머·HUD) | [04-script-and-blocks.md](04-script-and-blocks.md) | Reference + Guide |
-| 편집기가 안 뜨거나 콘솔 에러 / 헤드리스 테스트 | [05-host-editor.md](05-host-editor.md) | Guide |
+| 편집기가 안 뜨거나 콘솔 에러 / 헤드리스 테스트 / **playentry 기존 작품에 덮어쓰기** | [05-host-editor.md](05-host-editor.md) | Guide |
 | Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [07-runtime-quirks.md](07-runtime-quirks.md) | Runtime quirks |
 | **온라인 대전 작품**을 만들 때 (Entry Online 확장 계약·동기화 설계) | [08-entry-online.md](08-entry-online.md) | Reference + Guide |
 | 과거 해결된 버그 요약 (가드 파일 링크) | [lessons.md](lessons.md) | Lessons |
@@ -89,6 +89,13 @@
 | Entry Online 계약(빈 함수·예약 변수) · 쓰기 소유권 · 상태 기반 렌더러 · 서버 없이 검증 | [08-entry-online.md](08-entry-online.md) | 07 (개별 엔진 함정), `games/hexo` |
 
 | `몫`/`나머지` 는 floor 나눗셈 + 진짜 모듈로 (JS `%` 와 음수에서 다름) | [07 §몫·나머지](07-runtime-quirks.md#몫나머지-는-floor-나눗셈--진짜-모듈로--js--가-아니다) | 08 (무한 좌표), `games/hexo` |
+
+| 글상자 entity 를 비워두면 `font:'undefinedpx '` → **fontSize NaN** → 글자 10px | [07 §fontSize NaN](07-runtime-quirks.md#글상자-entity-를-비워두면-fontsize-가-nan--글자가-10px-로-쪼그라든다) | 03 (§textBox 체크리스트 · §Entity `font` 행), lessons |
+| `lineBreak:true` 는 `height` 넘는 줄을 **그리지 않고 버린다** (CreateJS `getMeasuredWidth()` 는 줄바꿈 무시 → 높이로 재라) | [07 §lineBreak 세로 클리핑](07-runtime-quirks.md#linebreak-true-는-height-를-넘는-줄을-그리지-않고-버린다) | 03 (§textBox 체크리스트), 07 §textBox 정렬 |
+| `묻고 대답 기다리기` — 입력칸이 무대 y −71~−112 를 덮고, 말풍선은 `hide()` 로 안 사라짐 (`x:500` 으로 밀어냄) | [07 §묻기 입력칸·말풍선](07-runtime-quirks.md#묻고-대답-기다리기--입력칸이-무대-아래-71-부터를-덮고-말풍선은-hide-로-안-사라진다) | lessons |
+| 장면 재진입 시 **실행기는 쌓이지 않는다**(`resetSceneDuringRun`) — 대신 `entity.reset()` 이 좌표를 되돌림 | [07 §장면 재진입 실행기](07-runtime-quirks.md#장면을-다시-들어가도-실행기는-쌓이지-않는다--대신-entityreset-이-좌표를-되돌린다) | 07 §장면 재진입 순서(값), 04 (등장 애니메이션) |
+| 글상자만으로 애니메이션 — 글자 프레임·좌표·타자기 (효과 블록 금지의 회피) · KS X 1001 기호만 | [04 §글상자만으로 애니메이션](04-script-and-blocks.md#글상자만으로-애니메이션--글자-프레임--좌표--타자기) | 07 §효과 블록과 글상자, 05 (에셋 0 배포) |
+| **콘솔 붙여넣기 배포** — 기존 playentry 작품에 `project.json` 만 교체(조회수·좋아요 보존). 전제 = **에셋 0** | [05 §콘솔 붙여넣기 배포](05-host-editor.md#playentryorg-배포--기존-작품에-projectjson-만-갈아끼우기-콘솔-붙여넣기) | 03 (글상자로 에셋 0), 01/02 (tar·JSON 구조) |
 
 **규칙**: 새 사실 추가 시 위 표에 한 줄 추가. 정본을 두 곳에 둘 일이 생기면 둘 중
 하나가 더 적합한 위치. 모호하면 07 (불변 동작) 또는 04 (블록·패턴) 우선.

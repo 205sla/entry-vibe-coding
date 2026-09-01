@@ -62,6 +62,8 @@
 
 - [2026-08-15] 장면을 다시 들어가면 다른 오브젝트의 `when_scene_start` 가 **지난 판의 `$승자`** 를 먼저 읽어 1.3 초 뒤 결과 장면으로 튐(오브젝트 간 실행 순서 미보장) → 두 번째 대국이 저절로 끝남. 짧은 판은 우연히 통과해 늦게 드러난다 — 가드: 장면 전환을 일으키는 쪽에서 미리 초기화(`resetGame()`), 재진입 후 지연보다 길게 기다려 장면 유지 확인 ([`games/hexo/verify.mjs`](../games/hexo/verify.mjs) §6, [`07` 장면 재진입 순서](07-runtime-quirks.md#장면을-다시-들어가면-when_scene_start-들이-지난-판의-값을-먼저-읽는다))
 
+- [2026-09-01] **장면 재진입에 `자신의 다른 코드 멈추기` 가드를 넣었다가 뺐다** — `Code.raiseEvent` 가 무조건 새 Executor 를 push 하는 것만 보고 "왕복하면 루프가 2개가 된다" 고 추론했으나, `selectScene` 첫 줄의 `resetSceneDuringRun()` 이 **떠나는 장면의 실행기를 이미 지운다**. 실측(재진입 3회 후 오브젝트당 실행기 1개)으로 뒤집었다 — 가드: [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §④ 가 `script.executors.length` 를 직접 세어 전제를 지킨다. 대신 `entity.reset()` 이 함께 도므로 **좌표 연출은 장면 진입 때마다 다시 잡아야 한다** ([07 §장면 재진입 실행기](07-runtime-quirks.md#장면을-다시-들어가도-실행기는-쌓이지-않는다--대신-entityreset-이-좌표를-되돌린다))
+
 ## 클릭 hit-test / 좌표
 
 - [2026-08-15] 글상자에 효과 블록(`setEffect('transparency', …)`)을 걸면 `Cannot set properties of undefined (setting 'alpha')` 로 스레드 사망 — 엔트리가 `entity.effect` 를 **sprite 분기에서만** 초기화(entity.js:42-48). 증상은 "다른 오브젝트의 버튼이 안 눌린다" 로 나타난다 — 가드: 잠김/열림을 오브젝트 2개의 show/hide 로 표현, 두 버튼의 `visible` 을 단언 ([`games/hexo/verify.mjs`](../games/hexo/verify.mjs) §1, [`07` 효과 블록과 글상자](07-runtime-quirks.md#효과-블록change_effect_amount-등을-글상자에-걸면-스레드가-죽는다))
@@ -70,6 +72,13 @@
 - [2026-04-29] sprite 도 `pixelPerfect = true` — source 픽셀 알파 검사. ring 가운데 (transparent) 클릭 무반응 — 가드: filled circle + `setEffect('transparency', N)` 으로 시각/클릭 분리 ([`07-runtime-quirks.md` sprite pixelPerfect](07-runtime-quirks.md#sprite-도-pixelperfect--투명-픽셀-ring-가운데-등-클릭-안-됨))
 - [2026-04-29] `Entry.dispatchEvent('entityClick', e)` 는 pixel hit-test 우회 → verify 통과해도 실제 사용자 클릭 실패 가능 — 가드: UI 회귀 가드는 `page.mouse.click(px, py)` + canvas 좌표 변환 ([`tools/verify-frontier-guard.mjs`](../tools/verify-frontier-guard.mjs) Step 1b)
 - [2026-04-29] stage 논리 좌표 (480×270) 와 canvas 렌더 픽셀 (640×360 등) 비율 다름 → `cx = w/2 + sx` 같은 1:1 가정 매핑이 fixture 마다 어긋남 — 가드: scale 적용 (`sx * (canvas.width / 480)`) ([`07-runtime-quirks.md` stage→canvas 변환](07-runtime-quirks.md#stage-논리-좌표-vs-canvas-렌더-픽셀--clickstagepoint-변환-공식))
+
+## 글상자 / 화면 레이아웃
+
+- [2026-09-01] **글상자에 글이 안 보인다** — spec 의 entity 를 `{x, y}` 만 줬더니 make-ent 의 sprite 기본값 `font: 'undefinedpx '` 가 들어가 `parseFloat` → `fontSize` NaN → 캔버스가 `NaNpx` 를 파싱 못 해 브라우저 기본 10px 로 그렸다. 여기에 `lineBreak` 가 없어 한 줄로 화면 밖까지 뻗어 "문장 가운데 토막만 아주 작게" 보였다. 에러·경고 없음 — 가드: 보이는 글상자를 만드는 헬퍼가 `font`/`fontSize`/`lineBreak`/`width`/`height`/`textAlign`/`scaleX/Y`/`colour`/`bgColor`/`visible` 을 전부 채운다. 회귀 가드 [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §① 이 함정을 픽스처로 재현·단언 ([07 §fontSize NaN](07-runtime-quirks.md#글상자-entity-를-비워두면-fontsize-가-nan--글자가-10px-로-쪼그라든다))
+- [2026-09-01] **`묻고 대답 기다리기` 를 쓰는 장면에서 하단 글상자가 통째로 안 보임** — 입력칸(`stage.js _createInputField`, 캔버스 y 275 + 세로 54px)이 엔트리 좌표 **−71 ~ −112** 를 덮는다. 좌표도 `visible` 도 정상이라 원인이 안 보인다 — 가드: 세로 예산을 `135 ~ −71` 로 잡는다. [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §③ 이 입력칸 윗변(−71.3)·아랫변(−111.8)을 실제로 재서 단언 ([07 §묻기 입력칸](07-runtime-quirks.md#묻고-대답-기다리기--입력칸이-무대-아래-71-부터를-덮고-말풍선은-hide-로-안-사라진다))
+- [2026-09-01] **`묻기` 말풍선이 `hide()` 로 안 사라짐** — `syncDialogVisible()` 은 `setVisible` 이 호출될 때만 도는데 말풍선은 그 뒤에 생겨 `visible: true` 로 태어난다 — 가드: 묻는 오브젝트를 `entity.x: 500` (무대 **오른쪽** 밖)으로. `dialog.ts` 의 `w` 가지가 `Math.max` 라 위쪽 clamp 가 없어 무대 밖으로 나간다. `x: -500` 은 `Math.min` 에 걸려 안 통한다. [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §③ 이 말풍선 x ≈ 412 를 단언 ([07 §말풍선](07-runtime-quirks.md#묻고-대답-기다리기--입력칸이-무대-아래-71-부터를-덮고-말풍선은-hide-로-안-사라진다))
+- [2026-09-01] **헤드리스에서 줄바꿈을 폭으로 검증하면 틀린다** — 로컬 편집기는 CreateJS 로 뜨는데 그쪽 `getMeasuredWidth()` 는 **줄바꿈을 무시하고 원문 전체를 잰다**(100자가 3줄로 접혔는데 폭 1307 로 보고). playentry 는 PIXI 라 `_lines` 가 있지만 로컬엔 없다 — 가드: 두 렌더러 공통인 `getMeasuredHeight() / lineHeight` 로 줄 수를 센다 ([`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §②) ([07 §lineBreak 세로 클리핑](07-runtime-quirks.md#linebreak-true-는-height-를-넘는-줄을-그리지-않고-버린다))
 
 ---
 

@@ -23,15 +23,39 @@
 ### textBox 오브젝트
 
 `objectType: "textBox"`일 때:
-- `text` 필드에 표시할 문자열
+- `text` 필드에 표시할 문자열. **빈 문자열이면 오브젝트 `name` 으로 폴백**해서 이름이 화면에 뜬다 — 색 사각형만 원하면 공백 한 칸(`" "`)을 넣는다 ([`07` §textBox `text: ''`](07-runtime-quirks.md#textbox-text--는-객체-이름으로-폴백))
 - `sprite.pictures`는 보통 비어있거나 무시됨
-- `entity.font` (예: `"20px NanumGothic"`)로 글꼴·크기 지정 — 공백만 있는 `"undefinedpx "`는 sprite 관례
 - `entity.bgColor` 는 hex(`'#xxxxxx'`) 일 때만 사각 전체 클릭 — 투명이면 글자(glyph) 픽셀만 hit. 자세한 건 [`07-runtime-quirks.md` textBox 클릭 영역](07-runtime-quirks.md#textbox-클릭-영역--bgcolor-에-따라-사각-전체-vs-glyph-픽셀만)
 - 썸네일은 `text_icon_ko.svg` / `text_icon.svg` 자동 사용 ([`object.js:240-243`](../../entryjs/src/class/object.js#L240))
 
+#### ⚠️ 보이는 글상자는 entity 를 **전부** 명시한다
+
+`entity` 를 `{ x, y }` 만 주면 make-ent 가 **sprite 기본값**으로 채운다. 그 안의
+`font: "undefinedpx "` 가 글상자에서는 `parseFloat` → **`fontSize` NaN** 이 되어
+글자가 브라우저 기본 10px 로 쪼그라든다. 에러도 경고도 없다.
+전체 메커니즘: [`07` §글상자 entity fontSize NaN](07-runtime-quirks.md#글상자-entity-를-비워두면-fontsize-가-nan--글자가-10px-로-쪼그라든다).
+
+| 필드 | 왜 필요한가 |
+|------|-------------|
+| `font` + `fontSize` | 둘 다. `font` 만 주면 `syncModel_` 이 파싱값으로 되돌아간다 |
+| `lineBreak` | `true` 여야 줄바꿈이 생긴다. `false` 면 한 줄로 화면 밖까지 뻗는다 |
+| `width`, `height` | `lineBreak: true` 일 때 접는 폭 / **넘는 줄은 그리지 않고 버린다** |
+| `textAlign` | **0 = 가운데**, 1 = 왼쪽, 2 = 오른쪽 (1 을 가운데로 착각하기 쉽다) |
+| `scaleX`, `scaleY` | `1` 로. 기본값 1.2 가 들어가면 폰트만 확대돼 접는 폭과 어긋난다 |
+| `colour`, `bgColor` | 무대 기본 배경은 흰색이다 |
+| `visible` | `hide()` 로 숨길 오브젝트는 **여기서도 `false`** — 첫 프레임에 이름이 번쩍인다 |
+
+정렬 규칙(`entity.x` 가 가운데 기준, `regX/regY` 강제 0)은
+[`07` §textBox 정렬](07-runtime-quirks.md#textbox-정렬--regxregy-강제-0-가운데는-textalign0-1-아님).
+
 make-ent 는 `objectType: "textBox"` + `text` 필드를 자동 emit (sprite 와 달리 picture 불필요).
 DSL `obj()` 는 `text`, `entity.bgColor` 등을 그대로 통과 — 사용 예: [`tests/fixtures/spec-name-loop.mjs`](../tests/fixtures/spec-name-loop.mjs).
-버튼 패턴은 [`04-script-and-blocks.md` 버튼 구현](04-script-and-blocks.md#버튼-구현--textbox-가-sprite--dialog-보다-깔끔) 참조.
+버튼 패턴은 [`04-script-and-blocks.md` 버튼 구현](04-script-and-blocks.md#버튼-구현--textbox-가-sprite--dialog-보다-깔끔),
+애니메이션은 [`04` §글상자만으로 애니메이션](04-script-and-blocks.md#글상자만으로-애니메이션--글자-프레임--좌표--타자기) 참조.
+
+**에셋 0 이 필요하면 오브젝트를 전부 글상자로 만든다** — sprite 는 picture 가 최소 1장
+필요해서 tar 없이는 못 옮긴다. 그 이유와 배포 경로는
+[`05` §콘솔 붙여넣기 배포](05-host-editor.md#playentryorg-배포--기존-작품에-projectjson-만-갈아끼우기-콘솔-붙여넣기).
 
 ### 키 순서 관찰 (레퍼런스 기준)
 
@@ -67,10 +91,14 @@ JSON.stringify 결과는 키 순서에 의존하지 않고 엔진도 순서 체�
 | `direction` | 진행 방향(도). `90` = 오른쪽 |
 | `rotation` | 시각적 회전(도) |
 | `width`, `height` | **첫 picture의 dimension과 일치시킬 것** — 맞추지 않으면 히트박스·스케일 계산에서 어긋남 |
-| `font` | textBox일 때만 의미. sprite는 **`"undefinedpx "`** 문자열 (엔트리 관례 — 없으면 런타임 경고) |
+| `font` | sprite는 **`"undefinedpx "`** 문자열 (엔트리 관례 — 없으면 런타임 경고). ⚠️ **글상자에 이 값이 가면 `fontSize` 가 NaN 이 되어 글자가 10px 로 쪼그라든다** — 글상자는 `"16px NanumGothic"` 처럼 실제 값 + `fontSize` 를 함께 준다 ([07](07-runtime-quirks.md#글상자-entity-를-비워두면-fontsize-가-nan--글자가-10px-로-쪼그라든다)) |
 | `visible` | 무대 표시 |
 
+**글상자 전용 필드** (sprite 에는 없음): `text`, `fontSize`, `lineBreak`, `textAlign`,
+`colour`, `bgColor`, `underLine`, `strike`. 위 §textBox 오브젝트의 체크리스트 참조.
+
 구현: [`tools/make-ent.mjs:159-174`](../tools/make-ent.mjs#L159) `makeDefaultEntity()`.
+⚠️ 이 함수는 **sprite 기준**이다 — 글상자는 spec 에서 entity 를 채워 덮어써야 한다.
 
 ## Picture — 최신 포맷 (playentry 레퍼런스 기준)
 

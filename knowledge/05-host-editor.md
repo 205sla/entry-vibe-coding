@@ -159,6 +159,76 @@ async function loadEntFile(file) {
 
 MYentry의 같은 패턴: [`MYentry/public/js/editor.js:345`](../../MYentry/public/js/editor.js#L345).
 
+## playentry.org 배포 — 기존 작품에 `project.json` 만 갈아끼우기 (콘솔 붙여넣기)
+
+`.ent` 를 **오프라인 작품 불러오기**로 새로 올리면 작품 id 가 새로 생겨
+**조회수·좋아요·댓글이 0 부터 시작한다.** 이미 사람이 모인 작품을 개정할 때는
+껍데기를 남기고 내용물만 바꿔야 한다.
+
+`Entry.loadProject` 는 편집기 안에서 호출하면 되고 (위 §프로젝트 로드), playentry.org 의
+편집기도 같은 전역 API 를 쓴다. 그래서 **브라우저 콘솔에서 project.json 을 직접 밀어넣고
+저장**하면 같은 작품 id 로 내용만 교체된다.
+
+```js
+Entry.clearProject();            // ★ 필수 — 안 하면 기존 오브젝트에 덧붙는다
+Entry.loadProject(project);
+Entry.projectId = keptId;        // 로드가 덮어쓰므로 되돌려 놓는다 → 같은 작품으로 저장
+```
+
+절차: `playentry.org/ws/<작품id>` 열기 → F12 콘솔에 스크립트 전체 붙여넣기 → **저장**.
+
+### 전제 — **에셋이 0 이어야 한다**
+
+이게 이 기법의 유일한 제약이자 핵심이다.
+
+`.ent` 는 `temp/project.json` + `temp/aa/bb/image|sound/<hash>.<ext>` 로 이루어진 tar 다
+([01](01-binary-format.md)). **콘솔로 옮길 수 있는 건 JSON 하나뿐**이고 그림·소리 파일은
+따라가지 않는다. picture 를 참조하는 오브젝트가 하나라도 있으면 로드 후 이미지 404 가 나고,
+경우에 따라 `addChildAt(undefined)` 로 엔진이 꺼진다.
+
+sprite 오브젝트는 **그림이 최소 1장 필요하다** — 없으면 make-ent 가 placeholder 를
+tar 에 넣는다([03 §자산 자동 번들링](03-objects-and-assets.md#자산-자동-번들링-make-entmjs-동작)).
+따라서 이 배포 경로를 쓰려면:
+
+> **보이지 않아도 되는 오브젝트는 전부 `objectType: 'textBox'` 로 만든다.**
+
+글상자는 텍스트 렌더 경로를 타서 picture 가 필요 없다. `hide`/`show`/`묻고 대답 기다리기`
+모두 `isNotFor` 제한이 없어 sprite 전용이 아니다. 배경·버튼·패널도
+`entity.bgColor` 를 hex 로 주면 `width × height` 사각형이 칠해지므로
+([07 §textBox 클릭 영역](07-runtime-quirks.md#textbox-클릭-영역--bgcolor-에-따라-사각-전체-vs-glyph-픽셀만)
+의 `updateBG`) 이미지 없이 화면을 다 짤 수 있다.
+
+애니메이션도 **모양 바꾸기 없이** 만들 수 있다 →
+[04 §글상자만으로 애니메이션](04-script-and-blocks.md#글상자만으로-애니메이션--글자-프레임--좌표--타자기).
+
+### 생성기 쪽에서 지킬 것
+
+빌드 스크립트에 **자립성 검사**를 넣는다. 나중에 누가 그림 한 장을 추가하면 조용히
+깨지는 게 아니라 생성 자체가 거부돼야 한다.
+
+```js
+// .ent 에서 project.json 만 꺼내고, 에셋이 하나라도 있으면 거부
+const assets = tarEntries.filter(e => !e.name.endsWith('project.json') && e.size > 0);
+if (assets.length) throw new Error(`에셋 ${assets.length}개 — 콘솔 붙여넣기로 옮길 수 없다`);
+```
+
+추가로 챙기면 좋은 것:
+
+| 항목 | 왜 |
+| --- | --- |
+| gzip + base64 로 싸기 | JSON 원문 234KB → 12KB. 콘솔 붙여넣기 한계와 스크롤 부담을 줄인다 |
+| `DecompressionStream('gzip')` 로 해동 | 브라우저 내장. 외부 라이브러리 불필요 |
+| `new Function(script)` 로 문법 검사 | 생성 직후 걸러낸다. 콘솔에서 SyntaxError 를 보는 것보다 낫다 |
+| 서버 메타데이터 제거 | `_id`, `user`, `visit`, `likeCnt` 등 playentry 전용 필드([02 §playentry 전용](02-project-json.md#playentryorg-전용-커뮤니티-메타데이터-우리는-쓰지-않음))는 빼고 넘긴다 |
+| 되돌리기 훅 | 덮어쓰기 **전에** `Entry.exportProject()` 로 원본을 떠서 `window.__restore()` 에 담아 둔다. 저장 전이면 한 줄로 복구된다 |
+
+### 한계
+
+- **저장을 누르는 순간 되돌릴 수 없다.** 되돌리기 훅은 그 페이지 세션에서만 산다.
+- 작품 이름·설명·썸네일은 안 바뀐다(그게 목적이다). 바꾸려면 편집기 UI 로.
+- 에셋이 필요한 작품은 이 경로를 못 쓴다 — 새로 업로드하거나, 에셋을 playentry 에
+  먼저 올려 `fileurl` 을 받아 JSON 에 박는 수밖에 없다.
+
 ## 서버 — `/api/load` + `/api/export`
 
 ### `/api/load`: 업로드된 `.ent` → JSON

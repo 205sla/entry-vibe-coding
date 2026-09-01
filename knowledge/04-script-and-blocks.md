@@ -1384,6 +1384,107 @@ top-level (오브젝트 스크립트의 `setVar(x, call(fn))`)에서는 스레�
 
 증거: [`spec-frontier-guard.mjs`](../tests/fixtures/spec-frontier-guard.mjs) `hud_status` — `hud_last_wave` 로 wave_idx 변화 시에만 writeText.
 
+## 글상자만으로 애니메이션 — 글자 프레임 · 좌표 · 타자기
+
+에셋 0 을 지켜야 하는 작품(→ [05 §콘솔 붙여넣기 배포](05-host-editor.md#playentryorg-배포--기존-작품에-projectjson-만-갈아끼우기-콘솔-붙여넣기))은
+오브젝트가 전부 글상자다. 그러면 연출 수단이 셋으로 줄어든다.
+
+| 못 쓰는 것 | 왜 | 대신 |
+| --- | --- | --- |
+| `효과 주기`·`효과 정하기` (투명도·밝기) | 글상자는 `entity.effect` 가 없어 **스레드가 죽는다** → [07 §효과 블록과 글상자](07-runtime-quirks.md#효과-블록change_effect_amount-등을-글상자에-걸면-스레드가-죽는다) | `show`/`hide`, 글자 바꾸기 |
+| `다음 모양으로` | picture 가 없다 | **글자 프레임** 교체 |
+| `크기 바꾸기` | 동작은 하지만(`setScaleX` 는 컨테이너 스케일) `lineBreak` 글상자는 `wordWrapWidth` 가 그대로라 줄바꿈이 어긋난다 | 좌표 이동 |
+
+남는 셋 — **글자 바꾸기 · 좌표 이동 · show/hide** — 로 충분히 움직임을 만든다.
+
+### 회전 표시 — 폭이 같은 글자 프레임
+
+```js
+const SPIN = ['●○○○', '○●○○', '○○●○', '○○○●'];
+
+repeat.inf([
+    setVar(V.spin, calc(mod(getVar(V.spin), num(SPIN.length)), '+', num(1))),
+    ...SPIN.map((frame, i) => if_(cmp(getVar(V.spin), '==', num(i + 1)), [
+        writeText(txt(frame)),
+    ])),
+    wait(0.16),
+]),
+```
+
+프레임 폭을 **모두 같게** 만드는 게 요령이다. `.` → `..` → `...` 처럼 길이가 변하면
+가운데 정렬 글상자가 매 프레임 좌우로 흔들린다.
+
+> ⚠️ **기호는 KS X 1001 안에서 고른다.** 무대 기본 폰트가 나눔고딕이고 이 폰트는
+> KS X 1001 을 전부 덮는다: `● ○ ◆ ◇ ■ □ ▲ ▼ ◀ ▶ ★ ☆ · … ※ ♥ ♬ →`.
+> 점자 스피너(`⠋⠙⠹`)나 블록 요소(`▁▂▃`)는 **집합 밖이라 두부(□)로 폴백**한다.
+
+### 살아 있다는 신호 — 2px 흔들기
+
+```js
+if_(or_(cmp(getVar(V.spin), '==', num(1)), cmp(getVar(V.spin), '==', num(3))),
+    [locateY(num(BASE_Y))], [locateY(num(BASE_Y + 2))]),
+```
+
+좌표 블록은 글상자에서도 안전하다. 등장 연출은 `glideTo`(`locate_xy_time`) 로
+무대 밖에서 미끄러뜨리면 된다.
+
+> ⚠️ 장면을 떠나면 `entity.reset()` 이 좌표를 spec 값으로 되돌린다 →
+> [07 §장면 재진입](07-runtime-quirks.md#장면을-다시-들어가도-실행기는-쌓이지-않는다--대신-entityreset-이-좌표를-되돌린다).
+> 위치를 바꾸는 연출은 **`장면이 시작되었을 때` 첫 줄에서 좌표를 다시 잡는다.**
+
+### 타자기 — `substring` 은 범위를 넘으면 **throw** 다
+
+긴 답변을 한 번에 툭 띄우지 않고 조금씩 드러내면 체감 대기가 줄어든다.
+단계 수를 고정하면 길이와 무관하게 시간이 일정하다.
+
+```js
+const REVEAL_STEPS = 12, REVEAL_TICK = 0.03;   // 최대 0.36초
+
+const revealText = (valueExpr) => [
+    setVar(V.answer, valueExpr),
+    setVar(V.reveal, num(0)),
+    if_(cmp(strLen(getVar(V.answer)), '>', num(0)), [          // 빈 문자열 가드
+        setVar(V.step,
+            calc(quotient(strLen(getVar(V.answer)), num(REVEAL_STEPS)), '+', num(1))),
+        repeat.basic(num(REVEAL_STEPS), [
+            setVar(V.reveal, calc(getVar(V.reveal), '+', getVar(V.step))),
+            if_(cmp(getVar(V.reveal), '>=', strLen(getVar(V.answer))), [stopRepeat()]),
+            writeText(substr(getVar(V.answer), num(1), getVar(V.reveal))),
+            wait(REVEAL_TICK),
+        ]),
+    ]),
+    writeText(getVar(V.answer)),   // 무슨 일이 있어도 전문으로 끝낸다
+];
+```
+
+두 가지가 안전장치다.
+
+1. **끝을 넘기 전에 `stopRepeat`.** `substring` 은 clamp 가 아니라 `throw` 다 →
+   [07 §char_at·substring throw](07-runtime-quirks.md#char_at--substring-은-범위를-벗어나면-throw--문자열-타일맵에-가드-필수).
+   `reveal >= 길이` 면 자르지 않고 루프를 끊는다.
+2. **루프 뒤에 전문 쓰기.** 걸음 계산이 어긋나도 화면에는 항상 완성된 글이 남는다.
+   `step = ⌊len/12⌋ + 1` 이므로 `12 × step ≥ len + 1` — 12 걸음 안에 반드시 끝난다.
+
+`writeText`(`text_write`)는 **자기 글상자에만** 쓴다. 상태 표시를 다른 글상자로 나누려면
+변수를 통해 건네고 그쪽에서 폴링한다 → [§HUD textBox 갱신](#hud-textbox-갱신--last_shown-변수로-flicker-회피).
+
+### 정적인 상태는 **바뀔 때 한 번만** 쓴다
+
+애니메이션이 아닌 문구까지 매 틱 `writeText` 하면 `setText` → `updateBG` →
+`Entry.stage.updateObject()` 가 계속 돌아 깜빡인다. 상태 코드를 변수에 두고
+전이할 때만 쓴다.
+
+```js
+repeat.inf([
+    if_(cmp(getVar(V.phase), '!=', getVar(V.lastPhase)), [
+        setVar(V.lastPhase, getVar(V.phase)),
+        ...정적 문구 분기...,
+    ]),
+    if_(cmp(getVar(V.phase), '==', num(PH.thinking)), [ ...매 틱 회전... ]),
+    wait(0.16),
+]),
+```
+
 ## `wait_until` 패턴 — `repeat.inf + stopRepeat`
 
 DSL 에 직접 `wait_until` 이 없지만 자주 필요 (특정 조건 만족까지 블로킹). Entry 의 `repeat_while_true` 블록을 쓰는 대신 `repeat.inf` + `stopRepeat` 으로 표현:

@@ -1433,3 +1433,240 @@ else                         return left - right * Math.floor(left / right);
 
 - [`games/hexo/spec.mjs`](../games/hexo/spec.mjs) — 커서 ↑↓ 의 홀짝 분기(`나머지(커서r, 2)`)를
   음수 r 에서 보정 없이 사용. 빌드 타임 어서션은 JS 쪽을 `((r%2)+2)%2` 로 맞춰 대조한다.
+
+
+---
+
+## 글상자 entity 를 비워두면 `fontSize` 가 **NaN** — 글자가 10px 로 쪼그라든다
+
+spec 에서 글상자 entity 를 `{ x: 0, y: 0 }` 처럼만 주면 make-ent 의 기본값이 채워진다.
+그 기본값은 **sprite 기준**이라 `font: 'undefinedpx '` 가 들어간다
+([`tools/make-ent.mjs`](../tools/make-ent.mjs) `makeDefaultEntity`).
+
+sprite 에서는 이 문자열이 관례지만([03 §Entity](03-objects-and-assets.md#entity)),
+글상자에서는 **폰트 크기 파서를 그대로 통과한다**:
+
+```js
+// entity.js  setFont()
+this.setFontSize(parseFloat(fontArray.shift()));   // parseFloat('undefinedpx') === NaN
+```
+
+```js
+// entity.js  _syncFontStyle()
+style.fontSize = `${this.getFontSize()}px`;        // → 'NaNpx'
+```
+
+`setFontSize` 는 `if (this.fontSize === fontSize) return;` 로만 걸러서 `NaN !== NaN` 때문에
+**매번 통과한다** — 방어가 없다. 최종적으로 캔버스가 `context.font = '... NaNpx ...'` 를
+받는데 이건 파싱 실패라 브라우저가 **직전 폰트(기본 10px sans-serif)** 를 유지한다.
+
+### 증상이 "안 보인다" 로 온다
+
+에러도 경고도 없다. 글자는 그려지지만 10px 라, 여기에 줄바꿈까지 없으면
+(아래 §`lineBreak`) 긴 문장이 한 줄로 좌우로 뻗어 **화면에는 문장 가운데 토막만
+아주 작게** 남는다. "글상자에 글이 안 나온다" 로 보고되지만 원인은 폰트다.
+
+### 처방 — 보이는 글상자는 entity 를 전부 명시
+
+```js
+entity: {
+    x: 0, y: 0, regX: 0, regY: 0, scaleX: 1, scaleY: 1,
+    rotation: 0, direction: 90,
+    textAlign: 0, lineBreak: true,          // 0 = 가운데 (1 이 아니다)
+    width: 440, height: 130,
+    font: '16px NanumGothic', fontSize: 16, // 둘 다 준다
+    colour: '#e8eef7', bgColor: 'transparent',
+    visible: true,
+}
+```
+
+`font` 만 주면 `syncModel_` 의 `setFontSize(fontSize || this.getFontSize())` 가 `undefined`
+를 만나 앞서 파싱한 값으로 되돌아간다 — `fontSize` 를 같이 주는 편이 안전하다.
+헬퍼로 감싸서 빠뜨릴 수 없게 만드는 걸 권한다.
+
+### 증거
+
+- [`entity.js`](../../entryjs/src/class/entity.js) `setFont` · `setFontSize` · `_syncFontStyle`
+- 같은 파일 `syncModel_` — 호출 순서
+  (`setScaleX` → `setLineBreak` → `setWidth` → `setHeight` → `setText` → `setTextAlign` → `setFontSize`)
+- 가드: [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §① · 픽스처 [`tests/fixtures/spec-textbox-layout.mjs`](../tests/fixtures/spec-textbox-layout.mjs) 의 `기본entity` 오브젝트가
+  **함정을 그대로 재현**한다(`entity: { x, y }` 만 준 글상자). 실측에서 `fontSize === NaN`.
+  이 단언이 깨지면 make-ent 가 고쳐진 것이니 이 문서와 [03](03-objects-and-assets.md#textbox-오브젝트) 를 함께 갱신할 것.
+
+---
+
+## `lineBreak: true` 는 `height` 를 넘는 줄을 **그리지 않고 버린다**
+
+[§textBox 정렬](#textbox-정렬--regxregy-강제-0-가운데는-textalign0-1-아님) 이 고정 폭을 위해
+`lineBreak: true` 를 권하는데, 켜면 **세로 클리핑**이 함께 따라온다.
+
+`alignTextBox()` 가 `textObject.style.maxHeight = this.getHeight()` 를 걸고, 렌더러가
+그 밖의 줄을 건너뛴다:
+
+```js
+// PIXIText.js
+const MAX_HEIGHT = style.maxHeight < 0 ? 0xffff : style.maxHeight - H_LH;
+for (let i = 0; i < lines.length; i++) {
+    linePositionY = style.strokeThickness / 2 + i * lineHeight + H_LH;
+    if (WORD_WRAP && linePositionY > MAX_HEIGHT) break;   // ← 조용히 잘림
+```
+
+`lineHeight` 는 `fontSize + 2` (`entity.js` `setLineHeight`) 이므로
+**들어가는 줄 수 ≈ `height / (fontSize + 2)`**. 잘려도 에러가 없고 `entity.getText()` 에는
+전문이 남아 있어서, 변수만 찍어 보면 "값은 맞는데 화면만 짧다" 로 보인다.
+
+| `lineBreak` | 폭 | 세로 |
+|---|---|---|
+| `false` | `setTextAlign` 이 **내용 길이로 덮어씀**(spec 의 width 무시) → 한 줄로 화면 밖까지 | 클리핑 없음 |
+| `true` | `width` 에서 접힘 (고정 폭) | **`height` 초과분 삭제** |
+
+길이를 모르는 텍스트(AI 응답, 사용자 입력)를 담을 땐 최악 길이로 `height` 를 잡는다.
+
+### 증거
+
+- [`entity.js`](../../entryjs/src/class/entity.js) `alignTextBox` · `setLineBreak`
+- [`PIXIText.js`](../../entryjs/src/class/pixi/text/PIXIText.js) `MAX_HEIGHT` break
+- ⚠️ **줄 수를 폭으로 검증하면 안 된다.** CreateJS 경로(`GEHelper.isWebGL === false`)의
+  `getMeasuredWidth()` 는 **줄바꿈을 무시하고 원문 전체를 잰다**. 두 렌더러 모두
+  `getMeasuredHeight()` 는 `lineWidth` 를 반영하므로 **높이 ÷ lineHeight 로 줄 수를 센다.**
+  (로컬 편집기는 CreateJS, playentry.org 는 PIXI 로 뜰 수 있어 실측 결과가 갈린다.)
+- 가드: [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §② — 폭 300·`fontSize` 16·`height` 60 글상자에
+  70자를 넣어 **4줄로 접히고 3줄만 그려지는 것**과 `maxHeight === height`,
+  `lineHeight === fontSize + 2` 를 단언한다.
+
+---
+
+## `묻고 대답 기다리기` — 입력칸이 무대 아래 **−71 부터**를 덮고, 말풍선은 `hide()` 로 안 사라진다
+
+이 블록은 두 가지를 화면에 얹는다. 둘 다 레이아웃을 짤 때 계산에 넣어야 한다.
+
+### 1. 입력칸 — 엔트리 좌표 −71 ~ −112
+
+```js
+// stage.js  _createInputField()
+const posX = 15, posY = 275;
+new classRef({ width: 520, height: 24, padding: 13, borderWidth: 2, x: posX, y: posY, … })
+```
+
+캔버스 좌표계(640×360) 기준이다. 세로로 `24 + 13×2 + 2×2 = 54px` 를 차지하므로
+캔버스 y `275 ~ 329`. [무대 논리 좌표 변환](#stage-논리-좌표-vs-canvas-렌더-픽셀--clickstagepoint-변환-공식)
+(`엔트리y = 135 − 캔버스y × 0.75`)을 적용하면
+
+> **엔트리 좌표 y −71 부터 −112 까지는 입력칸 자리다.**
+
+여기에 글상자를 두면 `visible: true` 이고 좌표도 맞는데 **눈에는 안 보인다**.
+`묻기` 를 쓰는 작품은 세로 예산을 `135 ~ −71` (206 단위)로 잡는다.
+
+입력칸은 답을 받으면 숨겨지고 다음 `묻기` 에 다시 뜬다. 장면을 바꿔도
+`resetSceneDuringRun` 이 `Entry.stage.hideInputField()` 를 부른다
+(아래 §장면 재진입).
+
+### 2. 말풍선 — `hide()` 로는 안 사라진다
+
+```js
+// block_variable.js  ask_and_wait.func
+Entry.stage.showInputField();
+new Entry.Dialog(sprite, Entry.convertToRoundedDecimals(message, 3), 'ask');
+```
+
+말풍선은 묻는 오브젝트에 붙는다. 오브젝트를 숨겨도 남는다 —
+`syncDialogVisible()` 은 **`setVisible` 이 호출될 때만** 돌고, 말풍선은 그 뒤에 생기므로
+`visible: true` 인 채로 태어난다. `hide()` 를 먼저 걸어둔 오브젝트가 나중에 물으면
+**말풍선만 떠 있다.**
+
+### 회피 — 묻는 오브젝트를 **무대 오른쪽 밖**으로
+
+```js
+entity: { x: 500, … visible: false }
+```
+
+말풍선 위치는 오브젝트 bound 로 정하는데, 두 가지가 겹쳐서 오른쪽만 통한다
+([`dialog.ts`](../../entryjs/src/class/dialog.ts) `setNotchPositionForPixi`):
+
+```js
+if (notchType.includes('e')) {                     // 오브젝트가 무대 왼쪽에 있을 때
+    this.object.x = Math.min(bound.x + bound.width + this.width / 2,
+                             240 - this.width / 2 - this.padding);   // ← 오른쪽으로 clamp
+} else {                                           // 오브젝트가 무대 오른쪽에 있을 때
+    this.object.x = Math.max(bound.x - this.width / 2,
+                             -240 + this.width / 2 + this.padding);  // ← 왼쪽으로만 clamp
+}
+```
+
+`w` 가지에는 **위쪽 clamp 가 없다.** `x: 500` 이면 말풍선이 `500 − 폭/2` 로 가서
+무대(±240) 밖으로 나가 렌더되지 않는다. 반대로 `x: -500` 은 `Math.min` 에 걸려
+왼쪽 가장자리에 붙는다 — **반드시 오른쪽(양수)으로 보낼 것.**
+
+보험이 필요하면 같은 오브젝트의 **두 번째 스레드**에서 `말풍선 지우기`(`remove_dialog`)를
+부른다. `sprite.dialog.remove()` 가 `parent.dialog = null` 로 만들 뿐이고
+`ask_and_wait` 의 완료 처리도 `if (sprite.dialog)` 로 가드돼 있어 깨지지 않는다
+([`block_looks.js`](../../entryjs/src/playground/blocks/block_looks.js) `remove_dialog`).
+`묻기` 는 블로킹이므로 가드 스레드는 같은 메시지 핸들러를 하나 더 두면 된다
+(`신호 보내고 기다리기` 는 두 스레드를 모두 기다리지만 가드 쪽은 즉시 끝난다).
+
+안내 문구는 말풍선 대신 **화면 안의 글상자**로 보여주는 편이 낫다 — 말풍선은 위치·폭을
+제어할 수 없다.
+
+### 증거
+
+- [`stage.js`](../../entryjs/src/class/stage.js) `_createInputField` · [`block_variable.js`](../../entryjs/src/playground/blocks/block_variable.js) `ask_and_wait` · [`dialog.ts`](../../entryjs/src/class/dialog.ts) `setNotchPositionForPixi` · [`entity.js`](../../entryjs/src/class/entity.js) `syncDialogVisible`
+- 가드: [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §③ — `묻기` 를 실제로 실행해 입력칸 윗변 **−71.3** ·
+  아랫변 **−111.8**(세로 54px)을 재고, `x: 500` 인 오브젝트의 말풍선이 **x ≈ 412** 로
+  무대(±240) 밖에 있는 것과 `hide()` 를 해도 `dialog.object.visible !== false` 인 것을 단언한다.
+
+### 곁다리 — `대답` 변수는 기본이 숨김
+
+`variableType: 'answer'` 변수는 `visible: false` 로 생성된다
+([`variable_container.js`](../../entryjs/src/class/variable_container.js) `generateAnswer`).
+무대에 값 상자가 뜰 걱정은 없다. (임의로 만들면 안 되는 이유는 [lessons.md](lessons.md) 참조.)
+
+---
+
+## 장면을 다시 들어가도 **실행기는 쌓이지 않는다** — 대신 `entity.reset()` 이 좌표를 되돌린다
+
+`start_scene` 은 `selectScene` + `fireEvent('when_scene_start')` 뿐이고
+([`block_start.js`](../../entryjs/src/playground/blocks/block_start.js) `start_scene.func`),
+`Code.raiseEvent` 는 **무조건 새 Executor 를 push** 한다
+([`code.js`](../../entryjs/src/playground/code.js) `raiseEvent`). 여기까지만 읽으면
+"장면을 왕복하면 `repeat.inf` 스레드가 2개, 3개로 늘어난다" 는 결론이 나온다.
+**틀렸다** — 그 앞에서 정리된다.
+
+```js
+// scene.js  selectScene()
+container.resetSceneDuringRun();
+```
+
+```js
+// container.js
+resetSceneDuringRun() {
+    if (!Entry.engine.isState('run')) return;        // ← 정지 상태면 아무것도 안 함
+    this.mapEntityOnScene((entity) => entity.reset());
+    this.clearRunningStateOnScene();                 // → object.clearExecutor() → script.clearExecutors()
+    Entry.stage.hideInputField();
+}
+```
+
+**떠나는 장면**의 오브젝트마다 실행기가 통째로 비워진다. 그래서
+`대화 장면 → 안내 장면 → 로딩 장면 → 대화 장면` 을 몇 번 돌아도 루프는 하나뿐이다.
+`자신의 다른 코드 멈추기` 같은 가드를 넣을 필요가 없다.
+
+### 따라오는 사실 — 좌표·크기는 **장면에 들어올 때마다 다시 잡는다**
+
+같은 함수가 `entity.reset()` 도 부른다. 런타임에 `locate_xy` 로 옮겨 둔 위치, 바꿔 둔 크기는
+장면을 떠나는 순간 **spec 의 entity 값으로 돌아간다**. 등장 애니메이션처럼 좌표를
+움직이는 연출은 `장면이 시작되었을 때` 스레드 첫 줄에서 위치를 다시 세팅해야
+두 번째 진입에서도 같게 보인다.
+
+### 함께 볼 것
+
+- 값이 **언제** 보이느냐는 별개 문제다 → [§장면 재진입 순서](#장면을-다시-들어가면-when_scene_start-들이-지난-판의-값을-먼저-읽는다)
+  (실행기는 새것인데 **변수는 지난 판 값**인 구간이 있다).
+- 첫 장면에서는 `when_scene_start` 가 아예 발화하지 않는다 →
+  [§when_scene_start 첫 장면 미발화](#when_scene_start-는-시작-시-첫-장면에서-발화-안-함--start_scene-전환에서만).
+
+### 증거
+
+- [`scene.js`](../../entryjs/src/class/scene.js) `selectScene` · [`container.js`](../../entryjs/src/class/container.js) `resetSceneDuringRun`/`clearRunningStateOnScene` · [`object.js`](../../entryjs/src/class/object.js) `clearExecutor`
+- 가드: [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §④ — 장면 3회 왕복 후 `repeat.inf` 오브젝트의
+  `script.executors.length === 1` 을 단언하고, 런타임에 옮긴 좌표가 `entity.reset()` 으로
+  spec 값으로 되돌아오는 것까지 확인한다.

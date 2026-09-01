@@ -12,6 +12,52 @@
 > - 플랫포머 발판 충돌 패턴 → `04-script-and-blocks.md §플랫포머 발판 충돌 패턴`
 > - 헤드리스 런타임 검증 → `05-host-editor.md §헤드리스 런타임 검증`
 
+## 2026-09-01 — 글상자 화면·콘솔 붙여넣기 배포 (외부 작품에서 역수입)
+
+이 저장소 밖 작품(playentry AI 챗봇, `.ent` 를 이 파이프라인으로 빌드)에서 화면을 다시
+짜다 밟은 함정들을 위키로 들여왔다. 공통점은 **에러도 경고도 없이 화면만 틀린다**는 것.
+
+- **글상자 entity 를 비워두면 `fontSize` 가 NaN** → [07 §fontSize NaN](07-runtime-quirks.md#글상자-entity-를-비워두면-fontsize-가-nan--글자가-10px-로-쪼그라든다) 신설.
+  `makeDefaultEntity()` 는 sprite 기준이라 `font: 'undefinedpx '` 를 넣는데, 글상자에서는
+  `parseFloat` 를 통과해 `style.fontSize = 'NaNpx'` 가 된다. 캔버스가 파싱에 실패해
+  **직전 폰트(기본 10px)** 로 그린다. `setFontSize` 의 중복 방지가 `===` 라 `NaN` 은 매번 통과.
+  → 03 의 §textBox 에 **필수 필드 체크리스트**, §Entity 의 `font` 행에 경고 추가.
+- **`lineBreak: true` 는 `height` 를 넘는 줄을 그리지 않고 버린다** →
+  [07 §lineBreak 세로 클리핑](07-runtime-quirks.md#linebreak-true-는-height-를-넘는-줄을-그리지-않고-버린다) 신설.
+  기존 §textBox 정렬이 고정 폭을 위해 `lineBreak: true` 를 권하는데, 세로 클리핑이
+  따라온다는 사실이 빠져 있었다. `entity.getText()` 에는 전문이 남아 변수만 보면 안 잡힌다.
+  **줄 수 검증은 폭이 아니라 높이로** — CreateJS 의 `getMeasuredWidth()` 는 줄바꿈을 무시한다
+  (로컬 편집기 CreateJS / playentry PIXI 로 갈린다).
+- **`묻고 대답 기다리기` 가 무대 아래 y −71 ~ −112 를 덮는다** →
+  [07 §묻기 입력칸·말풍선](07-runtime-quirks.md#묻고-대답-기다리기--입력칸이-무대-아래-71-부터를-덮고-말풍선은-hide-로-안-사라진다) 신설.
+  `_createInputField` 의 캔버스 y 275 + 세로 54px 를 논리 좌표로 환산한 값.
+  말풍선은 `hide()` 로 안 사라진다(`syncDialogVisible` 은 `setVisible` 때만 돈다) —
+  묻는 오브젝트를 **`x: 500`(오른쪽 밖)** 으로 보낸다. `dialog.ts` 의 `w` 가지가 `Math.max`
+  라 위쪽 clamp 가 없다. **`x: -500` 은 `Math.min` 에 걸려 안 통한다.**
+- **장면 재진입에 실행기 가드는 필요 없다** →
+  [07 §장면 재진입 실행기](07-runtime-quirks.md#장면을-다시-들어가도-실행기는-쌓이지-않는다--대신-entityreset-이-좌표를-되돌린다) 신설.
+  `Code.raiseEvent` 가 무조건 새 Executor 를 push 하는 것만 보고 "왕복하면 루프가 2개"
+  라고 추론해 `자신의 다른 코드 멈추기` 를 7군데 넣었다가, 실측으로 뒤집고 **되돌렸다** —
+  `selectScene` 첫 줄의 `resetSceneDuringRun()` 이 떠나는 장면의 실행기를 이미 지운다.
+  대신 같은 함수가 `entity.reset()` 을 부르므로 **좌표 연출은 장면 진입 때마다 다시 잡는다.**
+  (값이 언제 보이느냐는 별개 — 기존 §장면 재진입 순서와 짝으로 읽을 것.)
+- **글상자만으로 애니메이션** → [04 §글상자만으로 애니메이션](04-script-and-blocks.md#글상자만으로-애니메이션--글자-프레임--좌표--타자기) 신설.
+  효과 블록이 막혀 있으니(기존 §효과 블록과 글상자) 남는 건 **글자·좌표·show/hide** 셋.
+  폭이 같은 회전 프레임(`●○○○`), 2px 흔들기, `substring` 가드가 들어간 타자기 표시.
+  기호는 **KS X 1001 안에서만** — 점자(`⠋`)·블록(`▁`)은 나눔고딕 밖이라 두부가 된다.
+- **콘솔 붙여넣기 배포** → [05 §playentry.org 배포](05-host-editor.md#playentryorg-배포--기존-작품에-projectjson-만-갈아끼우기-콘솔-붙여넣기) 신설.
+  `.ent` 를 새로 올리면 조회수·좋아요·댓글이 0 부터 시작한다. `Entry.clearProject()` +
+  `Entry.loadProject(json)` + `Entry.projectId` 보존으로 **같은 작품에 내용만** 교체한다.
+  전제는 **에셋 0** — tar 의 그림·소리는 콘솔로 못 옮긴다. 그래서 오브젝트를 전부
+  글상자로 만든다(sprite 는 picture 가 최소 1장 필요). 빌드 스크립트에 자립성 검사를
+  넣어 나중에 그림이 추가되면 생성이 거부되게 한다.
+- **회귀 가드 신설** — [`tests/fixtures/spec-textbox-layout.mjs`](../tests/fixtures/spec-textbox-layout.mjs)
+  + [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) (19 단언).
+  위 네 주장을 **실제 엔진에서** 확인한다: `entity: {x,y}` 만 준 글상자의 `fontSize === NaN`
+  재현 · 70자가 4줄로 접히고 3줄만 그려짐 · 입력칸 윗변 −71.3 / 아랫변 −111.8 ·
+  `x:500` 오브젝트의 말풍선이 x ≈ 412(무대 밖) · 장면 3회 왕복 후 실행기 1개 +
+  `entity.reset()` 의 좌표 복원. `run-all-verify` 가 자동 수집한다.
+
 ## 2026-08-15 (2) — 무한 판 전환 (hexo)
 
 고정 13×11 판을 **무한 판 + 방향키 스크롤**로 바꿨다. 격자 배열을 버리고 **착수 기록**만
