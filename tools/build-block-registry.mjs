@@ -20,6 +20,15 @@ const ENTRYJS  = path.resolve(ROOT, '..', 'entryjs');
 const BLOCKS_DIR = path.join(ENTRYJS, 'src', 'playground', 'blocks');
 const OUT_FILE   = path.join(ROOT, 'tools', 'block-registry.json');
 
+// Blocks also live OUTSIDE blocks/: `block_entry.js` (one level up) defines ~200 of
+// them — primitives (number/angle/color), value blocks (get_pictures, get_sounds,
+// calc_*, get_x_coordinate), and hardware/UI helpers. Missing these made `--check`
+// reject specs that used perfectly valid blocks.
+// Order matters and mirrors the engine: block_entry.js:8083 does
+//   Entry.block = Object.assign(Entry.block, getBlocks(), blocks.getBlocks())
+// so blocks/ wins on the (rare) duplicate. We scan extras first for the same reason.
+const EXTRA_FILES = [path.join(ENTRYJS, 'src', 'playground', 'block_entry.js')];
+
 if (!fs.existsSync(BLOCKS_DIR)) {
     console.error('[registry] entryjs source not found at', ENTRYJS);
     console.error('[registry] run `npm run setup -- --with-entryjs-src` first (source clone only — no build needed)');
@@ -104,12 +113,25 @@ function summarizeBlockDef(objExpr) {
 }
 
 // Find every `return { ... }` within a function whose name hints at block export.
-// The top-level pattern is `module.exports = { getBlocks() { return { ... } } }`.
-// We recursively collect all top-level ObjectExpressions returned from any
-// function called `getBlocks`; this is robust to minor file-to-file variance.
+// Two shapes exist in the source tree:
+//   blocks/block_*.js  → `module.exports = { getBlocks() { return { ... } } }`  (Property)
+//   block_entry.js     → `function getBlocks() { return { ... } }`             (FunctionDeclaration)
+// Handling only the first silently dropped every block in block_entry.js.
 function parseBlockFile(src) {
     const ast = acorn.parse(src, { ecmaVersion: 2022, sourceType: 'module' });
     const blocks = [];
+
+    // Walk a getBlocks() body for ReturnStatement → ObjectExpression.
+    const collectFrom = (fnBody) => {
+        walk.simple(fnBody, {
+            ReturnStatement(ret) {
+                if (ret.argument && ret.argument.type === 'ObjectExpression') {
+                    blocks.push(...extractBlocks(ret.argument));
+                }
+            }
+        });
+    };
+
     walk.simple(ast, {
         Property(node) {
             // Methods like `getBlocks() { ... }`
@@ -117,28 +139,31 @@ function parseBlockFile(src) {
             if (k !== 'getBlocks') return;
             const fn = node.value;
             if (!fn || (fn.type !== 'FunctionExpression' && fn.type !== 'ArrowFunctionExpression')) return;
-            // Walk the function body for ReturnStatement → ObjectExpression
-            walk.simple(fn.body, {
-                ReturnStatement(ret) {
-                    if (ret.argument && ret.argument.type === 'ObjectExpression') {
-                        blocks.push(...extractBlocks(ret.argument));
-                    }
-                }
-            });
+            collectFrom(fn.body);
+        },
+        FunctionDeclaration(node) {
+            // Standalone `function getBlocks() { ... }`
+            if (!node.id || node.id.name !== 'getBlocks') return;
+            collectFrom(node.body);
         }
     });
     return blocks;
 }
 
-const files = fs.readdirSync(BLOCKS_DIR)
-    .filter(n => /^block_.*\.js$/.test(n))
-    .sort();
+// Extras first, blocks/ last — see EXTRA_FILES comment (engine's Object.assign order).
+const sources = [
+    ...EXTRA_FILES.filter(p => fs.existsSync(p)),
+    ...fs.readdirSync(BLOCKS_DIR)
+        .filter(n => /^block_.*\.js$/.test(n))
+        .sort()
+        .map(n => path.join(BLOCKS_DIR, n)),
+];
 
 const registry = {};
 const issues = [];
 
-for (const file of files) {
-    const absPath = path.join(BLOCKS_DIR, file);
+for (const absPath of sources) {
+    const file = path.basename(absPath);
     let src;
     try { src = fs.readFileSync(absPath, 'utf8'); }
     catch (e) { issues.push({ file, phase: 'read', error: e.message }); continue; }
