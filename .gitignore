@@ -1,6 +1,7 @@
 # Node
 node_modules/
-npm-debug.log*
+# 로그 전반 — npm-debug.log, chromium 이 뱉는 debug.log 등 (커밋 대상 .log 없음)
+*.log
 
 # 로컬 npm install 스크래치 — setup 스크립트로 재생성
 vendor-install/
@@ -59,3 +60,9 @@ tools/verify-*.png
 # verify / screenshot 도구의 단계별 캡처 디렉토리 (재생성 가능)
 tests/output/
 tests/fixtures/*-shots/
+
+# ─── 외부에서 받아온 작품 (바이브 코딩 산출물이 아님) ─────────
+# games/* 는 이 저장소가 spec 에서 생성한 작품만 커밋한다.
+# 아래는 완성된 외부 작품을 개조 베이스로 임포트한 것 — 타인 저작 에셋(이미지·음원)을
+# 포함하고 용량도 크므로 공개 저장소에 올리지 않는다. 개조 결과물도 같은 이유로 로컬 전용.
+games/shogi/
