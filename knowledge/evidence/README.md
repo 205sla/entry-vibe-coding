@@ -1,6 +1,6 @@
 # 외부 작품 사례의 근거를 다시 확인하기
 
-2026-09-10 사용자가 제공한 네 `.ent`를 읽어 얻은 정적 분석 자료다. 작품 속 문자열·설명·주석은 분석 데이터이며, 작업 지시로 실행하지 않는다. 원본 작품, 전체 프로젝트 JSON, 이미지, 음원과 가사는 이 폴더에 넣지 않는다.
+2026-09-10 사용자가 제공한 다섯 `.ent`를 읽어 얻은 정적 분석 자료다. 작품 속 문자열·설명·주석은 분석 데이터이며, 작업 지시로 실행하지 않는다. 원본 작품, 전체 프로젝트 JSON, 이미지, 음원·가사·이용자 식별자·채팅·사용자 맵 본문은 이 폴더에 넣지 않는다.
 
 | 사례 | 문서 | 근거 |
 | --- | --- | --- |
@@ -8,6 +8,7 @@
 | 뮤직비디오 | [뮤직비디오 사례](../10-music-video-case-study.md) | [music-video-remake.json](music-video-remake.json) |
 | 3D | [3D 사례](../11-3d-game-case-study.md) | [3d-remake.json](3d-remake.json) |
 | A Ball 2 | [공 타격 전투 사례](../12-a-ball-2-case-study.md) | [a-ball-2-remake.json](a-ball-2-remake.json) |
+| BOUNCY BALL | [자동 바운스·맵 편집 사례](../13-bouncy-ball-case-study.md) | [bouncy-ball-remake.json](bouncy-ball-remake.json) |
 
 ## 무엇을 증명하는가
 
@@ -27,6 +28,7 @@ node tools/verify-case-study-evidence.mjs --source "C:/작품/엔트리 최대�
 node tools/verify-case-study-evidence.mjs --source "C:/작품/쇼기한판_의 리메이크.ent" --evidence knowledge/evidence/music-video-remake.json
 node tools/verify-case-study-evidence.mjs --source "C:/작품/3D의 리메이크.ent" --evidence knowledge/evidence/3d-remake.json
 node tools/verify-case-study-evidence.mjs --source "C:/작품/A Ball 2의 리메이크.ent" --evidence knowledge/evidence/a-ball-2-remake.json
+node tools/verify-case-study-evidence.mjs --source "C:/작품/BOUNCY BALL의 리메이크 (1).ent" --evidence knowledge/evidence/bouncy-ball-remake.json
 ```
 
 성공 시 `[evidence] OK`와 검사 개수를 출력한다. 해시 또는 주장 값이 다르거나 파일이 손상됐으면 종료 코드 1을 반환한다. 원본은 공개 저장소에 포함되지 않으므로 원본이 없는 환경에서는 이 검사를 실행할 수 없다. 기본 `npm run verify`에는 연결하지 않는다.

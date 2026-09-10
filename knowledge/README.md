@@ -21,6 +21,7 @@
 | **뮤직비디오**의 모양 시퀀스·타이머·신호별 레이어를 설계할 때 | [10-music-video-case-study.md](10-music-video-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
 | **3D 표현**의 직교투영·법선·면 선택·회전 수식을 참고할 때 | [11-3d-game-case-study.md](11-3d-game-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
 | **공 타격 전투·웨이브·스킬 선택**을 설계할 때 | [12-a-ball-2-case-study.md](12-a-ball-2-case-study.md) | Case study · 현행 · 정적 확인 · 2026-09-10 |
+| **자동 바운스·맵 편집·클리어 후 저장**을 설계할 때 | [13-bouncy-ball-case-study.md](13-bouncy-ball-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
 | 사례의 원본 버전과 블록 근거를 다시 검사할 때 | [evidence/README.md](evidence/README.md) | 재검증 절차 · 2026-09-10 |
 | 과거 해결된 버그 요약 (가드 파일 링크) | [lessons.md](lessons.md) | Lessons |
 | 날짜별로 뭘 배웠는지 | [CHANGELOG.md](CHANGELOG.md) | History |
@@ -106,7 +107,8 @@
 | 대규모 RPG의 복제본 배치·대화 입력·직렬화와 외부 저장 경계 | [09 RPG 사례](09-rpg-case-study.md) | 04 (사례 탐색 링크) |
 | 뮤직비디오의 누적 마감시각·독립 레이어·신호 오케스트레이션 | [10 뮤직비디오 사례](10-music-video-case-study.md) | 04 (사례 탐색 링크) |
 | 정육면체의 직교투영·법선 부호 면 선택·조명 | [11 3D 사례](11-3d-game-case-study.md) | 04 (사례 탐색 링크) |
-| 외부 작품 원본 해시·정규화 JSON pointer 기반 주장 재검증 | [evidence 절차](evidence/README.md) | 09~11 (최소 근거 JSON) |
+| 한글 타일 코드·시간 설정 직렬화·맵 수정 시 클리어 검증 무효화 | [13 BOUNCY BALL 사례](13-bouncy-ball-case-study.md) | 04 (사례 탐색 링크) |
+| 외부 작품 원본 해시·정규화 JSON pointer 기반 주장 재검증 | [evidence 절차](evidence/README.md) | 09~13 (최소 근거 JSON) |
 
 **규칙**: 새 사실 추가 시 위 표에 한 줄 추가. 정본을 두 곳에 둘 일이 생기면 둘 중
 하나가 더 적합한 위치. 모호하면 07 (불변 동작) 또는 04 (블록·패턴) 우선.
@@ -124,7 +126,7 @@
 
 "이런 걸 하려면 이렇게" 유형. 패턴이 개선되면 기존 글을 고쳐서 최신 방법을 유지.
 
-### Case study — `09~12`, `evidence/`
+### Case study — `09~13`, `evidence/`
 
 영속 레퍼런스의 사례 분석이다. 파일 버전·관측 범위를 명시하고 증거와 함께 수정한다. 기존 패턴과 엔진 특성은 정본에 링크하고, 작품의 설계 선택만 해당 사례에서 설명한다. 성능 수치나 실행 보장은 실제 측정 전에는 추가하지 않는다.
 
