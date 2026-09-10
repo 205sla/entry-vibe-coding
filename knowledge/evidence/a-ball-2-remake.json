@@ -1,0 +1,3524 @@
+{
+  "source": {
+    "filename": "A Ball 2의 리메이크.ent",
+    "sha256": "83a2b07b9e587de58f8db7352caa61fdf3cf2eba2077aafd88f65f2c788c95df",
+    "bytes": 11722954,
+    "projectBytes": 2166033
+  },
+  "analysis": {
+    "date": "2026-09-10",
+    "method": "gzip/ustar+normalized JSON static analysis; no editor runtime",
+    "normalization": "JSON.parse objects[*].script/functions[*].content; zero-based RFC6901 pointers"
+  },
+  "stats": {
+    "scenes": 5,
+    "objects": 119,
+    "objectThreads": 301,
+    "objectBlocks": 8385,
+    "functionBlocks": 525,
+    "totalBlocks": 8910,
+    "functions": 14,
+    "messages": 17,
+    "scalarVariables": 57,
+    "lists": 27,
+    "timerVariables": 1,
+    "answerVariables": 1,
+    "objectScopedDeclarations": 18,
+    "pictureReferences": 245,
+    "soundReferences": 40,
+    "archiveImageFiles": 482,
+    "archiveImageExtensions": {
+      "png": 244,
+      "svg": 238
+    },
+    "archiveThumbnailFiles": 244,
+    "archiveSoundFiles": 40,
+    "missingReferencedTempAssets": 0
+  },
+  "statsDefinition": "Block nodes include literals, headers and detached stacks; recursively count type objects in all scripts/function contents. Assets counted as archive entries; references are sprite array totals. Summary stats are not recomputed by the evidence verifier.",
+  "mathChecks": [
+    {
+      "kind": "source AST evaluation",
+      "positions": {
+        "rwm1": {
+          "x": 11,
+          "y": 10
+        },
+        "self": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "velocity": {
+        "x": 2,
+        "y": 2
+      },
+      "afterOneGravityStep": 1.8
+    },
+    {
+      "kind": "derived easing recurrence",
+      "start": 0,
+      "target": 100,
+      "divisor": 10,
+      "iterations": 50,
+      "result": 99.484622479268
+    }
+  ],
+  "assertions": [
+    {
+      "label": "objects 개수",
+      "path": "/objects/length",
+      "expected": 119
+    },
+    {
+      "label": "scenes 개수",
+      "path": "/scenes/length",
+      "expected": 5
+    },
+    {
+      "label": "variables 개수",
+      "path": "/variables/length",
+      "expected": 86
+    },
+    {
+      "label": "functions 개수",
+      "path": "/functions/length",
+      "expected": 14
+    },
+    {
+      "label": "messages 개수",
+      "path": "/messages/length",
+      "expected": 17
+    },
+    {
+      "label": "장면 ID",
+      "path": "/scenes/0/id",
+      "expected": "yd39"
+    },
+    {
+      "label": "장면 이름",
+      "path": "/scenes/0/name",
+      "expected": "썸네일(임시)"
+    },
+    {
+      "label": "장면 ID",
+      "path": "/scenes/1/id",
+      "expected": "7dwq"
+    },
+    {
+      "label": "장면 이름",
+      "path": "/scenes/1/name",
+      "expected": "게임-전투"
+    },
+    {
+      "label": "장면 ID",
+      "path": "/scenes/2/id",
+      "expected": "yuuv"
+    },
+    {
+      "label": "장면 이름",
+      "path": "/scenes/2/name",
+      "expected": "게임-맵"
+    },
+    {
+      "label": "장면 ID",
+      "path": "/scenes/3/id",
+      "expected": "2i0x"
+    },
+    {
+      "label": "장면 이름",
+      "path": "/scenes/3/name",
+      "expected": "게임-종료"
+    },
+    {
+      "label": "장면 ID",
+      "path": "/scenes/4/id",
+      "expected": "1f11"
+    },
+    {
+      "label": "장면 이름",
+      "path": "/scenes/4/name",
+      "expected": "메인화면"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/1/id",
+      "expected": "7733"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/1/name",
+      "expected": "적 타격무효"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/1/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/1/object",
+      "expected": "4la4"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/4/id",
+      "expected": "gibr"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/4/name",
+      "expected": "죽음의 손길 확률"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/4/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/4/object",
+      "expected": null
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/46/id",
+      "expected": "n9f2"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/46/name",
+      "expected": "스테이지"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/46/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/46/object",
+      "expected": null
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/47/id",
+      "expected": "1zfm"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/47/name",
+      "expected": "남은 웨이브"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/47/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/47/object",
+      "expected": null
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/48/id",
+      "expected": "743n"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/48/name",
+      "expected": "적 체력한도"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/48/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/48/object",
+      "expected": null
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/49/id",
+      "expected": "e8q7"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/49/name",
+      "expected": "x 이동량"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/49/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/49/object",
+      "expected": "4la4"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/50/id",
+      "expected": "bb9m"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/50/name",
+      "expected": "글상자 고유번호"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/50/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/50/object",
+      "expected": "9vyi"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/51/id",
+      "expected": "jxe6"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/51/name",
+      "expected": "적 생성 감지"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/51/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/51/object",
+      "expected": null
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/52/id",
+      "expected": "zxhp"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/52/name",
+      "expected": "적 고유번호"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/52/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/52/object",
+      "expected": "4la4"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/54/id",
+      "expected": "jt78"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/54/name",
+      "expected": "y"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/54/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/54/object",
+      "expected": null
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/55/id",
+      "expected": "arrk"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/55/name",
+      "expected": "x"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/55/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/55/object",
+      "expected": null
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/56/id",
+      "expected": "mcix"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/56/name",
+      "expected": "진행 상황"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/56/variableType",
+      "expected": "variable"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/56/object",
+      "expected": null
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/63/id",
+      "expected": "54pg"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/63/name",
+      "expected": "시계용 위치저장"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/63/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/63/object",
+      "expected": "4la4"
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/63/array/length",
+      "expected": 2
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/64/id",
+      "expected": "xopt"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/64/name",
+      "expected": "강화된 스킬"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/64/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/64/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/64/array/length",
+      "expected": 0
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/65/id",
+      "expected": "m5vb"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/65/name",
+      "expected": "강화 설명"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/65/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/65/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/65/array/length",
+      "expected": 26
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/73/id",
+      "expected": "jta7"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/73/name",
+      "expected": "살아있는 적"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/73/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/73/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/73/array/length",
+      "expected": 0
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/75/id",
+      "expected": "yrqc"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/75/name",
+      "expected": "보유한 스킬"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/75/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/75/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/75/array/length",
+      "expected": 0
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/76/id",
+      "expected": "11q9"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/76/name",
+      "expected": "등장할 스킬"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/76/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/76/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/76/array/length",
+      "expected": 3
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/77/id",
+      "expected": "ytgx"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/77/name",
+      "expected": "!!등장할거 고르기"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/77/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/77/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/77/array/length",
+      "expected": 26
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/78/id",
+      "expected": "tlrz"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/78/name",
+      "expected": "스킬 이름"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/78/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/78/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/78/array/length",
+      "expected": 26
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/79/id",
+      "expected": "ewez"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/79/name",
+      "expected": "스킬 설명"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/79/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/79/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/79/array/length",
+      "expected": 26
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/80/id",
+      "expected": "55w9"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/80/name",
+      "expected": "진행 상황 표"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/80/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/80/object",
+      "expected": "rwm1"
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/80/array/length",
+      "expected": 19
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/81/id",
+      "expected": "xub2"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/81/name",
+      "expected": "적 체력"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/81/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/81/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/81/array/length",
+      "expected": 0
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/82/id",
+      "expected": "0uyb"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/82/name",
+      "expected": "적 y"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/82/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/82/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/82/array/length",
+      "expected": 0
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/83/id",
+      "expected": "egjp"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/83/name",
+      "expected": "적 x"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/83/variableType",
+      "expected": "list"
+    },
+    {
+      "label": "변수/리스트 연결",
+      "path": "/variables/83/object",
+      "expected": null
+    },
+    {
+      "label": "리스트 길이",
+      "path": "/variables/83/array/length",
+      "expected": 0
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/1/data",
+      "expected": "1: 플레이어 위치 설정"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/2/data",
+      "expected": "2: 플레이어 공격중"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/3/data",
+      "expected": "3: 적 생성"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/4/data",
+      "expected": "4: 적 이동"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/5/data",
+      "expected": "5: 스킬 선택 시작"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/6/data",
+      "expected": "6: 스킬 선택"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/7/data",
+      "expected": "7: 스킬 고른 후 처리"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/8/data",
+      "expected": "8: 이제 끄자"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/13/data",
+      "expected": "13: 보스 생성 이펙트"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/14/data",
+      "expected": "14: 보스 생성"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/15/data",
+      "expected": "15: 보스 처치 이펙트"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/16/data",
+      "expected": "16: 보스 처치 이펙트 끝"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/17/data",
+      "expected": "17: 강화창 열기"
+    },
+    {
+      "label": "작품 내 단계 설명(코드와 대조)",
+      "path": "/variables/80/array/18/data",
+      "expected": "18: 강화함"
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/10/id",
+      "expected": "89jf"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/10/name",
+      "expected": "I ♥ U 엔트리봇"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/10/script/length",
+      "expected": 4
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/15/id",
+      "expected": "bh1h"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/15/name",
+      "expected": "스킬 고르기 버튼"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/15/script/length",
+      "expected": 2
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/24/id",
+      "expected": "v9k2"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/24/name",
+      "expected": "판"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/24/script/length",
+      "expected": 5
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/26/id",
+      "expected": "iqhu"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/26/name",
+      "expected": "클리어"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/26/script/length",
+      "expected": 1
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/27/id",
+      "expected": "1h1m"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/27/name",
+      "expected": "!!!!!남은 웨이브"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/27/script/length",
+      "expected": 3
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/48/id",
+      "expected": "rwm1"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/48/name",
+      "expected": "플레이어"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/48/script/length",
+      "expected": 4
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/61/id",
+      "expected": "9vyi"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/61/name",
+      "expected": "적 체력 글상자"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/61/script/length",
+      "expected": 3
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/62/id",
+      "expected": "4la4"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/62/name",
+      "expected": "적"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/62/script/length",
+      "expected": 27
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/65/id",
+      "expected": "ulya"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/65/name",
+      "expected": "보스"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/65/script/length",
+      "expected": 38
+    },
+    {
+      "label": "담당 오브젝트",
+      "path": "/objects/96/id",
+      "expected": "j396"
+    },
+    {
+      "label": "담당 이름",
+      "path": "/objects/96/name",
+      "expected": "!!!!말풍선인가"
+    },
+    {
+      "label": "스레드 수",
+      "path": "/objects/96/script/length",
+      "expected": 10
+    },
+    {
+      "label": "핵심 블록 kwx9",
+      "path": "/objects/48/script/0/1/statements/0/5/statements/0/0/statements/0/0/statements/0/0/type",
+      "expected": "locate_x"
+    },
+    {
+      "label": "핵심 블록 kwx9",
+      "path": "/objects/48/script/0/1/statements/0/5/statements/0/0/statements/0/0/statements/0/0/params/0/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 kwx9",
+      "path": "/objects/48/script/0/1/statements/0/5/statements/0/0/statements/0/0/statements/0/0/params/0/params/0",
+      "expected": "95"
+    },
+    {
+      "label": "핵심 블록 qopy",
+      "path": "/objects/48/script/0/1/statements/0/5/statements/0/0/statements/0/0/statements/1/0/statements/0/0/type",
+      "expected": "locate_x"
+    },
+    {
+      "label": "핵심 블록 qopy",
+      "path": "/objects/48/script/0/1/statements/0/5/statements/0/0/statements/0/0/statements/1/0/statements/0/0/params/0/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 qopy",
+      "path": "/objects/48/script/0/1/statements/0/5/statements/0/0/statements/0/0/statements/1/0/statements/0/0/params/0/params/0",
+      "expected": "-95"
+    },
+    {
+      "label": "핵심 블록 ipds",
+      "path": "/objects/48/script/3/1/statements/0/1/statements/0/0/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "핵심 블록 ipds",
+      "path": "/objects/48/script/3/1/statements/0/1/statements/0/0/params/0/type",
+      "expected": "is_clicked"
+    },
+    {
+      "label": "핵심 블록 wdgq",
+      "path": "/objects/48/script/3/1/statements/0/1/statements/0/1/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "핵심 블록 wdgq",
+      "path": "/objects/48/script/3/1/statements/0/1/statements/0/1/params/0/type",
+      "expected": "boolean_not"
+    },
+    {
+      "label": "핵심 블록 wdgq",
+      "path": "/objects/48/script/3/1/statements/0/1/statements/0/1/params/0/params/1/type",
+      "expected": "is_clicked"
+    },
+    {
+      "label": "핵심 블록 uhay",
+      "path": "/objects/48/script/3/1/statements/0/1/statements/0/2/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 uhay",
+      "path": "/objects/48/script/3/1/statements/0/1/statements/0/2/statements/0/0/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 uhay",
+      "path": "/objects/48/script/3/1/statements/0/1/statements/0/2/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 uhay",
+      "path": "/objects/48/script/3/1/statements/0/1/statements/0/2/statements/0/0/params/1/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "핵심 블록 r6no",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/0/type",
+      "expected": "move_x"
+    },
+    {
+      "label": "핵심 블록 r6no",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/0/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 r6no",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/0/params/0/params/0",
+      "expected": "arrk"
+    },
+    {
+      "label": "핵심 블록 3ude",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/1/type",
+      "expected": "move_y"
+    },
+    {
+      "label": "핵심 블록 3ude",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/1/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 3ude",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/1/params/0/params/0",
+      "expected": "jt78"
+    },
+    {
+      "label": "핵심 블록 aakc",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/4/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "핵심 블록 aakc",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/4/params/0",
+      "expected": "jt78"
+    },
+    {
+      "label": "핵심 블록 aakc",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/4/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 aakc",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/4/params/1/params/0",
+      "expected": "-0.2"
+    },
+    {
+      "label": "핵심 블록 kyfs",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/2/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 kyfs",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/2/statements/0/0/params/0",
+      "expected": "jt78"
+    },
+    {
+      "label": "핵심 블록 kyfs",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/2/statements/0/0/params/1/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "핵심 블록 kyfs",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/2/statements/0/0/params/1/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 kyfs",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/2/statements/0/0/params/1/params/0/params/0",
+      "expected": "jt78"
+    },
+    {
+      "label": "핵심 블록 kyfs",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/2/statements/0/0/params/1/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "핵심 블록 kyfs",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/2/statements/0/0/params/1/params/2/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 kyfs",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/2/statements/0/0/params/1/params/2/params/0",
+      "expected": "-1"
+    },
+    {
+      "label": "핵심 블록 yzgk",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 yzgk",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/0/params/0",
+      "expected": "arrk"
+    },
+    {
+      "label": "핵심 블록 yzgk",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/0/params/1/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "핵심 블록 yzgk",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/0/params/1/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 yzgk",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/0/params/1/params/0/params/0",
+      "expected": "arrk"
+    },
+    {
+      "label": "핵심 블록 yzgk",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/0/params/1/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "핵심 블록 yzgk",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/0/params/1/params/2/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 yzgk",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/0/params/1/params/2/params/0",
+      "expected": "-1"
+    },
+    {
+      "label": "핵심 블록 6ihg",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/2/type",
+      "expected": "move_x"
+    },
+    {
+      "label": "핵심 블록 6ihg",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/2/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 6ihg",
+      "path": "/objects/48/script/0/1/statements/0/6/statements/0/3/statements/0/2/params/0/params/0",
+      "expected": "arrk"
+    },
+    {
+      "label": "핵심 블록 jvg1",
+      "path": "/objects/48/script/0/1/statements/0/9/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 jvg1",
+      "path": "/objects/48/script/0/1/statements/0/9/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 jvg1",
+      "path": "/objects/48/script/0/1/statements/0/9/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 jvg1",
+      "path": "/objects/48/script/0/1/statements/0/9/params/1/params/0",
+      "expected": "4"
+    },
+    {
+      "label": "핵심 블록 9nla",
+      "path": "/objects/62/script/1/4/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "핵심 블록 9nla",
+      "path": "/objects/62/script/1/4/params/0/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "핵심 블록 9nla",
+      "path": "/objects/62/script/1/4/params/0/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "핵심 블록 9nla",
+      "path": "/objects/62/script/1/4/params/0/params/3",
+      "expected": "x"
+    },
+    {
+      "label": "핵심 블록 9nla",
+      "path": "/objects/62/script/1/4/params/1",
+      "expected": "egjp"
+    },
+    {
+      "label": "핵심 블록 at6x",
+      "path": "/objects/62/script/1/5/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "핵심 블록 at6x",
+      "path": "/objects/62/script/1/5/params/0/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "핵심 블록 at6x",
+      "path": "/objects/62/script/1/5/params/0/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "핵심 블록 at6x",
+      "path": "/objects/62/script/1/5/params/0/params/3",
+      "expected": "y"
+    },
+    {
+      "label": "핵심 블록 at6x",
+      "path": "/objects/62/script/1/5/params/1",
+      "expected": "0uyb"
+    },
+    {
+      "label": "핵심 블록 6lsy",
+      "path": "/objects/62/script/1/6/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "핵심 블록 6lsy",
+      "path": "/objects/62/script/1/6/params/0/type",
+      "expected": "calc_rand"
+    },
+    {
+      "label": "핵심 블록 6lsy",
+      "path": "/objects/62/script/1/6/params/0/params/1/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 6lsy",
+      "path": "/objects/62/script/1/6/params/0/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 6lsy",
+      "path": "/objects/62/script/1/6/params/0/params/3/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 6lsy",
+      "path": "/objects/62/script/1/6/params/0/params/3/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "핵심 블록 6lsy",
+      "path": "/objects/62/script/1/6/params/1",
+      "expected": "xub2"
+    },
+    {
+      "label": "핵심 블록 x7hd",
+      "path": "/objects/62/script/1/7/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 x7hd",
+      "path": "/objects/62/script/1/7/params/0",
+      "expected": "zxhp"
+    },
+    {
+      "label": "핵심 블록 x7hd",
+      "path": "/objects/62/script/1/7/params/1/type",
+      "expected": "length_of_list"
+    },
+    {
+      "label": "핵심 블록 x7hd",
+      "path": "/objects/62/script/1/7/params/1/params/1",
+      "expected": "egjp"
+    },
+    {
+      "label": "핵심 블록 n4li",
+      "path": "/objects/62/script/1/10/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 n4li",
+      "path": "/objects/62/script/1/10/params/0",
+      "expected": "jxe6"
+    },
+    {
+      "label": "핵심 블록 n4li",
+      "path": "/objects/62/script/1/10/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 n4li",
+      "path": "/objects/62/script/1/10/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 sufe",
+      "path": "/objects/62/script/1/12/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "핵심 블록 sufe",
+      "path": "/objects/62/script/1/12/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 sufe",
+      "path": "/objects/62/script/1/12/params/0/params/0",
+      "expected": "zxhp"
+    },
+    {
+      "label": "핵심 블록 sufe",
+      "path": "/objects/62/script/1/12/params/1",
+      "expected": "jta7"
+    },
+    {
+      "label": "핵심 블록 8339",
+      "path": "/objects/62/script/1/13/type",
+      "expected": "change_value_list_index"
+    },
+    {
+      "label": "핵심 블록 8339",
+      "path": "/objects/62/script/1/13/params/0",
+      "expected": "54pg"
+    },
+    {
+      "label": "핵심 블록 8339",
+      "path": "/objects/62/script/1/13/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 8339",
+      "path": "/objects/62/script/1/13/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 8339",
+      "path": "/objects/62/script/1/13/params/2/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "핵심 블록 8339",
+      "path": "/objects/62/script/1/13/params/2/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "핵심 블록 8339",
+      "path": "/objects/62/script/1/13/params/2/params/3",
+      "expected": "x"
+    },
+    {
+      "label": "핵심 블록 uq47",
+      "path": "/objects/62/script/1/14/type",
+      "expected": "change_value_list_index"
+    },
+    {
+      "label": "핵심 블록 uq47",
+      "path": "/objects/62/script/1/14/params/0",
+      "expected": "54pg"
+    },
+    {
+      "label": "핵심 블록 uq47",
+      "path": "/objects/62/script/1/14/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 uq47",
+      "path": "/objects/62/script/1/14/params/1/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "핵심 블록 uq47",
+      "path": "/objects/62/script/1/14/params/2/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "핵심 블록 uq47",
+      "path": "/objects/62/script/1/14/params/2/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "핵심 블록 uq47",
+      "path": "/objects/62/script/1/14/params/2/params/3",
+      "expected": "y"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/0",
+      "expected": "arrk"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/0/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/0/params/0/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/0/params/0/params/1",
+      "expected": "rwm1"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/0/params/0/params/3",
+      "expected": "x"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/0/params/1",
+      "expected": "MINUS"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/0/params/2/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/0/params/2/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/0/params/2/params/3",
+      "expected": "x"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/1",
+      "expected": "DIVIDE"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/2/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 16pj",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/2/params/1/params/2/params/0",
+      "expected": "5.5"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/0",
+      "expected": "jt78"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/0/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/0/params/0/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/0/params/0/params/1",
+      "expected": "rwm1"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/0/params/0/params/3",
+      "expected": "y"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/0/params/1",
+      "expected": "MINUS"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/0/params/2/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/0/params/2/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/0/params/2/params/3",
+      "expected": "y"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/1",
+      "expected": "DIVIDE"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/2/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 rw73",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/3/params/1/params/2/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/type",
+      "expected": "boolean_and_or"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/0/type",
+      "expected": "boolean_not"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/0/params/1/type",
+      "expected": "reach_something"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/0/params/1/params/1",
+      "expected": "rwm1"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/1",
+      "expected": "OR"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/2/type",
+      "expected": "boolean_basic_operator"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/2/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/2/params/0/params/0",
+      "expected": "wj7r"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/2/params/1",
+      "expected": "NOT_EQUAL"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/2/params/2/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 qf1j",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/5/params/0/params/2/params/2/params/0",
+      "expected": "zxhp"
+    },
+    {
+      "label": "핵심 블록 gljp",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/6/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 gljp",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/6/statements/0/0/params/0",
+      "expected": "7733"
+    },
+    {
+      "label": "핵심 블록 gljp",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/6/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 gljp",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/6/statements/0/0/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 cy5p",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/6/statements/1/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 cy5p",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/6/statements/1/0/params/0",
+      "expected": "7733"
+    },
+    {
+      "label": "핵심 블록 cy5p",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/6/statements/1/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 cy5p",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/6/statements/1/0/params/1/params/0",
+      "expected": "0"
+    },
+    {
+      "label": "핵심 블록 6y78",
+      "path": "/objects/62/script/3/2/type",
+      "expected": "func_hbxr"
+    },
+    {
+      "label": "핵심 블록 6y78",
+      "path": "/objects/62/script/3/2/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 6y78",
+      "path": "/objects/62/script/3/2/params/0/params/0",
+      "expected": "zxhp"
+    },
+    {
+      "label": "핵심 블록 6y78",
+      "path": "/objects/62/script/3/2/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 6y78",
+      "path": "/objects/62/script/3/2/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 xbu1",
+      "path": "/objects/62/script/3/12/type",
+      "expected": "delete_clone"
+    },
+    {
+      "label": "핵심 블록 6jaf",
+      "path": "/objects/62/script/0/2/statements/0/4/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 6jaf",
+      "path": "/objects/62/script/0/2/statements/0/4/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 6jaf",
+      "path": "/objects/62/script/0/2/statements/0/4/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 6jaf",
+      "path": "/objects/62/script/0/2/statements/0/4/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 zliw",
+      "path": "/objects/62/script/0/2/statements/0/8/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 zliw",
+      "path": "/objects/62/script/0/2/statements/0/8/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 zliw",
+      "path": "/objects/62/script/0/2/statements/0/8/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 zliw",
+      "path": "/objects/62/script/0/2/statements/0/8/params/1/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "핵심 블록 4qef",
+      "path": "/objects/62/script/0/2/statements/0/1/statements/0/1/type",
+      "expected": "wait_second"
+    },
+    {
+      "label": "핵심 블록 4qef",
+      "path": "/objects/62/script/0/2/statements/0/1/statements/0/1/params/0/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 4qef",
+      "path": "/objects/62/script/0/2/statements/0/1/statements/0/1/params/0/params/0",
+      "expected": "0"
+    },
+    {
+      "label": "핵심 블록 iztc",
+      "path": "/objects/62/script/0/2/statements/0/1/statements/0/2/statements/0/2/type",
+      "expected": "repeat_basic"
+    },
+    {
+      "label": "핵심 블록 iztc",
+      "path": "/objects/62/script/0/2/statements/0/1/statements/0/2/statements/0/2/params/0/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 iztc",
+      "path": "/objects/62/script/0/2/statements/0/1/statements/0/2/statements/0/2/params/0/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "핵심 블록 rx3v",
+      "path": "/objects/61/script/1/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 rx3v",
+      "path": "/objects/61/script/1/1/params/0",
+      "expected": "bb9m"
+    },
+    {
+      "label": "핵심 블록 rx3v",
+      "path": "/objects/61/script/1/1/params/1/type",
+      "expected": "length_of_list"
+    },
+    {
+      "label": "핵심 블록 rx3v",
+      "path": "/objects/61/script/1/1/params/1/params/1",
+      "expected": "xub2"
+    },
+    {
+      "label": "핵심 블록 w32m",
+      "path": "/objects/61/script/0/1/statements/0/2/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 w32m",
+      "path": "/objects/61/script/0/1/statements/0/2/params/0",
+      "expected": "jxe6"
+    },
+    {
+      "label": "핵심 블록 w32m",
+      "path": "/objects/61/script/0/1/statements/0/2/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 w32m",
+      "path": "/objects/61/script/0/1/statements/0/2/params/1/params/0",
+      "expected": "0"
+    },
+    {
+      "label": "핵심 블록 freu",
+      "path": "/objects/61/script/1/4/statements/0/0/type",
+      "expected": "text_write"
+    },
+    {
+      "label": "핵심 블록 freu",
+      "path": "/objects/61/script/1/4/statements/0/0/params/0/type",
+      "expected": "value_of_index_from_list"
+    },
+    {
+      "label": "핵심 블록 freu",
+      "path": "/objects/61/script/1/4/statements/0/0/params/0/params/1",
+      "expected": "xub2"
+    },
+    {
+      "label": "핵심 블록 freu",
+      "path": "/objects/61/script/1/4/statements/0/0/params/0/params/3/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 freu",
+      "path": "/objects/61/script/1/4/statements/0/0/params/0/params/3/params/0",
+      "expected": "bb9m"
+    },
+    {
+      "label": "핵심 블록 ydyy",
+      "path": "/objects/61/script/2/1/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "핵심 블록 ydyy",
+      "path": "/objects/61/script/2/1/params/0/type",
+      "expected": "boolean_not"
+    },
+    {
+      "label": "핵심 블록 ydyy",
+      "path": "/objects/61/script/2/1/params/0/params/1/type",
+      "expected": "is_included_in_list"
+    },
+    {
+      "label": "핵심 블록 ydyy",
+      "path": "/objects/61/script/2/1/params/0/params/1/params/1",
+      "expected": "jta7"
+    },
+    {
+      "label": "핵심 블록 ydyy",
+      "path": "/objects/61/script/2/1/params/0/params/1/params/3/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 ydyy",
+      "path": "/objects/61/script/2/1/params/0/params/1/params/3/params/0",
+      "expected": "bb9m"
+    },
+    {
+      "label": "핵심 블록 06y8",
+      "path": "/objects/24/script/0/2/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 06y8",
+      "path": "/objects/24/script/0/2/params/0",
+      "expected": "vhve"
+    },
+    {
+      "label": "핵심 블록 06y8",
+      "path": "/objects/24/script/0/2/params/1/type",
+      "expected": "calc_rand"
+    },
+    {
+      "label": "핵심 블록 06y8",
+      "path": "/objects/24/script/0/2/params/1/params/1/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 06y8",
+      "path": "/objects/24/script/0/2/params/1/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 06y8",
+      "path": "/objects/24/script/0/2/params/1/params/3/type",
+      "expected": "length_of_list"
+    },
+    {
+      "label": "핵심 블록 06y8",
+      "path": "/objects/24/script/0/2/params/1/params/3/params/1",
+      "expected": "ytgx"
+    },
+    {
+      "label": "핵심 블록 88k3",
+      "path": "/objects/24/script/0/3/type",
+      "expected": "change_value_list_index"
+    },
+    {
+      "label": "핵심 블록 88k3",
+      "path": "/objects/24/script/0/3/params/0",
+      "expected": "11q9"
+    },
+    {
+      "label": "핵심 블록 88k3",
+      "path": "/objects/24/script/0/3/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 88k3",
+      "path": "/objects/24/script/0/3/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 88k3",
+      "path": "/objects/24/script/0/3/params/2/type",
+      "expected": "value_of_index_from_list"
+    },
+    {
+      "label": "핵심 블록 88k3",
+      "path": "/objects/24/script/0/3/params/2/params/1",
+      "expected": "ytgx"
+    },
+    {
+      "label": "핵심 블록 88k3",
+      "path": "/objects/24/script/0/3/params/2/params/3/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 88k3",
+      "path": "/objects/24/script/0/3/params/2/params/3/params/0",
+      "expected": "vhve"
+    },
+    {
+      "label": "핵심 블록 p2rc",
+      "path": "/objects/24/script/0/4/type",
+      "expected": "remove_value_from_list"
+    },
+    {
+      "label": "핵심 블록 p2rc",
+      "path": "/objects/24/script/0/4/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 p2rc",
+      "path": "/objects/24/script/0/4/params/0/params/0",
+      "expected": "vhve"
+    },
+    {
+      "label": "핵심 블록 p2rc",
+      "path": "/objects/24/script/0/4/params/1",
+      "expected": "ytgx"
+    },
+    {
+      "label": "핵심 블록 2pn6",
+      "path": "/objects/24/script/0/5/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 2pn6",
+      "path": "/objects/24/script/0/5/params/0",
+      "expected": "vhve"
+    },
+    {
+      "label": "핵심 블록 2pn6",
+      "path": "/objects/24/script/0/5/params/1/type",
+      "expected": "calc_rand"
+    },
+    {
+      "label": "핵심 블록 2pn6",
+      "path": "/objects/24/script/0/5/params/1/params/1/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 2pn6",
+      "path": "/objects/24/script/0/5/params/1/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 2pn6",
+      "path": "/objects/24/script/0/5/params/1/params/3/type",
+      "expected": "length_of_list"
+    },
+    {
+      "label": "핵심 블록 2pn6",
+      "path": "/objects/24/script/0/5/params/1/params/3/params/1",
+      "expected": "ytgx"
+    },
+    {
+      "label": "핵심 블록 beo1",
+      "path": "/objects/24/script/0/7/type",
+      "expected": "remove_value_from_list"
+    },
+    {
+      "label": "핵심 블록 beo1",
+      "path": "/objects/24/script/0/7/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 beo1",
+      "path": "/objects/24/script/0/7/params/0/params/0",
+      "expected": "vhve"
+    },
+    {
+      "label": "핵심 블록 beo1",
+      "path": "/objects/24/script/0/7/params/1",
+      "expected": "ytgx"
+    },
+    {
+      "label": "핵심 블록 9so5",
+      "path": "/objects/24/script/0/10/type",
+      "expected": "remove_value_from_list"
+    },
+    {
+      "label": "핵심 블록 9so5",
+      "path": "/objects/24/script/0/10/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 9so5",
+      "path": "/objects/24/script/0/10/params/0/params/0",
+      "expected": "vhve"
+    },
+    {
+      "label": "핵심 블록 9so5",
+      "path": "/objects/24/script/0/10/params/1",
+      "expected": "ytgx"
+    },
+    {
+      "label": "핵심 블록 dhix",
+      "path": "/objects/24/script/0/11/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 dhix",
+      "path": "/objects/24/script/0/11/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 dhix",
+      "path": "/objects/24/script/0/11/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 dhix",
+      "path": "/objects/24/script/0/11/params/1/params/0",
+      "expected": "6"
+    },
+    {
+      "label": "핵심 블록 kakg",
+      "path": "/objects/24/script/0/18/statements/0/0/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "핵심 블록 kakg",
+      "path": "/objects/24/script/0/18/statements/0/0/params/0/type",
+      "expected": "value_of_index_from_list"
+    },
+    {
+      "label": "핵심 블록 kakg",
+      "path": "/objects/24/script/0/18/statements/0/0/params/0/params/1",
+      "expected": "11q9"
+    },
+    {
+      "label": "핵심 블록 kakg",
+      "path": "/objects/24/script/0/18/statements/0/0/params/0/params/3/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 kakg",
+      "path": "/objects/24/script/0/18/statements/0/0/params/0/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 kakg",
+      "path": "/objects/24/script/0/18/statements/0/0/params/1",
+      "expected": "ytgx"
+    },
+    {
+      "label": "핵심 블록 4usd",
+      "path": "/objects/24/script/0/19/statements/0/0/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "핵심 블록 4usd",
+      "path": "/objects/24/script/0/19/statements/0/0/params/0/type",
+      "expected": "value_of_index_from_list"
+    },
+    {
+      "label": "핵심 블록 4usd",
+      "path": "/objects/24/script/0/19/statements/0/0/params/0/params/1",
+      "expected": "11q9"
+    },
+    {
+      "label": "핵심 블록 4usd",
+      "path": "/objects/24/script/0/19/statements/0/0/params/0/params/3/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 4usd",
+      "path": "/objects/24/script/0/19/statements/0/0/params/0/params/3/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "핵심 블록 4usd",
+      "path": "/objects/24/script/0/19/statements/0/0/params/1",
+      "expected": "ytgx"
+    },
+    {
+      "label": "핵심 블록 vuaj",
+      "path": "/objects/24/script/0/20/statements/0/0/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "핵심 블록 vuaj",
+      "path": "/objects/24/script/0/20/statements/0/0/params/0/type",
+      "expected": "value_of_index_from_list"
+    },
+    {
+      "label": "핵심 블록 vuaj",
+      "path": "/objects/24/script/0/20/statements/0/0/params/0/params/1",
+      "expected": "11q9"
+    },
+    {
+      "label": "핵심 블록 vuaj",
+      "path": "/objects/24/script/0/20/statements/0/0/params/0/params/3/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 vuaj",
+      "path": "/objects/24/script/0/20/statements/0/0/params/0/params/3/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "핵심 블록 vuaj",
+      "path": "/objects/24/script/0/20/statements/0/0/params/1",
+      "expected": "ytgx"
+    },
+    {
+      "label": "핵심 블록 sz8d",
+      "path": "/objects/15/script/1/3/statements/0/1/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "핵심 블록 sz8d",
+      "path": "/objects/15/script/1/3/statements/0/1/params/0/type",
+      "expected": "value_of_index_from_list"
+    },
+    {
+      "label": "핵심 블록 sz8d",
+      "path": "/objects/15/script/1/3/statements/0/1/params/0/params/1",
+      "expected": "11q9"
+    },
+    {
+      "label": "핵심 블록 sz8d",
+      "path": "/objects/15/script/1/3/statements/0/1/params/0/params/3/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "핵심 블록 sz8d",
+      "path": "/objects/15/script/1/3/statements/0/1/params/0/params/3/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "핵심 블록 sz8d",
+      "path": "/objects/15/script/1/3/statements/0/1/params/0/params/3/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "핵심 블록 sz8d",
+      "path": "/objects/15/script/1/3/statements/0/1/params/1",
+      "expected": "yrqc"
+    },
+    {
+      "label": "핵심 블록 y3kq",
+      "path": "/objects/15/script/1/3/statements/0/3/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 y3kq",
+      "path": "/objects/15/script/1/3/statements/0/3/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 y3kq",
+      "path": "/objects/15/script/1/3/statements/0/3/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 y3kq",
+      "path": "/objects/15/script/1/3/statements/0/3/params/1/params/0",
+      "expected": "7"
+    },
+    {
+      "label": "핵심 블록 00yw",
+      "path": "/objects/27/script/1/1/type",
+      "expected": "func_dngm"
+    },
+    {
+      "label": "핵심 블록 00yw",
+      "path": "/objects/27/script/1/1/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 00yw",
+      "path": "/objects/27/script/1/1/params/0/params/0",
+      "expected": "n9f2"
+    },
+    {
+      "label": "핵심 블록 tohm",
+      "path": "/objects/27/script/1/2/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 tohm",
+      "path": "/objects/27/script/1/2/params/0",
+      "expected": "p26f"
+    },
+    {
+      "label": "핵심 블록 tohm",
+      "path": "/objects/27/script/1/2/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 tohm",
+      "path": "/objects/27/script/1/2/params/1/params/0",
+      "expected": "4"
+    },
+    {
+      "label": "핵심 블록 p0hg",
+      "path": "/objects/27/script/1/4/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 p0hg",
+      "path": "/objects/27/script/1/4/statements/0/0/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 p0hg",
+      "path": "/objects/27/script/1/4/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 p0hg",
+      "path": "/objects/27/script/1/4/statements/0/0/params/1/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "핵심 블록 tfdy",
+      "path": "/objects/27/script/1/4/statements/1/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 tfdy",
+      "path": "/objects/27/script/1/4/statements/1/0/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 tfdy",
+      "path": "/objects/27/script/1/4/statements/1/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 tfdy",
+      "path": "/objects/27/script/1/4/statements/1/0/params/1/params/0",
+      "expected": "13"
+    },
+    {
+      "label": "핵심 블록 3mcn",
+      "path": "/objects/27/script/2/1/type",
+      "expected": "func_vg2r"
+    },
+    {
+      "label": "핵심 블록 3mcn",
+      "path": "/objects/27/script/2/1/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 3mcn",
+      "path": "/objects/27/script/2/1/params/0/params/0",
+      "expected": "n9f2"
+    },
+    {
+      "label": "핵심 블록 qwom",
+      "path": "/objects/26/script/0/9/statements/0/0/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 qwom",
+      "path": "/objects/26/script/0/9/statements/0/0/statements/0/0/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 qwom",
+      "path": "/objects/26/script/0/9/statements/0/0/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 qwom",
+      "path": "/objects/26/script/0/9/statements/0/0/statements/0/0/params/1/params/0",
+      "expected": "17"
+    },
+    {
+      "label": "핵심 블록 w2l9",
+      "path": "/objects/26/script/0/9/statements/0/0/statements/1/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 w2l9",
+      "path": "/objects/26/script/0/9/statements/0/0/statements/1/0/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 w2l9",
+      "path": "/objects/26/script/0/9/statements/0/0/statements/1/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 w2l9",
+      "path": "/objects/26/script/0/9/statements/0/0/statements/1/0/params/1/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "핵심 블록 s6t2",
+      "path": "/objects/26/script/0/1/statements/1/0/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "핵심 블록 s6t2",
+      "path": "/objects/26/script/0/1/statements/1/0/params/0/type",
+      "expected": "boolean_basic_operator"
+    },
+    {
+      "label": "핵심 블록 s6t2",
+      "path": "/objects/26/script/0/1/statements/1/0/params/0/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 s6t2",
+      "path": "/objects/26/script/0/1/statements/1/0/params/0/params/0/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 s6t2",
+      "path": "/objects/26/script/0/1/statements/1/0/params/0/params/1",
+      "expected": "EQUAL"
+    },
+    {
+      "label": "핵심 블록 s6t2",
+      "path": "/objects/26/script/0/1/statements/1/0/params/0/params/2/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 s6t2",
+      "path": "/objects/26/script/0/1/statements/1/0/params/0/params/2/params/0",
+      "expected": "16"
+    },
+    {
+      "label": "핵심 블록 r9lr",
+      "path": "/objects/65/script/2/8/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 r9lr",
+      "path": "/objects/65/script/2/8/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 r9lr",
+      "path": "/objects/65/script/2/8/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 r9lr",
+      "path": "/objects/65/script/2/8/params/1/params/0",
+      "expected": "15"
+    },
+    {
+      "label": "핵심 블록 7wqt",
+      "path": "/objects/96/script/1/1/statements/0/0/type",
+      "expected": "remove_value_from_list"
+    },
+    {
+      "label": "핵심 블록 7wqt",
+      "path": "/objects/96/script/1/1/statements/0/0/params/0/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 7wqt",
+      "path": "/objects/96/script/1/1/statements/0/0/params/0/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 7wqt",
+      "path": "/objects/96/script/1/1/statements/0/0/params/1",
+      "expected": "xub2"
+    },
+    {
+      "label": "핵심 블록 vxez",
+      "path": "/objects/96/script/2/1/statements/0/0/type",
+      "expected": "remove_value_from_list"
+    },
+    {
+      "label": "핵심 블록 vxez",
+      "path": "/objects/96/script/2/1/statements/0/0/params/0/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 vxez",
+      "path": "/objects/96/script/2/1/statements/0/0/params/0/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 vxez",
+      "path": "/objects/96/script/2/1/statements/0/0/params/1",
+      "expected": "egjp"
+    },
+    {
+      "label": "핵심 블록 aqnd",
+      "path": "/objects/96/script/3/1/statements/0/0/type",
+      "expected": "remove_value_from_list"
+    },
+    {
+      "label": "핵심 블록 aqnd",
+      "path": "/objects/96/script/3/1/statements/0/0/params/0/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 aqnd",
+      "path": "/objects/96/script/3/1/statements/0/0/params/0/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 aqnd",
+      "path": "/objects/96/script/3/1/statements/0/0/params/1",
+      "expected": "0uyb"
+    },
+    {
+      "label": "핵심 블록 23lh",
+      "path": "/objects/96/script/0/4/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "핵심 블록 23lh",
+      "path": "/objects/96/script/0/4/params/0/type",
+      "expected": "boolean_basic_operator"
+    },
+    {
+      "label": "핵심 블록 23lh",
+      "path": "/objects/96/script/0/4/params/0/params/0/type",
+      "expected": "length_of_list"
+    },
+    {
+      "label": "핵심 블록 23lh",
+      "path": "/objects/96/script/0/4/params/0/params/0/params/1",
+      "expected": "xub2"
+    },
+    {
+      "label": "핵심 블록 23lh",
+      "path": "/objects/96/script/0/4/params/0/params/1",
+      "expected": "EQUAL"
+    },
+    {
+      "label": "핵심 블록 23lh",
+      "path": "/objects/96/script/0/4/params/0/params/2/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 23lh",
+      "path": "/objects/96/script/0/4/params/0/params/2/params/0",
+      "expected": "0"
+    },
+    {
+      "label": "핵심 블록 kkg4",
+      "path": "/objects/96/script/0/11/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 kkg4",
+      "path": "/objects/96/script/0/11/statements/0/0/params/0",
+      "expected": "y2sn"
+    },
+    {
+      "label": "핵심 블록 kkg4",
+      "path": "/objects/96/script/0/11/statements/0/0/params/1/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 kkg4",
+      "path": "/objects/96/script/0/11/statements/0/0/params/1/params/0",
+      "expected": "v1ts"
+    },
+    {
+      "label": "핵심 블록 n2lh",
+      "path": "/objects/96/script/5/9/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 n2lh",
+      "path": "/objects/96/script/5/9/params/0",
+      "expected": "gibr"
+    },
+    {
+      "label": "핵심 블록 n2lh",
+      "path": "/objects/96/script/5/9/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 n2lh",
+      "path": "/objects/96/script/5/9/params/1/params/0",
+      "expected": "10"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/type",
+      "expected": "if_else"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/params/0/type",
+      "expected": "boolean_basic_operator"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/params/0/params/0/type",
+      "expected": "calc_rand"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/params/0/params/0/params/1/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/params/0/params/0/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/params/0/params/0/params/3/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/params/0/params/0/params/3/params/0",
+      "expected": "1000"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/params/0/params/1",
+      "expected": "LESS_OR_EQUAL"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/params/0/params/2/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 cpsc",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/params/0/params/2/params/0",
+      "expected": "gibr"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/params/0",
+      "expected": "gibr"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/params/1/type",
+      "expected": "calc_operation"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/params/1/params/1/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/params/1/params/1/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/params/1/params/1/params/0/params/0",
+      "expected": "gibr"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/params/1/params/1/params/1",
+      "expected": "DIVIDE"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/params/1/params/1/params/2/type",
+      "expected": "number"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/params/1/params/1/params/2/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "핵심 블록 kbg6",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/0/2/params/1/params/3",
+      "expected": "ceil"
+    },
+    {
+      "label": "핵심 블록 6awr",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/1/0/statements/0/0/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "핵심 블록 6awr",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/1/0/statements/0/0/params/0",
+      "expected": "gibr"
+    },
+    {
+      "label": "핵심 블록 6awr",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/1/0/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 6awr",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/1/0/statements/0/0/params/1/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "핵심 블록 1k65",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/1/0/statements/1/0/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "핵심 블록 1k65",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/1/0/statements/1/0/params/0",
+      "expected": "gibr"
+    },
+    {
+      "label": "핵심 블록 1k65",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/1/0/statements/1/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 1k65",
+      "path": "/objects/62/script/2/1/statements/0/1/statements/0/4/statements/0/13/statements/0/0/statements/1/0/statements/1/0/params/1/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "핵심 블록 s1lg",
+      "path": "/objects/10/script/2/1/type",
+      "expected": "start_scene"
+    },
+    {
+      "label": "핵심 블록 s1lg",
+      "path": "/objects/10/script/2/1/params/0",
+      "expected": "7dwq"
+    },
+    {
+      "label": "핵심 블록 jra3",
+      "path": "/objects/24/script/3/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 jra3",
+      "path": "/objects/24/script/3/0/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 jra3",
+      "path": "/objects/24/script/3/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 jra3",
+      "path": "/objects/24/script/3/0/params/1/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "핵심 블록 80mh",
+      "path": "/objects/24/script/4/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "핵심 블록 80mh",
+      "path": "/objects/24/script/4/0/params/0",
+      "expected": "mcix"
+    },
+    {
+      "label": "핵심 블록 80mh",
+      "path": "/objects/24/script/4/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "핵심 블록 80mh",
+      "path": "/objects/24/script/4/0/params/1/params/0",
+      "expected": "17"
+    },
+    {
+      "label": "함수 핵심 kmb4",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/0/0/type",
+      "expected": "remove_value_from_list"
+    },
+    {
+      "label": "함수 핵심 kmb4",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/0/0/params/0/type",
+      "expected": "stringParam_ytkt"
+    },
+    {
+      "label": "함수 핵심 kmb4",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/0/0/params/1",
+      "expected": "jta7"
+    },
+    {
+      "label": "함수 핵심 3qr9",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/1/0/type",
+      "expected": "func_hbxr"
+    },
+    {
+      "label": "함수 핵심 3qr9",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/1/0/params/0/type",
+      "expected": "stringParam_my0d"
+    },
+    {
+      "label": "함수 핵심 3qr9",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/1/0/params/1/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "함수 핵심 3qr9",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/1/0/params/1/params/0/type",
+      "expected": "stringParam_ytkt"
+    },
+    {
+      "label": "함수 핵심 3qr9",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/1/0/params/1/params/1",
+      "expected": "PLUS"
+    },
+    {
+      "label": "함수 핵심 3qr9",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/1/0/params/1/params/2/type",
+      "expected": "number"
+    },
+    {
+      "label": "함수 핵심 3qr9",
+      "path": "/functions/3/content/0/0/statements/0/0/statements/1/0/params/1/params/2/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/params/0/type",
+      "expected": "boolean_basic_operator"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/params/0/params/0/type",
+      "expected": "get_variable"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/params/0/params/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/params/0/params/1",
+      "expected": "EQUAL"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/params/0/params/2/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/params/0/params/2/params/0/type",
+      "expected": "stringParam_uuad"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/params/0/params/2/params/1",
+      "expected": "MINUS"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/params/0/params/2/params/2/type",
+      "expected": "number"
+    },
+    {
+      "label": "함수 핵심 4yar",
+      "path": "/functions/4/content/0/0/statements/0/0/params/0/params/2/params/2/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "함수 핵심 6tdx",
+      "path": "/functions/4/content/0/0/statements/0/1/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "함수 핵심 6tdx",
+      "path": "/functions/4/content/0/0/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "함수 핵심 6tdx",
+      "path": "/functions/4/content/0/0/statements/0/1/params/1/type",
+      "expected": "stringParam_mz9g"
+    },
+    {
+      "label": "함수 핵심 mhzl",
+      "path": "/functions/8/content/0/0/statements/0/0/type",
+      "expected": "repeat_basic"
+    },
+    {
+      "label": "함수 핵심 mhzl",
+      "path": "/functions/8/content/0/0/statements/0/0/params/0/type",
+      "expected": "number"
+    },
+    {
+      "label": "함수 핵심 mhzl",
+      "path": "/functions/8/content/0/0/statements/0/0/params/0/params/0",
+      "expected": "50"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/type",
+      "expected": "move_x"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/params/0/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/params/0/params/0/type",
+      "expected": "stringParam_luym"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/params/0/params/1",
+      "expected": "MINUS"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/params/0/params/2/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/params/0/params/2/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/params/0/params/2/params/3",
+      "expected": "x"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/params/1",
+      "expected": "DIVIDE"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/params/2/type",
+      "expected": "number"
+    },
+    {
+      "label": "함수 핵심 87rp",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/0/params/0/params/2/params/0",
+      "expected": "10"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/type",
+      "expected": "move_y"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/params/0/type",
+      "expected": "calc_basic"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/params/0/params/0/type",
+      "expected": "stringParam_sk08"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/params/0/params/1",
+      "expected": "MINUS"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/params/0/params/2/type",
+      "expected": "coordinate_object"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/params/0/params/2/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/params/0/params/2/params/3",
+      "expected": "y"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/params/1",
+      "expected": "DIVIDE"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/params/2/type",
+      "expected": "number"
+    },
+    {
+      "label": "함수 핵심 xx69",
+      "path": "/functions/8/content/0/0/statements/0/0/statements/0/1/params/0/params/2/params/0",
+      "expected": "10"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/0/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/0/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/0/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/0/statements/0/0/params/1/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/0/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/0/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/0/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/0/statements/0/1/params/1/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/1/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/1/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/1/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/1/statements/0/0/params/1/params/0",
+      "expected": "8"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/1/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/1/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/1/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/1/statements/0/1/params/1/params/0",
+      "expected": "4"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/2/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/2/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/2/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/2/statements/0/0/params/1/params/0",
+      "expected": "11"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/2/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/2/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/2/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/2/statements/0/1/params/1/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/3/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/3/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/3/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/3/statements/0/0/params/1/params/0",
+      "expected": "199"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/3/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/3/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/3/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/3/statements/0/1/params/1/params/0",
+      "expected": "8"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/4/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/4/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/4/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/4/statements/0/0/params/1/params/0",
+      "expected": "6"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/4/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/4/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/4/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/4/statements/0/1/params/1/params/0",
+      "expected": "8"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/5/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/5/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/5/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/5/statements/0/0/params/1/params/0",
+      "expected": "9"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/5/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/5/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/5/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/5/statements/0/1/params/1/params/0",
+      "expected": "9"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/6/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/6/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/6/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/6/statements/0/0/params/1/params/0",
+      "expected": "12"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/6/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/6/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/6/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/6/statements/0/1/params/1/params/0",
+      "expected": "10"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/7/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/7/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/7/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/7/statements/0/0/params/1/params/0",
+      "expected": "199"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/7/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/7/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/7/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/7/statements/0/1/params/1/params/0",
+      "expected": "13"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/8/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/8/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/8/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/8/statements/0/0/params/1/params/0",
+      "expected": "7"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/8/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/8/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/8/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/8/statements/0/1/params/1/params/0",
+      "expected": "14"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/9/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/9/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/9/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/9/statements/0/0/params/1/params/0",
+      "expected": "10"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/9/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/9/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/9/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/9/statements/0/1/params/1/params/0",
+      "expected": "15"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/10/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/10/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/10/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/10/statements/0/0/params/1/params/0",
+      "expected": "13"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/10/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/10/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/10/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/10/statements/0/1/params/1/params/0",
+      "expected": "16"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/11/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/11/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/11/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/11/statements/0/0/params/1/params/0",
+      "expected": "199"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/11/statements/0/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/11/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/11/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/11/statements/0/1/params/1/params/0",
+      "expected": "20"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/0/0/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/0/0/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/0/1/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/0/1/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/0/0/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/0/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/0/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/0/0/params/1/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/0/1/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/0/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/0/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/0/1/params/1/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/1/0/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/1/0/params/0",
+      "expected": "1zfm"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/1/0/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/1/0/params/1/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/1/1/type",
+      "expected": "change_variable"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/1/1/params/0",
+      "expected": "743n"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/1/1/params/1/type",
+      "expected": "text"
+    },
+    {
+      "label": "스테이지 설정",
+      "path": "/functions/1/content/0/0/statements/0/12/statements/0/0/statements/1/0/statements/1/1/params/1/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "함수 첫 스레드는 주석",
+      "path": "/functions/2/content/0/0/type",
+      "expected": "comment"
+    },
+    {
+      "label": "실제 함수 헤더는 두 번째 스레드",
+      "path": "/functions/2/content/1/0/type",
+      "expected": "function_create"
+    },
+    {
+      "label": "플레이어 원본 SVG",
+      "path": "/objects/48/sprite/pictures/0/imageType",
+      "expected": "svg"
+    },
+    {
+      "label": "플레이어 에셋 경로",
+      "path": "/objects/48/sprite/pictures/0/fileurl",
+      "expected": "temp/2e/52/image/2e523ef0mtudh8qc0006e7f142awo7da.svg"
+    }
+  ]
+}

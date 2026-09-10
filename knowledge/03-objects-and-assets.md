@@ -24,6 +24,29 @@
 
 `objectType: "textBox"`일 때:
 - `text` 필드에 표시할 문자열. **빈 문자열이면 오브젝트 `name` 으로 폴백**해서 이름이 화면에 뜬다 — 색 사각형만 원하면 공백 한 칸(`" "`)을 넣는다 ([`07` §textBox `text: ''`](07-runtime-quirks.md#textbox-text--는-객체-이름으로-폴백))
+
+#### ⚠️ 글상자 문자열은 `object.text` 와 `entity.text` **두 곳**에 있다
+
+기존 `.ent` 의 글상자 문구를 프로그램으로 바꿀 때 가장 걸리기 쉬운 함정이다.
+
+```jsonc
+{
+  "objectType": "textBox",
+  "text": "안녕",              // ① 오브젝트 레벨
+  "entity": { "text": "안녕" } // ② 엔티티 레벨 — **엔진이 실제로 그리는 쪽**
+}
+```
+
+**`object.text` 만 고치면 파일은 바뀌는데 화면은 그대로다.** tar·JSON 구조 검사는 전부
+통과하므로 조용히 지나간다 — 무대에 올려 렌더된 문자열을 봐야 잡힌다.
+
+- 고칠 때는 **항상 둘 다** 쓴다.
+- 검증에는 `object.text === entity.text` 전수 확인을 넣는다.
+- 런타임에 `text_write` 로 덮는 글상자라면 세 번째 출처(**블록 파라미터**)도 있다.
+  정적 두 필드는 그 블록이 실행되기 **전 첫 프레임**에 보이는 값이다.
+
+make-ent 로 새로 만들 때는 DSL 이 둘 다 채워주므로 문제가 없다. **기존 작품을 외과적으로
+수정할 때** 걸린다.
 - `sprite.pictures`는 보통 비어있거나 무시됨
 - `entity.bgColor` 는 hex(`'#xxxxxx'`) 일 때만 사각 전체 클릭 — 투명이면 글자(glyph) 픽셀만 hit. 자세한 건 [`07-runtime-quirks.md` textBox 클릭 영역](07-runtime-quirks.md#textbox-클릭-영역--bgcolor-에-따라-사각-전체-vs-glyph-픽셀만)
 - 썸네일은 `text_icon_ko.svg` / `text_icon.svg` 자동 사용 ([`object.js:240-243`](../../entryjs/src/class/object.js#L240))
@@ -100,7 +123,7 @@ JSON.stringify 결과는 키 순서에 의존하지 않고 엔진도 순서 체�
 구현: [`tools/make-ent.mjs:159-174`](../tools/make-ent.mjs#L159) `makeDefaultEntity()`.
 ⚠️ 이 함수는 **sprite 기준**이다 — 글상자는 spec 에서 entity 를 채워 덮어써야 한다.
 
-## Picture — 최신 포맷 (playentry 레퍼런스 기준)
+## Picture — PNG 생성 정책과 외부 작품의 SVG
 
 ```json
 {
@@ -113,9 +136,9 @@ JSON.stringify 결과는 키 순서에 의존하지 않고 엔진도 순서 체�
 }
 ```
 
-### 핵심 규칙
+### 이 저장소가 생성하는 Picture
 
-1. **`imageType`은 항상 `"png"`** — SVG 원본을 올려도 엔트리가 서버에서 PNG로 래스터라이즈한다.
+1. **현재 생성기는 `imageType: "png"`를 출력한다.** `lib/asset-bundler.js`가 이미지를 PNG로 변환하는 정책이며, 모든 외부 `.ent`의 형식 제약은 아니다.
 2. **`thumbUrl` 필드를 쓰지 않는다.** Entry의 `updateThumbnailView`
    ([`object.js:223-245`](../../entryjs/src/class/object.js#L223))가 `thumbUrl || fileurl`로
    fallback하는데, fileurl이 PNG면 CSS `background-image`로 썸네일을 바로 띄운다.
@@ -123,13 +146,12 @@ JSON.stringify 결과는 키 순서에 의존하지 않고 엔진도 순서 체�
 4. **`filename`은 해시만** (확장자 없음) — Entry가 필요시 `<defaultPath>/uploads/…/thumb/<hash>.png`로 derive.
 5. **키 순서** (레퍼런스): `id, dimension, filename, name, imageType, fileurl`.
 
-### 왜 PNG로 강제?
+### 외부 작품을 읽을 때는 SVG도 보존한다
 
-- 레퍼런스 `C:\Users\young\Downloads\260423_작품.ent` (저장소 외부, 사용자 로컬) tar에는 SVG 파일이 **전혀 없음**.
-  오직 `image/*.png` + `thumb/*.png` 페어만 존재.
-- 엔트리 엔진은 사실 SVG도 렌더 가능(EaselJS Bitmap이 SVG URL 지원).
-  하지만 playentry.org 업로더가 SVG를 그대로 받으면 관례 외 파일이 되어 서버 측 처리 경로에서 문제가 생길 수 있음 (MYentry 커밋 `b79d8a9` 메모).
-- **결론**: SVG 입력이 있어도 `sharp(svg).png()`로 래스터라이즈해 PNG만 번들.
+- 과거 레퍼런스 `260423_작품.ent`의 이미지가 PNG뿐이었다는 관찰을 전체 포맷 규칙으로 일반화하면 안 된다.
+- 2026-09-10 분석한 뮤직비디오에는 `imageType: "svg"` Picture와 SVG 원본·PNG 래스터·PNG 썸네일이 함께 있다. 일부 기본 모양은 엔진 자산 경로를 참조한다. 개수와 원본 식별 근거는 [뮤직비디오 사례](10-music-video-case-study.md)에 둔다.
+- 읽기·분석 도구는 `imageType`, `fileurl`, `filename`과 TAR 내부 파일을 함께 확인한다. SVG 메타데이터 또는 엔진 기본 모양 경로만 보고 손상으로 판정하지 않는다.
+- 새 작품의 PNG 번들 정책은 유지한다. 기존 작품을 다시 내보낼 때 SVG를 PNG로 바꾸는 것은 변환이며, 벡터 편집 정보까지 그대로 보존하는 왕복이 아니다. 이번 정적 분석은 공식 사이트 재업로드 성공을 검증한 것이 아니다.
 
 ### 흔한 실수 / 혼란
 
@@ -137,8 +159,7 @@ JSON.stringify 결과는 키 순서에 의존하지 않고 엔진도 순서 체�
   실제 playentry.org가 내놓는 파일(우리 레퍼런스)을 보면 thumbUrl이 **없다**.
   `68a8dc4`는 중간 정정이었고, 이후 `b984b2f`가 다시 제거.
   empirical 정답: **쓰지 말 것**.
-- `imageType: "svg"` 로 넣고 fileurl을 SVG로 두면 엔트리 편집기에서는 보이지만
-  playentry.org로 업로드 시 서버가 거부하거나 썸네일만 비어 보이는 케이스 있음.
+- `imageType: "svg"` 자체를 업로드 실패 원인으로 단정하지 않는다. 원본·래스터·썸네일의 파일명과 참조 관계를 먼저 검사하고, 업로드 호환성은 별도 실사이트 검증으로 확인한다.
 
 ## Sound
 
@@ -182,7 +203,7 @@ spec에서 picture/sound 참조 방법:
 자주 쓰는 ball / brick / paddle / heart / star 등의 SVG 자산을 두 갈래로 제공:
 
 **A. 정적 라이브러리** ([`public/images/game/`](../public/images/game/)):
-- `node tools/build-game-assets.mjs` (`npm run build:assets`) 가 sprite-gen 으로 18 개 SVG + manifest.json 생성
+- `node tools/build-game-assets.mjs` (`npm run build:assets`) 가 sprite-gen 으로 SVG 카탈로그 + manifest.json 생성
 - spec 에서 [`assets()`](../tools/lib/game-assets.mjs) 헬퍼로 의미 있는 이름 → fileurl 변환:
   ```js
   import { assets } from '../../tools/lib/game-assets.mjs';
@@ -203,6 +224,110 @@ spec에서 picture/sound 참조 방법:
 **선택 가이드**: 자주 쓰는 변형은 A (콜사이트 짧음, 카탈로그 검토 가능). 일회성·동적 변형은 B (정확히 원하는 크기/색).
 A 의 자산은 사실상 B 의 산출물을 동결한 것 — `build-game-assets.mjs` 가 sprite-gen 호출.
 
+### 이미지 생성 도구가 없는 환경의 SVG 제작
+
+**이미지 생성 도구가 없는 Claude Code 등의 환경은 이 절차를 기본으로 사용한다.**
+에이전트가 SVG 코드를 작성하고 기존 빌더가 PNG로 변환하므로 이미지 생성 API나 배경 제거 도구가
+필요 없다. 도구가 없다는 이유로 기존 에셋만 사용하거나 요청된 캐릭터·배경 제작을 생략하지 않는다.
+
+1. 기존 카탈로그에 맞는 모양이 있으면 `assets('ball-blue')`처럼 재사용한다.
+   카탈로그 파일이 없을 때는 `npm run build:assets`로 생성한다.
+2. 공·별·하트·벽돌 등은 `sprite-gen.mjs`의 함수로 원하는 크기와 색을 만든다.
+3. 캐릭터·몬스터·장비·배경은 `path`, `circle`, `rect`, `polygon`, 그라데이션을 조합해
+   게임별 SVG를 직접 작성한다. `{ svgString, dimension, imageType: 'svg' }`를 `obj()`의
+   `picture` 또는 `pictures` 배열에 연결한다. 기본 도형만 늘어놓지 말고 실루엣·색·명암으로 역할을 구분한다.
+4. 캐릭터·아이템은 캔버스 전체를 덮는 배경 도형을 넣지 않아 투명 영역을 유지한다.
+   무대 배경에는 전체 배경색을 넣어도 된다. 외부 이미지·폰트·스크립트 참조 없이 SVG 안에서 완결한다.
+   애니메이션은 같은 캔버스 크기·중심으로 여러 모양을 만들고 엔트리 모양 전환 블록으로 재생한다.
+5. `make-ent.mjs --check`와 빌드를 실행한다. 빌더가 SVG를 PNG 이미지·썸네일로 변환해
+   `.ent`에 포함한다. 편집기에서 크기·투명 영역·모양 전환을 확인하고 가능한 런타임 검증까지 진행한다.
+
+```js
+// games/<game>/spec.mjs — 이미지 생성 도구 없이 만드는 투명 캐릭터
+import { obj } from '../../tools/lib/spec-dsl.mjs';
+import * as gen from '../../tools/lib/sprite-gen.mjs';
+
+const slime = {
+    svgString: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+      <path d="M8 48 Q8 16 32 16 Q56 16 56 48 Q32 60 8 48Z" fill="#34d399" stroke="#065f46" stroke-width="3"/>
+      <ellipse cx="24" cy="26" rx="8" ry="4" fill="#a7f3d0"/>
+      <circle cx="24" cy="37" r="3" fill="#172554"/>
+      <circle cx="42" cy="37" r="3" fill="#172554"/>
+      <path d="M28 45 Q33 49 38 45" fill="none" stroke="#172554" stroke-width="2"/>
+    </svg>`,
+    dimension: { width: 64, height: 64 },
+    imageType: 'svg',
+};
+
+export default {
+    objects: [
+        obj('slime', '슬라임', { picture: slime }),
+        obj('star', '보상 별', { picture: gen.star(20, 9, 5, '#facc15') }),
+    ],
+};
+```
+
+위 코드는 에셋 연결 예시다. 실제 작품에서는 이동·전투 등 게임 로직과 연결해 완성한다.
+SVG는 `svgString`으로 바로 연결하므로 PNG 전용 `import-image-asset.mjs`에 넣지 않는다.
+
+### AI 이미지 생성과 투명 오브젝트
+
+현재 에이전트에 이미지 생성 도구가 제공되면, 제작 중 필요한 캐릭터·아이템·배경을 직접 생성하여
+사용한다. **에이전트의 제작 절차**이며 오프라인 편집기 자체에 이미지 생성 API가 탑재되는 것은 아니다.
+도구의 사용 가능 여부는 매 작업의 도구 목록에서 확인한다. 단순 도형이나 기존 벡터 스타일의 확장은
+위 SVG 도구를 사용하고, 일러스트가 필요한 자산은 이미지 생성 도구를 사용한다.
+
+1. 필요한 오브젝트, 시점, 크기, 스타일을 게임 설계에서 정한다. 한 오브젝트씩 생성하며
+   애니메이션은 프레임마다 캔버스 크기·중심·시점·비율을 맞춘다.
+2. 캐릭터·아이템·이펙트는 **실제 투명 배경 PNG**를 요청한다. 흰색·체크무늬를 배경에 그리지 말고,
+   오브젝트 전체와 약간의 여백을 담으며 텍스트·워터마크는 제외하도록 명시한다.
+   무대 배경은 작품의 무대 비율에 맞게 생성하고 불투명 이미지를 허용한다.
+3. 배경이 남으면 결과를 먼저 이미지 뷰어로 확인한 뒤, 이미지 편집 도구에 **배경 제거**를 요청한다.
+   피사체의 형태·색·얼굴·포즈를 유지하고 가장자리의 흰 테두리를 없애도록 지시한다.
+   임의의 흰색 픽셀 삭제로 대체하지 않는다. 배경 제거도 완료되었다고 가정하지 않고 다시 검사한다.
+4. 완성된 PNG를 아래 도구로 가져온다. 원본 바이트와 알파를 그대로 복사하고 크기·투명도·SHA-256·
+   선택한 프롬프트를 JSON에 기록한다. 기본 `sprite` 모드는 완전 투명 픽셀이 없는 이미지와
+   전체가 투명한 이미지를 거부한다. **불투명한 체크무늬도 검사에서 거부**된다.
+   수치 검사는 누끼 품질·배경 잔여물까지 판정하지 못하므로 밝은/어두운 배경에서 눈으로도 확인한다.
+5. 반환된 모양을 spec에 연결하고 빌드·로드·런타임 검사로 크기, 중심, 가장자리와 실제 플레이를 확인한다.
+   원본 생성 도구의 개인 출력 폴더를 참조하는 상태로 끝내지 않는다.
+
+```powershell
+node tools/import-image-asset.mjs --source "C:/path/to/generated-image.png" --name forest-hero-v1 --prompt-file "C:/path/to/prompt.txt"
+# 불투명 무대 배경은 명시적으로 구분
+node tools/import-image-asset.mjs --source "C:/path/to/background.png" --name forest-background-v1 --kind background
+```
+
+위 경로는 예시다. 실제 생성 도구가 반환한 로컬 경로를 사용하며, 파일을 먼저 요구하거나 API 키를
+요구할 필요는 없다. 가져오기 도구 자체는 생성·배경 제거·리사이즈를 하지 않는다.
+출력은 `public/images/game/generated/<name>.png`와 같은 이름의 `.json`이다. 기존 파일은
+덮어쓰지 않으므로 수정본은 `-v2`처럼 새 이름을 사용한다. 기존 SVG 카탈로그 재생성과도 독립적이다.
+
+```js
+// games/<game>/spec.mjs (위 가져오기를 완료한 이름만 참조)
+import { generatedPicture } from '../../tools/lib/generated-assets.mjs';
+import { obj, when, moveX } from '../../tools/lib/spec-dsl.mjs';
+const hero = generatedPicture('forest-hero-v1');
+const scale = 96 / hero.dimension.width;
+export default {
+    objects: [obj('hero', '주인공', {
+        picture: hero,
+        entity: { x: 0, y: 0, scaleX: scale, scaleY: scale },
+        script: [when.run(), moveX(10)],
+    })],
+};
+```
+
+생성 프롬프트 예시: “엔트리 게임용 [필요한 오브젝트] 하나. [게임의 시점과 스타일].
+오브젝트 전체와 약간의 여백, 실제 알파가 있는 투명 PNG 배경. 흰 배경, 체크무늬 배경,
+바닥, 텍스트, 워터마크 없이.” 배경 제거 편집에서는 “피사체를 유지하고 배경만 제거”를 추가한다.
+
+이미지 생성·편집 도구가 없거나 실패하면 [SVG 제작 절차](#이미지-생성-도구가-없는-환경의-svg-제작)로
+필요한 에셋을 직접 만들어 제작을 계속한다. 최종 보고에는 실제 사용한 제작 방식을 적는다.
+별도 유료 API/CLI 방식은 사용자가 선택한 경우에만 사용한다. 자동으로 키를 찾거나 다른 모델로 바꾸지 않는다.
+검증 근거: [가져오기·알파 보존 회귀 검사](../tests/generated-assets.test.js)는 투명·반투명 픽셀이
+가져오기와 `.ent` 번들링 뒤에도 유지되는지, 불투명 sprite와 덮어쓰기가 차단되는지 확인한다.
+
 ### 자산이 tar에 들어가야 하는 이유
 
 `fileurl: "/images/mascot/bot205-idle.svg"` 같이 서버 상대경로로 두면
@@ -217,7 +342,7 @@ node -e "const z=require('zlib'),f=require('fs');const{forEachTarEntry}=require(
     e.name.match(/image\|sound/)&&console.log(e.name,e.data.length));"
 ```
 
-image/*.png + thumb/*.png 페어가 각 picture마다 나와야 정상.
+현재 생성기가 번들한 이미지에는 image/*.png + thumb/*.png 페어가 있어야 한다. 외부 작품에는 SVG 원본이나 엔진 기본 자산 참조도 있을 수 있으므로 이 검사를 그대로 적용하지 않는다.
 
 ## 오브젝트 시각 크기 기본값
 

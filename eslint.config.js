@@ -51,7 +51,8 @@ module.exports = [
     // reference browser globals (Entry, window, KeyboardEvent, etc.); those
     // strings never execute in Node, but ESLint sees them so we allow them here.
     {
-        files: ['tools/**/*.mjs', 'scripts/**/*.mjs'],
+        files: ['tools/**/*.mjs', 'scripts/**/*.mjs', 'games/**/verify*.mjs',
+            'games/**/_*verify*.mjs', 'games/**/shots.mjs', 'games/**/capture-*.mjs'],
         languageOptions: {
             globals: {
                 ...globals.node,

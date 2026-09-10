@@ -31,16 +31,10 @@ app.use(express.static(path.join(__dirname, 'public'), {
 
 // ========== Session cache for loaded .ent (so /api/ent-asset/... can stream from tar) ==========
 
-const __sessionCache = new Map(); // sid → { tarBuf, createdAt }
-const SESSION_TTL_MS = 30 * 60 * 1000;
-
-function gcSessions() {
-    const now = Date.now();
-    for (const [sid, rec] of __sessionCache.entries()) {
-        if (now - rec.createdAt > SESSION_TTL_MS) __sessionCache.delete(sid);
-    }
-}
-setInterval(gcSessions, 5 * 60 * 1000).unref?.();
+const { createSessionStore } = require('./lib/ent-session-store.js');
+const sessions = createSessionStore();
+setInterval(() => sessions.gc(), 5 * 60 * 1000).unref();
+process.once('exit', () => sessions.close());
 
 const MIME_BY_EXT = {
     '.svg': 'image/svg+xml', '.png': 'image/png',
@@ -87,7 +81,6 @@ app.post('/api/load', upload.single('ent'), (req, res) => {
         if (!jsonBuf) return res.status(400).json({ error: 'temp/project.json not found in .ent' });
 
         const sid = entryStyleHash().slice(0, 16);
-        __sessionCache.set(sid, { tarBuf, createdAt: Date.now() });
 
         let project;
         try {
@@ -110,12 +103,18 @@ app.post('/api/load', upload.single('ent'), (req, res) => {
             });
         });
 
+        sessions.set(sid, tarBuf);
         project.__sid = sid;
         res.json(project);
     } catch (e) {
         console.error('[api/load] error:', e);
         res.status(500).json({ error: String(e.message || e) });
     }
+});
+
+app.delete('/api/ent-session/:sid', (req, res) => {
+    sessions.remove(req.params.sid);
+    res.sendStatus(204);
 });
 
 // GET /api/ent-asset/:sid/*  — stream a file embedded in the session's loaded tar.
@@ -125,7 +124,7 @@ app.get('/api/ent-asset/:sid/*', (req, res) => {
     if (!/^temp\//.test(subpath) || /(^|\/)\.\.(\/|$)/.test(subpath)) {
         return res.status(400).end();
     }
-    const rec = __sessionCache.get(sid);
+    const rec = sessions.get(sid);
     if (!rec) return res.status(404).end();
     const buf = extractTarFile(rec.tarBuf, subpath);
     if (!buf) return res.status(404).end();
@@ -138,11 +137,15 @@ app.get('/api/ent-asset/:sid/*', (req, res) => {
 //   /api/ent-asset/<sid>/temp/…  → pulled from that session's tar
 //   /<any-media-file>            → read from public/ (path-traversal-safe)
 const MEDIA_EXT_RE = /\.(svg|png|jpg|jpeg|gif|webp|mp3|wav|ogg|m4a)$/i;
-function resolveAsset(url) {
+function resolveAsset(url, sid) {
     if (typeof url !== 'string' || !url) return null;
+    if (/^(\.\/)?temp\//.test(url)) {
+        if (!sid) return null;
+        url = '/api/ent-asset/' + sid + '/' + url.replace(/^\.\//, '');
+    }
     const m = /^\/api\/ent-asset\/([^/]+)\/(.+)$/.exec(url);
     if (m) {
-        const rec = __sessionCache.get(m[1]);
+        const rec = sessions.get(m[1]);
         if (!rec) return null;
         const buf = extractTarFile(rec.tarBuf, m[2]);
         if (!buf) return null;
@@ -170,6 +173,7 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
             return res.status(400).json({ error: 'invalid project JSON' });
         }
         // Remove internal session marker before packaging.
+        const sid = project.__sid;
         if ('__sid' in project) delete project.__sid;
 
         // Shared bundler: handles dirs1/dirs2/dirs3 accumulation, SVG→PNG,
@@ -178,21 +182,19 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
         const passthroughCache = new Map();
 
         // Thin adapter: resolve URL → buffer, hand to the bundler.
-        // Passthrough for already-tar-embedded or absolute URLs (temp/…, http:,
-        // data:) — just echo back the URL with null filename.
+        // Only external/data references may pass through. A missing local
+        // asset must never turn a successful export into a broken project.
         const bundleAsset = async (url, kind) => {
-            if (!url) return null;
+            if (!url) throw Object.assign(new Error('모양 또는 소리의 파일 주소가 없습니다.'), { status: 422 });
             if (passthroughCache.has(url)) return passthroughCache.get(url);
-            if (/^(\.\/)?temp\//.test(url) || /^(https?:|data:)/.test(url)) {
+            if (/^(https?:|data:)/.test(url)) {
                 const r = { fileurl: url, filename: null, ext: null };
                 passthroughCache.set(url, r);
                 return r;
             }
-            const asset = resolveAsset(url);
+            const asset = resolveAsset(url, sid);
             if (!asset) {
-                const r = { fileurl: url, filename: null, ext: null };
-                passthroughCache.set(url, r);
-                return r;
+                throw Object.assign(new Error('저장할 에셋을 찾을 수 없습니다. 원본 작품을 다시 불러오세요: ' + url), { status: 409 });
             }
             const r = await bundler.bundle({
                 buf: asset.buf, ext: asset.ext, kind, cacheKey: url,
@@ -203,7 +205,6 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
         for (const obj of project.objects) {
             if (!obj || !obj.sprite) continue;
             for (const p of (obj.sprite.pictures || [])) {
-                if (!p.fileurl) continue;
                 const r = await bundleAsset(p.fileurl, 'image');
                 if (!r) continue;
                 p.fileurl = r.fileurl;
@@ -216,7 +217,6 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
                 delete p.thumbUrl;
             }
             for (const sn of (obj.sprite.sounds || [])) {
-                if (!sn.fileurl) continue;
                 const r = await bundleAsset(sn.fileurl, 'sound');
                 if (!r) continue;
                 sn.fileurl = r.fileurl;
@@ -247,19 +247,23 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
         res.setHeader('Content-Length', gz.length);
         res.send(gz);
     } catch (e) {
-        console.error('[api/export] error:', e);
-        res.status(500).json({ error: String(e.message || e) });
+        if (!e.status) console.error('[api/export] error:', e);
+        res.status(e.status || 500).json({ error: String(e.message || e) });
     }
 });
 
 // Expose helpers for smoke tests (loaded via require()).
 module.exports = {
     app, extractTarFile, forEachTarEntry,
-    tarHeader, makeTar, entryStyleHash
+    tarHeader, makeTar, entryStyleHash, sessions
 };
 
 if (require.main === module) {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
         console.log('MYentry-game running at http://localhost:' + PORT);
     });
+    const shutdown = () => server.close(() => process.exit(0));
+    process.on('message', message => { if (message?.type === 'shutdown') shutdown(); });
+    process.once('SIGINT', shutdown);
+    process.once('SIGTERM', shutdown);
 }

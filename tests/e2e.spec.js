@@ -10,8 +10,42 @@ const FIXTURES = fs.existsSync(FIXTURES_DIR)
     ? fs.readdirSync(FIXTURES_DIR).filter(n => n.endsWith('.ent'))
     : [];
 
+test('editor UI saves, releases replaced sessions, and reports missing assets without downloading', async ({ page }) => {
+    await page.goto('/editor.html');
+    await expect(page.locator('#status')).toHaveText('준비됨');
+    const open = async () => {
+        const response = page.waitForResponse(r => r.url().endsWith('/api/load') && r.request().method() === 'POST');
+        await page.locator('#open-ent').setInputFiles(path.join(FIXTURES_DIR, 'move.ent'));
+        const project = await (await response).json();
+        await expect(page.locator('#status')).toContainText('불러오기 완료');
+        return project.__sid;
+    };
+    const first = await open();
+    const download = page.waitForEvent('download');
+    const exported = page.waitForRequest(r => r.url().endsWith('/api/export'));
+    await page.evaluate(() => window.exportEnt());
+    expect((await exported).postDataJSON().__sid).toBe(first);
+    expect((await download).suggestedFilename()).toMatch(/\.ent$/);
+    await expect(page.locator('#status')).toHaveText('저장 완료');
+
+    const released = page.waitForResponse(r => r.url().endsWith('/api/ent-session/' + first) && r.request().method() === 'DELETE');
+    const second = await open();
+    expect((await released).status()).toBe(204);
+    await page.request.delete('/api/ent-session/' + second);
+    let downloads = 0;
+    page.on('download', () => downloads++);
+    const dialog = page.waitForEvent('dialog').then(async d => {
+        expect(d.message()).toContain('저장할 에셋을 찾을 수 없습니다');
+        await d.accept();
+    });
+    await page.evaluate(() => window.exportEnt());
+    await dialog;
+    await expect(page.locator('#status')).toContainText('저장 실패');
+    expect(downloads).toBe(0);
+});
+
 test.describe('editor boots cleanly', () => {
-    test('loads with no page errors', async ({ page }) => {
+    test('loads with no page errors', async ({ page, baseURL }) => {
         const pageErrors = [];
         const consoleErrors = [];
         const extReqs = [];
@@ -19,7 +53,7 @@ test.describe('editor boots cleanly', () => {
         page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()); });
         page.on('request', r => {
             const u = r.url();
-            if (!/^http:\/\/localhost:3000\//.test(u) && !/^(data:|blob:|about:)/.test(u)) {
+            if (!u.startsWith(new URL(baseURL).origin + '/') && !/^(data:|blob:|about:)/.test(u)) {
                 extReqs.push(u);
             }
         });

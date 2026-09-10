@@ -155,10 +155,10 @@ function entryStyleHash() {
 
 ## 이미지 규칙 (중요)
 
-playentry.org 레퍼런스 `C:\Users\young\Downloads\260423_작품.ent` (저장소 외부, 사용자 로컬) 분석 결과:
+아래는 과거 레퍼런스 `260423_작품.ent`와 **현재 생성기의 PNG 출력 정책**이다. 외부 작품 전체의 제약이 아니다. SVG와 PNG가 공존하는 실제 작품 및 Picture 해석의 정본은 [03의 이미지 형식 설명](03-objects-and-assets.md#외부-작품을-읽을-때는-svg도-보존한다)을 따른다.
 
-- **tar에는 PNG만** — SVG 원본 파일은 저장되지 않음.
-- SVG를 업로드해도 서버가 `sharp(svg).png()`로 래스터라이즈해 PNG만 남긴다.
+- 현재 생성기가 번들한 이미지 payload는 PNG이며 SVG 원본은 별도 보존하지 않는다.
+- 변환은 이 저장소의 `lib/asset-bundler.js`가 수행한다. 공식 서버의 모든 업로드 처리에 대한 단정이 아니다.
 - `image/<hash>.png` = 원본 해상도 PNG.
 - `thumb/<hash>.png` = 같은 hash의 **96px 한 변** 다운스케일 PNG.
 - 이미지와 썸네일이 **같은 hash**, 다른 폴더.

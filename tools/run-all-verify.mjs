@@ -1,135 +1,138 @@
 #!/usr/bin/env node
-// Run every tools/verify-*.mjs sequentially and aggregate results.
-//
-// Usage: node tools/run-all-verify.mjs [--keep-server] [--filter <substr>]
-//
-// Server lifecycle: if http://localhost:3000 isn't reachable, this script
-// spawns `node server.js` as a child process and kills it on exit. Pass
-// `--keep-server` to leave it running (useful when iterating manually).
-//
-// Each verify-*.mjs is run in its own node subprocess; their internals (own
-// chromium instance, page lifecycle, etc.) are independent. Exit code:
-//   0 — all scripts passed
-//   1 — one or more failed (failure list printed at end)
-
+// Discover tools/verify-*.mjs and games/**/verify*.mjs before starting a server.
 import fs from 'node:fs';
 import path from 'node:path';
-import url from 'node:url';
-import { spawn } from 'node:child_process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { spawn, execFile } from 'node:child_process';
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
-const KEEP_SERVER = process.argv.includes('--keep-server');
-const FILTER_IDX  = process.argv.indexOf('--filter');
-const FILTER = FILTER_IDX >= 0 ? process.argv[FILTER_IDX + 1] : null;
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const activeChildren = new Set();
+const EXCLUSIONS = new Map([['tools/verify-case-study-evidence.mjs', 'requires --source and --evidence; see knowledge/evidence/README.md']]);
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-
-// ── Server lifecycle ─────────────────────────────────────────────
-
-async function isServerUp() {
-    try {
-        const res = await fetch(BASE_URL + '/editor.html', { signal: AbortSignal.timeout(2000) });
-        return res.ok;
-    } catch { return false; }
-}
-
-async function startServer() {
-    const proc = spawn('node', ['server.js'], {
-        cwd: ROOT,
-        stdio: ['ignore', 'pipe', 'pipe'],
-        detached: false,
-    });
-    proc.stdout.on('data', () => {});  // discard
-    proc.stderr.on('data', () => {});
-    // Wait for ready (up to 20s)
-    for (let i = 0; i < 40; i++) {
-        if (await isServerUp()) return proc;
-        await new Promise(r => setTimeout(r, 500));
+export function discoverScripts(root = ROOT) {
+    const scripts = [], excluded = [];
+    function scan(directory, recursive) {
+        if (!fs.existsSync(path.join(root, directory))) return;
+        for (const entry of fs.readdirSync(path.join(root, directory), { withFileTypes: true })) {
+            const relative = directory + '/' + entry.name;
+            if (entry.isDirectory() && recursive && !['node_modules', '.git', 'test-results'].includes(entry.name)) scan(relative, true);
+            if (!entry.isFile() || !/^verify(?:-.+)?\.mjs$/.test(entry.name)) continue;
+            if (EXCLUSIONS.has(relative)) excluded.push({ script: relative, reason: EXCLUSIONS.get(relative) });
+            else scripts.push(relative);
+        }
     }
-    proc.kill();
-    throw new Error('server failed to become ready within 20s');
+    scan('tools', false);
+    scan('games', true);
+    return { scripts: scripts.sort(), excluded };
 }
 
-let ownsServer = false;
-let serverProc = null;
-
-if (await isServerUp()) {
-    console.log(`[runner] using existing server at ${BASE_URL}`);
-} else {
-    console.log(`[runner] starting server...`);
-    serverProc = await startServer();
-    ownsServer = true;
-    console.log(`[runner] server up at ${BASE_URL}`);
+async function stopChild(proc) {
+    if (!proc || proc.exitCode !== null || proc.signalCode !== null) return;
+    if (proc.connected) {
+        proc.send({ type: 'shutdown' });
+        await new Promise(resolve => {
+            const timer = setTimeout(resolve, 2000);
+            proc.once('exit', () => { clearTimeout(timer); resolve(); });
+        });
+        if (proc.exitCode !== null) return;
+    }
+    if (process.platform === 'win32') {
+        await new Promise(resolve => execFile('taskkill', ['/PID', String(proc.pid), '/T', '/F'], { windowsHide: true }, error => {
+            if (error) proc.kill('SIGKILL');
+            resolve();
+        }));
+    } else proc.kill('SIGKILL');
 }
 
-// ── Discover verify scripts ──────────────────────────────────────
-
-const allScripts = fs.readdirSync(path.join(ROOT, 'tools'))
-    .filter(n => /^verify-.*\.mjs$/.test(n))
-    .sort()
-    .map(n => path.join('tools', n));
-
-const scripts = FILTER
-    ? allScripts.filter(s => s.includes(FILTER))
-    : allScripts;
-
-if (scripts.length === 0) {
-    console.error(`[runner] no verify scripts matched (filter: ${FILTER || 'none'})`);
-    process.exit(1);
-}
-
-console.log(`[runner] running ${scripts.length} verify script${scripts.length === 1 ? '' : 's'}\n`);
-
-// ── Run each script ──────────────────────────────────────────────
-
-function runScript(script) {
-    return new Promise((resolve) => {
-        const t0 = Date.now();
-        // Capture stdout/stderr for failure reporting; print short status to runner stdout.
-        const proc = spawn('node', [script], { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
-        let out = '';
-        proc.stdout.on('data', (d) => { out += d.toString(); });
-        proc.stderr.on('data', (d) => { out += d.toString(); });
-        proc.on('exit', (code) => {
-            resolve({ script, code, ms: Date.now() - t0, out });
+export function runScript(script, { root = ROOT, timeoutMs = 600_000 } = {}) {
+    return new Promise(resolve => {
+        const started = Date.now();
+        const proc = spawn(process.execPath, [script], { cwd: root, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+        activeChildren.add(proc);
+        let out = '', timedOut = false;
+        const append = data => { out = (out + data).slice(-256_000); };
+        proc.stdout.on('data', append);
+        proc.stderr.on('data', append);
+        const timer = setTimeout(() => { timedOut = true; void stopChild(proc); }, timeoutMs);
+        proc.once('error', error => { append(error.message); });
+        proc.once('close', code => {
+            activeChildren.delete(proc);
+            clearTimeout(timer);
+            resolve({ script, code: timedOut ? 124 : (code ?? 1), ms: Date.now() - started, out, timedOut });
         });
     });
 }
 
-const results = [];
-for (const script of scripts) {
-    process.stdout.write(`  ${script.padEnd(40)} `);
-    const r = await runScript(script);
-    const icon = r.code === 0 ? '✓' : '✗';
-    console.log(`${icon} ${(r.ms / 1000).toFixed(1)}s (exit ${r.code})`);
-    results.push(r);
-}
-
-// ── Cleanup server ────────────────────────────────────────────────
-
-if (ownsServer && !KEEP_SERVER && serverProc) {
-    serverProc.kill();
-}
-
-// ── Summary ──────────────────────────────────────────────────────
-
-console.log('\n=== verify:runtime summary ===');
-const passed = results.filter(r => r.code === 0);
-const failed = results.filter(r => r.code !== 0);
-console.log(`  passed: ${passed.length}`);
-console.log(`  failed: ${failed.length}`);
-console.log(`  total time: ${(results.reduce((s, r) => s + r.ms, 0) / 1000).toFixed(1)}s`);
-
-if (failed.length > 0) {
-    console.log('\n=== failure details ===');
-    for (const r of failed) {
-        console.log(`\n--- ${r.script} (exit ${r.code}) ---`);
-        // Last ~30 lines of output where the failure usually is
-        const lines = r.out.split('\n');
-        const tail = lines.slice(Math.max(0, lines.length - 30)).join('\n');
-        console.log(tail);
+export async function main(args = process.argv.slice(2)) {
+    const option = name => {
+        const index = args.indexOf(name);
+        if (index < 0) return null;
+        if (!args[index + 1] || args[index + 1].startsWith('--')) throw new Error(name + ' requires a value');
+        return args[index + 1];
+    };
+    const filter = option('--filter');
+    const timeoutMs = Number(option('--timeout-ms') || 600_000);
+    if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new Error('invalid --timeout-ms');
+    const found = discoverScripts();
+    const scripts = found.scripts.filter(script => !filter || script.includes(filter));
+    if (!scripts.length) throw new Error('no verify scripts matched: ' + (filter || 'none'));
+    for (const item of found.excluded) console.log('[runner] excluded ' + item.script + ': ' + item.reason);
+    if (args.includes('--list')) {
+        console.log(scripts.join('\n') + '\n[runner] total: ' + scripts.length);
+        return 0;
+    }
+    const { chromium } = await import('@playwright/test');
+    const browser = await chromium.launch();
+    await browser.close();
+    const baseURL = process.env.BASE_URL || 'http://localhost:3000';
+    async function isUp() {
+        try { return (await fetch(baseURL + '/editor.html', { signal: AbortSignal.timeout(2000) })).ok; }
+        catch { return false; }
+    }
+    let server, serverError, serverReady = false;
+    const interrupted = () => { void Promise.all([...activeChildren, server].map(stopChild)).finally(() => process.exit(130)); };
+    process.once('SIGINT', interrupted);
+    process.once('SIGTERM', interrupted);
+    try {
+        if (!await isUp()) {
+            const address = new URL(baseURL);
+            if (!['localhost', '127.0.0.1', '[::1]'].includes(address.hostname)) throw new Error('remote editor unavailable: ' + baseURL);
+            server = spawn(process.execPath, ['server.js'], {
+                cwd: ROOT, env: { ...process.env, PORT: address.port || '80' }, windowsHide: true,
+                stdio: ['ignore', 'ignore', 'pipe', 'ipc'],
+            });
+            server.on('error', error => { serverError = error; });
+            server.stderr.on('data', () => {});
+            for (let attempt = 0; attempt < 40; attempt++) {
+                if (serverError) throw serverError;
+                if (await isUp()) break;
+                if (server.exitCode !== null) throw new Error('editor server exited: ' + server.exitCode);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            if (!await isUp()) throw new Error('editor server did not start');
+            serverReady = true;
+        }
+        const results = [];
+        for (const script of scripts) {
+            const result = await runScript(script, { timeoutMs });
+            results.push(result);
+            console.log((result.code === 0 ? 'PASS ' : 'FAIL ') + script + ' (' + (result.ms / 1000).toFixed(1) + 's)');
+            if (result.code !== 0) console.log((result.timedOut ? 'Timed out\n' : '') + result.out.split('\n').slice(-30).join('\n'));
+        }
+        const failed = results.filter(result => result.code !== 0).length;
+        console.log('[runner] passed: ' + (results.length - failed) + ', failed: ' + failed);
+        return failed ? 1 : 0;
+    } finally {
+        process.removeListener('SIGINT', interrupted);
+        process.removeListener('SIGTERM', interrupted);
+        if (!args.includes('--keep-server') || !serverReady) await stopChild(server);
+        else if (server) { server.stderr.destroy(); server.disconnect(); server.unref(); }
     }
 }
 
-process.exit(failed.length === 0 ? 0 : 1);
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+    main().then(code => { process.exitCode = code; }).catch(error => {
+        console.error('[runner] ' + error.message);
+        process.exitCode = 1;
+    });
+}

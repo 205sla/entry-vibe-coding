@@ -236,7 +236,7 @@ if (assets.length) throw new Error(`에셋 ${assets.length}개 — 콘솔 붙여
 1. 멀티파트에서 파일 버퍼 받기 (`multer.memoryStorage()`)
 2. `zlib.gunzipSync(buf)` → tar 버퍼
 3. `extractTarFile(tarBuf, 'temp/project.json')` → JSON 파싱
-4. **세션 캐시에 tar 저장** — 유저별 sid(16자 base36), TTL 30분
+4. **세션의 tar를 메모리와 서버 임시 파일에 저장** — 세션별 sid(16자). 30분 미사용 시 메모리만 정리하며, 이후 요청은 임시 파일에서 복원한다. 탭 절전·장시간 편집에도 원본 에셋은 남는다.
 5. 프로젝트의 모든 `fileurl`/`thumbUrl` 리라이트:
    - `temp/aa/bb/…` → `/api/ent-asset/<sid>/temp/aa/bb/…`
    - `/...` (절대 경로) → 그대로
@@ -247,9 +247,11 @@ if (assets.length) throw new Error(`에셋 ${assets.length}개 — 콘솔 붙여
 
 세션 캐시에서 해당 경로의 tar 엔트리를 꺼내 스트리밍. content-type은 확장자로 결정.
 
+`DELETE /api/ent-session/:sid`는 해당 세션의 메모리와 임시 파일을 제거한다. 편집기가 다른 작품을 성공적으로 불러오면 이전 세션을 해제한다. 나머지 임시 파일은 서버 정상 종료 때 정리한다. 강제 종료 시 OS 임시 폴더에 파일이 남을 수 있으며, 서버 재시작 후 기존 세션 복구는 지원하지 않는다. 구현: [ent-session-store.js](../lib/ent-session-store.js).
+
 ### `/api/export`: JSON → `.ent`
 
-1. project의 각 `picture.fileurl`을 해석 (temp/… 는 통과, 절대 경로는 public/에서 번들)
+1. 모양·소리 주소를 해석한다. `/api/ent-asset/<sid>/...`는 세션에서, `/...`는 public에서 읽는다. `temp/...`는 요청 `__sid`로 원본에서 찾아 번들한다. 원본이 없으면 409, 주소가 없으면 422로 중단하며 편집기에 이유를 표시한다. HTTP/data 주소는 기존처럼 통과하므로 항상 자체 포함한 파일이라는 뜻은 아니다.
 2. 이미지는 `sharp(buf).png()`로 래스터라이즈해 tar에 PNG만 저장
 3. 썸네일은 96px 다운스케일 PNG
 4. `picture.imageType = "png"`, `picture.filename = hash`, **`picture.thumbUrl` 삭제**

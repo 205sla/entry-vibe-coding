@@ -1,0 +1,831 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "filename": "쇼기한판_의 리메이크.ent",
+    "sha256": "97a77cb6217216fcbe8040ece1ad858c13f4f0f417e589835e9d92af674f479e",
+    "bytes": 10040361,
+    "projectEntry": "temp/project.json",
+    "projectJsonSha256": "09357148e663c8aef315e35dc1c5c81d7e9a9e422e00888411e31fe1f39d903c"
+  },
+  "method": {
+    "date": "2026-09-10",
+    "scope": "gzip/tar 및 project.json 정적 분석; 자막 레이어 SVG 표본 3장 메모리 렌더 확인; 런타임 재생·실측 FPS·오디오 동기화 미검증",
+    "normalization": "objects[*].script JSON 문자열을 파싱. paths는 이 정규화 프로젝트에 대한 RFC 6901 JSON Pointer.",
+    "blockDefinition": "objects[*].script의 params와 statements를 재귀 순회하며 문자열 type 필드를 가진 객체 1개를 블록 1개로 집계. 떨어진 스택 포함, 중복 id는 합치지 않음.",
+    "assetDefinition": "picture는 메타데이터 항목 수. tar 파일은 디렉터리(type 5)를 제외하여 경로와 확장자로 집계. 번들 외 기본 엔트리봇 경로는 별도 분류."
+  },
+  "stats": {
+    "scenes": 1,
+    "objects": 15,
+    "sprites": 15,
+    "textBoxes": 0,
+    "scriptStacks": 47,
+    "blocks": 644,
+    "blockTypes": 31,
+    "variables": 5,
+    "messages": 26,
+    "functions": 0,
+    "pictures": 305,
+    "sounds": 1,
+    "pictureTypes": {
+      "svg": 303,
+      "png": 2
+    },
+    "tarEntries": 2000,
+    "tarDirectories": 1091,
+    "tarFiles": 909,
+    "tarImageSvg": 301,
+    "tarImagePng": 303,
+    "tarThumbPng": 303,
+    "tarSoundMp3": 1,
+    "tarProjectJson": 1,
+    "bundledPictureReferences": 303,
+    "builtinPictureReferences": 2,
+    "blockTypeCounts": {
+      "when_run_button_click": 2,
+      "start_neighbor_scene": 1,
+      "when_scene_start": 5,
+      "hide": 9,
+      "when_message_cast": 38,
+      "set_variable": 25,
+      "text": 31,
+      "show": 17,
+      "repeat_basic": 37,
+      "number": 122,
+      "wait_until_true": 36,
+      "boolean_basic_operator": 36,
+      "get_project_timer_value": 36,
+      "get_variable": 30,
+      "change_to_next_shape": 54,
+      "change_variable": 30,
+      "calc_basic": 38,
+      "change_to_some_shape": 15,
+      "get_pictures": 15,
+      "wait_second": 10,
+      "choose_project_timer_action": 19,
+      "message_cast": 22,
+      "flip_y": 2,
+      "change_scale_size": 3,
+      "coordinate_object": 4,
+      "locate_y": 1,
+      "stretch_scale_size": 1,
+      "locate_xy_time": 2,
+      "start_scene": 1,
+      "sound_something_with_block": 1,
+      "get_sounds": 1
+    }
+  },
+  "comparison": {
+    "files": [
+      {
+        "file": "shogi_000.ent",
+        "sha256": "278a061c8202793d0e3ca31c5bed342f9a21913cdda6b262c2f1ad43ac8dd562"
+      },
+      {
+        "file": "shogi_001.ent",
+        "sha256": "6674423c868f334df7f243f975cfbdaeabe81298072c51d321f846730e86889b"
+      },
+      {
+        "file": "shogi_002.ent",
+        "sha256": "789fee86f8f5de1ddeece5283cdd6ad9ce6961acaaedcc32393c1232b65b3b28"
+      },
+      {
+        "file": "shogi_003.ent",
+        "sha256": "32d3aabb66fcfb667a20bd74895ab80be7ecf1b1cb74b24942f7c78662ec4ce6"
+      },
+      {
+        "file": "shogi_004.ent",
+        "sha256": "66c6d1bdc68dad861e399dbb00685f09570bdf4df2eeebaf200e17b61d93d0ba"
+      },
+      {
+        "file": "shogi_005.ent",
+        "sha256": "684812fae0074266b5ec01bba832ac7a8561c29e664458f18c9f4d52843e7e52"
+      },
+      {
+        "file": "shogi_006.ent",
+        "sha256": "52b19f9f747aab556c71b4f3168456af5cfd9929fac44fed045ad7b67cb2aa22"
+      },
+      {
+        "file": "shogi_007.ent",
+        "sha256": "73d232891bd0c38eb2e56e0e38741f8c7bc9cb2dac74b291aec072b0428d2419"
+      },
+      {
+        "file": "shogi_008.ent",
+        "sha256": "415d2189167b5fafe48a5a80b36099ffaeeed992598999bad271ae8fb01a2938"
+      },
+      {
+        "file": "shogi_009.ent",
+        "sha256": "83f8dacb42b67d17c8bf91a96f62e9007293a5405dc1c0c59fc59e60a7a26d20"
+      },
+      {
+        "file": "shogi_010.ent",
+        "sha256": "06108247e26b4b4e08a403f56220c05e378ad45a26741437c3e33e2ad126232b"
+      },
+      {
+        "file": "shogi_011.ent",
+        "sha256": "6f1e078dff1aa8c6c2663fe3deae285e682ad0f0c5914104de7d6bb53d8b0895"
+      }
+    ],
+    "exactSourceMatch": false,
+    "note": "games/shogi의 기존 12개 파일과 원본 바이트 해시가 다름. 기존 작업 결과·런타임 검증을 첨부 원본에 전이하지 않음."
+  },
+  "observations": {
+    "subtitleSamples": [
+      {
+        "path": "/objects/11/sprite/pictures/0",
+        "id": "kul6",
+        "observation": "어두운 배경 합성으로 흰색 한글 글자/단어 형태를 확인. 문구는 보관하지 않음."
+      },
+      {
+        "path": "/objects/11/sprite/pictures/1",
+        "id": "ietm",
+        "observation": "어두운 배경 합성으로 흰색 한글 글자/단어 형태를 확인. 문구는 보관하지 않음."
+      },
+      {
+        "path": "/objects/11/sprite/pictures/7",
+        "id": "e4wf",
+        "observation": "어두운 배경 합성으로 흰색 한글 글자/단어 형태를 확인. 문구는 보관하지 않음."
+      }
+    ],
+    "audio": {
+      "path": "/objects/14/sprite/sounds/0",
+      "id": "tqu1",
+      "metadataDurationSeconds": 19.1,
+      "embedded": true,
+      "durationMeasured": false
+    },
+    "detachedStacks": [
+      {
+        "path": "/objects/7/script/0",
+        "headType": "repeat_basic"
+      },
+      {
+        "path": "/objects/11/script/4",
+        "headType": "wait_until_true"
+      }
+    ]
+  },
+  "assertions": [
+    {
+      "label": "scene",
+      "path": "/scenes/0/id",
+      "expected": "7dwq"
+    },
+    {
+      "label": "functions-empty",
+      "path": "/functions",
+      "expected": []
+    },
+    {
+      "label": "main-owner",
+      "path": "/objects/6/id",
+      "expected": "s6im"
+    },
+    {
+      "label": "main-start-signal",
+      "path": "/objects/6/script/0/0/params",
+      "expected": [
+        null,
+        "78qp"
+      ]
+    },
+    {
+      "label": "timer-reset",
+      "path": "/objects/6/script/0/1/params",
+      "expected": [
+        null,
+        "RESET",
+        null,
+        null
+      ]
+    },
+    {
+      "label": "deadline-variable",
+      "path": "/objects/6/script/0/2/params/0",
+      "expected": "oinf"
+    },
+    {
+      "label": "deadline-zero",
+      "path": "/objects/6/script/0/2/params/1/params/0",
+      "expected": "0"
+    },
+    {
+      "label": "first-repeat-count",
+      "path": "/objects/6/script/0/4/params/0/params/0",
+      "expected": "17"
+    },
+    {
+      "label": "frame-wait",
+      "path": "/objects/6/script/0/4/statements/0/0/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "frame-clock",
+      "path": "/objects/6/script/0/4/statements/0/0/params/0/params/0/type",
+      "expected": "get_project_timer_value"
+    },
+    {
+      "label": "frame-comparison",
+      "path": "/objects/6/script/0/4/statements/0/0/params/0/params/1",
+      "expected": "GREATER_OR_EQUAL"
+    },
+    {
+      "label": "frame-next",
+      "path": "/objects/6/script/0/4/statements/0/1/type",
+      "expected": "change_to_next_shape"
+    },
+    {
+      "label": "frame-step-op",
+      "path": "/objects/6/script/0/4/statements/0/2/params/1/params/1",
+      "expected": "DIVIDE"
+    },
+    {
+      "label": "frame-step-numerator",
+      "path": "/objects/6/script/0/4/statements/0/2/params/1/params/0/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "frame-step-denominator",
+      "path": "/objects/6/script/0/4/statements/0/2/params/1/params/2/params/0",
+      "expected": "24"
+    },
+    {
+      "label": "cue-before-reset",
+      "path": "/objects/6/script/0/5/params",
+      "expected": [
+        "ytle",
+        null
+      ]
+    },
+    {
+      "label": "reset-after-cue",
+      "path": "/objects/6/script/0/6/params",
+      "expected": [
+        null,
+        "RESET",
+        null,
+        null
+      ]
+    },
+    {
+      "label": "subtitle-owner",
+      "path": "/objects/11/id",
+      "expected": "ttj0"
+    },
+    {
+      "label": "subtitle-cue",
+      "path": "/objects/11/script/2/0/params",
+      "expected": [
+        null,
+        "ytle"
+      ]
+    },
+    {
+      "label": "subtitle-first-change",
+      "path": "/objects/11/script/2/1/type",
+      "expected": "change_to_next_shape"
+    },
+    {
+      "label": "subtitle-threshold-035",
+      "path": "/objects/11/script/2/2/params/0/params/2/params/0",
+      "expected": "0.35"
+    },
+    {
+      "label": "subtitle-threshold-070",
+      "path": "/objects/11/script/2/4/params/0/params/2/params/0",
+      "expected": "0.7"
+    },
+    {
+      "label": "overlay-cue",
+      "path": "/objects/5/script/1/0/params",
+      "expected": [
+        null,
+        "ytle"
+      ]
+    },
+    {
+      "label": "overlay-deadline",
+      "path": "/objects/5/script/1/1/params/0",
+      "expected": "h8ww"
+    },
+    {
+      "label": "repeat-cycle-count",
+      "path": "/objects/6/script/0/20/params/0/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "repeat-cycle-anchor",
+      "path": "/objects/6/script/0/20/statements/0/0/params/0/params/0",
+      "expected": "atjl"
+    },
+    {
+      "label": "repeat-cycle-inner-count",
+      "path": "/objects/6/script/0/20/statements/0/1/params/0/params/0",
+      "expected": "7"
+    },
+    {
+      "label": "repeat-flip",
+      "path": "/objects/6/script/0/66/type",
+      "expected": "flip_y"
+    },
+    {
+      "label": "ending-cue",
+      "path": "/objects/6/script/0/75/params",
+      "expected": [
+        "vucl",
+        null
+      ]
+    },
+    {
+      "label": "ending-hide",
+      "path": "/objects/6/script/0/76/type",
+      "expected": "hide"
+    },
+    {
+      "label": "ending-motion-owner",
+      "path": "/objects/12/id",
+      "expected": "tqc4"
+    },
+    {
+      "label": "ending-resize-cue",
+      "path": "/objects/12/script/0/0/params",
+      "expected": [
+        null,
+        "vucl"
+      ]
+    },
+    {
+      "label": "ending-move-cue",
+      "path": "/objects/12/script/1/0/params",
+      "expected": [
+        null,
+        "vucl"
+      ]
+    },
+    {
+      "label": "ending-move-duration",
+      "path": "/objects/12/script/1/2/params/0/params/0",
+      "expected": "0.4"
+    },
+    {
+      "label": "ending-move2-duration",
+      "path": "/objects/12/script/1/3/params/0/params/0",
+      "expected": "0.2"
+    },
+    {
+      "label": "start-specific-scene",
+      "path": "/objects/14/script/0/1/params",
+      "expected": [
+        "7dwq",
+        null
+      ]
+    },
+    {
+      "label": "start-neighbor-scene",
+      "path": "/objects/0/script/0/1/params",
+      "expected": [
+        "next",
+        null
+      ]
+    },
+    {
+      "label": "audio-scene-trigger",
+      "path": "/objects/14/script/1/0/type",
+      "expected": "when_scene_start"
+    },
+    {
+      "label": "audio-nonblocking",
+      "path": "/objects/14/script/1/1/type",
+      "expected": "sound_something_with_block"
+    },
+    {
+      "label": "audio-reference",
+      "path": "/objects/14/script/1/1/params/0/params/0",
+      "expected": "tqu1"
+    },
+    {
+      "label": "audio-duration-metadata",
+      "path": "/objects/14/sprite/sounds/0/duration",
+      "expected": 19.1
+    },
+    {
+      "label": "audio-id",
+      "path": "/objects/14/sprite/sounds/0/id",
+      "expected": "tqu1"
+    },
+    {
+      "label": "intro-timer-start",
+      "path": "/objects/9/script/0/1/params",
+      "expected": [
+        null,
+        "START",
+        null,
+        null
+      ]
+    },
+    {
+      "label": "intro-next-signal",
+      "path": "/objects/9/script/0/3/params",
+      "expected": [
+        "0ft3",
+        null
+      ]
+    },
+    {
+      "label": "intro-chain-signal",
+      "path": "/objects/8/script/0/4/params",
+      "expected": [
+        "7604",
+        null
+      ]
+    },
+    {
+      "label": "main-chain-signal",
+      "path": "/objects/7/script/4/2/params",
+      "expected": [
+        "78qp",
+        null
+      ]
+    },
+    {
+      "label": "main-chain-threshold",
+      "path": "/objects/7/script/4/1/params/0/params/2/params/0",
+      "expected": "1.5"
+    },
+    {
+      "label": "detached-repeat",
+      "path": "/objects/7/script/0/0/type",
+      "expected": "repeat_basic"
+    },
+    {
+      "label": "detached-wait",
+      "path": "/objects/11/script/4/0/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "svg-picture",
+      "path": "/objects/11/sprite/pictures/0/imageType",
+      "expected": "svg"
+    },
+    {
+      "label": "builtin-reference-1",
+      "path": "/objects/14/sprite/pictures/0/fileurl",
+      "expected": "./bower_components/entry-js/images/media/entrybot1.svg"
+    },
+    {
+      "label": "builtin-reference-2",
+      "path": "/objects/14/sprite/pictures/1/fileurl",
+      "expected": "./bower_components/entry-js/images/media/entrybot2.svg"
+    },
+    {
+      "label": "object-count",
+      "path": "/objects/length",
+      "expected": 15
+    },
+    {
+      "label": "scene-count",
+      "path": "/scenes/length",
+      "expected": 1
+    },
+    {
+      "label": "message-count",
+      "path": "/messages/length",
+      "expected": 26
+    },
+    {
+      "label": "variable-count",
+      "path": "/variables/length",
+      "expected": 5
+    },
+    {
+      "label": "function-count",
+      "path": "/functions/length",
+      "expected": 0
+    },
+    {
+      "label": "subtitle-picture-count",
+      "path": "/objects/11/sprite/pictures/length",
+      "expected": 18
+    },
+    {
+      "label": "main-picture-count",
+      "path": "/objects/6/sprite/pictures/length",
+      "expected": 232
+    },
+    {
+      "label": "audio-count",
+      "path": "/objects/14/sprite/sounds/length",
+      "expected": 1
+    },
+    {
+      "label": "object-0-script-count",
+      "path": "/objects/0/script/length",
+      "expected": 2
+    },
+    {
+      "label": "object-0-picture-count",
+      "path": "/objects/0/sprite/pictures/length",
+      "expected": 1
+    },
+    {
+      "label": "object-0-type",
+      "path": "/objects/0/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-1-script-count",
+      "path": "/objects/1/script/length",
+      "expected": 1
+    },
+    {
+      "label": "object-1-picture-count",
+      "path": "/objects/1/sprite/pictures/length",
+      "expected": 1
+    },
+    {
+      "label": "object-1-type",
+      "path": "/objects/1/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-2-script-count",
+      "path": "/objects/2/script/length",
+      "expected": 0
+    },
+    {
+      "label": "object-2-picture-count",
+      "path": "/objects/2/sprite/pictures/length",
+      "expected": 2
+    },
+    {
+      "label": "object-2-type",
+      "path": "/objects/2/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-3-script-count",
+      "path": "/objects/3/script/length",
+      "expected": 0
+    },
+    {
+      "label": "object-3-picture-count",
+      "path": "/objects/3/sprite/pictures/length",
+      "expected": 1
+    },
+    {
+      "label": "object-3-type",
+      "path": "/objects/3/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-4-script-count",
+      "path": "/objects/4/script/length",
+      "expected": 0
+    },
+    {
+      "label": "object-4-picture-count",
+      "path": "/objects/4/sprite/pictures/length",
+      "expected": 1
+    },
+    {
+      "label": "object-4-type",
+      "path": "/objects/4/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-5-script-count",
+      "path": "/objects/5/script/length",
+      "expected": 11
+    },
+    {
+      "label": "object-5-picture-count",
+      "path": "/objects/5/sprite/pictures/length",
+      "expected": 7
+    },
+    {
+      "label": "object-5-type",
+      "path": "/objects/5/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-6-script-count",
+      "path": "/objects/6/script/length",
+      "expected": 1
+    },
+    {
+      "label": "object-6-picture-count",
+      "path": "/objects/6/sprite/pictures/length",
+      "expected": 232
+    },
+    {
+      "label": "object-6-type",
+      "path": "/objects/6/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-7-script-count",
+      "path": "/objects/7/script/length",
+      "expected": 5
+    },
+    {
+      "label": "object-7-picture-count",
+      "path": "/objects/7/sprite/pictures/length",
+      "expected": 5
+    },
+    {
+      "label": "object-7-type",
+      "path": "/objects/7/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-8-script-count",
+      "path": "/objects/8/script/length",
+      "expected": 1
+    },
+    {
+      "label": "object-8-picture-count",
+      "path": "/objects/8/sprite/pictures/length",
+      "expected": 17
+    },
+    {
+      "label": "object-8-type",
+      "path": "/objects/8/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-9-script-count",
+      "path": "/objects/9/script/length",
+      "expected": 1
+    },
+    {
+      "label": "object-9-picture-count",
+      "path": "/objects/9/sprite/pictures/length",
+      "expected": 14
+    },
+    {
+      "label": "object-9-type",
+      "path": "/objects/9/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-10-script-count",
+      "path": "/objects/10/script/length",
+      "expected": 4
+    },
+    {
+      "label": "object-10-picture-count",
+      "path": "/objects/10/sprite/pictures/length",
+      "expected": 2
+    },
+    {
+      "label": "object-10-type",
+      "path": "/objects/10/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-11-script-count",
+      "path": "/objects/11/script/length",
+      "expected": 17
+    },
+    {
+      "label": "object-11-picture-count",
+      "path": "/objects/11/sprite/pictures/length",
+      "expected": 18
+    },
+    {
+      "label": "object-11-type",
+      "path": "/objects/11/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-12-script-count",
+      "path": "/objects/12/script/length",
+      "expected": 2
+    },
+    {
+      "label": "object-12-picture-count",
+      "path": "/objects/12/sprite/pictures/length",
+      "expected": 1
+    },
+    {
+      "label": "object-12-type",
+      "path": "/objects/12/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-13-script-count",
+      "path": "/objects/13/script/length",
+      "expected": 0
+    },
+    {
+      "label": "object-13-picture-count",
+      "path": "/objects/13/sprite/pictures/length",
+      "expected": 1
+    },
+    {
+      "label": "object-13-type",
+      "path": "/objects/13/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "object-14-script-count",
+      "path": "/objects/14/script/length",
+      "expected": 2
+    },
+    {
+      "label": "object-14-picture-count",
+      "path": "/objects/14/sprite/pictures/length",
+      "expected": 2
+    },
+    {
+      "label": "object-14-type",
+      "path": "/objects/14/objectType",
+      "expected": "sprite"
+    },
+    {
+      "label": "main-cue-ko5a",
+      "path": "/objects/6/script/0/5/params/0",
+      "expected": "ytle"
+    },
+    {
+      "label": "main-cue-hxmc",
+      "path": "/objects/6/script/0/9/params/0",
+      "expected": "0h45"
+    },
+    {
+      "label": "main-cue-95gx",
+      "path": "/objects/6/script/0/13/params/0",
+      "expected": "px0p"
+    },
+    {
+      "label": "main-cue-22hz",
+      "path": "/objects/6/script/0/17/params/0",
+      "expected": "lwk6"
+    },
+    {
+      "label": "main-cue-chu6",
+      "path": "/objects/6/script/0/23/params/0",
+      "expected": "7cfs"
+    },
+    {
+      "label": "main-cue-etmz",
+      "path": "/objects/6/script/0/26/params/0",
+      "expected": "eiqc"
+    },
+    {
+      "label": "main-cue-uhvd",
+      "path": "/objects/6/script/0/30/params/0",
+      "expected": "suuy"
+    },
+    {
+      "label": "main-cue-lwgb",
+      "path": "/objects/6/script/0/34/params/0",
+      "expected": "gumi"
+    },
+    {
+      "label": "main-cue-thvc",
+      "path": "/objects/6/script/0/38/params/0",
+      "expected": "ljnw"
+    },
+    {
+      "label": "main-cue-0vg3",
+      "path": "/objects/6/script/0/42/params/0",
+      "expected": "2z2u"
+    },
+    {
+      "label": "main-cue-v5eq",
+      "path": "/objects/6/script/0/46/params/0",
+      "expected": "zguu"
+    },
+    {
+      "label": "main-cue-asax",
+      "path": "/objects/6/script/0/50/params/0",
+      "expected": "ltrm"
+    },
+    {
+      "label": "main-cue-vzob",
+      "path": "/objects/6/script/0/54/params/0",
+      "expected": "21a3"
+    },
+    {
+      "label": "main-cue-ld35",
+      "path": "/objects/6/script/0/58/params/0",
+      "expected": "qbph"
+    },
+    {
+      "label": "main-cue-rpan",
+      "path": "/objects/6/script/0/63/params/0",
+      "expected": "si9t"
+    },
+    {
+      "label": "main-cue-a0ir",
+      "path": "/objects/6/script/0/69/params/0",
+      "expected": "nst8"
+    },
+    {
+      "label": "main-cue-itvy",
+      "path": "/objects/6/script/0/75/params/0",
+      "expected": "vucl"
+    }
+  ]
+}

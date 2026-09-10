@@ -35,6 +35,15 @@ npx playwright install chromium    # 헤드리스 검증용 (한 번만)
    완성 게임 예시: `games/*/spec.mjs`
 2. **spec 작성** — `games/<이름>/spec.mjs` (DSL 권장 — helper 문서는
    [tools/lib/spec-dsl.mjs](tools/lib/spec-dsl.mjs) 상단 주석 + JSDoc)
+   에셋 제작 방식은 현재 사용 가능한 도구를 기준으로 선택한다.
+   **이미지 생성 도구가 없는 Claude Code 등의 환경에서는 기존 SVG 기능을 기본으로 사용한다.**
+   [SVG 제작 절차](knowledge/03-objects-and-assets.md#이미지-생성-도구가-없는-환경의-svg-제작)에 따라
+   `assets()`로 기존 모양을 재사용하고, `sprite-gen.mjs` 또는 직접 작성한 `svgString`으로
+   캐릭터·아이템·배경·이펙트·애니메이션 모양을 완성한다. 도구 부재를 이유로 제작 범위를 줄이거나
+   이미지 업로드·API 키·유료 도구 설치를 요구하며 멈추지 않는다.
+   이미지 생성 도구가 있으면 일러스트 제작에 활용하고, 캐릭터·아이템은 투명 배경을 우선 요청한다.
+   [AI 이미지 에셋 절차](knowledge/03-objects-and-assets.md#ai-이미지-생성과-투명-오브젝트)에 따라
+   배경 제거·실제 알파 검사·등록을 진행한다. 실패하거나 사용할 수 없으면 SVG 제작으로 이어간다.
 3. **정적 검증** — `node tools/make-ent.mjs games/<이름>/spec.mjs --check` (< 1초).
    통과할 때까지 2↔3 반복.
 4. **빌드** — `node tools/make-ent.mjs games/<이름>/spec.mjs --out games/<이름>/<이름>_001.ent`
@@ -46,7 +55,7 @@ npx playwright install chromium    # 헤드리스 검증용 (한 번만)
 
 | 레이어 | 명령 | 전제 | 확인 내용 |
 |---|---|---|---|
-| L1 정적 | `node tools/make-ent.mjs <spec> --check` | `npm install`만 | 블록 type·paramCount·슬롯 wrap |
+| L1 정적 | `node tools/make-ent.mjs <spec> --check` | `npm install`만 | 블록 type·슬롯·참조·ID 중복·로컬 에셋 (빌드 시에도 자동 검사) |
 | L2 smoke | `npm run test:smoke` | `npm install`만 | tar/JSON 구조, 에셋 실재 |
 | L3 부트+로드 | `npm run test:e2e` | setup + chromium | 편집기 부팅 console error 0, 전 fixture 로드 |
 | L4 런타임 플레이 | `node tools/run-all-verify.mjs --filter <이름>` | setup + chromium | 실제 플레이: 변수 변화·클론·픽셀 |

@@ -33,6 +33,7 @@ import zlib from 'node:zlib';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { uid } from 'uid';
+import { checkSpecReferences } from './lib/spec-references.mjs';
 
 // tar/hash/bundler helpers shared with server.js — single source in lib/.
 const require = createRequire(import.meta.url);
@@ -46,12 +47,12 @@ const PUBLIC_DIR    = path.resolve(__dirname, '..', 'public');
 // Resolve a spec picture/sound reference to a bundlable absolute path.
 //   { path: "C:/…" }                  → absolute path (explicit)
 //   { fileurl: "/images/foo.svg" }    → <PUBLIC_DIR>/images/foo.svg (auto-bundle)
-//   { fileurl: "http[s]:..." | "data:..." | "temp/..." } → null (leave as-is)
-// Returns null when the reference is external or not found on disk.
+//   { fileurl: "http[s]:..." | "data:..." } → null (leave as-is)
+// Validation checks existence; reads still throw if a local file disappears.
 function resolveLocalPath(ref) {
     if (!ref) return null;
     if (typeof ref.path === 'string' && ref.path) {
-        return fs.existsSync(ref.path) ? ref.path : null;
+        return ref.path;
     }
     const url = typeof ref.fileurl === 'string' ? ref.fileurl : null;
     if (!url) return null;
@@ -59,16 +60,14 @@ function resolveLocalPath(ref) {
     if (!url.startsWith('/')) return null;
     const abs = path.resolve(PUBLIC_DIR, url.slice(1));
     if (!abs.startsWith(PUBLIC_DIR + path.sep) && abs !== PUBLIC_DIR) return null;
-    return fs.existsSync(abs) ? abs : null;
+    return abs;
 }
 
 let __registry = null;
 function loadRegistry() {
     if (__registry) return __registry;
     if (!fs.existsSync(REGISTRY_PATH)) {
-        console.warn('[make-ent] block-registry.json missing; run build-block-registry first. Skipping block validation.');
-        __registry = { blocks: {} };
-        return __registry;
+        throw new Error('block-registry.json missing; run build-block-registry before validation/build');
     }
     __registry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
     return __registry;
@@ -191,8 +190,11 @@ function wrapParam(v, slotShape = null) {
 //
 // Returns an array of { severity: 'error' | 'warning', path, msg }.
 export function validateSpec(spec) {
-    const issues = [];
     const blocks = loadRegistry().blocks;
+    const checked = checkSpecReferences(spec, blocks, PUBLIC_DIR);
+    const issues = checked.issues;
+    if (checked.malformed) return issues;
+    spec = checked.spec;
 
     // Value functions used as a statement break Entry.loadProject outright
     // (appendChild TypeError inside the block-rendering pass) — the project
@@ -205,9 +207,9 @@ export function validateSpec(spec) {
 
     // Synthesized at runtime by Entry.Func — not in our registry, but valid.
     const isUserFuncType = (t) =>
-        /^func_[a-z0-9]+$/i.test(t) ||
-        /^stringParam_[a-z0-9]+$/i.test(t) ||
-        /^booleanParam_[a-z0-9]+$/i.test(t);
+        /^func_.+$/.test(t) ||
+        /^stringParam_.+$/.test(t) ||
+        /^booleanParam_.+$/.test(t);
 
     const FIELD_SLOTS = new Set(['Dropdown', 'DropdownDynamic', 'Keyboard', 'TextInput']);
 
@@ -298,8 +300,7 @@ export function validateSpec(spec) {
                 walkStatement(b, `objects[${tag}].script[${ti}][${bi}]`)));
     });
 
-    // Function content (skip if already stringified — that path is for
-    // pre-built strings the author opted into).
+    // The reference prepass also parses stringified function content.
     (spec.functions || []).forEach((f, fi) => {
         if (!Array.isArray(f.content)) return;
         const tag = f.id ? `${fi}=${f.id}` : `${fi}`;
@@ -336,7 +337,6 @@ function buildAssets(_spec) {
     // buildProject() keeps working unchanged.
     const bundler = createAssetBundler();
     const bundleOne = async (absPath, kind) => {
-        if (!fs.existsSync(absPath)) return null;
         const buf = fs.readFileSync(absPath);
         const ext = (path.extname(absPath).slice(1) || 'bin').toLowerCase();
         // path itself is the cacheKey — same file referenced N times → 1 tar entry.
@@ -354,6 +354,8 @@ function buildAssets(_spec) {
 }
 
 export async function buildProject(spec) {
+    const errors = validateSpec(spec).filter(issue => issue.severity === 'error');
+    if (errors.length) throw new Error('Invalid spec:\n' + errors.map(issue => issue.path + ': ' + issue.msg).join('\n'));
     // Scene ids are plain 4-char random (same style as objects/pictures).
     // Entry's starter project uses '7dwq' (see entryjs src/class/project.js:82),
     // but that's only an implementation detail of the no-args Entry.loadProject().
@@ -428,8 +430,8 @@ export async function buildProject(spec) {
             //   1. svgString — generated SVG (sprite-gen). Bundle bytes directly,
             //      content-hashed → duplicate generated SVGs dedup automatically.
             //   2. path / fileurl resolves under public/ → read file, bundle.
-            //   3. external (http/data/temp/...) → leave fileurl as-is.
-            // Result is a self-contained .ent that works in any Entry editor.
+            //   3. external (http/data) → leave fileurl as-is.
+            // Local assets are bundled; external references stay external.
             let bundled = null;
             if (typeof p.svgString === 'string' && p.svgString.length > 0) {
                 bundled = await assets.bundleBuf(Buffer.from(p.svgString, 'utf8'), 'svg', 'image');
@@ -475,9 +477,7 @@ export async function buildProject(spec) {
         // use a text rendering path and do NOT need a picture.
         if (objectType === 'sprite' && pictures.length === 0) {
             const blankPath = path.join(PUBLIC_DIR, 'images', 'blank', 'placeholder.svg');
-            const bundled = fs.existsSync(blankPath)
-                ? await assets.bundleOne(blankPath, 'image')
-                : null;
+            const bundled = await assets.bundleOne(blankPath, 'image');
             pictures.push({
                 id: shortId(),
                 dimension: (bundled && bundled.dimension) || { width: 200, height: 240 },
@@ -490,7 +490,8 @@ export async function buildProject(spec) {
         // Entry expects at least one thread array (even if empty). An empty
         // top-level "[]" triggers addChildAt(undefined) during sprite creation;
         // "[[]]" is the canonical empty-but-valid shape.
-        const rawThreads = (o.script && o.script.length) ? o.script : [[]];
+        const parsedThreads = typeof o.script === 'string' ? JSON.parse(o.script) : o.script;
+        const rawThreads = parsedThreads?.length ? parsedThreads : [[]];
         const script = rawThreads.map(thread => (thread || []).map(normalizeBlock));
         const sceneId = resolveSceneId(o.scene, scenes);
         const obj = {
@@ -604,8 +605,7 @@ export async function writeEnt(spec, outPath) {
 //   .json → parsed as JSON literally
 //   .mjs / .js → dynamically imported; uses `default` export (or whole module)
 //                so authors can use the spec-DSL helpers (tools/lib/spec-dsl.mjs)
-if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}` ||
-    process.argv[1] && process.argv[1].endsWith('make-ent.mjs')) {
+if (process.argv[1] && import.meta.url === url.pathToFileURL(path.resolve(process.argv[1])).href) {
     const args = process.argv.slice(2);
     const checkOnly = args.includes('--check');
     const positional = args.filter(a => !a.startsWith('--'));

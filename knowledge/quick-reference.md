@@ -25,7 +25,7 @@
   파일 mode `000644`, uid/gid/uname/gname NUL, 디렉터리 mtime NUL.
 - **해시**: `uid(8) + puid.generate()` 공식 알고리즘, 32자 base36 (`[0-9a-z]`).
 - **샤딩**: `d1 = hash[0:2]`, `d2 = hash[2:4]` → `temp/<d1>/<d2>/...`
-- **이미지**: 항상 PNG (SVG 입력은 sharp로 래스터라이즈). thumb은 96px PNG.
+- **이미지 생성 정책**: PNG로 래스터라이즈하고 96px PNG thumb을 만든다. 외부 작품의 SVG는 별도 해석한다([이미지 형식](03-objects-and-assets.md#외부-작품을-읽을-때는-svg도-보존한다)).
 
 ## project.json 최소 유효 shape
 

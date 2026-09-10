@@ -378,9 +378,25 @@ if_(isTarget, [
 
 증거: 회귀 가드 [`tools/verify-fruit-hunt.mjs`](../tools/verify-fruit-hunt.mjs) Step 3 — 두 번째 정답 클릭 후 레벨 증가 + 9 클론 재생성.
 
+#### 오브젝트 전용 변수와 클론별 상태
+
+`project.variables[*].object`에 오브젝트 ID를 지정한 변수는 전역 변수와 구분된다. 복제본을 만들 때 오브젝트 전용 변수·리스트가 복사되며, 클론에서 해당 변수를 읽고 쓰면 클론의 저장소를 사용한다. 함수의 `localVariables`와는 별개 기능이다.
+
+| 상태 범위 | 선언·저장 방식 | 용도 |
+| --- | --- | --- |
+| 전역 | `variables[*].object: null` | 점수, 진행 상태, 여러 오브젝트가 읽는 병렬 리스트 |
+| 오브젝트 전용 | `variables[*].object: "enemy"` | 복제본별 번호, 원본/복제본 구분, 개별 타이머 |
+| 함수 지역 | `functions[*].localVariables` | 함수 안 임시 계산값. 클론 ID의 영속 저장소로 혼동하지 않음 |
+
+생성기 `make-ent.mjs`는 `spec.variables[*].object`를 전달한다. 예를 들어 `variables: [{ id: 'enemy_id', name: '내 번호', object: 'enemy', value: 0 }]`로 선언할 수 있다. 단축형 `spec.lists`는 현재 `object: null`로 생성하므로, 오브젝트 전용 리스트에는 `spec.variables`의 `variableType: 'list'`와 `object`를 사용한다.
+
+2026-09-10 소스 대조: `src/class/object.js`의 `addCloneEntity` → `addCloneVariables`는 대상 오브젝트의 변수·리스트를 각각 `clone()`한다. `src/class/variable_container.js`의 `getVariable`·`getList`는 클론이며 `object_`가 있는 경우 클론 저장소에서 조회한다. 이는 로컬 엔진 소스 확인이며 이번 작업에서 브라우저 실행 검증은 하지 않았다.
+
+[RPG 사례](09-rpg-case-study.md)는 이 스코프와 전역 병렬 리스트를 함께 사용하는 실제 블록 근거를 제공한다. 변수 스코프가 분리돼도 같은 클론의 여러 시작 스레드끼리는 상태를 공유한다. [다중 시작 핸들러의 순서 문제](07-runtime-quirks.md#다중-when_clone_start-스크립트는-병렬-실행--클론-초기화-race)는 별도로 설계해야 한다.
+
 #### 클론 정체 판정 — 클론 좌표 = 고유 id 대용
 
-클론은 글로벌 변수만 공유 — "이 클론이 정답인가?" 같은 판정에 클론별 식별자가 필요. Entry 에는 클론별 로컬 변수가 없고, `selectedPicture.id` 도 직접 못 읽음. 대안:
+"이 클론이 정답인가?" 같은 판정에는 클론별 식별자가 필요하다. **오브젝트 전용 변수는 복제본별로 복사되므로 이를 사용할 수 있다**([오브젝트 전용 변수와 클론별 상태](#오브젝트-전용-변수와-클론별-상태)). 아래는 기존 예제처럼 전역 변수와 엔티티 속성을 사용하는 설계의 대안이며, 엔진에 로컬 변수가 없어서 필요한 우회는 아니다:
 
 - **클론의 (x, y) 좌표를 정답 위치와 비교** — N 슬롯 그리드면 좌표 N 개가 모두 고유함.
 - 클릭 핸들러에서 `coord('self', 'x')` / `coord('self', 'y')` 로 자기 좌표 읽고 `valueAt('grid_x', target_pos)` 와 비교.
@@ -1543,10 +1559,10 @@ frontier-guard Phase 3 사례: `setVar dbg1` 만 → 작동 → `if(state==1)` �
 
 | 레이어 | 도구 | 시간 | 잡는 것 |
 |---|---|---|---|
-| 1. 정적 | `make-ent --check` | < 1 초 | paramCount, 미지의 블록 type, 슬롯 mismatch |
-| 2. 빌드 | `make-ent` (no `--check`) | 1-2 초 | 자산 누락, JSON 직렬화 실패 |
-| 3. smoke (로드) | `tests/smoke.test.js` | ~ 5 초 | Entry 가 .ent 로드 시 crash (예: `addChildAt(undefined)`) |
-| 4. runtime | `tools/verify-*.mjs` (playwright) | 10-60 초 | 변수 변화, 메시지 발화, 클론 카운트, **시각 픽셀 검증**, **실제 click hit-test** |
+| 1. 정적 | `make-ent --check` | < 1 초 | 블록·슬롯, 변수/함수/장면 등의 참조, ID 중복, 로컬 에셋 |
+| 2. 빌드 | `make-ent` (no `--check`) | 1-2 초 | 정적 검사 자동 실행, 에셋 번들링, JSON 직렬화 |
+| 3. 구조·로드 | `npm run test:smoke` + `npm run test:e2e` | 수 초~수 분 | tar/JSON 구조·참조·에셋 회귀 검사 + 실제 Entry 로드 |
+| 4. runtime | `npm run verify:runtime` (`tools/` + `games/`) | 시나리오별 상이 | 변수 변화, 메시지 발화, 클론 카운트, **시각 픽셀 검증**, **실제 click hit-test** |
 
 **4 의 sub-layer**:
 - `Entry.dispatchEvent('entityClick', e)` — 핸들러 로직만 검증 (hit-test 우회). UI 회귀 가드로 부족.
@@ -1555,19 +1571,30 @@ frontier-guard Phase 3 사례: `setVar dbg1` 만 → 작동 → `if(state==1)` �
 
 frontier-guard 의 회귀 가드 (46/46 pass) 는 4 레이어 + 모든 sub-layer 활용. 새 fixture 도 같은 레이어링 권장.
 
+## 실제 작품에서 확인한 설계 사례
+
+| 만들려는 것 | 참고할 설계 | 정본 |
+| --- | --- | --- |
+| 대규모 RPG | 공통 배치 함수, 복제본별 상태와 병렬 리스트, 대화 입력 단계, 저장 직렬화와 외부 연동 경계 | [RPG 사례](09-rpg-case-study.md) |
+| 뮤직비디오 | 타이머의 누적 마감시각, 모양 프레임 시퀀스, 신호별 독립 레이어 | [뮤직비디오 사례](10-music-video-case-study.md) |
+| 회전하는 3D 정육면체 | 직교투영, 꼭짓점과 법선의 회전, 앞면 선택과 조명 | [3D 사례](11-3d-game-case-study.md) |
+| 공 타격 전투·웨이브·스킬 보상 | 단계별 전투, 고정 인덱스와 활성 ID 목록, 접촉별 피해 가드, 중복 없는 후보 추첨 | [A Ball 2 사례](12-a-ball-2-case-study.md) |
+
+이 사례들은 2026-09-10 제공된 파일의 정적 분석이다. 동작 의도와 관측 가능한 블록 구조를 구분하며, 원본 해시와 블록 위치는 [근거 재검증 절차](evidence/README.md)로 확인한다.
+
 ## 검증 — 잘못된 블록 잡기
 
-### smoke 테스트가 잡는 것
+### 정적 검사와 smoke 테스트
 
-- 레지스트리에 없는 `type` — 유효하지 않은 블록 이름.
-- 필수 primitive(`number`/`text`/…)는 화이트리스트.
+`make-ent --check`는 블록 type·슬롯 형태뿐 아니라 선언된 변수·리스트·신호·함수·장면 참조,
+명시된 ID 중복, 로컬 에셋 파일 존재 여부도 검사한다. 문자열 형태의 script/content도 파싱한다.
+빌드 시 같은 검사가 자동 실행되므로 `--check`를 생략해도 오류가 있는 spec은 생성되지 않는다.
 
-### smoke가 못 잡는 것
+`npm run test:smoke`는 기존 `.ent`의 tar/JSON·블록 구조를 검사하고, fixture 소스 전체를
+메모리에서 다시 빌드해 참조와 에셋을 확인한다. 에셋 보존·저장 실패·검증 파일 탐색 회귀 검사도 포함한다.
 
-- params 배열 길이가 `paramCount`와 다름 — **런타임 경고 블록**으로만 표시됨.
-  TODO: 레지스트리의 paramCount와 길이 일치 체크를 smoke 테스트에 추가하면 좋음.
-- 필드 슬롯에 블록을 넣거나, 블록 슬롯에 필드 문자열을 넣음.
-- statements 길이가 `statementCount`와 다름.
+계산된 참조의 실제 값, 외부 URL의 접근 가능 여부, 실행 중 변수 변화와 화면 동작은 정적 검사만으로
+보장하지 않는다. 브라우저 로드와 `tools/`·`games/` 런타임 검증을 함께 실행한다.
 
 수동 확인:
 ```js

@@ -235,13 +235,14 @@ test('validateSpec rejects a value function call in statement position', async (
     // Same call inside a value slot is legitimate — must NOT be flagged.
     const good = validateSpec({
         functions: [valueFn],
+        variables: [{ id: 'sink' }],
         objects: [{ id: 'o', script: [[
             { type: 'when_run_button_click', params: [] },
             { type: 'set_variable', params: [{ __field: 'sink' }, callBlock, null] },
         ]] }],
     });
     assert.deepEqual(
-        good.filter(i => /value function used as a statement/.test(i.msg)), [],
+        good.filter(i => i.severity === 'error'), [],
         `value-slot call must not be flagged: ${JSON.stringify(good, null, 2)}`);
 
     // A `normal` function call IS a valid statement — must NOT be flagged.

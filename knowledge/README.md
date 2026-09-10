@@ -12,10 +12,16 @@
 | `.ent` 바이너리가 깨짐 / tar 구조 확인 | [01-binary-format.md](01-binary-format.md) | Reference |
 | `project.json` 최상위 키가 뭐가 필요한지 | [02-project-json.md](02-project-json.md) | Reference |
 | 오브젝트·이미지 필드 / 이미지를 tar에 포함시키는 법 | [03-objects-and-assets.md](03-objects-and-assets.md) | Reference |
+| AI로 오브젝트 생성 / 배경 제거 / 투명 PNG를 spec에 연결 | [03 AI 이미지 에셋](03-objects-and-assets.md#ai-이미지-생성과-투명-오브젝트) | Guide · 현행 · 2026-09-10 |
 | 블록 type 이름 / params 쉐이프 / 필드 vs 블록 슬롯 / 설계 패턴 (플랫포머·HUD) | [04-script-and-blocks.md](04-script-and-blocks.md) | Reference + Guide |
 | 편집기가 안 뜨거나 콘솔 에러 / 헤드리스 테스트 / **playentry 기존 작품에 덮어쓰기** | [05-host-editor.md](05-host-editor.md) | Guide |
 | Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [07-runtime-quirks.md](07-runtime-quirks.md) | Runtime quirks |
 | **온라인 대전 작품**을 만들 때 (Entry Online 확장 계약·동기화 설계) | [08-entry-online.md](08-entry-online.md) | Reference + Guide |
+| **대규모 RPG**의 맵·복제본·대화·저장 설계를 참고할 때 | [09-rpg-case-study.md](09-rpg-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
+| **뮤직비디오**의 모양 시퀀스·타이머·신호별 레이어를 설계할 때 | [10-music-video-case-study.md](10-music-video-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
+| **3D 표현**의 직교투영·법선·면 선택·회전 수식을 참고할 때 | [11-3d-game-case-study.md](11-3d-game-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
+| **공 타격 전투·웨이브·스킬 선택**을 설계할 때 | [12-a-ball-2-case-study.md](12-a-ball-2-case-study.md) | Case study · 현행 · 정적 확인 · 2026-09-10 |
+| 사례의 원본 버전과 블록 근거를 다시 검사할 때 | [evidence/README.md](evidence/README.md) | 재검증 절차 · 2026-09-10 |
 | 과거 해결된 버그 요약 (가드 파일 링크) | [lessons.md](lessons.md) | Lessons |
 | 날짜별로 뭘 배웠는지 | [CHANGELOG.md](CHANGELOG.md) | History |
 | 초기 부트스트랩 지시문 확인 | [bootstrap-prompt.txt](bootstrap-prompt.txt) | Historical prompt |
@@ -33,6 +39,8 @@
 주장 옆에는 가능하면 `파일:줄번호` 또는 `commit <hash>` 형태로 출처를 남긴다.
 공식 문서에 있는 사실은 그쪽을 1순위로 인용.
 추측이면 "(추정)" 표시.
+
+외부 작품 사례는 **그 파일이 어떻게 구성됐는지**의 근거다. 엔진 일반 규칙의 출처보다 우선하지 않는다. [09~11 사례의 증거](evidence/README.md)는 원본 SHA-256과 JSON pointer로 고정한다. 첨부 작품은 직접 실행하지 않고 구조를 분석했으며, 성능·플레이·공식 사이트 호환성 보장은 별도 검증이 필요하다.
 
 ## 정본 (canonical) 매트릭스 — DRY 유지
 
@@ -82,20 +90,23 @@
 | 렌더 예산은 **그린 칸**으로 센다 (순회는 공짜) · 타일 크기별 실측표 · 성능 비교는 케이스마다 브라우저 재기동 | [07 §렌더 예산은 그린 칸으로](07-runtime-quirks.md#brush_stamp-렌더-예산은-방문-칸이-아니라-그린-칸으로-센다--타일-크기를-바꾸면-다시-재야-한다) | 07 §brush_stamp(단발 실측), 기획 Phase2-4 §4 |
 | 타일 배율은 상수 하나에서 유도 (길이 상수 누락·verify 사본이 단정을 헐겁게 만듦) | [04 §타일 크기는 한 곳에서 유도](04-script-and-blocks.md#타일-크기는-한-곳에서-유도한다--검증-코드까지) | lessons |
 | 엔진 사본 버전 기준 (npm 4.0.20 핀 vs 실서비스 격차 · pull이 사본을 안 바꾸는 이유) | [05 §엔진 사본의 버전 기준](05-host-editor.md#엔진-사본의-버전-기준-npm-핀과-실서비스의-격차) | (SSOT는 `upstream/지식/entryjs-4.56.0-2026-07-update.md`) |
-
 | 글상자에 효과 블록 → 스레드 사망 (`entity.effect` 는 sprite 에만 초기화) | [07 §효과 블록과 글상자](07-runtime-quirks.md#효과-블록change_effect_amount-등을-글상자에-걸면-스레드가-죽는다) | (잠김/열림은 오브젝트 2개 show/hide), lessons |
 | 장면 재진입 시 `when_scene_start` 들이 지난 판 값을 먼저 읽음 (오브젝트 간 순서 미보장) | [07 §장면 재진입 순서](07-runtime-quirks.md#장면을-다시-들어가면-when_scene_start-들이-지난-판의-값을-먼저-읽는다) | 08 (§3.3 관찰 가능한 조건), lessons |
 | 클론 초기값은 **엔티티 상속**으로 (전역+`when_clone_start` 는 한 프레임 다중 생성 시 겹침) | [07 §회피 패턴 2 — 엔티티 상속](07-runtime-quirks.md#회피-패턴-2--엔티티-상속으로-넘기기-자리모양이-목적일-때) | 08 (§3.4 렌더러), lessons |
 | Entry Online 계약(빈 함수·예약 변수) · 쓰기 소유권 · 상태 기반 렌더러 · 서버 없이 검증 | [08-entry-online.md](08-entry-online.md) | 07 (개별 엔진 함정), `games/hexo` |
-
 | `몫`/`나머지` 는 floor 나눗셈 + 진짜 모듈로 (JS `%` 와 음수에서 다름) | [07 §몫·나머지](07-runtime-quirks.md#몫나머지-는-floor-나눗셈--진짜-모듈로--js--가-아니다) | 08 (무한 좌표), `games/hexo` |
-
 | 글상자 entity 를 비워두면 `font:'undefinedpx '` → **fontSize NaN** → 글자 10px | [07 §fontSize NaN](07-runtime-quirks.md#글상자-entity-를-비워두면-fontsize-가-nan--글자가-10px-로-쪼그라든다) | 03 (§textBox 체크리스트 · §Entity `font` 행), lessons |
 | `lineBreak:true` 는 `height` 넘는 줄을 **그리지 않고 버린다** (CreateJS `getMeasuredWidth()` 는 줄바꿈 무시 → 높이로 재라) | [07 §lineBreak 세로 클리핑](07-runtime-quirks.md#linebreak-true-는-height-를-넘는-줄을-그리지-않고-버린다) | 03 (§textBox 체크리스트), 07 §textBox 정렬 |
 | `묻고 대답 기다리기` — 입력칸이 무대 y −71~−112 를 덮고, 말풍선은 `hide()` 로 안 사라짐 (`x:500` 으로 밀어냄) | [07 §묻기 입력칸·말풍선](07-runtime-quirks.md#묻고-대답-기다리기--입력칸이-무대-아래-71-부터를-덮고-말풍선은-hide-로-안-사라진다) | lessons |
 | 장면 재진입 시 **실행기는 쌓이지 않는다**(`resetSceneDuringRun`) — 대신 `entity.reset()` 이 좌표를 되돌림 | [07 §장면 재진입 실행기](07-runtime-quirks.md#장면을-다시-들어가도-실행기는-쌓이지-않는다--대신-entityreset-이-좌표를-되돌린다) | 07 §장면 재진입 순서(값), 04 (등장 애니메이션) |
 | 글상자만으로 애니메이션 — 글자 프레임·좌표·타자기 (효과 블록 금지의 회피) · KS X 1001 기호만 | [04 §글상자만으로 애니메이션](04-script-and-blocks.md#글상자만으로-애니메이션--글자-프레임--좌표--타자기) | 07 §효과 블록과 글상자, 05 (에셋 0 배포) |
 | **콘솔 붙여넣기 배포** — 기존 playentry 작품에 `project.json` 만 교체(조회수·좋아요 보존). 전제 = **에셋 0** | [05 §콘솔 붙여넣기 배포](05-host-editor.md#playentryorg-배포--기존-작품에-projectjson-만-갈아끼우기-콘솔-붙여넣기) | 03 (글상자로 에셋 0), 01/02 (tar·JSON 구조) |
+| 오브젝트 전용 변수·리스트와 클론별 저장소, 함수 지역 변수와의 구분 | [04 §오브젝트 전용 변수](04-script-and-blocks.md#오브젝트-전용-변수와-클론별-상태) | 09 (RPG의 사용 사례) |
+| PNG 생성 정책과 외부 `.ent`의 SVG 원본·래스터·썸네일 구분 | [03 §외부 작품의 SVG](03-objects-and-assets.md#외부-작품을-읽을-때는-svg도-보존한다) | 01, quick-reference, 10 (실제 관측) |
+| 대규모 RPG의 복제본 배치·대화 입력·직렬화와 외부 저장 경계 | [09 RPG 사례](09-rpg-case-study.md) | 04 (사례 탐색 링크) |
+| 뮤직비디오의 누적 마감시각·독립 레이어·신호 오케스트레이션 | [10 뮤직비디오 사례](10-music-video-case-study.md) | 04 (사례 탐색 링크) |
+| 정육면체의 직교투영·법선 부호 면 선택·조명 | [11 3D 사례](11-3d-game-case-study.md) | 04 (사례 탐색 링크) |
+| 외부 작품 원본 해시·정규화 JSON pointer 기반 주장 재검증 | [evidence 절차](evidence/README.md) | 09~11 (최소 근거 JSON) |
 
 **규칙**: 새 사실 추가 시 위 표에 한 줄 추가. 정본을 두 곳에 둘 일이 생기면 둘 중
 하나가 더 적합한 위치. 모호하면 07 (불변 동작) 또는 04 (블록·패턴) 우선.
@@ -112,6 +123,10 @@
 ### 🛠️ Guide — `04`의 설계 패턴 섹션들, `05-host-editor`
 
 "이런 걸 하려면 이렇게" 유형. 패턴이 개선되면 기존 글을 고쳐서 최신 방법을 유지.
+
+### Case study — `09~12`, `evidence/`
+
+영속 레퍼런스의 사례 분석이다. 파일 버전·관측 범위를 명시하고 증거와 함께 수정한다. 기존 패턴과 엔진 특성은 정본에 링크하고, 작품의 설계 선택만 해당 사례에서 설명한다. 성능 수치나 실행 보장은 실제 측정 전에는 추가하지 않는다.
 
 ### ⚠️ Runtime quirks — `07-runtime-quirks`
 
@@ -141,4 +156,4 @@
 
 ## 한 줄 요약
 
-`.ent` = ustar tar(npm portable 포맷) → gzip(memLevel:6). 내부는 `temp/project.json` + 에셋들(`temp/aa/bb/image|thumb|sound/<hash>.<ext>`). 에셋 hash는 base36 32자. 이미지는 PNG로 래스터라이즈해서 번들. picture 객체에 `thumbUrl` 필드는 **쓰지 않음** (playentry 포맷). 장면 id는 4자 영숫자 아무거나 OK — 단 호스트 편집기가 사용자 `.ent` 로드 전 `Entry.clearProject()`를 반드시 선행해야 한다. 스크립트는 JSON.stringify된 2차원 배열. 여기서 한 글자라도 어긋나면 엔진이 로드하다가 `addChildAt(undefined)`로 꺼진다.
+현재 생성기는 ustar tar → gzip(memLevel:6)으로 `temp/project.json`과 에셋을 묶고, 이미지를 PNG로 변환하며 Picture의 `thumbUrl`을 생략한다. 외부 `.ent`에는 SVG도 있다([이미지 형식 정본](03-objects-and-assets.md)). `object.script`는 JSON 문자열로 저장된 2차원 배열이며, 호스트 편집기는 로드 전에 `Entry.clearProject()`를 호출한다. 필수 필드와 참조 검증은 [블록·검증](04-script-and-blocks.md), 실제 작품의 설계 근거는 위 사례 문서에서 확인한다.

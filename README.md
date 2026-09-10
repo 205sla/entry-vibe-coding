@@ -225,6 +225,14 @@ node -e "const r=require('./tools/block-registry.json').blocks;
 
 ## ② spec 작성 — DSL `.mjs` 권장
 
+캐릭터·아이템·배경은 외부 이미지 생성 도구 없이도 제작할 수 있다.
+이미지 생성 도구가 없는 Claude Code 등의 환경에서는 기존 `assets()`·`sprite-gen.mjs`와
+직접 작성한 SVG를 사용한다. [SVG 제작 절차](knowledge/03-objects-and-assets.md#이미지-생성-도구가-없는-환경의-svg-제작)를 따른다.
+이미지 생성 도구가 제공되는 환경에서는 일러스트를 직접 생성해 spec에서 사용할 수도 있다.
+투명 배경 생성·배경 제거·실제 알파 검사·프로젝트 등록은
+[AI 이미지 에셋 절차](knowledge/03-objects-and-assets.md#ai-이미지-생성과-투명-오브젝트)를 따른다.
+`node tools/import-image-asset.mjs --help`로 PNG 가져오기 명령을 확인할 수 있다.
+
 신규 fixture 는 **DSL** 우선. 8 단 중첩 JSON 회피 + 슬롯 wrap 자동 + IDE 자동완성 + 5× 코드 압축 (Fibonacci 기준 163 줄 → 76 줄).
 
 ```js
@@ -239,6 +247,7 @@ import { assets } from '../../tools/lib/game-assets.mjs';
 export default {
     name: '내 게임',
     scenes: [ makeScene('play', '게임 화면') ],
+    messages: [{ id: 'lose', name: '패배' }],
     variables: [{ id: 'hp', name: '체력', value: '5', visible: true, x: -210, y: 110 }],
     objects: [
         obj('player', '플레이어', {
@@ -278,6 +287,7 @@ DSL 의 모든 helper 는 [`tools/lib/spec-dsl.mjs`](tools/lib/spec-dsl.mjs) 상
 ```jsonc
 {
   "name": "내 게임",
+  "scenes": [{ "id": "ab12", "name": "게임 화면" }],
   "messages": [                           // 선택
     { "id": "round_start", "name": "라운드시작" }
   ],
@@ -366,8 +376,10 @@ Field 슬롯에 `{"type":"text",...}`로 감싸면 엔진이 "text 블록의 결
 - 모든 블록 type 이 `block-registry.json` 에 존재
 - `params.length === paramCount` (registry 와 일치)
 - 슬롯 wrap 검증 (Field 슬롯에 Block 들어가는지 등)
+- 선언된 변수·리스트·함수·메시지·장면 참조, 오브젝트 전용 변수의 소유자, 종류별 ID 중복
+- 로컬 모양·소리 파일 존재와 script/content의 2차원 배열 구조(문자열 JSON 포함)
 
-빌드 없이 스펙 작성 직후 즉시 실행. LLM 이 수십 번 반복해도 부담 없음.
+빌드 없이 스펙 작성 직후 실행한다. `buildProject`/`writeEnt`도 같은 검사를 자동 실행하고 오류가 있으면 출력 전에 중단한다. 동적으로 계산되는 참조는 정적으로 확정하지 않으며, 외부 HTTP/data 에셋은 경고와 함께 그대로 유지한다(다운로드·내용 검증은 하지 않음).
 
 ### Layer 2. smoke (`npm run test:smoke`, ~ 5 초)
 
@@ -381,6 +393,8 @@ Field 슬롯에 `{"type":"text",...}`로 감싸면 엔진이 "text 블록의 결
 - `selectedPictureId` 가 그 object 의 pictures[*].id 와 매칭
 - `object.scene` 이 scenes[*].id 와 매칭
 
+`tests/hardening.test.js`는 장시간 편집 후 에셋 보존, 누락 에셋 저장 거부, 명세 오류 차단, fixture 소스 전체의 메모리 재빌드, 게임 검증 탐색·실패·시간 초과도 확인한다.
+
 ### Layer 3. e2e (`npm run test:e2e`, ~ 30 초)
 
 - 편집기 부트스트랩 시 `pageErrors === [] && consoleErrors === []`, 외부 요청 0
@@ -389,16 +403,16 @@ Field 슬롯에 `{"type":"text",...}`로 감싸면 엔진이 "text 블록의 결
 - 2 초 대기 후 `_warningBlock` 가 한 개도 없는지 (블록 type·params 형태가 유효)
 - round-trip export (Entry → `/api/export` → gzip 마법 숫자 확인)
 
-### Layer 4. verify-runtime (`npm run verify:runtime`, ~ 4 분)
+### Layer 4. verify-runtime (`npm run verify:runtime`)
 
-각 게임 fixture 에 대응하는 `tools/verify-*.mjs` 스크립트 (총 14) 가 playwright + headless chromium 으로 **실제 게임 플레이** 검증:
+`tools/verify-*.mjs`와 `games/**/verify.mjs`·`verify-*.mjs`를 자동 탐색해 playwright + headless chromium으로 검증한다. 로컬 외부 작품 폴더도 해당 이름의 검증기가 있으면 포함한다. 필수 파일이 없는 검증을 성공으로 처리하지 않는다.
 - 변수 / 리스트 변화 (점수 증가, 클론 카운트, hp drop 등)
 - 메시지 발화 + 핸들러 동작 (race condition 회귀 가드)
 - 픽셀 색상 검증 (`findColoredPixels` — 빔, 깜빡임, 그래픽)
 - 클릭 hit-test — `Entry.dispatchEvent('entityClick', e)` (핸들러 로직) + `page.mouse.click(px, py)` (pixel hit-test)
 - 좌표 변환 검증 (stage 논리 480×270 ↔ canvas 렌더 픽셀)
 
-`tools/run-all-verify.mjs` 가 전체 일괄 실행 + 서버 자동 라이프사이클. `--filter <name>` 로 일부만.
+`node tools/run-all-verify.mjs --list`로 서버 없이 목록을 확인한다. `--filter <name>`으로 일부만, `--timeout-ms 600000`으로 스크립트별 제한 시간을 지정한다(기본 10분). 실패·시간 초과는 전체 실패로 집계하며 직접 띄운 서버는 종료한다. `--keep-server`는 서버를 유지한다. 개인 원본 인자가 필요한 `verify-case-study-evidence.mjs`는 사유를 출력하고 제외한다. 실행 전에 브라우저 설치 여부를 한 번 확인한다.
 
 ### Layer 5. knowledge links (`npm run verify:links`, < 1 초)
 
@@ -517,7 +531,7 @@ node tools/make-ent.mjs tests/fixtures/spec-foo.mjs --out tests/fixtures/foo.ent
 # 검증 (4 레이어)
 npm run test:smoke                # Node 스모크 (~ 5 초, 23 fixture)
 npm run test:e2e                  # Playwright e2e (~ 30 초)
-npm run verify:runtime            # playwright + chromium 게임 플레이 (~ 4 분, 14 fixture)
+npm run verify:runtime            # tools/ + games/ 검증; 실행 시간은 대상별로 다름
 npm run verify:links              # knowledge md 간 링크 검증 (< 1 초)
 npm run verify                    # 위 4 개 모두
 

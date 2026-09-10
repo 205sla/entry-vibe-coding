@@ -8,6 +8,11 @@
     window.PUBLIC_PATH_FOR_ENTRYJS = 'lib/entry-js/dist/';
 
     const statusEl = document.getElementById('status');
+    let loadedSession = null;
+    async function responseError(res) {
+        const body = await res.json().catch(() => ({}));
+        return new Error(body.error || 'HTTP ' + res.status);
+    }
     function setStatus(msg) { if (statusEl) statusEl.textContent = msg || ''; }
 
     // SoundJS 1.x (installed from npm as 0.6.0 alias) crashes in _parsePath
@@ -81,13 +86,18 @@
             const fd = new FormData();
             fd.append('ent', file, file.name || 'project.ent');
             const res = await fetch('/api/load', { method: 'POST', body: fd });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
+            if (!res.ok) throw await responseError(res);
             const project = await res.json();
             if (!project || !Array.isArray(project.objects)) {
                 throw new Error('invalid project JSON');
             }
             if (typeof Entry.clearProject === 'function') Entry.clearProject();
-            Entry.loadProject(project);
+            await Entry.loadProject(project);
+            const previousSession = loadedSession;
+            loadedSession = project.__sid;
+            if (previousSession && previousSession !== loadedSession) {
+                fetch('/api/ent-session/' + encodeURIComponent(previousSession), { method: 'DELETE' }).catch(() => {});
+            }
             setStatus('불러오기 완료 · ' + (file.name || ''));
         } catch (e) {
             console.error('[editor] load failed', e);
@@ -105,12 +115,13 @@
         setStatus('저장 준비 중…');
         try {
             const project = Entry.exportProject({});
+            if (loadedSession) project.__sid = loadedSession;
             const res = await fetch('/api/export', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(project)
             });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
+            if (!res.ok) throw await responseError(res);
             const blob = await res.blob();
             const ts = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '-');
             const a = document.createElement('a');

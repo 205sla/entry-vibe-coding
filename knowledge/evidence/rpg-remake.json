@@ -1,0 +1,901 @@
+{
+  "source": {
+    "filename": "엔트리 최대규모 RPG게임의 리메이크.ent",
+    "sha256": "b5e27e8e97c59c367b7c2ff0a79197c0b3c2af9d7742a004fdbe3bd423582ba3",
+    "bytes": 214417286,
+    "projectEntry": "temp/project.json",
+    "projectJsonBytes": 19638838
+  },
+  "method": {
+    "analysis": "static-only",
+    "runtimeVerified": false,
+    "normalization": "JSON.parse objects[*].script and functions[*].content before applying RFC6901 pointers",
+    "blockDefinition": "Every object with string type and array params recursively under normalized object scripts and function contents. Includes literals, reporters and function header parameter definitions, not executed instructions or runtime clones.",
+    "assetDefinition": "Picture/sound records count project metadata entries without deduplication. Archive file counts include only type 0 regular files; directories excluded.",
+    "sourceHandling": "Read-only streaming gunzip; collect project.json only; discard asset bytes; no source scripts evaluated."
+  },
+  "stats": {
+    "scenes": 20,
+    "objects": 483,
+    "sprites": 423,
+    "textBoxes": 60,
+    "objectThreads": 1327,
+    "functions": 53,
+    "normalFunctions": 51,
+    "valueFunctions": 2,
+    "functionLocalVariables": 26,
+    "variableEntries": 283,
+    "scalarVariables": 257,
+    "objectScopedScalarVariables": 109,
+    "lists": 24,
+    "listItems": 401,
+    "timers": 1,
+    "answers": 1,
+    "messages": 55,
+    "blocks": 82798,
+    "objectBlocks": 69058,
+    "functionBlocks": 13740,
+    "distinctBlockTypes": 259,
+    "pictureRecords": 2896,
+    "soundRecords": 273,
+    "archiveEntries": 16153,
+    "archiveRegularFiles": 6890,
+    "archiveImages": 3733,
+    "archiveThumbnails": 2883,
+    "archiveSounds": 273,
+    "placementFunctionCalls": 1549,
+    "dialogueFunctionCalls": 818,
+    "monsterCloneStartHandlers": 8
+  },
+  "blockTypes": {
+    "when_run_button_click": 21,
+    "if_else": 2398,
+    "boolean_and_or": 937,
+    "is_current_device_type": 2,
+    "set_variable": 2640,
+    "text": 31528,
+    "set_visible_project_timer": 1,
+    "set_visible_answer": 1,
+    "start_neighbor_scene": 3,
+    "when_scene_start": 438,
+    "wait_second": 1641,
+    "number": 9060,
+    "change_effect_amount": 416,
+    "show": 626,
+    "repeat_basic": 1106,
+    "add_effect_amount": 350,
+    "start_scene": 142,
+    "when_some_key_pressed": 11,
+    "_if": 1508,
+    "boolean_basic_operator": 5133,
+    "get_nickname": 18,
+    "func_xcbj": 9,
+    "move_y": 264,
+    "change_to_next_shape": 396,
+    "create_clone": 1428,
+    "when_clone_start": 279,
+    "change_scale_size": 149,
+    "when_message_cast": 543,
+    "sound_volume_change": 50,
+    "sound_silent_all": 32,
+    "sound_volume_set": 48,
+    "sound_speed_set": 4,
+    "hide": 285,
+    "repeat_inf": 508,
+    "get_variable": 5395,
+    "text_write": 419,
+    "combine_something": 135,
+    "wait_until_true": 560,
+    "when_object_click": 23,
+    "message_cast": 541,
+    "reach_something": 285,
+    "boolean_not": 168,
+    "move_x": 364,
+    "change_variable": 361,
+    "value_of_index_from_list": 360,
+    "sound_something_with_block": 294,
+    "get_sounds": 315,
+    "length_of_list": 19,
+    "repeat_while_true": 184,
+    "add_value_to_list": 25,
+    "change_value_list_index": 152,
+    "char_at": 28,
+    "calc_operation": 62,
+    "calc_basic": 1140,
+    "is_type": 6,
+    "func_xj7m": 16,
+    "True": 2,
+    "length_of_string": 23,
+    "func_55bo": 6,
+    "show_list": 1,
+    "hide_list": 1,
+    "change_to_some_shape": 1171,
+    "coordinate_object": 1186,
+    "set_scale_size": 444,
+    "locate_xy": 1052,
+    "sound_something_wait_with_block": 22,
+    "is_clicked": 44,
+    "locate": 42,
+    "coordinate_mouse": 37,
+    "see_angle_object": 11,
+    "ask_and_wait": 4,
+    "get_canvas_input_value": 4,
+    "locate_y": 49,
+    "func_xsvf": 177,
+    "flip_x": 21,
+    "flip_y": 168,
+    "choose_project_timer_action": 34,
+    "calc_rand": 200,
+    "func_lxwf": 7,
+    "stretch_scale_size": 100,
+    "locate_x": 203,
+    "change_object_index": 9,
+    "delete_clone": 212,
+    "is_press_some_key": 84,
+    "is_object_clicked": 28,
+    "func_9n7p": 5,
+    "func_d5kq": 1,
+    "rotate_absolute": 87,
+    "angle": 205,
+    "text_change_font_color": 39,
+    "text_color": 39,
+    "False": 1,
+    "rotate_relative": 132,
+    "func_nmok": 4,
+    "func_b0t2": 5,
+    "func_ghu9": 14,
+    "func_x4vt": 14,
+    "func_w6x3": 1549,
+    "set_thickness": 10,
+    "brush_erase_all": 11,
+    "start_drawing": 10,
+    "set_color": 27,
+    "color": 27,
+    "stop_drawing": 10,
+    "func_uylh": 1,
+    "stop_object": 29,
+    "func_hnx4": 1,
+    "func_8ec4": 1,
+    "func_z7b5": 1,
+    "func_ezfv": 1,
+    "func_w2kp": 63,
+    "func_u9l0": 1,
+    "func_apj8": 1,
+    "reset_scale_size": 7,
+    "get_pictures": 44,
+    "func_4m9q": 66,
+    "direction_absolute": 2,
+    "move_direction": 31,
+    "func_kmr0": 185,
+    "func_y38i": 117,
+    "func_w5fp": 28,
+    "func_witp": 6,
+    "func_9ght": 1,
+    "func_yw0t": 6,
+    "func_i71j": 1,
+    "func_aok0": 11,
+    "func_p2p0": 10,
+    "get_sound_duration": 23,
+    "remove_value_from_list": 3,
+    "text_change_font": 10,
+    "func_dsk9": 2,
+    "sound_from_to_and_wait": 8,
+    "get_project_timer_value": 6,
+    "func_at4g": 818,
+    "func_qm8t": 41,
+    "func_r40f": 54,
+    "func_pn4v": 1,
+    "func_a8xo": 31,
+    "func_scb3": 1,
+    "stop_repeat": 14,
+    "func_3y68": 10,
+    "locate_object_time": 3,
+    "func_99a4": 1,
+    "func_qutw": 11,
+    "func_gviy": 5,
+    "func_m72g": 3,
+    "func_ozj7": 9,
+    "func_hf5b": 2,
+    "func_0u2u": 1,
+    "func_qyyg": 24,
+    "erase_all_effects": 3,
+    "locate_xy_time": 1,
+    "func_e2sy": 1,
+    "remove_all_clones": 6,
+    "func_5t4t": 14,
+    "sound_from_to": 1,
+    "func_znd5": 5,
+    "func_gyt7": 6,
+    "func_bq2r": 74,
+    "is_included_in_list": 3,
+    "function_create": 51,
+    "function_field_label": 107,
+    "function_field_string": 87,
+    "stringParam_9q1b": 3,
+    "stringParam_4vgo": 3,
+    "stringParam_ddjt": 6,
+    "set_func_variable": 42,
+    "get_func_variable": 47,
+    "stringParam_0ikw": 3,
+    "text_append": 3,
+    "stringParam_vyir": 2,
+    "stringParam_objq": 2,
+    "stringParam_8tu2": 2,
+    "stringParam_4og6": 2,
+    "stringParam_k360": 2,
+    "stringParam_mk4x": 4,
+    "stringParam_neuy": 2,
+    "stringParam_o168": 2,
+    "stringParam_x40h": 2,
+    "stringParam_mr74": 4,
+    "stringParam_zzdu": 7,
+    "stringParam_vymp": 3,
+    "stringParam_wusm": 3,
+    "stringParam_liwz": 2,
+    "stringParam_znz2": 2,
+    "stringParam_gwc8": 2,
+    "stringParam_9yd5": 2,
+    "stringParam_gmzt": 2,
+    "stringParam_iyxt": 2,
+    "stringParam_6e9n": 4,
+    "stringParam_zh2q": 3,
+    "stringParam_9sma": 2,
+    "stringParam_t1zq": 2,
+    "stringParam_kizo": 3,
+    "stringParam_4e2x": 2,
+    "stringParam_qbbh": 2,
+    "stringParam_v9ch": 3,
+    "stringParam_psky": 4,
+    "stringParam_h4pv": 3,
+    "stringParam_uxwv": 4,
+    "function_create_value": 2,
+    "stringParam_l1o0": 2,
+    "stringParam_czo4": 2,
+    "stringParam_jagh": 2,
+    "stringParam_1bgl": 2,
+    "stringParam_xwnx": 2,
+    "stringParam_ew8n": 2,
+    "stringParam_g3tt": 2,
+    "stringParam_6vxl": 2,
+    "stringParam_ympq": 3,
+    "stringParam_3ww3": 3,
+    "stringParam_qnx7": 2,
+    "stringParam_7jca": 2,
+    "stringParam_deve": 2,
+    "stringParam_405u": 3,
+    "stringParam_7j25": 2,
+    "stringParam_u05a": 2,
+    "stringParam_6i6x": 2,
+    "stringParam_otrt": 2,
+    "stringParam_4qie": 2,
+    "stringParam_abd8": 2,
+    "stringParam_bwex": 2,
+    "stringParam_dndh": 2,
+    "stringParam_62ie": 9,
+    "stringParam_9q1j": 2,
+    "stringParam_9gp2": 2,
+    "func_sle7": 1,
+    "stringParam_sgam": 4,
+    "stringParam_43gh": 3,
+    "stringParam_00oz": 6,
+    "stringParam_s0zh": 3,
+    "stringParam_73ea": 3,
+    "stringParam_94hg": 3,
+    "stringParam_e8yd": 3,
+    "stringParam_qsie": 3,
+    "stringParam_c6yn": 11,
+    "stringParam_034d": 5,
+    "stringParam_prym": 2,
+    "stringParam_xnvk": 3,
+    "stringParam_l0ix": 3,
+    "stringParam_u6mf": 2,
+    "stringParam_tpk3": 2,
+    "stringParam_mvwl": 3,
+    "stringParam_frhu": 3,
+    "stringParam_2up9": 2,
+    "stringParam_uest": 5,
+    "stringParam_d8r6": 5,
+    "index_of_string": 5,
+    "substring": 24,
+    "stringParam_rufo": 7,
+    "stringParam_zo5m": 4,
+    "stringParam_kyk2": 2,
+    "func_uopi": 7,
+    "insert_value_to_list": 1,
+    "stringParam_op8o": 2,
+    "stringParam_1lw6": 2,
+    "stringParam_vmgs": 2,
+    "stringParam_3dgm": 2,
+    "stringParam_sey2": 2
+  },
+  "scenes": [
+    {
+      "id": "7dwq",
+      "name": "thum",
+      "objects": 1,
+      "objectBlocks": 12
+    },
+    {
+      "id": "abdo",
+      "name": "mess",
+      "objects": 5,
+      "objectBlocks": 94
+    },
+    {
+      "id": "in52",
+      "name": "시작화면",
+      "objects": 23,
+      "objectBlocks": 934
+    },
+    {
+      "id": "9hgw",
+      "name": "inGame",
+      "objects": 73,
+      "objectBlocks": 37702
+    },
+    {
+      "id": "vc9h",
+      "name": "배틀준비",
+      "objects": 44,
+      "objectBlocks": 1261
+    },
+    {
+      "id": "4wsv",
+      "name": "Battle",
+      "objects": 84,
+      "objectBlocks": 21354
+    },
+    {
+      "id": "fi6d",
+      "name": "캐릭터편성",
+      "objects": 30,
+      "objectBlocks": 1547
+    },
+    {
+      "id": "0u8r",
+      "name": "설정",
+      "objects": 13,
+      "objectBlocks": 244
+    },
+    {
+      "id": "28it",
+      "name": "포탈 이동연출",
+      "objects": 13,
+      "objectBlocks": 1048
+    },
+    {
+      "id": "y987",
+      "name": "최종장 입장",
+      "objects": 8,
+      "objectBlocks": 109
+    },
+    {
+      "id": "0n83",
+      "name": "엘리베이터 연출",
+      "objects": 11,
+      "objectBlocks": 304
+    },
+    {
+      "id": "j2ev",
+      "name": "컷씬1-1",
+      "objects": 29,
+      "objectBlocks": 639
+    },
+    {
+      "id": "ga0u",
+      "name": "컷씬1-2",
+      "objects": 14,
+      "objectBlocks": 451
+    },
+    {
+      "id": "ctoh",
+      "name": "컷씬2-1",
+      "objects": 35,
+      "objectBlocks": 987
+    },
+    {
+      "id": "ruo1",
+      "name": "컷씬2-2",
+      "objects": 20,
+      "objectBlocks": 403
+    },
+    {
+      "id": "w7vw",
+      "name": "엔딩1",
+      "objects": 17,
+      "objectBlocks": 590
+    },
+    {
+      "id": "r2dh",
+      "name": "엔딩2",
+      "objects": 24,
+      "objectBlocks": 405
+    },
+    {
+      "id": "pxvb",
+      "name": "쿠키",
+      "objects": 13,
+      "objectBlocks": 281
+    },
+    {
+      "id": "8cqd",
+      "name": "오프닝씬",
+      "objects": 6,
+      "objectBlocks": 117
+    },
+    {
+      "id": "xf00",
+      "name": "히든보스op",
+      "objects": 20,
+      "objectBlocks": 576
+    }
+  ],
+  "assertions": [
+    {
+      "label": "exploration scene",
+      "path": "/scenes/3/id",
+      "expected": "9hgw"
+    },
+    {
+      "label": "battle scene",
+      "path": "/scenes/5/id",
+      "expected": "4wsv"
+    },
+    {
+      "label": "virtual-map variable",
+      "path": "/variables/245/id",
+      "expected": "sfbe"
+    },
+    {
+      "label": "virtual-map variable scope",
+      "path": "/variables/245/object",
+      "expected": null
+    },
+    {
+      "label": "map renderer object",
+      "path": "/objects/90/id",
+      "expected": "4smj"
+    },
+    {
+      "label": "map renderer physical scene",
+      "path": "/objects/90/scene",
+      "expected": "9hgw"
+    },
+    {
+      "label": "placement function",
+      "path": "/functions/21/id",
+      "expected": "w6x3"
+    },
+    {
+      "label": "dialogue function",
+      "path": "/functions/3/id",
+      "expected": "at4g"
+    },
+    {
+      "label": "monster object",
+      "path": "/objects/179/id",
+      "expected": "s6lj"
+    },
+    {
+      "label": "save hook function",
+      "path": "/functions/48/id",
+      "expected": "55bo"
+    },
+    {
+      "label": "save gate variable",
+      "path": "/variables/12/id",
+      "expected": "x0b2"
+    },
+    {
+      "label": "save record list",
+      "path": "/variables/259/id",
+      "expected": "bph8"
+    },
+    {
+      "label": "save reader function",
+      "path": "/functions/49/id",
+      "expected": "xj7m"
+    },
+    {
+      "label": "save writer function",
+      "path": "/functions/50/id",
+      "expected": "uopi"
+    },
+    {
+      "label": "camera function",
+      "path": "/functions/11/id",
+      "expected": "ozj7"
+    },
+    {
+      "label": "map render scene trigger block type",
+      "path": "/objects/90/script/0/0/type",
+      "expected": "when_scene_start"
+    },
+    {
+      "label": "map render scene trigger block id",
+      "path": "/objects/90/script/0/0/id",
+      "expected": "r6fv"
+    },
+    {
+      "label": "map number branch block type",
+      "path": "/objects/90/script/0/2/params/0/type",
+      "expected": "boolean_basic_operator"
+    },
+    {
+      "label": "map number branch block id",
+      "path": "/objects/90/script/0/2/params/0/id",
+      "expected": "vatk"
+    },
+    {
+      "label": "placement call block type",
+      "path": "/objects/90/script/0/2/statements/0/0/type",
+      "expected": "func_w6x3"
+    },
+    {
+      "label": "placement call block id",
+      "path": "/objects/90/script/0/2/statements/0/0/id",
+      "expected": "c5cp"
+    },
+    {
+      "label": "clone self spawn block type",
+      "path": "/functions/21/content/0/0/statements/0/6/type",
+      "expected": "create_clone"
+    },
+    {
+      "label": "clone self spawn block id",
+      "path": "/functions/21/content/0/0/statements/0/6/id",
+      "expected": "6o24"
+    },
+    {
+      "label": "monster clone flag assignment block type",
+      "path": "/objects/179/script/3/1/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "monster clone flag assignment block id",
+      "path": "/objects/179/script/3/1/id",
+      "expected": "cyre"
+    },
+    {
+      "label": "monster slot assignment block type",
+      "path": "/objects/179/script/3/5/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "monster slot assignment block id",
+      "path": "/objects/179/script/3/5/id",
+      "expected": "n849"
+    },
+    {
+      "label": "monster x slot append block type",
+      "path": "/objects/179/script/3/6/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "monster x slot append block id",
+      "path": "/objects/179/script/3/6/id",
+      "expected": "lcbd"
+    },
+    {
+      "label": "monster y slot append block type",
+      "path": "/objects/179/script/3/7/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "monster y slot append block id",
+      "path": "/objects/179/script/3/7/id",
+      "expected": "s1f5"
+    },
+    {
+      "label": "monster initial hp append block type",
+      "path": "/objects/179/script/3/8/statements/0/0/type",
+      "expected": "add_value_to_list"
+    },
+    {
+      "label": "monster initial hp append block id",
+      "path": "/objects/179/script/3/8/statements/0/0/id",
+      "expected": "503v"
+    },
+    {
+      "label": "monster attack listener block type",
+      "path": "/objects/179/script/5/0/type",
+      "expected": "when_message_cast"
+    },
+    {
+      "label": "monster attack listener block id",
+      "path": "/objects/179/script/5/0/id",
+      "expected": "0q6k"
+    },
+    {
+      "label": "monster spawn template gate block type",
+      "path": "/objects/179/script/13/1/type",
+      "expected": "_if"
+    },
+    {
+      "label": "monster spawn template gate block id",
+      "path": "/objects/179/script/13/1/id",
+      "expected": "9p0h"
+    },
+    {
+      "label": "monster nonzero id wait block type",
+      "path": "/objects/179/script/4/1/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "monster nonzero id wait block id",
+      "path": "/objects/179/script/4/1/id",
+      "expected": "hbev"
+    },
+    {
+      "label": "dialogue release wait block type",
+      "path": "/functions/3/content/0/0/statements/0/6/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "dialogue release wait block id",
+      "path": "/functions/3/content/0/0/statements/0/6/id",
+      "expected": "i1rj"
+    },
+    {
+      "label": "dialogue character append block type",
+      "path": "/functions/3/content/0/0/statements/0/4/statements/0/0/type",
+      "expected": "text_append"
+    },
+    {
+      "label": "dialogue character append block id",
+      "path": "/functions/3/content/0/0/statements/0/4/statements/0/0/id",
+      "expected": "j5f5"
+    },
+    {
+      "label": "save gate block type",
+      "path": "/functions/51/content/0/0/statements/0/0/type",
+      "expected": "_if"
+    },
+    {
+      "label": "save gate block id",
+      "path": "/functions/51/content/0/0/statements/0/0/id",
+      "expected": "lkk8"
+    },
+    {
+      "label": "save hook call block type",
+      "path": "/functions/51/content/0/0/statements/0/0/statements/0/0/statements/0/29/type",
+      "expected": "func_55bo"
+    },
+    {
+      "label": "save hook call block id",
+      "path": "/functions/51/content/0/0/statements/0/0/statements/0/0/statements/0/29/id",
+      "expected": "6ila"
+    },
+    {
+      "label": "codec read substring block type",
+      "path": "/functions/49/content/0/0/statements/0/0/statements/0/2/params/1/type",
+      "expected": "substring"
+    },
+    {
+      "label": "codec read substring block id",
+      "path": "/functions/49/content/0/0/statements/0/0/statements/0/2/params/1/id",
+      "expected": "vv7u"
+    },
+    {
+      "label": "codec write row block type",
+      "path": "/functions/50/content/0/0/statements/0/4/type",
+      "expected": "change_value_list_index"
+    },
+    {
+      "label": "codec write row block id",
+      "path": "/functions/50/content/0/0/statements/0/4/id",
+      "expected": "izcn"
+    },
+    {
+      "label": "checkpoint location record block type",
+      "path": "/functions/25/content/0/0/statements/0/2/statements/0/0/type",
+      "expected": "set_variable"
+    },
+    {
+      "label": "checkpoint location record block id",
+      "path": "/functions/25/content/0/0/statements/0/2/statements/0/0/id",
+      "expected": "n43e"
+    },
+    {
+      "label": "camera snapshot block type",
+      "path": "/functions/11/content/0/0/statements/0/0/type",
+      "expected": "set_func_variable"
+    },
+    {
+      "label": "camera snapshot block id",
+      "path": "/functions/11/content/0/0/statements/0/0/id",
+      "expected": "1zj1"
+    },
+    {
+      "label": "camera position update block type",
+      "path": "/functions/11/content/0/0/statements/0/1/statements/0/0/type",
+      "expected": "locate_x"
+    },
+    {
+      "label": "camera position update block id",
+      "path": "/functions/11/content/0/0/statements/0/1/statements/0/0/id",
+      "expected": "z9aa"
+    },
+    {
+      "label": "state variable 0xez id",
+      "path": "/variables/171/id",
+      "expected": "0xez"
+    },
+    {
+      "label": "state variable 0xez scope",
+      "path": "/variables/171/object",
+      "expected": "s6lj"
+    },
+    {
+      "label": "state variable pont id",
+      "path": "/variables/122/id",
+      "expected": "pont"
+    },
+    {
+      "label": "state variable pont scope",
+      "path": "/variables/122/object",
+      "expected": "s6lj"
+    },
+    {
+      "label": "state variable qzgy id",
+      "path": "/variables/270/id",
+      "expected": "qzgy"
+    },
+    {
+      "label": "state variable qzgy scope",
+      "path": "/variables/270/object",
+      "expected": null
+    },
+    {
+      "label": "state variable tc34 id",
+      "path": "/variables/271/id",
+      "expected": "tc34"
+    },
+    {
+      "label": "state variable tc34 scope",
+      "path": "/variables/271/object",
+      "expected": null
+    },
+    {
+      "label": "state variable lqmi id",
+      "path": "/variables/272/id",
+      "expected": "lqmi"
+    },
+    {
+      "label": "state variable lqmi scope",
+      "path": "/variables/272/object",
+      "expected": null
+    },
+    {
+      "label": "save hook contains no statement stacks",
+      "path": "/functions/48/content/0/0/statements",
+      "expected": [
+        []
+      ]
+    },
+    {
+      "label": "pattern contract",
+      "path": "/functions/3/localVariables/0/id",
+      "expected": "at4g_7nwd"
+    },
+    {
+      "label": "pattern contract",
+      "path": "/functions/3/localVariables/1/id",
+      "expected": "at4g_yfax"
+    },
+    {
+      "label": "pattern contract",
+      "path": "/functions/21/content/0/0/statements/0/0/type",
+      "expected": "_if"
+    },
+    {
+      "label": "pattern contract",
+      "path": "/functions/21/content/0/0/statements/0/1/type",
+      "expected": "_if"
+    },
+    {
+      "label": "pattern contract",
+      "path": "/functions/21/content/0/0/statements/0/2/type",
+      "expected": "_if"
+    },
+    {
+      "label": "pattern contract",
+      "path": "/functions/21/content/0/0/statements/0/3/type",
+      "expected": "_if"
+    },
+    {
+      "label": "pattern contract",
+      "path": "/functions/21/content/0/0/statements/0/4/type",
+      "expected": "locate_xy"
+    },
+    {
+      "label": "pattern contract",
+      "path": "/functions/21/content/0/0/statements/0/5/type",
+      "expected": "change_effect_amount"
+    },
+    {
+      "label": "pattern contract",
+      "path": "/objects/90/script/0/2/params/0/params/0/params/0",
+      "expected": "sfbe"
+    },
+    {
+      "label": "pattern contract",
+      "path": "/objects/90/script/0/2/params/0/params/2/params/0",
+      "expected": "22"
+    },
+    {
+      "label": "guard exact predicate",
+      "path": "/objects/179/script/13/1/params/0/params/0/params/0",
+      "expected": "pont"
+    },
+    {
+      "label": "guard exact predicate",
+      "path": "/objects/179/script/13/1/params/0/params/1",
+      "expected": "EQUAL"
+    },
+    {
+      "label": "guard exact predicate",
+      "path": "/objects/179/script/13/1/params/0/params/2/params/0",
+      "expected": "0"
+    },
+    {
+      "label": "guard exact predicate",
+      "path": "/functions/51/content/0/0/statements/0/0/params/0/params/0/params/0",
+      "expected": "x0b2"
+    },
+    {
+      "label": "guard exact predicate",
+      "path": "/functions/51/content/0/0/statements/0/0/params/0/params/1",
+      "expected": "EQUAL"
+    },
+    {
+      "label": "guard exact predicate",
+      "path": "/functions/51/content/0/0/statements/0/0/params/0/params/2/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "dialogue wait for release predicate",
+      "path": "/functions/3/content/0/0/statements/0/6/params/0/type",
+      "expected": "boolean_not"
+    },
+    {
+      "label": "dialogue wait for new input",
+      "path": "/functions/3/content/0/0/statements/0/8/params/0/type",
+      "expected": "boolean_and_or"
+    },
+    {
+      "label": "dialogue show advance message",
+      "path": "/functions/3/content/0/0/statements/0/7/params/0",
+      "expected": "wadz"
+    },
+    {
+      "label": "dialogue hide advance message",
+      "path": "/functions/3/content/0/0/statements/0/9/params/0",
+      "expected": "8yd1"
+    },
+    {
+      "label": "map load restores map number",
+      "path": "/objects/13/script/0/4/params/0",
+      "expected": "sfbe"
+    },
+    {
+      "label": "map load enters exploration",
+      "path": "/objects/13/script/0/41/params/0",
+      "expected": "9hgw"
+    },
+    {
+      "label": "parallax example ratio nine",
+      "path": "/objects/202/script/2/1/params/0/params/0",
+      "expected": "9"
+    },
+    {
+      "label": "parallax example ratio five",
+      "path": "/objects/217/script/1/1/params/0/params/0",
+      "expected": "5"
+    }
+  ],
+  "validation": {
+    "structuralAssertions": 92,
+    "runtimeExecuted": false
+  }
+}

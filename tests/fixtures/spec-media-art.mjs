@@ -56,7 +56,7 @@ const cellEntity = (x, y) => ({
 // 셀 헬퍼 — id, name, 위치, 스레드 (1 개 또는 배열) 받아서 obj 생성.
 // threads 가 thread 배열 ([[trigger, ...], [trigger, ...]]) 이면 평행 실행.
 const cell = (id, name, x, y, threads) => {
-    const isMultiThread = Array.isArray(threads[0]) && Array.isArray(threads[0][0]);
+    const isMultiThread = Array.isArray(threads[0]);
     return {
         id, name,
         objectType: 'sprite',

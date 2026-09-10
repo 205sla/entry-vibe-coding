@@ -1,7 +1,7 @@
 {
   "name": "변수 하나 + 반복",
   "variables": [
-    { "name": "점수", "value": "0" }
+    { "id": "score", "name": "점수", "value": "0" }
   ],
   "objects": [
     {
@@ -12,7 +12,7 @@
           "type": "repeat_basic",
           "params": [10],
           "statements": [[
-            { "type": "change_variable", "params": ["점수", 1] },
+            { "type": "change_variable", "params": ["score", 1] },
             { "type": "wait_second", "params": [0.1] }
           ]]
         }

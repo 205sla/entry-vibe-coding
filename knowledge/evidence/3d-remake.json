@@ -1,0 +1,1505 @@
+{
+  "source": {
+    "filename": "3D의 리메이크.ent",
+    "sha256": "51c92993cbc54103c8f3877682e3560c9f0616331d3d0eb0785df7634810bb81",
+    "bytes": 140508,
+    "projectEntry": "temp/project.json"
+  },
+  "analysis": {
+    "date": "2026-09-10",
+    "method": "gzip+lib/tar-portable.js 정적 분석; 실행 및 FPS 측정 없음",
+    "normalization": "objects[*].script 및 functions[*].content가 문자열이면 JSON.parse; 경로는 정규화 project의 RFC6901 JSON pointer"
+  },
+  "stats": {
+    "scenes": 1,
+    "objects": 4,
+    "objectThreads": 5,
+    "objectBlocks": 775,
+    "functionBlocks": 21,
+    "totalBlocks": 796,
+    "functions": 1,
+    "scalarVariables": 6,
+    "lists": 9,
+    "timerVariables": 1,
+    "answerVariables": 1,
+    "messages": 0,
+    "pictureReferences": 7,
+    "soundReferences": 3,
+    "archiveImageFiles": 5,
+    "archiveThumbnailFiles": 5,
+    "archiveSoundFiles": 2
+  },
+  "statsDefinition": "블록 수는 objects[*].script 및 functions[*].content 내 type을 가진 객체를 params/statements 포함 재귀 집계; 함수 헤더/필드/리터럴 포함. objectThreads는 이벤트 없는 분리 표현식 1개 포함. 에셋 참조 수는 sprite 배열 합계, 파일 수는 tar 실제 경로별 집계.",
+  "assertions": [
+    {
+      "label": "리스트 ID 6",
+      "path": "/variables/6/id",
+      "expected": "85cr"
+    },
+    {
+      "label": "리스트 초기 배열 6",
+      "path": "/variables/6/array",
+      "expected": [
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        }
+      ]
+    },
+    {
+      "label": "리스트 ID 7",
+      "path": "/variables/7/id",
+      "expected": "gkig"
+    },
+    {
+      "label": "리스트 초기 배열 7",
+      "path": "/variables/7/array",
+      "expected": [
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        }
+      ]
+    },
+    {
+      "label": "리스트 ID 8",
+      "path": "/variables/8/id",
+      "expected": "7k28"
+    },
+    {
+      "label": "리스트 초기 배열 8",
+      "path": "/variables/8/array",
+      "expected": [
+        {
+          "data": "0.57735026919"
+        },
+        {
+          "data": "0.57735026919"
+        },
+        {
+          "data": "-0.57735026919"
+        }
+      ]
+    },
+    {
+      "label": "리스트 ID 9",
+      "path": "/variables/9/id",
+      "expected": "d48u"
+    },
+    {
+      "label": "리스트 초기 배열 9",
+      "path": "/variables/9/array",
+      "expected": [
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        }
+      ]
+    },
+    {
+      "label": "리스트 ID 10",
+      "path": "/variables/10/id",
+      "expected": "ox7h"
+    },
+    {
+      "label": "리스트 초기 배열 10",
+      "path": "/variables/10/array",
+      "expected": [
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        }
+      ]
+    },
+    {
+      "label": "리스트 ID 11",
+      "path": "/variables/11/id",
+      "expected": "z68k"
+    },
+    {
+      "label": "리스트 초기 배열 11",
+      "path": "/variables/11/array",
+      "expected": [
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        },
+        {
+          "data": 0
+        }
+      ]
+    },
+    {
+      "label": "리스트 ID 12",
+      "path": "/variables/12/id",
+      "expected": "0l2z"
+    },
+    {
+      "label": "리스트 초기 배열 12",
+      "path": "/variables/12/array",
+      "expected": [
+        {
+          "data": "1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "1"
+        }
+      ]
+    },
+    {
+      "label": "리스트 ID 13",
+      "path": "/variables/13/id",
+      "expected": "bhkh"
+    },
+    {
+      "label": "리스트 초기 배열 13",
+      "path": "/variables/13/array",
+      "expected": [
+        {
+          "data": "1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "0"
+        }
+      ]
+    },
+    {
+      "label": "리스트 ID 14",
+      "path": "/variables/14/id",
+      "expected": "rztd"
+    },
+    {
+      "label": "리스트 초기 배열 14",
+      "path": "/variables/14/array",
+      "expected": [
+        {
+          "data": "1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "-1"
+        },
+        {
+          "data": "1"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        }
+      ]
+    },
+    {
+      "label": "오브젝트 ID 0",
+      "path": "/objects/0/id",
+      "expected": "ej66"
+    },
+    {
+      "label": "오브젝트 ID 1",
+      "path": "/objects/1/id",
+      "expected": "7y0y"
+    },
+    {
+      "label": "오브젝트 ID 2",
+      "path": "/objects/2/id",
+      "expected": "9ys5"
+    },
+    {
+      "label": "오브젝트 ID 3",
+      "path": "/objects/3/id",
+      "expected": "bfav"
+    },
+    {
+      "label": "블록 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/id",
+      "expected": "gktu"
+    },
+    {
+      "label": "블록 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/id",
+      "expected": "wlpe"
+    },
+    {
+      "label": "블록 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/id",
+      "expected": "h5ie"
+    },
+    {
+      "label": "블록 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/id",
+      "expected": "hm6d"
+    },
+    {
+      "label": "블록 ynm6",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/0/id",
+      "expected": "ynm6"
+    },
+    {
+      "label": "블록 hn0u",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/1/id",
+      "expected": "hn0u"
+    },
+    {
+      "label": "블록 0t4b",
+      "path": "/objects/1/script/0/12/statements/0/8/id",
+      "expected": "0t4b"
+    },
+    {
+      "label": "블록 1bri",
+      "path": "/objects/1/script/0/12/statements/0/9/id",
+      "expected": "1bri"
+    },
+    {
+      "label": "블록 jnyz",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/8/id",
+      "expected": "jnyz"
+    },
+    {
+      "label": "블록 z5ty",
+      "path": "/objects/2/script/0/1/statements/0/4/id",
+      "expected": "z5ty"
+    },
+    {
+      "label": "블록 rexo",
+      "path": "/objects/2/script/0/1/statements/0/5/id",
+      "expected": "rexo"
+    },
+    {
+      "label": "블록 1nwi",
+      "path": "/objects/2/script/0/1/statements/0/6/id",
+      "expected": "1nwi"
+    },
+    {
+      "label": "블록 7tpj",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/id",
+      "expected": "7tpj"
+    },
+    {
+      "label": "블록 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/id",
+      "expected": "xclx"
+    },
+    {
+      "label": "블록 sbm7",
+      "path": "/objects/2/script/1/0/id",
+      "expected": "sbm7"
+    },
+    {
+      "label": "블록 6iv4",
+      "path": "/functions/0/content/0/0/statements/0/1/id",
+      "expected": "6iv4"
+    },
+    {
+      "label": "블록 gzlf",
+      "path": "/functions/0/content/0/0/statements/0/1/statements/0/0/id",
+      "expected": "gzlf"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/0",
+      "expected": "d48u"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/1/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/1/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/0/params/0/params/1",
+      "expected": "bhkh"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/0/params/0/params/3/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/0/params/0/params/3/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/0/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/0/params/2/params/1",
+      "expected": "z68k"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/0/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/1",
+      "expected": "MINUS"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/2/params/0/params/1",
+      "expected": "0l2z"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/2/params/0/params/3/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/2/params/0/params/3/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/2/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/2/params/2/params/1",
+      "expected": "z68k"
+    },
+    {
+      "label": "수식/조건 gktu",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/1/params/2/params/2/params/2/params/3/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/0",
+      "expected": "85cr"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/1/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/1/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/0/params/0/params/1",
+      "expected": "bhkh"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/0/params/0/params/3/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/0/params/0/params/3/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/0/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/0/params/2/params/1",
+      "expected": "z68k"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/0/params/2/params/3/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/1",
+      "expected": "PLUS"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/2/params/0/params/1",
+      "expected": "0l2z"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/2/params/0/params/3/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/2/params/0/params/3/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/2/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/2/params/2/params/1",
+      "expected": "z68k"
+    },
+    {
+      "label": "수식/조건 wlpe",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/2/params/2/params/2/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/0",
+      "expected": "ox7h"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/1/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/1/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/0/params/0/params/1",
+      "expected": "rztd"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/0/params/0/params/3/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/0/params/0/params/3/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/0/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/0/params/2/params/1",
+      "expected": "z68k"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/0/params/2/params/3/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/1",
+      "expected": "PLUS"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/2/params/0/params/1",
+      "expected": "85cr"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/2/params/0/params/3/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/2/params/0/params/3/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/2/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/2/params/2/params/1",
+      "expected": "z68k"
+    },
+    {
+      "label": "수식/조건 h5ie",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/3/params/2/params/2/params/2/params/3/params/0",
+      "expected": "4"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/0",
+      "expected": "85cr"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/1/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/1/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/0/params/0/params/1",
+      "expected": "85cr"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/0/params/0/params/3/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/0/params/0/params/3/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/0/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/0/params/2/params/1",
+      "expected": "z68k"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/0/params/2/params/3/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/1",
+      "expected": "MINUS"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/2/params/0/params/1",
+      "expected": "rztd"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/2/params/0/params/3/params/1",
+      "expected": "self"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/2/params/0/params/3/params/3",
+      "expected": "direction"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/2/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/2/params/2/params/1",
+      "expected": "z68k"
+    },
+    {
+      "label": "수식/조건 hm6d",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/4/params/2/params/2/params/2/params/3/params/0",
+      "expected": "4"
+    },
+    {
+      "label": "수식/조건 ynm6",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/0/params/0",
+      "expected": "ixwq"
+    },
+    {
+      "label": "수식/조건 ynm6",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/0/params/1/params/0/params/0",
+      "expected": "0.1"
+    },
+    {
+      "label": "수식/조건 ynm6",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/0/params/1/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 ynm6",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/0/params/1/params/2/params/0/params/1",
+      "expected": "y"
+    },
+    {
+      "label": "수식/조건 ynm6",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/0/params/1/params/2/params/1",
+      "expected": "MINUS"
+    },
+    {
+      "label": "수식/조건 ynm6",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/0/params/1/params/2/params/2/params/0",
+      "expected": "392y"
+    },
+    {
+      "label": "수식/조건 hn0u",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/1/params/0",
+      "expected": "3att"
+    },
+    {
+      "label": "수식/조건 hn0u",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/1/params/1/params/0/params/0",
+      "expected": "-0.1"
+    },
+    {
+      "label": "수식/조건 hn0u",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/1/params/1/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 hn0u",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/1/params/1/params/2/params/0/params/1",
+      "expected": "x"
+    },
+    {
+      "label": "수식/조건 hn0u",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/1/params/1/params/2/params/1",
+      "expected": "MINUS"
+    },
+    {
+      "label": "수식/조건 hn0u",
+      "path": "/objects/1/script/0/12/statements/0/0/statements/0/1/params/1/params/2/params/2/params/0",
+      "expected": "avtm"
+    },
+    {
+      "label": "수식/조건 0t4b",
+      "path": "/objects/1/script/0/12/statements/0/8/params/0",
+      "expected": "ixwq"
+    },
+    {
+      "label": "수식/조건 0t4b",
+      "path": "/objects/1/script/0/12/statements/0/8/params/1/params/0/params/0",
+      "expected": "0.9"
+    },
+    {
+      "label": "수식/조건 0t4b",
+      "path": "/objects/1/script/0/12/statements/0/8/params/1/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 0t4b",
+      "path": "/objects/1/script/0/12/statements/0/8/params/1/params/2/params/0",
+      "expected": "ixwq"
+    },
+    {
+      "label": "수식/조건 1bri",
+      "path": "/objects/1/script/0/12/statements/0/9/params/0",
+      "expected": "3att"
+    },
+    {
+      "label": "수식/조건 1bri",
+      "path": "/objects/1/script/0/12/statements/0/9/params/1/params/0/params/0",
+      "expected": "0.9"
+    },
+    {
+      "label": "수식/조건 1bri",
+      "path": "/objects/1/script/0/12/statements/0/9/params/1/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 1bri",
+      "path": "/objects/1/script/0/12/statements/0/9/params/1/params/2/params/0",
+      "expected": "3att"
+    },
+    {
+      "label": "수식/조건 jnyz",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/8/type",
+      "expected": "wait_until_true"
+    },
+    {
+      "label": "수식/조건 jnyz",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/8/params/0/type",
+      "expected": "boolean_not"
+    },
+    {
+      "label": "수식/조건 jnyz",
+      "path": "/objects/1/script/0/12/statements/0/7/statements/0/8/params/0/params/1/type",
+      "expected": "continue_repeat"
+    },
+    {
+      "label": "수식/조건 z5ty",
+      "path": "/objects/2/script/0/1/statements/0/4/params/0/params/0/params/1",
+      "expected": "0l2z"
+    },
+    {
+      "label": "수식/조건 z5ty",
+      "path": "/objects/2/script/0/1/statements/0/4/params/0/params/0/params/3/params/0",
+      "expected": "9"
+    },
+    {
+      "label": "수식/조건 z5ty",
+      "path": "/objects/2/script/0/1/statements/0/4/params/0/params/1",
+      "expected": "LESS"
+    },
+    {
+      "label": "수식/조건 z5ty",
+      "path": "/objects/2/script/0/1/statements/0/4/params/0/params/2/params/0",
+      "expected": "0"
+    },
+    {
+      "label": "수식/조건 rexo",
+      "path": "/objects/2/script/0/1/statements/0/5/params/0/params/0/params/1",
+      "expected": "0l2z"
+    },
+    {
+      "label": "수식/조건 rexo",
+      "path": "/objects/2/script/0/1/statements/0/5/params/0/params/0/params/3/params/0",
+      "expected": "10"
+    },
+    {
+      "label": "수식/조건 rexo",
+      "path": "/objects/2/script/0/1/statements/0/5/params/0/params/1",
+      "expected": "LESS"
+    },
+    {
+      "label": "수식/조건 rexo",
+      "path": "/objects/2/script/0/1/statements/0/5/params/0/params/2/params/0",
+      "expected": "0"
+    },
+    {
+      "label": "수식/조건 1nwi",
+      "path": "/objects/2/script/0/1/statements/0/6/params/0/params/0/params/1",
+      "expected": "0l2z"
+    },
+    {
+      "label": "수식/조건 1nwi",
+      "path": "/objects/2/script/0/1/statements/0/6/params/0/params/0/params/3/params/0",
+      "expected": "11"
+    },
+    {
+      "label": "수식/조건 1nwi",
+      "path": "/objects/2/script/0/1/statements/0/6/params/0/params/1",
+      "expected": "LESS"
+    },
+    {
+      "label": "수식/조건 1nwi",
+      "path": "/objects/2/script/0/1/statements/0/6/params/0/params/2/params/0",
+      "expected": "0"
+    },
+    {
+      "label": "수식/조건 7tpj",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/params/0/params/0/params/0",
+      "expected": "50"
+    },
+    {
+      "label": "수식/조건 7tpj",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/params/0/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 7tpj",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/params/0/params/2/params/1",
+      "expected": "ox7h"
+    },
+    {
+      "label": "수식/조건 7tpj",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/params/0/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "수식/조건 7tpj",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/params/1/params/0/params/0",
+      "expected": "50"
+    },
+    {
+      "label": "수식/조건 7tpj",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/params/1/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 7tpj",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/params/1/params/2/params/1",
+      "expected": "d48u"
+    },
+    {
+      "label": "수식/조건 7tpj",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/params/1/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/0",
+      "expected": "gkw7"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/0/params/0",
+      "expected": "255"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/0/params/0",
+      "expected": "0.1"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/0/params/0/params/1",
+      "expected": "rztd"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/0/params/0/params/3/params/0",
+      "expected": "9"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/0/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/0/params/2/params/1",
+      "expected": "7k28"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/0/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/1",
+      "expected": "PLUS"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/2/params/0/params/1",
+      "expected": "bhkh"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/2/params/0/params/3/params/0",
+      "expected": "9"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/2/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/2/params/2/params/1",
+      "expected": "7k28"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/0/params/2/params/2/params/3/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/1",
+      "expected": "PLUS"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/2/params/0/params/1",
+      "expected": "0l2z"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/2/params/0/params/3/params/0",
+      "expected": "9"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/2/params/1",
+      "expected": "MULTI"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/2/params/2/params/1",
+      "expected": "7k28"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/1/params/2/params/1/params/2/params/2/params/3/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "수식/조건 xclx",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/0/params/1/params/3",
+      "expected": "round"
+    },
+    {
+      "label": "수식/조건 6iv4",
+      "path": "/functions/0/content/0/0/statements/0/1/params/0/params/0/params/0",
+      "expected": "rq1f_14x5"
+    },
+    {
+      "label": "수식/조건 6iv4",
+      "path": "/functions/0/content/0/0/statements/0/1/params/0/params/1",
+      "expected": "GREATER"
+    },
+    {
+      "label": "수식/조건 6iv4",
+      "path": "/functions/0/content/0/0/statements/0/1/params/0/params/2/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "수식/조건 gzlf",
+      "path": "/functions/0/content/0/0/statements/0/1/statements/0/0/params/0",
+      "expected": "rq1f_14x5"
+    },
+    {
+      "label": "수식/조건 gzlf",
+      "path": "/functions/0/content/0/0/statements/0/1/statements/0/0/params/1/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "함수 ID",
+      "path": "/functions/0/id",
+      "expected": "rq1f"
+    },
+    {
+      "label": "값 함수",
+      "path": "/functions/0/type",
+      "expected": "value"
+    },
+    {
+      "label": "면 채우기 시작 z5ty/0",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/3/type",
+      "expected": "start_fill"
+    },
+    {
+      "label": "면 채우기 종료 z5ty/0",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/8/type",
+      "expected": "stop_fill"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/0",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/2/params/0/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/0",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/4/params/0/params/2/params/3/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/0",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/5/params/0/params/2/params/3/params/0",
+      "expected": "4"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/0",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/6/params/0/params/2/params/3/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/0",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/0/7/params/0/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "면 채우기 시작 z5ty/1",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/1/3/type",
+      "expected": "start_fill"
+    },
+    {
+      "label": "면 채우기 종료 z5ty/1",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/1/8/type",
+      "expected": "stop_fill"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/1",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/1/2/params/0/params/2/params/3/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/1",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/1/4/params/0/params/2/params/3/params/0",
+      "expected": "6"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/1",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/1/5/params/0/params/2/params/3/params/0",
+      "expected": "8"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/1",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/1/6/params/0/params/2/params/3/params/0",
+      "expected": "7"
+    },
+    {
+      "label": "면 꼭짓점 순서 z5ty/1",
+      "path": "/objects/2/script/0/1/statements/0/4/statements/1/7/params/0/params/2/params/3/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "면 채우기 시작 rexo/0",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/0/3/type",
+      "expected": "start_fill"
+    },
+    {
+      "label": "면 채우기 종료 rexo/0",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/0/8/type",
+      "expected": "stop_fill"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/0",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/0/2/params/0/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/0",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/0/4/params/0/params/2/params/3/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/0",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/0/5/params/0/params/2/params/3/params/0",
+      "expected": "6"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/0",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/0/6/params/0/params/2/params/3/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/0",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/0/7/params/0/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "면 채우기 시작 rexo/1",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/1/3/type",
+      "expected": "start_fill"
+    },
+    {
+      "label": "면 채우기 종료 rexo/1",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/1/8/type",
+      "expected": "stop_fill"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/1",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/1/2/params/0/params/2/params/3/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/1",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/1/4/params/0/params/2/params/3/params/0",
+      "expected": "4"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/1",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/1/5/params/0/params/2/params/3/params/0",
+      "expected": "8"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/1",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/1/6/params/0/params/2/params/3/params/0",
+      "expected": "7"
+    },
+    {
+      "label": "면 꼭짓점 순서 rexo/1",
+      "path": "/objects/2/script/0/1/statements/0/5/statements/1/7/params/0/params/2/params/3/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "면 채우기 시작 1nwi/0",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/0/3/type",
+      "expected": "start_fill"
+    },
+    {
+      "label": "면 채우기 종료 1nwi/0",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/0/8/type",
+      "expected": "stop_fill"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/0",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/0/2/params/0/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/0",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/0/4/params/0/params/2/params/3/params/0",
+      "expected": "3"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/0",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/0/5/params/0/params/2/params/3/params/0",
+      "expected": "7"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/0",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/0/6/params/0/params/2/params/3/params/0",
+      "expected": "5"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/0",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/0/7/params/0/params/2/params/3/params/0",
+      "expected": "1"
+    },
+    {
+      "label": "면 채우기 시작 1nwi/1",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/1/3/type",
+      "expected": "start_fill"
+    },
+    {
+      "label": "면 채우기 종료 1nwi/1",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/1/8/type",
+      "expected": "stop_fill"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/1",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/1/2/params/0/params/2/params/3/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/1",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/1/4/params/0/params/2/params/3/params/0",
+      "expected": "4"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/1",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/1/5/params/0/params/2/params/3/params/0",
+      "expected": "8"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/1",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/1/6/params/0/params/2/params/3/params/0",
+      "expected": "6"
+    },
+    {
+      "label": "면 꼭짓점 순서 1nwi/1",
+      "path": "/objects/2/script/0/1/statements/0/6/statements/1/7/params/0/params/2/params/3/params/0",
+      "expected": "2"
+    },
+    {
+      "label": "삼각함수 캐시 ktzx",
+      "path": "/objects/1/script/0/12/statements/0/2/params/2/params/3",
+      "expected": "cos"
+    },
+    {
+      "label": "삼각함수 입력 축 ktzx",
+      "path": "/objects/1/script/0/12/statements/0/2/params/2/params/1/params/3",
+      "expected": "x"
+    },
+    {
+      "label": "삼각함수 캐시 ypmq",
+      "path": "/objects/1/script/0/12/statements/0/3/params/2/params/3",
+      "expected": "cos"
+    },
+    {
+      "label": "삼각함수 입력 축 ypmq",
+      "path": "/objects/1/script/0/12/statements/0/3/params/2/params/1/params/3",
+      "expected": "y"
+    },
+    {
+      "label": "삼각함수 캐시 0f05",
+      "path": "/objects/1/script/0/12/statements/0/4/params/2/params/3",
+      "expected": "sin"
+    },
+    {
+      "label": "삼각함수 입력 축 0f05",
+      "path": "/objects/1/script/0/12/statements/0/4/params/2/params/1/params/3",
+      "expected": "x"
+    },
+    {
+      "label": "삼각함수 캐시 1vjj",
+      "path": "/objects/1/script/0/12/statements/0/5/params/2/params/3",
+      "expected": "sin"
+    },
+    {
+      "label": "삼각함수 입력 축 1vjj",
+      "path": "/objects/1/script/0/12/statements/0/5/params/2/params/1/params/3",
+      "expected": "y"
+    },
+    {
+      "label": "max 선택 r916",
+      "path": "/functions/0/content/0/0/statements/0/0/type",
+      "expected": "if_else"
+    },
+    {
+      "label": "max 선택 r916",
+      "path": "/functions/0/content/0/0/statements/0/0/params/0/type",
+      "expected": "boolean_basic_operator"
+    },
+    {
+      "label": "max 선택 r916",
+      "path": "/functions/0/content/0/0/statements/0/0/params/0/params/0/type",
+      "expected": "stringParam_4osn"
+    },
+    {
+      "label": "max 선택 r916",
+      "path": "/functions/0/content/0/0/statements/0/0/params/0/params/1",
+      "expected": "GREATER"
+    },
+    {
+      "label": "max 선택 r916",
+      "path": "/functions/0/content/0/0/statements/0/0/params/0/params/2/type",
+      "expected": "stringParam_1bnq"
+    },
+    {
+      "label": "max 선택 o6dw",
+      "path": "/functions/0/content/0/0/statements/0/0/statements/0/0/type",
+      "expected": "set_func_variable"
+    },
+    {
+      "label": "max 선택 o6dw",
+      "path": "/functions/0/content/0/0/statements/0/0/statements/0/0/params/0",
+      "expected": "rq1f_14x5"
+    },
+    {
+      "label": "max 선택 o6dw",
+      "path": "/functions/0/content/0/0/statements/0/0/statements/0/0/params/1/type",
+      "expected": "stringParam_4osn"
+    },
+    {
+      "label": "max 선택 8xu6",
+      "path": "/functions/0/content/0/0/statements/0/0/statements/1/0/type",
+      "expected": "set_func_variable"
+    },
+    {
+      "label": "max 선택 8xu6",
+      "path": "/functions/0/content/0/0/statements/0/0/statements/1/0/params/0",
+      "expected": "rq1f_14x5"
+    },
+    {
+      "label": "max 선택 8xu6",
+      "path": "/functions/0/content/0/0/statements/0/0/statements/1/0/params/1/type",
+      "expected": "stringParam_1bnq"
+    }
+  ],
+  "mathChecks": [
+    {
+      "angles": [
+        0,
+        0
+      ],
+      "vector": [
+        1,
+        1,
+        1
+      ],
+      "result": [
+        1,
+        1,
+        1
+      ],
+      "squaredLengthError": 0
+    },
+    {
+      "angles": [
+        30,
+        -20
+      ],
+      "vector": [
+        1,
+        -1,
+        1
+      ],
+      "result": [
+        0.814504559722719,
+        -1.3660254037844386,
+        0.6859715142820884
+      ],
+      "squaredLengthError": 0
+    },
+    {
+      "angles": [
+        90,
+        0
+      ],
+      "vector": [
+        0,
+        1,
+        0
+      ],
+      "result": [
+        0,
+        6.123233995736766e-17,
+        1
+      ],
+      "squaredLengthError": 0
+    }
+  ]
+}
