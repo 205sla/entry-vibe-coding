@@ -185,6 +185,33 @@ JSON.stringify 결과는 키 순서에 의존하지 않고 엔진도 순서 체�
 
 사운드는 이미지와 달리 **원본 바이트 그대로** tar에 저장 (MP3/WAV/OGG).
 `imageType` 같은 필드는 없고 `ext`가 그 역할.
+번들 가능 형식과 공식 웹의 가져오기·재생 호환성은 다르다. 새 공개용 작품은
+[15의 MP3 기본 방침](15-audio-verification.md#공식-웹용-음원-형식-선택)을 따른다.
+
+### 합성 WAV를 포함하고 음악을 별도 스레드에서 반복하기
+
+심연의 성채의 [build.mjs](../games/abyssal-keep/build.mjs)는 22,050 Hz·16-bit·mono PCM
+WAV를 생성한다. RIFF 헤더의 샘플 수와 실제 데이터 크기, `duration`을 같은 길이에서 계산하고
+샘플을 16-bit 범위로 제한한다. 만들어진 파일은 오브젝트의 `sounds`에
+`{ id, name, path, duration }`으로 등록하여 기존 생성기가 tar 내부 경로로 바꾸게 한다.
+합성 JS는 제작 시에만 실행하며 작품 안의 재생은 소리 블록이 담당한다.
+
+게임 로직의 효과음은 `sound_something_with_block`, 배경 음악은 전용 오브젝트의
+`repeat.inf` 안에서 `sound_something_wait_with_block`으로 끝까지 재생한 뒤 반복한다.
+음악 완료를 기다리는 블록을 이동·전투 루프에 넣으면 그 루프가 기다리므로 스레드를 나눈다.
+음원은 재생 블록을 실행하는 오브젝트에 등록한다. 정확한 슬롯과 기존 소리 블록은
+[04 소리](04-script-and-blocks.md#소리)를 참고한다.
+
+이 사례는 `muted` 플래그로 새 효과음을 거르고 `sound_volume_set`으로 진행 중 음악의
+음량도 바꾼다. 일시정지 때 음악은 계속 흐르는 설계다. 끝까지 기다린 뒤 반복하는 방식은
+샘플 단위의 끊김 없는 연결을 보장하지 않는다.
+
+근거: [spec.mjs](../games/abyssal-keep/spec.mjs)의 `sound`, `music`, N키 처리와
+[번들·실행 검사](../games/abyssal-keep/verification.json).
+위 검사는 tar 실재와 로컬 실행 무오류에 한정되며 실제 소리 출력 성공의 근거가 아니다.
+2026-09-11에 발견한 호스트 의존성 오류와 별도 WAV·MP3 테스트 결과는
+[15 소리 검증](15-audio-verification.md)에 정리했다. 소리를 쓰는 새 작품은 그 문서의
+등록·디코딩·네이티브 블록·출력 신호 검사를 반드시 추가한다.
 
 ## 자산 자동 번들링 (make-ent.mjs 동작)
 

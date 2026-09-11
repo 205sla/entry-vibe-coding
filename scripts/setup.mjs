@@ -25,6 +25,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import url from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { installAudioVendors, verifyAudioVendors } from './setup-audio.mjs';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT      = path.resolve(__dirname, '..');
@@ -242,9 +243,7 @@ const VENDOR_PKG = {
         'jquery-ui-dist': '1.13.3',
         'lodash': '4.17.21',
         'underscore': '1.8.3',
-        'preload-js': '0.6.3',
         'easeljs': '1.0.2',
-        'soundjs': '1.0.1',
         'velocity-animate': '1.5.2',
         'codemirror': '5.12.0',
         'fuzzy': '0.1.3',
@@ -277,10 +276,7 @@ async function copyVendorFiles() {
         ['jquery-ui-dist/jquery-ui.min.css',                    'jquery-ui.min.css'],
         ['lodash/lodash.min.js',                                'lodash.min.js'],
         ['underscore/underscore-min.js',                        'underscore-min.js'],
-        ['preload-js/index.js',                                 'preloadjs-0.6.0.min.js'],
         ['easeljs/lib/easeljs.min.js',                          'easeljs-0.8.0.min.js'],
-        ['soundjs/lib/soundjs.min.js',                          'soundjs-0.6.0.min.js'],
-        ['soundjs/lib/flashaudioplugin.min.js',                 'flashaudioplugin-0.6.0.min.js'],
         ['velocity-animate/velocity.min.js',                    'velocity.min.js'],
         ['codemirror/lib/codemirror.js',                        'codemirror/lib/codemirror.js'],
         ['codemirror/lib/codemirror.css',                       'codemirror/lib/codemirror.css'],
@@ -302,18 +298,6 @@ async function copyVendorFiles() {
         fs.mkdirSync(path.dirname(d), { recursive: true });
         fs.copyFileSync(s, d);
     }
-}
-
-async function patchPreloadjs() {
-    // npm `preload-js@0.6.3` ends with `;module.exports=window.createjs;` which
-    // throws `ReferenceError: module is not defined` in the browser.
-    // Strip the suffix once, idempotent.
-    const p = path.join(ROOT, 'public/lib/vendor/preloadjs-0.6.0.min.js');
-    let src = fs.readFileSync(p, 'utf8');
-    if (!/module\.exports/.test(src)) return { note: 'already patched' };
-    src = src.replace(/;module\.exports=[^;]*;\s*$/, ';');
-    fs.writeFileSync(p, src);
-    return {};
 }
 
 // ---------- steps ----------
@@ -415,6 +399,7 @@ async function verifyBootFiles() {
     if (missing.length) {
         throw new Error('boot files missing:\n      - ' + missing.join('\n      - '));
     }
+    await verifyAudioVendors();
     return { note: `${required.length} boot files present` };
 }
 
@@ -439,10 +424,12 @@ async function main() {
     if (!FLAGS.has('--skip-vendor')) {
         await step('npm install vendor libs',             installVendor);
         await step('copy vendor lib dist files',          copyVendorFiles);
-        await step('patch preload-js (module.exports)',   patchPreloadjs);
     } else {
         log('  (--skip-vendor): vendor install skipped');
     }
+
+    // --skip-vendor skips npm, but must still repair the incompatible historical audio aliases.
+    await step('install verified CreateJS audio 0.6.0',  installAudioVendors);
 
     await step('verify editor boot files',                verifyBootFiles);
 

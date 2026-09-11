@@ -130,7 +130,10 @@ function checkLink(link, headingsByFile) {
     const [filePart, anchorPart] = u.split('#');
     if (!filePart) return null;  // shouldn't happen after the # check above
 
-    const targetAbs = path.resolve(path.dirname(link.file), filePart);
+    let decodedFile;
+    try { decodedFile = decodeURIComponent(filePart); }
+    catch { return { ...link, reason: 'invalid percent encoding in local path' }; }
+    const targetAbs = path.resolve(path.dirname(link.file), decodedFile);
     if (!fs.existsSync(targetAbs)) {
         return { ...link, reason: `target file not found: ${path.relative(ROOT, targetAbs)}` };
     }

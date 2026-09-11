@@ -1,0 +1,395 @@
+{
+  "date": "2026-09-11",
+  "scope": "Observed audio behavior; no claim of physical speaker listening or successful new online import",
+  "originalGame": {
+    "file": "games/abyssal-keep/abyssal-keep_007.ent",
+    "sha256": "3c84e30b691210e1a650c9b163aa0bc31c1e25fca5adb98b3708bdd6c4f06f10",
+    "modifiedByThisTask": false
+  },
+  "reference": {
+    "name": "음악 제작기의 리메이크.ent",
+    "sha256": "369f07159221d1626243cb6d3cffb4ebc4809ceaa4da3ecce93ddf8c93a3e94e",
+    "soundCount": 3,
+    "format": "MP3",
+    "audioCopiedIntoTest": false
+  },
+  "before": {
+    "date": "2026-09-11T08:10:34.860Z",
+    "file": "audio-check_001.ent",
+    "sha256": "1a865f3f762623b86e804a33490b09ab5228d10c0add1318d8a3b4b98d8fff44",
+    "passed": false,
+    "error": "Audio was not registered and decoded",
+    "pageErrors": [],
+    "versions": {
+      "soundjs": "1.0.0",
+      "preloadjs": "0.4.1"
+    },
+    "context": "running",
+    "registeredSounds": [
+      {
+        "id": "wav1",
+        "registered": false,
+        "decoded": false
+      },
+      {
+        "id": "mp31",
+        "registered": false,
+        "decoded": false
+      }
+    ],
+    "cases": [
+      {
+        "phase": "wav",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": {
+          "id": "wav1",
+          "state": "playFailed"
+        },
+        "volume": 0.6
+      },
+      {
+        "phase": "mp3",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": {
+          "id": "mp31",
+          "state": "playFailed"
+        },
+        "volume": 0.6
+      },
+      {
+        "phase": "mute",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": {
+          "id": "wav1",
+          "state": "playFailed"
+        },
+        "volume": 0
+      }
+    ]
+  },
+  "afterSameFile": {
+    "date": "2026-09-11T08:30:38.438Z",
+    "file": "audio-check_001.ent",
+    "sha256": "1a865f3f762623b86e804a33490b09ab5228d10c0add1318d8a3b4b98d8fff44",
+    "passed": true,
+    "pageErrors": [],
+    "versions": {
+      "soundjs": "0.6.0",
+      "preloadjs": "0.6.0"
+    },
+    "context": "running",
+    "registeredSounds": [
+      {
+        "id": "wav1",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "id": "mp31",
+        "registered": true,
+        "decoded": true
+      }
+    ],
+    "cases": [
+      {
+        "phase": "wav",
+        "signal": {
+          "peak": 0.13576935231685638,
+          "rms": 0.09518553397215933
+        },
+        "nativeCall": {
+          "id": "wav1",
+          "state": "playSucceeded"
+        },
+        "volume": 0.6
+      },
+      {
+        "phase": "mp3",
+        "signal": {
+          "peak": 0.12898088991641998,
+          "rms": 0.08883990065212673
+        },
+        "nativeCall": {
+          "id": "mp31",
+          "state": "playSucceeded"
+        },
+        "volume": 0.6
+      },
+      {
+        "phase": "mute",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": {
+          "id": "wav1",
+          "state": "playSucceeded"
+        },
+        "volume": 0
+      }
+    ]
+  },
+  "currentLocal": {
+    "date": "2026-09-11T08:20:33.985Z",
+    "file": "audio-check_003.ent",
+    "sha256": "1229c870016b529e9d53f5661349836421d7734a244ee76141db5712bb298c6e",
+    "passed": true,
+    "pageErrors": [],
+    "versions": {
+      "soundjs": "0.6.0",
+      "preloadjs": "0.6.0"
+    },
+    "context": "running",
+    "registeredSounds": [
+      {
+        "id": "wav1",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "id": "mp31",
+        "registered": true,
+        "decoded": true
+      }
+    ],
+    "cases": [
+      {
+        "phase": "wav",
+        "signal": {
+          "peak": 0.13576935231685638,
+          "rms": 0.09232417024508008
+        },
+        "nativeCall": {
+          "id": "wav1",
+          "state": "playSucceeded"
+        },
+        "volume": 0.6
+      },
+      {
+        "phase": "mp3",
+        "signal": {
+          "peak": 0.1289830505847931,
+          "rms": 0.08927392066318379
+        },
+        "nativeCall": {
+          "id": "mp31",
+          "state": "playSucceeded"
+        },
+        "volume": 0.6
+      },
+      {
+        "phase": "mute",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": {
+          "id": "wav1",
+          "state": "playSucceeded"
+        },
+        "volume": 0
+      }
+    ]
+  },
+  "currentOfficialOffline": {
+    "date": "2026-09-11T08:21:02.501Z",
+    "file": "audio-check_003.ent",
+    "sha256": "1229c870016b529e9d53f5661349836421d7734a244ee76141db5712bb298c6e",
+    "passed": true,
+    "pageErrors": [],
+    "versions": {
+      "soundjs": "0.6.0",
+      "preloadjs": "0.6.0"
+    },
+    "context": "running",
+    "registeredSounds": [
+      {
+        "id": "wav1",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "id": "mp31",
+        "registered": true,
+        "decoded": true
+      }
+    ],
+    "cases": [
+      {
+        "phase": "wav",
+        "signal": {
+          "peak": 0.13576935231685638,
+          "rms": 0.09237579647733418
+        },
+        "nativeCall": {
+          "id": "wav1",
+          "state": "playSucceeded"
+        },
+        "volume": 0.6
+      },
+      {
+        "phase": "mp3",
+        "signal": {
+          "peak": 0.1289866715669632,
+          "rms": 0.08909363064848506
+        },
+        "nativeCall": {
+          "id": "mp31",
+          "state": "playSucceeded"
+        },
+        "volume": 0.6
+      },
+      {
+        "phase": "mute",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": {
+          "id": "wav1",
+          "state": "playSucceeded"
+        },
+        "volume": 0
+      }
+    ],
+    "app": {
+      "version": "2.1.35",
+      "isolatedUserData": true,
+      "isolatedAppData": true
+    },
+    "sourceUnchanged": true
+  },
+  "existingPublicProject": {
+    "url": "https://playentry.org/project/6aa2bf98315d7c6734880731",
+    "versions": {
+      "soundjs": "0.6.0",
+      "preloadjs": "0.6.0"
+    },
+    "context": "running",
+    "responses": [
+      {
+        "url": "https://playentry.org/uploads/01/13/0113e861mtvkkf7g0ng45b23a661peww.wav",
+        "status": 404
+      },
+      {
+        "url": "https://playentry.org/uploads/11/b3/11b31494mtvkkgrc0ng45b23a66966zs.wav",
+        "status": 404
+      },
+      {
+        "url": "https://playentry.org/uploads/1b/31/1b314940mtvkkgrd0ng45b23a669gx6k.wav",
+        "status": 404
+      },
+      {
+        "url": "https://playentry.org/uploads/b3/14/b3149408mtvkkgrd0ng45b23a669omcc.wav",
+        "status": 404
+      },
+      {
+        "url": "https://playentry.org/uploads/31/49/31494088mtvkkgrd0ng45b23a669uvko.wav",
+        "status": 404
+      },
+      {
+        "url": "https://playentry.org/uploads/14/94/14940880mtvkkgre0ng45b23a66a482k.wav",
+        "status": 404
+      },
+      {
+        "url": "https://playentry.org/uploads/49/40/4940880emtvkkgre0ng45b23a66agd9g.wav",
+        "status": 404
+      },
+      {
+        "url": "https://playentry.org/uploads/94/08/940880eemtvkkgrf0ng45b23a66asldw.wav",
+        "status": 404
+      }
+    ],
+    "nativeCalls": [
+      {
+        "id": "ambient",
+        "state": "playFailed"
+      },
+      {
+        "id": "shot",
+        "state": "playFailed"
+      }
+    ],
+    "resolved": false
+  },
+  "newOfficialWebsiteTest": {
+    "verified": false,
+    "userObservation": {
+      "date": "2026-09-11",
+      "file": "audio-check_003.ent",
+      "environment": "playentry.org website in Chrome",
+      "wavKey1": "silent",
+      "mp3Key2": "audible",
+      "source": "User directly tested the file and reported that only key 2 produced sound; user confirmed the environment was the Entry website.",
+      "agentVerified": false,
+      "requestUrlComparison": "blocked: project metadata query returned permission error"
+    },
+    "projectUrl": "https://playentry.org/ws/6aa3bd781af80892d3d1d982",
+    "readOnlyMetadataProbe": {
+      "pageHttpStatus": 200,
+      "graphqlHttpStatus": 200,
+      "graphqlErrorStatusCode": 403,
+      "projectReturned": false,
+      "session": "fresh anonymous session from public page; no signed-in browser credentials used"
+    },
+    "reason": "Anonymous file input did not load the fixture; the subsequent signed-in Chrome check was stopped by Computer Use because it could not establish the current browser URL with sufficient confidence."
+  },
+  "vendorFiles": [
+    {
+      "file": "preloadjs-0.6.0.min.js",
+      "source": "https://raw.githubusercontent.com/CreateJS/PreloadJS/ba52a4d4a1308962107cb1acd144bd28735637da/lib/preloadjs-0.6.0.min.js",
+      "expectedSha256": "671d2d4201bf3fe25c22d343ea377ed88c0646b2bb8bb490e1ce6aa6143426b9",
+      "actualSha256": "671d2d4201bf3fe25c22d343ea377ed88c0646b2bb8bb490e1ce6aa6143426b9"
+    },
+    {
+      "file": "soundjs-0.6.0.min.js",
+      "source": "https://raw.githubusercontent.com/CreateJS/SoundJS/093c91fc1dc78dd85dd103467e280f01034a177b/lib/soundjs-0.6.0.min.js",
+      "expectedSha256": "09c0c658a5d0a5fe8db0ba8f2e55513bd9a7f8525e678ca344430521e8559ca6",
+      "actualSha256": "09c0c658a5d0a5fe8db0ba8f2e55513bd9a7f8525e678ca344430521e8559ca6"
+    },
+    {
+      "file": "flashaudioplugin-0.6.0.min.js",
+      "source": "https://raw.githubusercontent.com/CreateJS/SoundJS/093c91fc1dc78dd85dd103467e280f01034a177b/lib/flashaudioplugin-0.6.0.min.js",
+      "expectedSha256": "2f0325655de628188e6b5bb62b5f9b15e3b1b67b3ccd23d028c58d51679a9194",
+      "actualSha256": "2f0325655de628188e6b5bb62b5f9b15e3b1b67b3ccd23d028c58d51679a9194"
+    }
+  ],
+  "regressions": {
+    "smoke": "tests/audio-vendor.test.js",
+    "nativePlaybackAndRoundTrip": "tests/audio-e2e.spec.js",
+    "fixture": "games/audio-check/verify.mjs",
+    "officialDesktop": "tools/verify-audio-offline.mjs"
+  },
+  "validation": {
+    "e2e": {
+      "passed": 29,
+      "failed": 0,
+      "browser": "isolated headless Chrome; temporary config overrides channel because bundled Chromium is unavailable"
+    },
+    "smoke": {
+      "passed": 34,
+      "failed": 0
+    },
+    "coldAudioInstall": "passed with empty vendor/cache directories; hash validation and idempotent rerun passed",
+    "changedSourceLint": "passed",
+    "knowledgeLinks": {
+      "checked": 1010,
+      "broken": 0
+    },
+    "workspaceKnowledgeRegistry": "passed"
+  },
+  "limits": [
+    "Output samples are measured after the WebAudio gain node, before OS/device output.",
+    "The original user-profile offline failure was not reproduced in a clean profile.",
+    "The old public project still had missing audio URLs; hosting dependency repairs do not repair these server assets."
+  ]
+}

@@ -15,26 +15,15 @@
     }
     function setStatus(msg) { if (statusEl) statusEl.textContent = msg || ''; }
 
-    // SoundJS 1.x (installed from npm as 0.6.0 alias) crashes in _parsePath
-    // when entryjs registers sounds whose src is undefined at startup.
-    // playentry.org's actual 0.6.0 silently skipped these; the 1.x code path
-    // throws because the `toString()` call is unguarded. Patch defensively.
-    function patchCreateJSSoundParsePath() {
-        if (typeof createjs === 'undefined' || !createjs.Sound) return;
-        const proto = Object.getPrototypeOf(createjs.Sound);
-        // _parsePath lives on Sound class methods; find and wrap it.
-        ['_parsePath', 'parsePath'].forEach(fn => {
-            const target = createjs.Sound[fn] || (proto && proto[fn]);
-            if (typeof target !== 'function' || target.__patched) return;
-            const wrapped = function (src) {
-                if (src == null) return null;
-                try { return target.apply(this, arguments); }
-                catch (e) { console.warn('[editor] _parsePath skipped for', src, e.message); return null; }
-            };
-            wrapped.__patched = true;
-            createjs.Sound[fn] = wrapped;
-            if (proto && proto[fn]) proto[fn] = wrapped;
-        });
+    function checkAudioVersions() {
+        const sound = window.createjs?.SoundJS?.version;
+        const preload = window.createjs?.PreloadJS?.version;
+        if (sound === '0.6.0' && preload === '0.6.0') return true;
+        const message = `소리 라이브러리 버전 오류 (SoundJS ${sound}, PreloadJS ${preload}). node scripts/setup-audio.mjs 실행이 필요합니다.`;
+        window.__myentryInitError = new Error(message);
+        setStatus(message);
+        console.error('[editor] ' + message);
+        return false;
     }
 
     function initEntry() {
@@ -43,7 +32,7 @@
             setStatus('엔트리 로드 실패');
             return;
         }
-        patchCreateJSSoundParsePath();
+        if (!checkAudioVersions()) return;
         const initOption = {
             libDir: '',
             entryDir: '',
@@ -154,12 +143,15 @@
     };
 
     // Expose a promise for tests to wait on ("Entry ready").
-    window.__myentryReady = new Promise((resolve) => {
+    window.__myentryReady = new Promise((resolve, reject) => {
         (function poll() {
+            if (window.__myentryInitError) return reject(window.__myentryInitError);
             if (typeof Entry !== 'undefined' && Entry.container) return resolve();
             setTimeout(poll, 50);
         })();
     });
+    // Keep the readiness promise rejected for callers without an unhandled-rejection event.
+    window.__myentryReady.catch(() => {});
 
     function wire() {
         const open = document.getElementById('open-ent');

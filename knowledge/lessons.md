@@ -10,11 +10,15 @@
 
 ## 편집기 부팅
 
+> 2026-09-11 정정: 아래 4월의 SoundJS 방어 래퍼·preload-js strip은 당시 기록이다.
+> 현재 가드는 [공식 소리 vendor 설치와 실제 출력 검사](15-audio-verification.md)로 대체했다.
+
 - [2026-04-23] SoundJS `_parsePath`가 undefined src로 crash — 가드: [`public/js/editor.js`](../public/js/editor.js) `patchCreateJSSoundParsePath` (defensive wrapper)
 - [2026-04-23] preload-js npm dist 말미의 `;module.exports=window.createjs;`가 브라우저에서 `module is not defined` — 가드: [`scripts/setup.mjs`](../scripts/setup.mjs) perl strip
 - [2026-04-23] 하드웨어 모듈이 `ws://127.0.0.1:23518` 연결 실패 로그 스팸 — 가드: [`editor.js`](../public/js/editor.js) init option `hardwareEnable: false`
 - [2026-04-23] `/images/*`와 `/lib/entry-js/images/*` 404 (Entry가 두 경로 모두 요청) — 가드: [`scripts/setup.mjs`](../scripts/setup.mjs) 양쪽에 복사
 - [2026-04-23] `Entry.engine.toggleRun()`이 tickEnabled 에러로 간헐 crash (헤드리스) — 가드: [`tools/lib/editor-harness.mjs`](../tools/lib/editor-harness.mjs) try/catch 래핑
+- [2026-09-11] PreloadJS 0.4.1 + SoundJS 1.0.0 혼용을 방어 래퍼가 숨겨 WAV·MP3가 무음 — 가드: [공식 0.6.0 해시 설치](../scripts/setup-audio.mjs), [부팅 버전 차단·네이티브 출력·왕복 재생 검사](../tests/audio-e2e.spec.js), [진단 정본](15-audio-verification.md).
 
 ## `.ent` 로드 · 렌더
 
@@ -82,6 +86,12 @@
 - [2026-09-01] **헤드리스에서 줄바꿈을 폭으로 검증하면 틀린다** — 로컬 편집기는 CreateJS 로 뜨는데 그쪽 `getMeasuredWidth()` 는 **줄바꿈을 무시하고 원문 전체를 잰다**(100자가 3줄로 접혔는데 폭 1307 로 보고). playentry 는 PIXI 라 `_lines` 가 있지만 로컬엔 없다 — 가드: 두 렌더러 공통인 `getMeasuredHeight() / lineHeight` 로 줄 수를 센다 ([`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §②) ([07 §lineBreak 세로 클리핑](07-runtime-quirks.md#linebreak-true-는-height-를-넘는-줄을-그리지-않고-버린다))
 
 ---
+
+## 1인칭 던전 제작
+
+- [2026-09-10] DSL 함수 인자에 JS 곱셈을 써 미니맵 Y 수식이 `NaN`이 됨 — 가드: [spec.mjs](../games/abyssal-keep/spec.mjs)의 `mapdrawrow`에서 `sub(98, mul(y, 2))`로 블록 수식 구성 ([04 DSL 수식](04-script-and-blocks.md#dsl-수식은-실행-시점에-따라-구분한다)).
+- [2026-09-10] 불리언 `moving`을 숫자 0과 같음 비교하여 정지 중 회피가 안 됨 — 가드: [spec.mjs](../games/abyssal-keep/spec.mjs)의 `moveplayer`에서 원래 숫자 입력 검사, [verify.mjs](../games/abyssal-keep/verify.mjs)의 단독 Shift 이동 검사 ([07 불리언 비교](07-runtime-quirks.md#불리언-false와-숫자-0은-같음-비교에서-다르다)).
+- [2026-09-10] 알파가 매우 낮은 유물 클릭판은 키보드 검증이 통과해도 마우스에 반응하지 않음 — 가드: [assets.mjs](../games/abyssal-keep/assets.mjs)의 불투명 `relicCard`, [verify.mjs](../games/abyssal-keep/verify.mjs)의 실제 캔버스 카드 클릭 ([07 재현 사례](07-runtime-quirks.md#낮은-알파의-클릭판도-pixelperfect-검사에서-탈락할-수-있다)).
 
 ## 재발 시 재구성 절차
 

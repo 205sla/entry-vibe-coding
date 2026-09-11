@@ -83,6 +83,7 @@
 | Object·Entity·Picture·Sound 필드 | [`03-objects-and-assets.md`](03-objects-and-assets.md) |
 | 블록 타입 레퍼런스 + params 구조 + 필드 vs 블록 | [`04-script-and-blocks.md`](04-script-and-blocks.md) |
 | 편집기(entryjs) 오프라인 호스팅 | [`05-host-editor.md`](05-host-editor.md) |
+| 소리가 안 남 / WAV·MP3 실제 출력 검사 / 웹 404 | [`15-audio-verification.md`](15-audio-verification.md) · 로컬 서버 실행 후 `node games/audio-check/verify.mjs` |
 | Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [`07-runtime-quirks.md`](07-runtime-quirks.md) |
 | 과거에 해결한 버그 요약 (가드 링크) | [`lessons.md`](lessons.md) |
 | 엔트리랩스 공식 문서 인덱스 | [`00-official-sources.md`](00-official-sources.md) |

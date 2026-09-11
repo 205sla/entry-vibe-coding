@@ -320,51 +320,15 @@ if (assets.length) throw new Error(`에셋 ${assets.length}개 — 콘솔 붙여
 
 순서를 지키지 않으면 "EntryStatic is not defined" / "createjs is not defined" / "Entry is not defined" 류 에러.
 
-## 필수 vendor 라이브러리 패치
+## 소리 vendor 구성과 부팅 검사
 
-### preload-js npm 패키지 — `module.exports` 제거
+`node scripts/setup-audio.mjs`가 공식 PreloadJS·SoundJS 0.6.0 세트를 고정 커밋·SHA-256으로
+설치한다. 전체 setup에도 포함되며, 편집기는 실제 버전이 다르면 초기화를 중단하고 복구 명령을 표시한다.
 
-`npm install preload-js`로 받은 파일 끝에 `;module.exports=window.createjs;`가 붙어있어
-브라우저에서 `ReferenceError: module is not defined`.
-
-수정:
-```bash
-perl -i -pe 's/;module\.exports=[^;]*;\s*$/;/' public/lib/vendor/preloadjs-0.6.0.min.js
-```
-
-### soundjs 1.x 호환 패치 (editor.js에서)
-
-npm `soundjs@1.0.1`의 `_parsePath`가 undefined src에 대해 `toString()` 호출로 크래시.
-playentry.org가 쓰는 0.6.0은 관대하게 null 반환. 방어 래퍼:
-
-```js
-function patchCreateJSSoundParsePath() {
-    if (typeof createjs === 'undefined' || !createjs.Sound) return;
-    const proto = Object.getPrototypeOf(createjs.Sound);
-    ['_parsePath', 'parsePath'].forEach(fn => {
-        const target = createjs.Sound[fn] || (proto && proto[fn]);
-        if (typeof target !== 'function' || target.__patched) return;
-        const wrapped = function (src) {
-            if (src == null) return null;
-            try { return target.apply(this, arguments); }
-            catch (e) { return null; }
-        };
-        wrapped.__patched = true;
-        createjs.Sound[fn] = wrapped;
-        if (proto && proto[fn]) proto[fn] = wrapped;
-    });
-}
-```
-
-`Entry.init()` 호출 직전에 실행.
-
-### CreateJS 버전 주의
-
-- playentry.org CDN: PreloadJS 0.6.0, EaselJS 0.8.0, SoundJS 0.6.0 (legacy).
-- npm latest: PreloadJS 0.6.3, EaselJS 1.0.2, SoundJS 1.0.1.
-- npm 최신으로도 엔트리 엔진은 돌아간다(API drift 작음). 완전한 바이너리 round-trip 호환이
-  중요하면 playentry.org 파일을 직접 복사해서 써야 하지만, 외부 호스트 금지 규칙과 충돌.
-  우리는 npm latest + 위 패치로 타협.
+2026-09-11 정정: 기존 npm 별칭 파일과 `_parsePath` 방어 래퍼는 소리 미등록을 오류 없이
+숨겼다. 예전 `module.exports` 제거와 SoundJS 1.x 래핑 절차는 사용하지 않는다.
+원인·설치 정책·WAV/MP3 실제 블록 검증·웹 404 구분은
+[15 소리 검증](15-audio-verification.md)이 정본이다.
 
 ## 헤드리스 런타임 검증 — 이벤트 직접 dispatch
 
@@ -493,3 +457,31 @@ async function release(page) {
 
 같은 프로세스에서 브라우저를 ~10 회 재부팅하면 키 이벤트가 게임에 도달하지 않는다 —
 [07 §헤드리스 검증에서 브라우저를 ~10 회 재부팅하면](07-runtime-quirks.md#헤드리스-검증에서-브라우저를-10-회-재부팅하면-키-이벤트가-게임에-도달하지-않는다).
+
+## 기능 검사와 입력 완주는 별도로 기록한다
+
+복잡한 게임은 상황을 통제한 검사와 처음부터 진행하는 검사가 서로 다른 결함을 찾는다.
+[심연의 성채](14-abyssal-keep-case-study.md)에서는 아래 두 스크립트를 함께 사용했다.
+
+| 검사 | 허용하는 준비 | 확인하는 것 | 확인하지 못하는 것 |
+| --- | --- | --- | --- |
+| [verify.mjs](../games/abyssal-keep/verify.mjs) | 지도·체력·적·상태를 fixture로 설정한 뒤 입력 | 벽 뒤 공격 차단, 가림, 피해, 회피, 보상, 보스 전환 같은 개별 규칙 | 플레이로 그 상황까지 도달할 수 있는지 |
+| [playthrough.mjs](../games/abyssal-keep/playthrough.mjs) | 정상 로드·시작 후 상태 읽기와 키 이벤트만 | 탐색→전투→유물→층 전환→승리가 연결되는지 | 사람의 탐색 난이도, 모든 시드·강화 조합 |
+
+fixture는 정답 상태를 넣고 성공이라고 판정하는 용도가 아니다. 예를 들어 벽 뒤 적의 체력을
+설정한 다음 실제 사격 입력을 보내고 **체력이 감소하지 않았는지** 검사한다. 완주 스크립트에는
+변수·리스트 쓰기, 순간이동, 피해 함수 직접 호출을 넣지 않는다. 이 사례의 키 입력은
+`document`에 `KeyboardEvent`를 보내는 방식이며 물리 키보드로 사람이 플레이한 기록은 아니다.
+
+마우스 입력은 별도로 `page.mouse`로 캔버스를 클릭한다. `entityClick` 직접 발신은
+[픽셀 알파 검사](07-runtime-quirks.md#sprite-도-pixelperfect--투명-픽셀-ring-가운데-등-클릭-안-됨)를
+건너뛰므로, 카드 선택 함수를 호출해 본 것만으로 클릭 검증을 대신하지 않는다.
+
+검증 결과에는 파일명·SHA-256·엔진 버전·검사 종류·오류를 남긴다. 완주에는 시드, 층·상태
+전환, 선택한 보상, 시간별 입력, 최종 상태를 기록한다. 성능에는 실제 경과 시간과 측정 장면을
+명시한다. 이 사례는 카메라 정지 시 렌더를 생략하므로 **회전하는 장면**을 측정했다.
+
+보고서는 읽는 쪽에서도 확인해야 한다. `inputsOnly: true`는 작성자의 표기이므로 스크립트가
+실제로 쓰기 도구를 호출하지 않는지 확인한다. 자동으로 최신 `.ent`를 고르는 하네스에서는
+보고서의 파일명과 해시가 문서의 대상 버전과 일치하는지도 검사한다.
+로컬 순정 EntryJS 성공은 공식 사이트 업로드·실행 성공과 구별해서 기록한다.

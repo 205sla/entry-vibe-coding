@@ -7,7 +7,10 @@ import { spawn, execFile } from 'node:child_process';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const activeChildren = new Set();
-const EXCLUSIONS = new Map([['tools/verify-case-study-evidence.mjs', 'requires --source and --evidence; see knowledge/evidence/README.md']]);
+const EXCLUSIONS = new Map([
+    ['tools/verify-case-study-evidence.mjs', 'requires --source and --evidence; see knowledge/evidence/README.md'],
+    ['tools/verify-audio-offline.mjs', 'requires an installed official Entry app and --entry-exe; see knowledge/15-audio-verification.md'],
+]);
 
 export function discoverScripts(root = ROOT) {
     const scripts = [], excluded = [];

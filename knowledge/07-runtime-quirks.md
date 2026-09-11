@@ -1670,3 +1670,60 @@ resetSceneDuringRun() {
 - 가드: [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §④ — 장면 3회 왕복 후 `repeat.inf` 오브젝트의
   `script.executors.length === 1` 을 단언하고, 런타임에 옮긴 좌표가 `entity.reset()` 으로
   spec 값으로 되돌아오는 것까지 확인한다.
+
+---
+
+## 불리언 false와 숫자 0은 같음 비교에서 다르다
+
+2026-09-10 심연의 성채, npm `@entrylabs/entry` 4.0.20 로컬 실행에서 확인.
+`boolean_and_or`는 불리언을 반환한다. 이를 변수에 저장해 놓고 `cmp(value, '==', 0)`으로
+거짓을 검사하면 기대한 분기로 들어가지 않을 수 있다.
+
+`boolean_basic_operator`의 `EQUAL`은 비어 있지 않은 숫자 문자열을 숫자로 바꾼 뒤
+`===`로 비교한다. 따라서 숫자 문자열 `'0'`과 0은 같지만 **불리언 false와 0은 다르다**.
+확인한 소스의 `NOT_EQUAL`은 `!=`를 사용하므로, 혼합 타입에서는 같음과 다름이 단순한
+논리적 반대라고 가정해서도 안 된다.
+
+심연의 성채의 `moving`은 불리언이었다. 정지 중 회피에서 `moving == 0`을 검사하던 것을
+**원래의 숫자 입력인 `fwd == 0 && strafe == 0`**으로 바꾸어 해결했다.
+일반적으로 상태 플래그는 숫자 0/1 또는 불리언 중 하나로 통일하고, 불리언 부정에는
+`boolean_not`을 쓴다. 숫자 0/1이 필요하면 `if_`의 양쪽 분기에서 명시적으로 저장한다.
+
+근거: `src/playground/blocks/block_judgement.js`의 `boolean_basic_operator.func`
+(`EQUAL`/`NOT_EQUAL`)와 `boolean_and_or.func`.
+소스 위치를 찾는 절차는 [공식 소스 인덱스](00-official-sources.md)를 따른다.
+수정: [spec.mjs](../games/abyssal-keep/spec.mjs)의 `moveplayer`.
+회귀 확인: [verify.mjs](../games/abyssal-keep/verify.mjs)의
+`dash advances the player and starts its cooldown`은 이동 키 없이 Shift만 누른다.
+
+## 전역 변수·리스트 조회는 배열 탐색이다
+
+`src/class/variable_container.js`의 `getVariable`은 `variables_`를,
+`getList`는 `lists_`를 ID 조건의 `_.find`로 찾는다. 복제본 전용 값은 이후 해당 엔티티의
+저장소를 추가로 찾는다. 조회가 항상 ID 해시 맵의 상수 시간이라고 가정하면 안 된다.
+
+심연의 성채는 DDA에서 반복해서 읽는 `mx`, `my`, `sideX`, `sideY`, `ddx`, `ddy` 등을
+선언 배열 앞쪽으로 옮겼다. 이는 비교할 후보 수를 줄이는 선택이며 엔진을 수정하지 않는다.
+일반 게임에서도 무조건 재정렬하라는 규칙은 아니다. 조회가 많은 경로인지 먼저 확인하고,
+한 호출에서 재사용할 중간값과 [함수 지역 변수](04-script-and-blocks.md#함수-지역-변수-function-local-variables)를 검토한다.
+
+근거: 위 엔진 함수와 [spec.mjs](../games/abyssal-keep/spec.mjs)의 `hot` 배열·`variables.sort`.
+최종 처리량과 측정 조건은 [사례의 검증 범위](14-abyssal-keep-case-study.md#검증한-버전과-범위)에 있다.
+변수 순서만 바꾼 A/B 수치는 남기지 않았으므로 성능 개선 배수는 미확인이다.
+엔진 버전이 바뀌면 실제 조회 구현을 다시 확인한다.
+
+## 낮은 알파의 클릭판도 pixelPerfect 검사에서 탈락할 수 있다
+
+2026-09-10 심연의 성채에서 불투명 카드 배경 위에 `fill-opacity=".005"`인 별도 sprite를
+클릭판으로 올렸더니 키보드 선택은 되지만 실제 마우스 클릭은 실패했다. 완전한 알파 0이
+아니어도 매우 작은 값은 래스터화 과정에서 낮은 정수 알파가 되어 hit-test 기준을 넘지 못할 수 있다.
+정확한 클릭 원리는 기존 [sprite pixelPerfect 항목](#sprite-도-pixelperfect--투명-픽셀-ring-가운데-등-클릭-안-됨)이 정본이다.
+
+해결은 보이는 카드 그림 자체를 불투명 sprite로 만들어 클릭 이벤트를 받게 한 것이다.
+투명한 여백·배경이 있는 이미지는 파일의 사각 경계 전체가 클릭된다고 가정하지 않는다.
+이전 반투명 이미지의 래스터 알파 값을 별도로 보관하지 않았으므로 특정 반올림 결과까지 단정하지 않는다.
+
+근거: [assets.mjs](../games/abyssal-keep/assets.mjs)의 `relicCard`,
+[spec.mjs](../games/abyssal-keep/spec.mjs)의 `card1`〜`card3`.
+회귀 확인: [verify.mjs](../games/abyssal-keep/verify.mjs)의
+`real canvas click selects the middle relic card`는 실제 무대 좌표를 클릭한 뒤 선택 효과를 검사한다.
