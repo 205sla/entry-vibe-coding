@@ -15,6 +15,7 @@
 | AI로 오브젝트 생성 / 배경 제거 / 투명 PNG를 spec에 연결 | [03 AI 이미지 에셋](03-objects-and-assets.md#ai-이미지-생성과-투명-오브젝트) | Guide · 현행 · 2026-09-10 |
 | 블록 type 이름 / params 쉐이프 / 필드 vs 블록 슬롯 / 설계 패턴 (플랫포머·HUD) | [04-script-and-blocks.md](04-script-and-blocks.md) | Reference + Guide |
 | 편집기가 안 뜨거나 콘솔 에러 / 헤드리스 테스트 / **playentry 기존 작품에 덮어쓰기** | [05-host-editor.md](05-host-editor.md) | Guide |
+| 음악과 장면·자막이 어긋남 / 로딩·준비 지연 / 시계 원점과 표시값 구분 | [16-music-synchronization.md](16-music-synchronization.md) | Guide · 현행 · 로컬 실행 근거 · 2026-09-15 |
 | Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [07-runtime-quirks.md](07-runtime-quirks.md) | Runtime quirks |
 | **온라인 대전 작품**을 만들 때 (Entry Online 확장 계약·동기화 설계) | [08-entry-online.md](08-entry-online.md) | Reference + Guide |
 | **대규모 RPG**의 맵·복제본·대화·저장 설계를 참고할 때 | [09-rpg-case-study.md](09-rpg-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
@@ -33,9 +34,9 @@
 ## 사실의 출처 (우선 순위)
 
 1. **[entrylabs/docs](https://github.com/entrylabs/docs)** — 공식 문서. 최고 권위. [00-official-sources.md](00-official-sources.md)에 인덱스.
-2. **엔트리 원본 소스** — `C:\Users\young\prg\ENTRY\upstream\entryjs\src\…`. 공식 문서에 없는 세부 동작의 ground truth.
-3. **공식 export 레퍼런스** — `C:\Users\young\Downloads\260423_작품.ent` (playentry.org에서 내려받은 정상 동작 파일).
-4. **형제 프로젝트 MYentry 커밋** — `C:\Users\young\prg\ENTRY\apps\MYentry\server.js` 의 역사 (`git log`).
+2. **[엔트리 원본 소스](https://github.com/entrylabs/entryjs/tree/53e121523760f15961cd14ab7cb93563a79eaab3/src)** — 공식 문서에 없는 세부 동작의 근거. 인용한 파일·리비전과 실제 실행 배포본의 버전을 구분한다.
+3. **공식 내보내기 파일** — 정상 동작하는 `.ent`의 구조 근거. 원본은 공개하지 않으며 [사례 근거](evidence/README.md)에 파일 해시와 검증 범위를 남긴다.
+4. **이 저장소의 구현·검증 기록** — [server.js](../server.js)와 [실측 근거](evidence/README.md). 특정 파일의 관측을 엔진 전체 규칙으로 일반화하지 않는다.
 
 주장 옆에는 가능하면 `파일:줄번호` 또는 `commit <hash>` 형태로 출처를 남긴다.
 공식 문서에 있는 사실은 그쪽을 1순위로 인용.
@@ -50,6 +51,12 @@
 
 | 사실 | 정본 (full) | 다른 파일에선 한 줄 + 링크 |
 |------|-------------|--------------------------|
+| 음악 시작 기준 시각·프레임 대조·준비 지연 재현·동기화 검사 범위 | [16 음악 동기화](16-music-synchronization.md) | 10, lessons, evidence |
+| 프로젝트 초시계 START/RESET과 저장값 갱신 지연 | [07 초시계](07-runtime-quirks.md#프로젝트-초시계의-원점과-표시값은-다르다) | 16, lessons |
+| 크기 정하기의 폭·높이 평균 단위와 긴 자막 검사 | [07 크기](07-runtime-quirks.md#크기-정하기는-퍼센트가-아니다) | 03, lessons |
+| 기존 script의 단일 파싱 트리·깊은 복제·블록 id와 변경 수 대조 | [04 기존 스크립트 수정](04-script-and-blocks.md#기존-스크립트의-여러-항목을-수정할-때) | 01, lessons |
+| 외부 작품 tar 엔트리 보존과 허용 변경 검사 | [01 부분 수정](01-binary-format.md#기존-작품의-일부만-수정하기) | 16 |
+| 글상자 초기 두 text 필드와 동적 text_write 데이터 출처 | [03 글상자](03-objects-and-assets.md#️-글상자-문자열은-objecttext-와-entitytext-두-곳에-있다) | lessons |
 | 60fps 암묵 틱 + `wait_second` 비용 | [07 §반복하기 블록](07-runtime-quirks.md#반복하기-블록--1-프레임반복-60fps-암묵-틱) | 04 (브러쉬 패턴 안에서) |
 | 꼬리 재귀가 틱 우회 | [07 §함수 호출은 반복하기의 60fps 틱을 우회](07-runtime-quirks.md#함수-호출은-반복하기의-60fps-틱을-우회-꼬리-재귀-최적화) | 04 (함수 정의), CHANGELOG |
 | `boolean_and_or` 단락 평가 없음 | [07 §`boolean_and_or`](07-runtime-quirks.md#boolean_and_or에-단락-평가short-circuit-없음) | 04 (플랫포머 패턴 안에서) |
@@ -122,7 +129,7 @@
 **자유롭게 수정·리팩터링**. 사실이 바뀌면 그 자리를 덮어쓴다. 역사 추적은 `git log`.
 섹션을 지우는 것도 OK — 지금 틀린 정보를 계속 남겨두면 독자가 헷갈린다.
 
-### 🛠️ Guide — `04`의 설계 패턴 섹션들, `05-host-editor`
+### 🛠️ Guide — `04`의 설계 패턴 섹션들, `05-host-editor`, `16-music-synchronization`
 
 "이런 걸 하려면 이렇게" 유형. 패턴이 개선되면 기존 글을 고쳐서 최신 방법을 유지.
 

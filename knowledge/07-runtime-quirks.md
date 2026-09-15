@@ -15,8 +15,8 @@ Entry 엔진(entryjs) 고유 동작 중 **make-ent가 자동으로 처리할 수
 ## `Entry.clearProject()` — loadProject 전 필수
 
 Entry는 `loadProject(project)` 시 **기존 scene/object를 덮어쓰지 않고 append** 한다.
-- [`entryjs/src/class/container.js:285`](../../entryjs/src/class/container.js#L285) `setObjects` — 기존 objects에 push
-- [`entryjs/src/util/utils.js:143`](../../entryjs/src/util/utils.js#L143) `Entry.clearProject`는
+- [`entryjs/src/class/container.js:285`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/container.js#L285) `setObjects` — 기존 objects에 push
+- [`entryjs/src/util/utils.js:143`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/util/utils.js#L143) `Entry.clearProject`는
   `Entry.scene.clear()` + `Entry.container.clear()` + `Entry.variableContainer.clear()` 로 완전 리셋
 
 두 번째 `loadProject` 전 `clearProject()`를 선행하지 않으면:
@@ -46,7 +46,7 @@ Entry는 `loadProject(project)` 시 **기존 scene/object를 덮어쓰지 않고
 이론은 `t` 초 추가지만, 실제는 **`ceil(t / 16.67ms) + 1` 프레임**:
 `wait_second(0.02)` → 3 프레임 ≈ 50ms (2.5× 부풀림).
 
-원인 2단계 ([`block_flow.js:47-73`](../../entryjs/src/playground/blocks/block_flow.js#L47)):
+원인 2단계 ([`block_flow.js:47-73`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_flow.js#L47)):
 1. `Entry.TimeWaitManager`의 setTimeout이 다음 tick에만 `timeFlag=0` 확인 —
    20ms 대기 요청이 16.67ms 프레임 경계를 이미 지나쳤으면 2 프레임 소모
 2. 타이머 종료 시 `Entry.engine.isContinue = false` → 현 tick의 남은 시간을 다음 tick으로 양보 → +1 프레임
@@ -101,7 +101,7 @@ Entry는 `loadProject(project)` 시 **기존 scene/object를 덮어쓰지 않고
 
 1. **이상적 한계**: 동기 깊이가 JS 스택을 초과 → `RangeError` → Entry 의 catch 블록이
    `Entry.toast.alert(RecursiveCallWarningTitle, …)` + `stopProjectWithToast`로 정지.
-   근거: [`entryjs/src/playground/executors.js:60-62`](../../entryjs/src/playground/executors.js#L60).
+   근거: [`entryjs/src/playground/executors.js:60-62`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/executors.js#L60).
 
 2. **실측 관찰 (Entry 1.x + 모던 V8)**: 단순 깊이만 큰 재귀는 RangeError 까지 가지 않고
    Entry 가 `funcRestExecute` (rAF 큐) 로 자동 분할 → 매우 느리게 진행.
@@ -122,8 +122,8 @@ Entry는 `loadProject(project)` 시 **기존 scene/object를 덮어쓰지 않고
 
 - [`tests/fixtures/spec-recursion.json`](../tests/fixtures/spec-recursion.json) — `fibtail` (꼬리재귀, value), `fibiter` (반복, value), `fibnaive` (지수재귀, 비-꼬리)
 - [`tools/verify-recursion.mjs`](../tools/verify-recursion.mjs) — Test 1+2: 꼬리재귀 0ms vs 반복 ~480ms 자동 검증. Test 3: per-frame budget 관찰
-- [`entryjs/src/playground/blocks/block_func.js:415-491`](../../entryjs/src/playground/blocks/block_func.js#L415) — `function_value.func` 의 sync/async 분기
-- [`entryjs/src/playground/code.js:587`](../../entryjs/src/playground/code.js#L587) — `funcRestExecute` rAF 분할
+- [`entryjs/src/playground/blocks/block_func.js:415-491`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_func.js#L415) — `function_value.func` 의 sync/async 분기
+- [`entryjs/src/playground/code.js:587`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/code.js#L587) — `funcRestExecute` rAF 분할
 
 ---
 
@@ -131,7 +131,7 @@ Entry는 `loadProject(project)` 시 **기존 scene/object를 덮어쓰지 않고
 
 Entry의 AND/OR 블록은 **두 피연산자를 항상 평가**.
 JavaScript의 `&&` 단락 평가 전에 `getValues(['LEFTHAND', 'RIGHTHAND'])`가 이미 두 값을
-구해 놓는다 ([`block_judgement.js:boolean_and_or`](../../entryjs/src/playground/blocks/block_judgement.js)).
+구해 놓는다 ([`block_judgement.js:boolean_and_or`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_judgement.js)).
 
 ### 실패 예
 
@@ -141,7 +141,7 @@ JavaScript의 `&&` 단락 평가 전에 `getValues(['LEFTHAND', 'RIGHTHAND'])`�
 ```
 
 pos가 리스트 끝을 넘어가는 순간에도 RIGHTHAND가 평가되어 `value_of_index_from_list`가
-[`block_variable.js:866`](../../entryjs/src/playground/blocks/block_variable.js#L866)의
+[`block_variable.js:866`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_variable.js#L866)의
 guard `if (index > array.length) throw …`를 터뜨림 → `can not insert value to array`
 런타임 에러.
 
@@ -186,7 +186,7 @@ Entry의 키 리스너는 **`document`에 직접** 붙어 있고 **`event.code`*
 
 ### 근거
 
-[`entryjs/src/util/utils.js:831-844`](../../entryjs/src/util/utils.js#L831):
+[`entryjs/src/util/utils.js:831-844`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/util/utils.js#L831):
 ```js
 Entry.pressedKeys = [];
 const func = (e) => {
@@ -197,7 +197,7 @@ const func = (e) => {
 addEntryEvent(doc, 'keydown', func);   // doc = document
 ```
 
-`inputToKeycode` ([utils.js:881](../../entryjs/src/util/utils.js#L881)):
+`inputToKeycode` ([utils.js:881](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/util/utils.js#L881)):
 ```js
 let keyCode = event.code == undefined ? event.key : event.code;
 return Entry.KeyboardCode.codeToKeyCode[keyCode];
@@ -246,17 +246,17 @@ textBox 오브젝트의 `when_object_click` 클릭 인식 영역은 **`entity.bg
 
 ### 메커니즘
 
-1. **bgObject (사각 배경) 의 alpha 게이팅** — [`entity.js:1537-1539`](../../entryjs/src/class/entity.js#L1537):
+1. **bgObject (사각 배경) 의 alpha 게이팅** — [`entity.js:1537-1539`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L1537):
    ```js
    const hasColor = (bgColor || '').indexOf('#') === 0;
    this.bgObject.alpha = hasColor ? 1 : 0;   // ← transparent → 0 → 사각 영역 hit 비활성
    ```
 
-2. **textObject 는 pixel-perfect hit-test** — [`entity.js:65`](../../entryjs/src/class/entity.js#L65):
+2. **textObject 는 pixel-perfect hit-test** — [`entity.js:65`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L65):
    ```js
    this.textObject.pixelPerfect = true;     // ← glyph 알파>1 픽셀만 hit
    ```
-   plugin 동작: [`PIXIPixelPerfectInteractionPlugIn.js:84`](../../entryjs/src/class/pixi/plugins/PIXIPixelPerfectInteractionPlugIn.js#L84) — `rgba.data[3] > pixelPerfectAlpha (=1)` 체크.
+   plugin 동작: [`PIXIPixelPerfectInteractionPlugIn.js:84`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/pixi/plugins/PIXIPixelPerfectInteractionPlugIn.js#L84) — `rgba.data[3] > pixelPerfectAlpha (=1)` 체크.
 
 3. 결과: 투명 배경 → bgObject 비활성 + textObject 만 hit-test → glyph 만 클릭됨.
 
@@ -288,7 +288,7 @@ textBox 오브젝트의 `when_object_click` 클릭 인식 영역은 **`entity.bg
 
 ## sprite 도 pixelPerfect — 투명 픽셀 (ring 가운데 등) 클릭 안 됨
 
-textBox 의 `pixelPerfect` 함정과 같은 원리가 **모든 sprite 에도 적용**. [`entity.js:46`](../../entryjs/src/class/entity.js#L46) 에서 sprite 생성 시 `this.object.pixelPerfect = true`. 클릭 hit-test 가 source 텍스처의 픽셀 알파 검사.
+textBox 의 `pixelPerfect` 함정과 같은 원리가 **모든 sprite 에도 적용**. [`entity.js:46`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L46) 에서 sprite 생성 시 `this.object.pixelPerfect = true`. 클릭 hit-test 가 source 텍스처의 픽셀 알파 검사.
 
 `PIXIPixelPerfectInteractionPlugIn.js:78-87` — `containsPoint` → `_pixelHasAlpha`:
 ```js
@@ -330,7 +330,7 @@ const slotEmpty = circle(20, '#94a3b8');  // 전체 면 채움
 
 - [`tests/fixtures/spec-frontier-guard.mjs`](../tests/fixtures/spec-frontier-guard.mjs) Phase 3.2 — `circle(20, '#94a3b8')` 로 전환. 이전 `ring(22, 16, ...)` 는 가운데 클릭 무반응.
 - [`tools/verify-frontier-guard.mjs`](../tools/verify-frontier-guard.mjs) Step 1b — 실제 stage point click (`clickStagePoint(-160, 50)`) 로 슬롯 가운데 클릭 → 메뉴 열림 검증. dispatchEvent 와 분리된 회귀 가드.
-- 코드: [`PIXIPixelPerfectInteractionPlugIn.js:78`](../../entryjs/src/class/pixi/plugins/PIXIPixelPerfectInteractionPlugIn.js#L78) `_pixelHasAlpha`. `pixelPerfectAlpha = 1` (= 알파 > 1 만 hit).
+- 코드: [`PIXIPixelPerfectInteractionPlugIn.js:78`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/pixi/plugins/PIXIPixelPerfectInteractionPlugIn.js#L78) `_pixelHasAlpha`. `pixelPerfectAlpha = 1` (= 알파 > 1 만 hit).
 
 ### 관련 패턴
 
@@ -375,7 +375,7 @@ const slotEmpty = circle(20, '#94a3b8');  // 전체 면 채움
 
 ### 근거
 
-[`entryjs/src/class/entity.js:142`](../../entryjs/src/class/entity.js#L142):
+[`entryjs/src/class/entity.js:142`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L142):
 ```js
 entityModel.text = entityModel.text || parent.text || parent.name;
 ```
@@ -401,7 +401,7 @@ entityModel.text = entityModel.text || parent.text || parent.name;
 2. **`pictures[*].name == value`** — name 이 정확히 일치 (id 매칭 실패 시)
 3. **숫자 인덱스 (1-base)** — `Entry.parseNumber(value)` 가 1-N 정수면 `pictures[N-1]` 반환
 
-근거: [`entryjs/src/class/object.js:342-372`](../../entryjs/src/class/object.js#L342) `getPicture(value)`.
+근거: [`entryjs/src/class/object.js:342-372`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/object.js#L342) `getPicture(value)`.
 
 ### 실용 지침
 
@@ -823,10 +823,10 @@ Entry 의 stage 좌표계는 entity (sprite) 와 variable 에서 **Y 부호 처�
 
 | 대상 | 저장 y | 화면상 위치 | 근거 |
 |------|--------|------------|------|
-| **Entity (sprite)** | y > 0 → **화면 위** | `this.object.y = -this.y + rndPosY` 로 반전 | [`entryjs/src/class/entity.js:273`](../../entryjs/src/class/entity.js#L273) |
-| **Variable** | y > 0 → **화면 아래** | `view_.y = this.getY()` 그대로 (반전 없음) | [`entryjs/src/class/variable/variable.js:264-265`](../../entryjs/src/class/variable/variable.js#L264) |
+| **Entity (sprite)** | y > 0 → **화면 위** | `this.object.y = -this.y + rndPosY` 로 반전 | [`entryjs/src/class/entity.js:273`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L273) |
+| **Variable** | y > 0 → **화면 아래** | `view_.y = this.getY()` 그대로 (반전 없음) | [`entryjs/src/class/variable/variable.js:264-265`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/variable/variable.js#L264) |
 
-stage container 자체는 `canvas.x/y = (320, 180)` 으로 중앙 이동 + `scaleX/Y = 2/1.5` 만 적용 ([`stage.js:46-48`](../../entryjs/src/class/stage.js#L46)) — Y flip 없음. entity 는 setY 에서 별도로 반전하지만 variable 은 반전 없이 createjs/PIXI 기본 (Y 아래 양수) 그대로.
+stage container 자체는 `canvas.x/y = (320, 180)` 으로 중앙 이동 + `scaleX/Y = 2/1.5` 만 적용 ([`stage.js:46-48`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/stage.js#L46)) — Y flip 없음. entity 는 setY 에서 별도로 반전하지만 variable 은 반전 없이 createjs/PIXI 기본 (Y 아래 양수) 그대로.
 
 ### 실측 (2026-05-18, headless chromium)
 
@@ -875,7 +875,7 @@ Variable 의 stored x 또는 y 가 정확히 0 이면 저장된 위치가 무시
 
 ### 원인
 
-[`entryjs/src/class/variable/variable.js:136`](../../entryjs/src/class/variable/variable.js#L136):
+[`entryjs/src/class/variable/variable.js:136`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/variable/variable.js#L136):
 
 ```js
 const { x, y } = VariableBP.add(this.id_, this.x_, this.y_, ...);
@@ -1013,22 +1013,22 @@ boolean 슬롯에 들어간 비정상 조립이라 편집기 드래그로는 못
 
 정상 딜레이의 정체: 바디 마지막 블록이 끝나면 `scope.block === null` → `_callStack.pop()` 으로
 반복 블록에 복귀할 때 `isLooped` 불일치 → `break` = execute() 종료 = 다음 프레임까지 대기
-([`executors.js:125-132`](../../entryjs/src/playground/executors.js#L125)).
+([`executors.js:125-132`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/executors.js#L125)).
 
 트릭은 이 "정상 종료 → pop" 경로 자체를 우회한다:
 
 1. `wait_until_true` 실행 시 param 은 **동기 평가** — `Scope.run` 이 func 호출 **전에**
-   `getParams()` 로 중첩 블록을 즉시 실행 ([`scope.js:192`](../../entryjs/src/playground/scope.js#L192), [`:36-46`](../../entryjs/src/playground/scope.js#L36)).
+   `getParams()` 로 중첩 블록을 즉시 실행 ([`scope.js:192`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/scope.js#L192), [`:36-46`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/scope.js#L36)).
 2. 그 안의 `continue_repeat.func` = `this.executor.continueLoop()`
-   ([`block_flow.js:348`](../../entryjs/src/playground/blocks/block_flow.js#L348)) —
+   ([`block_flow.js:348`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_flow.js#L348)) —
    **콜스택을 반복 블록 scope 까지 즉석에서 되감고**(`executor.scope` 교체) `Entry.STATIC.BREAK`(=2) 를
-   **값으로** 반환 ([`executors.js:227-241`](../../entryjs/src/playground/executors.js#L227)).
+   **값으로** 반환 ([`executors.js:227-241`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/executors.js#L227)).
 3. `boolean_not(2)` = false → `wait_until_true` 는 `return script` — 자신의 (이미 교체되기 전)
-   **낡은 scope 객체** ([`block_flow.js:548-555`](../../entryjs/src/playground/blocks/block_flow.js#L548)).
+   **낡은 scope 객체** ([`block_flow.js:548-555`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_flow.js#L548)).
 4. executor 의 returnVal 분기(Promise / undefined·null·PASS / CONTINUE / `=== this.scope` / BREAK)
    중 **아무것도 매칭 안 됨** — `this.scope` 는 2에서 이미 반복 블록으로 교체됐으므로
    `returnVal === this.scope` 도 false → `while(true)` 가 **같은 틱에서** 다음 iteration 을 계속
-   ([`executors.js:117-146`](../../entryjs/src/playground/executors.js#L117)). `iterCount` 소진 시에만
+   ([`executors.js:117-146`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/executors.js#L117)). `iterCount` 소진 시에만
    `callReturn()`(undefined) 로 정상 탈출.
 
 `boolean_not` 은 **필수**: `continue_repeat` 를 BOOL 에 직접 넣으면 값 2(truthy) → `callReturn()`
@@ -1056,13 +1056,13 @@ boolean 슬롯에 들어간 비정상 조립이라 편집기 드래그로는 못
 호스트 조건의 일반형: **「continue_repeat 를 심을 param 슬롯이 있고, func 가 분기표 어디에도
 안 걸리는 값(자신의 낡은 scope)을 반환」**. 유통 스니펫
 `Talebot_Move(continue_repeat, continue_repeat)` (하드웨어 테일봇 이동 블록,
-[`block_talebot.js:111-144`](../../entryjs/src/playground/blocks/hardware/block_talebot.js#L111)) 이 그 예:
+[`block_talebot.js:111-144`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/hardware/block_talebot.js#L111)) 이 그 예:
 
 - 하드웨어 대기 상태머신 — 기기 무연결이면 `portData.done` 이 영영 안 와 **매 호출 `return script`**
   → `boolean_not` 래퍼 불필요, 조건 없이 항상 성립.
 - `getParams()` 는 슬롯 종류를 안 가림 — **드롭다운(방향) 자리의 continue_repeat 도** Block
   인스턴스면 평가·실행됨. 두 번째(거리 슬롯) continue_repeat 는 최상위 반복에선 no-op
-  (첫 번째가 스택을 이미 되감아 `_callStack` 이 비면 즉시 PASS 반환 — [`executors.js:228-232`](../../entryjs/src/playground/executors.js#L228)).
+  (첫 번째가 스택을 이미 되감아 `_callStack` 이 비면 즉시 PASS 반환 — [`executors.js:228-232`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/executors.js#L228)).
 - 하드웨어 블록 정의는 entryjs 에 상시 내장 — 기기 없이도 실행됨(블록 메뉴 노출만 연결 필요).
 - 실측: 트릭 이식 시 360회 **14ms**(원본 트릭과 동일 스케일), **정상 파라미터(0, 10)면 1회 호출
   후 영원 대기**(무응답 대기 본성 — 루프가 1회차에서 정지). page error 0.
@@ -1071,7 +1071,7 @@ boolean 슬롯에 들어간 비정상 조립이라 편집기 드래그로는 못
 
 유통 .ent "딜레이 없는 반복분(재귀함수x)": continue_repeat 가족이 아니라 **주니어 미로 코스웨어
 전용**(`mode: 'maze'`) 반복 블록을 일반 작품 JSON 에 밀반입한 것
-([`block_entry.js:7387-7412`](../../entryjs/src/playground/block_entry.js#L7387)).
+([`block_entry.js:7387-7412`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/block_entry.js#L7387)).
 
 - func 가 `stepInto(바디)` 만 하고 **`script.isLooped = true` 를 설정하지 않음** + 반복 횟수/조건도
   없음. executor 의 프레임 양보는 pop 복귀 시 **isLooped 불일치**에서만 발동하므로
@@ -1168,7 +1168,7 @@ locateXY(0, -400)          // 커서 sprite 자체는 화면 밖
 
 `entity.stamps` 는 매 프레임 `eraseAll` → 재그리기 사이클에서 **252 에서 더 늘지 않는다**
 (실측: 252 → 252). `removeStamps()` 가 배열을 비우므로 누적 누수는 없다
-([`entity.js:1636`](../../entryjs/src/class/entity.js#L1636), 호출부 [`block_brush.js:651`](../../entryjs/src/playground/blocks/block_brush.js#L651)).
+([`entity.js:1636`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L1636), 호출부 [`block_brush.js:651`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_brush.js#L651)).
 
 ### 증거
 
@@ -1212,7 +1212,7 @@ if_(cmp(r, '>=', 0), [ if_(cmp(r, '<', ROWS), [
 
 ### 한 칸만 바꾸려면 `replace_string` 이 아니라 `substring` + `combine`
 
-`replace_string` 은 `split(old).join(new)` 다 ([`block_calc.js:2261`](../../entryjs/src/playground/blocks/block_calc.js#L2261))
+`replace_string` 은 `split(old).join(new)` 다 ([`block_calc.js:2261`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_calc.js#L2261))
 — **같은 문자를 전부** 바꾼다. 타일 한 칸(벽돌 파괴, 보상 블록 소진)을 교체하는 데 쓰면
 그 행의 모든 벽돌이 함께 사라진다. 정답은 좌/우를 잘라 이어붙이기:
 
@@ -1307,13 +1307,13 @@ for (let i = 0; i < SCENARIOS.length; i++) {
 
 ### 원인 — `entity.effect` 를 sprite 에만 초기화한다
 
-[`entity.js:42-48`](../../entryjs/src/class/entity.js#L42) 의 생성자는
+[`entity.js:42-48`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L42) 의 생성자는
 `this.type === 'sprite'` 분기에서만 `this.setInitialEffectValue()` 를 부른다. 이어지는
-`else if (this.type === 'textBox')` 분기([:49](../../entryjs/src/class/entity.js#L49))에는
+`else if (this.type === 'textBox')` 분기([:49](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L49))에는
 그 호출이 **없다** — 글상자 엔티티는 `this.effect` 가 `undefined` 인 채로 살아간다.
 
 블록 쪽은 그걸 모르고 바로 대입한다
-([`block_looks.js:615-617`](../../entryjs/src/playground/blocks/block_looks.js#L615)):
+([`block_looks.js:615-617`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_looks.js#L615)):
 
 ```js
 } else if (effect === 'transparency') {
@@ -1404,7 +1404,7 @@ const resetGame = () => [ setVar('승자', 0), setVar('상태', 0) ];
 ## `몫`·`나머지` 는 **floor 나눗셈 + 진짜 모듈로** — JS `%` 가 아니다
 
 `quotient_and_mod` 는 JS 의 절단 나눗셈/나머지가 아니라 **수학적 정의**를 쓴다
-([`block_calc.js:654-657`](../../entryjs/src/playground/blocks/block_calc.js#L654)):
+([`block_calc.js:654-657`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_calc.js#L654)):
 
 ```js
 if (operator === 'QUOTIENT') return Math.floor(left / right);
@@ -1486,7 +1486,7 @@ entity: {
 
 ### 증거
 
-- [`entity.js`](../../entryjs/src/class/entity.js) `setFont` · `setFontSize` · `_syncFontStyle`
+- [`entity.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js) `setFont` · `setFontSize` · `_syncFontStyle`
 - 같은 파일 `syncModel_` — 호출 순서
   (`setScaleX` → `setLineBreak` → `setWidth` → `setHeight` → `setText` → `setTextAlign` → `setFontSize`)
 - 가드: [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §① · 픽스처 [`tests/fixtures/spec-textbox-layout.mjs`](../tests/fixtures/spec-textbox-layout.mjs) 의 `기본entity` 오브젝트가
@@ -1524,8 +1524,8 @@ for (let i = 0; i < lines.length; i++) {
 
 ### 증거
 
-- [`entity.js`](../../entryjs/src/class/entity.js) `alignTextBox` · `setLineBreak`
-- [`PIXIText.js`](../../entryjs/src/class/pixi/text/PIXIText.js) `MAX_HEIGHT` break
+- [`entity.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js) `alignTextBox` · `setLineBreak`
+- [`PIXIText.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/pixi/text/PIXIText.js) `MAX_HEIGHT` break
 - ⚠️ **줄 수를 폭으로 검증하면 안 된다.** CreateJS 경로(`GEHelper.isWebGL === false`)의
   `getMeasuredWidth()` 는 **줄바꿈을 무시하고 원문 전체를 잰다**. 두 렌더러 모두
   `getMeasuredHeight()` 는 `lineWidth` 를 반영하므로 **높이 ÷ lineHeight 로 줄 수를 센다.**
@@ -1581,7 +1581,7 @@ entity: { x: 500, … visible: false }
 ```
 
 말풍선 위치는 오브젝트 bound 로 정하는데, 두 가지가 겹쳐서 오른쪽만 통한다
-([`dialog.ts`](../../entryjs/src/class/dialog.ts) `setNotchPositionForPixi`):
+([`dialog.ts`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/dialog.ts) `setNotchPositionForPixi`):
 
 ```js
 if (notchType.includes('e')) {                     // 오브젝트가 무대 왼쪽에 있을 때
@@ -1600,7 +1600,7 @@ if (notchType.includes('e')) {                     // 오브젝트가 무대 왼
 보험이 필요하면 같은 오브젝트의 **두 번째 스레드**에서 `말풍선 지우기`(`remove_dialog`)를
 부른다. `sprite.dialog.remove()` 가 `parent.dialog = null` 로 만들 뿐이고
 `ask_and_wait` 의 완료 처리도 `if (sprite.dialog)` 로 가드돼 있어 깨지지 않는다
-([`block_looks.js`](../../entryjs/src/playground/blocks/block_looks.js) `remove_dialog`).
+([`block_looks.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_looks.js) `remove_dialog`).
 `묻기` 는 블로킹이므로 가드 스레드는 같은 메시지 핸들러를 하나 더 두면 된다
 (`신호 보내고 기다리기` 는 두 스레드를 모두 기다리지만 가드 쪽은 즉시 끝난다).
 
@@ -1609,7 +1609,7 @@ if (notchType.includes('e')) {                     // 오브젝트가 무대 왼
 
 ### 증거
 
-- [`stage.js`](../../entryjs/src/class/stage.js) `_createInputField` · [`block_variable.js`](../../entryjs/src/playground/blocks/block_variable.js) `ask_and_wait` · [`dialog.ts`](../../entryjs/src/class/dialog.ts) `setNotchPositionForPixi` · [`entity.js`](../../entryjs/src/class/entity.js) `syncDialogVisible`
+- [`stage.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/stage.js) `_createInputField` · [`block_variable.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_variable.js) `ask_and_wait` · [`dialog.ts`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/dialog.ts) `setNotchPositionForPixi` · [`entity.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js) `syncDialogVisible`
 - 가드: [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §③ — `묻기` 를 실제로 실행해 입력칸 윗변 **−71.3** ·
   아랫변 **−111.8**(세로 54px)을 재고, `x: 500` 인 오브젝트의 말풍선이 **x ≈ 412** 로
   무대(±240) 밖에 있는 것과 `hide()` 를 해도 `dialog.object.visible !== false` 인 것을 단언한다.
@@ -1617,7 +1617,7 @@ if (notchType.includes('e')) {                     // 오브젝트가 무대 왼
 ### 곁다리 — `대답` 변수는 기본이 숨김
 
 `variableType: 'answer'` 변수는 `visible: false` 로 생성된다
-([`variable_container.js`](../../entryjs/src/class/variable_container.js) `generateAnswer`).
+([`variable_container.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/variable_container.js) `generateAnswer`).
 무대에 값 상자가 뜰 걱정은 없다. (임의로 만들면 안 되는 이유는 [lessons.md](lessons.md) 참조.)
 
 ---
@@ -1625,9 +1625,9 @@ if (notchType.includes('e')) {                     // 오브젝트가 무대 왼
 ## 장면을 다시 들어가도 **실행기는 쌓이지 않는다** — 대신 `entity.reset()` 이 좌표를 되돌린다
 
 `start_scene` 은 `selectScene` + `fireEvent('when_scene_start')` 뿐이고
-([`block_start.js`](../../entryjs/src/playground/blocks/block_start.js) `start_scene.func`),
+([`block_start.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_start.js) `start_scene.func`),
 `Code.raiseEvent` 는 **무조건 새 Executor 를 push** 한다
-([`code.js`](../../entryjs/src/playground/code.js) `raiseEvent`). 여기까지만 읽으면
+([`code.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/code.js) `raiseEvent`). 여기까지만 읽으면
 "장면을 왕복하면 `repeat.inf` 스레드가 2개, 3개로 늘어난다" 는 결론이 나온다.
 **틀렸다** — 그 앞에서 정리된다.
 
@@ -1666,7 +1666,63 @@ resetSceneDuringRun() {
 
 ### 증거
 
-- [`scene.js`](../../entryjs/src/class/scene.js) `selectScene` · [`container.js`](../../entryjs/src/class/container.js) `resetSceneDuringRun`/`clearRunningStateOnScene` · [`object.js`](../../entryjs/src/class/object.js) `clearExecutor`
+- [`scene.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/scene.js) `selectScene` · [`container.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/container.js) `resetSceneDuringRun`/`clearRunningStateOnScene` · [`object.js`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/object.js) `clearExecutor`
 - 가드: [`tools/verify-textbox-layout.mjs`](../tools/verify-textbox-layout.mjs) §④ — 장면 3회 왕복 후 `repeat.inf` 오브젝트의
   `script.executors.length === 1` 을 단언하고, 런타임에 옮긴 좌표가 `entity.reset()` 으로
   spec 값으로 되돌아오는 것까지 확인한다.
+
+---
+
+## 프로젝트 초시계의 원점과 표시값은 다르다
+
+음악 동기화에서 초시계는 세 가지를 구분한다. **시작 원점**, 원점에서 계산한 경과 시간,
+마지막 갱신 때 저장한 **표시값**이다. 아래 동작은 확인한 소스 리비전 기준이며 엔진 변경 시 다시 확인한다.
+
+| 조작·읽기 | 확인한 동작 |
+| --- | --- |
+| START | 미시작이면 시작하고, 초시계 정지 상태면 재개한다. 이미 실행 중이면 원점을 바꾸지 않는다 |
+| STOP | 초시계를 일시 정지한다 |
+| RESET | 실행 중인 초시계를 0으로 돌리고 원점을 다시 잡는다. 모든 오브젝트가 읽는 공유 상태다 |
+| get_project_timer_value | projectTimer.getValue()의 마지막 저장값을 반환한다 |
+
+START·STOP·RESET은 [block_calc.js](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_calc.js#L1169),
+원점과 갱신은 [engine.js](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/engine.js#L1176)에서 확인했다.
+미시작 상태의 RESET은 바로 반환하며, 정지 상태 RESET에는 초기화 상태를 해제하는 별도 처리가 있다.
+블록 START의 재호출과 내부 startProjectTimer() 직접 호출은 같은 동작이 아니다.
+
+초시계 값은 약 60 Hz의 setInterval에서 갱신된다. 렌더·장면 전환으로 메인 스레드가 바쁘면
+getValue()가 잠시 오래된 값을 반환할 수 있다. 그러므로 순간적인 '음악 위치 − 표시값'만으로
+음악과 원점이 계속 벌어지고 있다고 판정하지 않는다. 이 지연은 실제 블록의 조건 평가에도 영향을 줄 수 있다.
+
+진단 중 **엔진과 초시계 모두 실행 상태이고 일시 정지하지 않은 구간**에서는
+`Date.now() - timer.start - timer.pausedTime`도 따로 기록해 음악 위치와 비교할 수 있다.
+이는 확인한 내부 필드를 이용한 진단식이며 공개 API나 일시 정지·재개 전체를 처리하는 일반 시계가 아니다.
+표시값 지연과 관계없이 **실제 장면·자막 출력 시각의 합격선은 별도로 유지**한다.
+
+근거: [음악 동기화 실측](evidence/music-sync-20260915.json)에서 표시값 차이가 최대 114.7 ms였던
+캡처도 장면·자막 오차는 55.4 ms 미만이었다. 원점을 함께 기록한 별도 전 구간 검사에서는
+원점 경과 시간과 음악 위치 차이가 최대 7.7 ms 미만이었다. 오래된 캡처에는 원점 값이 없어
+그 검사를 통과했다고 소급 표시하지 않았다. 적용 절차는 [음악 동기화](16-music-synchronization.md)가 정본이다.
+
+## 크기 정하기는 퍼센트가 아니다
+
+확인한 구현에서 `set_scale_size(n)`은 Entity.setSize(n)을 호출한다.
+Entity.getSize()는 **배율 적용 후 폭과 높이의 평균**을 반환한다.
+
+```js
+size = (width * Math.abs(scaleX) + height * Math.abs(scaleY)) / 2;
+factor = Math.max(1, n) / size;
+scaleX *= factor;
+scaleY *= factor;
+```
+
+근거: [block_looks.js](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_looks.js#L727),
+[entity.js의 setSize·getSize](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L477).
+예를 들어 300×30 크기의 글상자를 배율 1에서 size 160으로 맞추면 폭은 약 291이 된다.
+fontSize를 줄여도 같은 크기 블록이 뒤에서 실행되면 다시 커질 수 있다.
+
+긴 자막은 그 문구가 표시되는 동안 적용되는 크기 값과 좌표를 찾아 조정한다.
+다음 크기 변경 전까지 등장하는 **모든 문자열의 실제 렌더 경계**가 무대 안에 있는지 확인한다.
+글자 수만으로 폭을 추정하거나, 보통 sprite의 퍼센트 확대처럼 해석하지 않는다.
+줄바꿈 글상자는 별도로 [height에 의한 세로 잘림](#linebreak-true-는-height-를-넘는-줄을-그리지-않고-버린다)을
+검사한다. 줄 높이는 서체·크기·간격에 따라 달라지므로 줄 수에 곱하는 단일 상수를 일반 규칙으로 삼지 않는다.

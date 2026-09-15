@@ -155,9 +155,9 @@ async function loadEntFile(file) {
 
 **`Entry.clearProject()`를 반드시 먼저 호출.** 생략하면 `setObjects()`가 `objects_.push()`로
 기존 오브젝트 위에 **덧붙여서** — 엔트리봇 옆에 사용자 오브젝트가 달라붙고, 선택된 오브젝트의
-블록/이미지가 뒤섞인다. [`entryjs/src/class/container.js:285`](../../entryjs/src/class/container.js#L285).
+블록/이미지가 뒤섞인다. [`entryjs/src/class/container.js:285`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/container.js#L285).
 
-MYentry의 같은 패턴: [`MYentry/public/js/editor.js:345`](../../MYentry/public/js/editor.js#L345).
+기존 상태 정리의 원리와 확인 위치는 [07의 clearProject 항목](07-runtime-quirks.md#entryclearproject--loadproject-전-필수)을 따른다.
 
 ## playentry.org 배포 — 기존 작품에 `project.json` 만 갈아끼우기 (콘솔 붙여넣기)
 
@@ -375,10 +375,10 @@ Playwright 헤드리스에서 **클릭/키 기반 게임**을 검증하려면 �
 
 ### 클릭 — `Entry.dispatchEvent`
 
-Entry의 클릭 처리는 [`entity.js:90`](../../entryjs/src/class/entity.js#L90)에서
+Entry의 클릭 처리는 [`entity.js:90`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L90)에서
 `Entry.dispatchEvent('entityClick', this.entity)` 한 줄로 이벤트 버스에 쏜다.
 `when_object_click` 트리거는 이 이벤트를 구독
-([`block_start.js:229`](../../entryjs/src/playground/blocks/block_start.js#L229)).
+([`block_start.js:229`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_start.js#L229)).
 
 따라서 Playwright `page.evaluate` 안에서:
 ```js

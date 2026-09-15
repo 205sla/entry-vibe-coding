@@ -12,6 +12,34 @@ object.script = JSON.stringify([
 ])
 ```
 
+### 기존 스크립트의 여러 항목을 수정할 때
+
+**오브젝트마다 한 번 파싱한 트리를 공유하고, 모든 수정 후 한 번 저장한다.**
+매핑을 만들 때마다 원래 script를 새로 파싱하면 서로 다른 사본을 수정하게 된다.
+마지막 사본만 저장되어 구조 검사는 통과하고 앞선 수정은 사라질 수 있다.
+실제 외부 작품에서 예정 25건 중 6건만 남았던 원인이다.
+
+```js
+const parsed = new Map(project.objects.map(o => [o.id, JSON.parse(o.script)]));
+for (const change of changes) {
+  const script = parsed.get(change.objectId);
+  if (!script) throw new Error('대상 오브젝트 없음');
+  applyChange(script, change); // 대상의 기존 타입·값·분기를 확인한 뒤 수정
+}
+for (const object of project.objects) {
+  object.script = JSON.stringify(parsed.get(object.id));
+}
+```
+
+블록 쌍을 복제할 때는 깊은 복사 후 **중첩 params·statements를 포함한 모든 새 블록 id**를 재발급한다.
+변수·리스트·신호·오브젝트를 가리키는 참조 id까지 바꾸면 안 된다. 원본에서 서로 다른 오브젝트가
+블록 id를 재사용한 사례가 있으므로, 파일 전체 중복을 일괄 교정하지 말고 오브젝트 안의 충돌을 검사한다.
+새로 발급할 id는 기존 전체 집합과 충돌하지 않게 만든다.
+
+매핑에는 오브젝트와 분기·회차를 함께 기록한다. 삽입 후 달라지는 walk 인덱스를 그대로 재사용하지 않는다.
+저장 후 다시 파싱해 **예정한 변경 수와 변경 값**을 전수 대조한다. wait를 쪼갰다면 대기 합 검사에 더해
+[실제 음악 기준 시각](16-music-synchronization.md)도 확인한다.
+
 ### 최소 단위는 `"[[]]"`
 
 빈 프로젝트라도 `"[]"` (빈 thread 리스트)는 안 되고 `"[[]]"` (빈 thread 하나)가 필요.
@@ -131,7 +159,7 @@ reg['repeat_basic']
 
 ### 카테고리별 파일 매핑
 
-엔트리의 블록 정의는 [`entryjs/src/playground/blocks/block_*.js`](../../entryjs/src/playground/blocks)에 흩어져 있다.
+엔트리의 블록 정의는 [`entryjs/src/playground/blocks/block_*.js`](https://github.com/entrylabs/entryjs/tree/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks)에 흩어져 있다.
 
 | 카테고리 | 파일 | 대표 블록 |
 |----------|------|-----------|
@@ -1180,7 +1208,7 @@ make-ent의 normalizeBlock이 일반 string을 자동으로 `text` 블록으로 
 ### 함정 — 헤드리스 재실행 시 toggleStop 은 async
 
 `Entry.engine.toggleStop()`은 변수 snapshot을 비동기로 복원
-([`engine.js:715`](../../entryjs/src/class/engine.js#L715), `Promise.all` + `loadSnapshot`).
+([`engine.js:715`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/engine.js#L715), `Promise.all` + `loadSnapshot`).
 다음 `toggleRun()` 전에 await 하지 않으면 변수가 막 복원된 상태와 새 setValue 호출이
 경합 → 두 번째 실행부터 빈 결과. 검증 스크립트는:
 ```js
