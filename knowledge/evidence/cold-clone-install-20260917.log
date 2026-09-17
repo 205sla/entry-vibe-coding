@@ -1,0 +1,311 @@
+/c/Users/young/prg/ENTRY/_temp/entry-cold-review-20260917/fresh space/repo
+/usr/bin/tar
+tar (GNU tar) 1.35
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by John Gilmore and Jay Fenlason.
+v22.17.0
+10.9.2
+npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+
+added 193 packages, and audited 194 packages in 2s
+
+41 packages are looking for funding
+  run `npm fund` for details
+
+5 vulnerabilities (1 low, 1 moderate, 3 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> myentry-game@0.1.0 setup
+> node scripts/setup.mjs
+
+
+[MYentry-game] setup starting
+
+  entryjs dist + extern + images                  … OK  (npm @entrylabs/entry@4.0.20 (prebuilt))
+Cloning into '<fresh-clone>\.setup-cache\entry-tool'...
+  external modules (tool/paint/lms/…)             … OK  (entry-tool: github, entry-paint: downloaded, entry-lms: downloaded, sound-editor: downloaded, legacy-video: downloaded)
+  refresh mascot + cursor from sibling            … OK  (no sibling — repo-bundled mascot/cursor used)
+  npm install vendor libs                         …
+added 37 packages in 4s
+OK
+  copy vendor lib dist files                      … OK
+  install verified CreateJS audio 0.6.0           … OK  (PreloadJS + SoundJS 0.6.0, SHA-256 verified)
+  verify editor boot files                        … OK  (37 boot files present; audio hashes verified)
+
+✓ setup complete.
+    npm start                → editor at http://localhost:3000
+    npx playwright install chromium   (once, for headless verify)
+    npm run verify           → smoke + links + e2e + runtime
+
+
+[MYentry-game] setup starting
+
+  entryjs dist + extern + images                  … OK  (npm @entrylabs/entry@4.0.20 (prebuilt))
+  external modules (tool/paint/lms/…)             … OK  (entry-tool: present, entry-paint: present, entry-lms: present, sound-editor: present, legacy-video: present)
+  refresh mascot + cursor from sibling            … OK  (no sibling — repo-bundled mascot/cursor used)
+  (--skip-vendor): vendor install skipped
+  install verified CreateJS audio 0.6.0           … OK  (PreloadJS + SoundJS 0.6.0, SHA-256 verified)
+  verify editor boot files                        … OK  (37 boot files present; audio hashes verified)
+
+✓ setup complete.
+    npm start                → editor at http://localhost:3000
+    npx playwright install chromium   (once, for headless verify)
+    npm run verify           → smoke + links + e2e + runtime
+
+
+> myentry-game@0.1.0 test:smoke
+> node --test tests/*.test.js
+
+TAP version 13
+# Subtest: audio setup rejects corrupt cache/download without replacing installed files
+ok 1 - audio setup rejects corrupt cache/download without replacing installed files
+  ---
+  duration_ms: 35.3748
+  type: 'test'
+  ...
+# Subtest: generated PNG import preserves alpha through .ent build and refuses opaque sprites and overwrites
+ok 2 - generated PNG import preserves alpha through .ent build and refuses opaque sprites and overwrites
+  ---
+  duration_ms: 36.0358
+  type: 'test'
+  ...
+# Subtest: idle/suspended editor sessions survive memory eviction and release removes the source
+ok 3 - idle/suspended editor sessions survive memory eviction and release removes the source
+  ---
+  duration_ms: 4.1361
+  type: 'test'
+  ...
+# Subtest: HTTP export preserves assets after 36 minutes and rejects missing session/local assets
+ok 4 - HTTP export preserves assets after 36 minutes and rejects missing session/local assets
+  ---
+  duration_ms: 1268.2197
+  type: 'test'
+  ...
+# Subtest: semantic validation rejects bad references, duplicate IDs and missing assets before build
+ok 5 - semantic validation rejects bad references, duplicate IDs and missing assets before build
+  ---
+  duration_ms: 11.3429
+  type: 'test'
+  ...
+# Subtest: semantic validation accepts declared scopes, sentinels, scene names and stringified functions
+ok 6 - semantic validation accepts declared scopes, sentinels, scene names and stringified functions
+  ---
+  duration_ms: 1.0809
+  type: 'test'
+  ...
+# Subtest: every fixture source builds with automatic validation and embedded local assets
+ok 7 - every fixture source builds with automatic validation and embedded local assets
+  ---
+  duration_ms: 240.0933
+  type: 'test'
+  ...
+# Subtest: runtime discovery includes nested game verifiers, excludes argument-only CLI and propagates failure/timeout
+ok 8 - runtime discovery includes nested game verifiers, excludes argument-only CLI and propagates failure/timeout
+  ---
+  duration_ms: 467.1697
+  type: 'test'
+  ...
+# Subtest: links reject existing sibling files, encoded traversal, absolute paths and external junctions
+ok 9 - links reject existing sibling files, encoded traversal, absolute paths and external junctions
+  ---
+  duration_ms: 18.6604
+  type: 'test'
+  ...
+# Subtest: boot gate checks scripts and styles declared by editor.html, including empty vendor files
+ok 10 - boot gate checks scripts and styles declared by editor.html, including empty vendor files
+  ---
+  duration_ms: 17.113
+  type: 'test'
+  ...
+# Subtest: setup extracts an npm archive using PATH tar from an absolute path containing spaces
+ok 11 - setup extracts an npm archive using PATH tar from an absolute path containing spaces
+  ---
+  duration_ms: 81.7339
+  type: 'test'
+  ...
+# Subtest: bounce-ball.ent — gunzip + tar parse
+ok 12 - bounce-ball.ent — gunzip + tar parse
+  ---
+  duration_ms: 3.9481
+  type: 'test'
+  ...
+# Subtest: bullet-circle.ent — gunzip + tar parse
+ok 13 - bullet-circle.ent — gunzip + tar parse
+  ---
+  duration_ms: 1.7166
+  type: 'test'
+  ...
+# Subtest: bullethell.ent — gunzip + tar parse
+ok 14 - bullethell.ent — gunzip + tar parse
+  ---
+  duration_ms: 1.1513
+  type: 'test'
+  ...
+# Subtest: chase-hp.ent — gunzip + tar parse
+ok 15 - chase-hp.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.9888
+  type: 'test'
+  ...
+# Subtest: circle-recursive.ent — gunzip + tar parse
+ok 16 - circle-recursive.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.9973
+  type: 'test'
+  ...
+# Subtest: empty.ent — gunzip + tar parse
+ok 17 - empty.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.7763
+  type: 'test'
+  ...
+# Subtest: fibonacci.ent — gunzip + tar parse
+ok 18 - fibonacci.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.9111
+  type: 'test'
+  ...
+# Subtest: frontier-guard.ent — gunzip + tar parse
+ok 19 - frontier-guard.ent — gunzip + tar parse
+  ---
+  duration_ms: 2.4386
+  type: 'test'
+  ...
+# Subtest: fruit-hunt.ent — gunzip + tar parse
+ok 20 - fruit-hunt.ent — gunzip + tar parse
+  ---
+  duration_ms: 1.5398
+  type: 'test'
+  ...
+# Subtest: healthbar-brush.ent — gunzip + tar parse
+ok 21 - healthbar-brush.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.9068
+  type: 'test'
+  ...
+# Subtest: known-good.ent — gunzip + tar parse
+ok 22 - known-good.ent — gunzip + tar parse
+  ---
+  duration_ms: 1.5692
+  type: 'test'
+  ...
+# Subtest: media-art.ent — gunzip + tar parse
+ok 23 - media-art.ent — gunzip + tar parse
+  ---
+  duration_ms: 2.6399
+  type: 'test'
+  ...
+# Subtest: memory-ranking.ent — gunzip + tar parse
+ok 24 - memory-ranking.ent — gunzip + tar parse
+  ---
+  duration_ms: 1.1119
+  type: 'test'
+  ...
+# Subtest: move.ent — gunzip + tar parse
+ok 25 - move.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.7311
+  type: 'test'
+  ...
+# Subtest: name-loop.ent — gunzip + tar parse
+ok 26 - name-loop.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.5962
+  type: 'test'
+  ...
+# Subtest: platformer.ent — gunzip + tar parse
+ok 27 - platformer.ent — gunzip + tar parse
+  ---
+  duration_ms: 1.4209
+  type: 'test'
+  ...
+# Subtest: recursion.ent — gunzip + tar parse
+ok 28 - recursion.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.7554
+  type: 'test'
+  ...
+# Subtest: repeat-timing-wait.ent — gunzip + tar parse
+ok 29 - repeat-timing-wait.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.7108
+  type: 'test'
+  ...
+# Subtest: repeat-timing.ent — gunzip + tar parse
+ok 30 - repeat-timing.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.7679
+  type: 'test'
+  ...
+# Subtest: scene-custom-id.ent — gunzip + tar parse
+ok 31 - scene-custom-id.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.6188
+  type: 'test'
+  ...
+# Subtest: textbox-click.ent — gunzip + tar parse
+ok 32 - textbox-click.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.6662
+  type: 'test'
+  ...
+# Subtest: textbox-layout.ent — gunzip + tar parse
+ok 33 - textbox-layout.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.6816
+  type: 'test'
+  ...
+# Subtest: variable.ent — gunzip + tar parse
+ok 34 - variable.ent — gunzip + tar parse
+  ---
+  duration_ms: 0.6987
+  type: 'test'
+  ...
+# Subtest: fixtures exist
+ok 35 - fixtures exist
+  ---
+  duration_ms: 0.3192
+  type: 'test'
+  ...
+# Subtest: validateSpec rejects a value function call in statement position
+ok 36 - validateSpec rejects a value function call in statement position
+  ---
+  duration_ms: 110.2945
+  type: 'test'
+  ...
+# Subtest: validateSpec finds statement-position value calls nested in loops
+ok 37 - validateSpec finds statement-position value calls nested in loops
+  ---
+  duration_ms: 0.4909
+  type: 'test'
+  ...
+1..37
+# tests 37
+# suites 0
+# pass 37
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2104.4174
+
+> myentry-game@0.1.0 verify:links
+> node tools/check-knowledge-links.mjs
+
+[links] scanning 29 markdown files...
+[links] 840 links checked, 0 broken
+
+[links] all good ✓
+
+[make-ent --check] tests/fixtures/spec-bounce-ball.mjs: OK — 0 errors, 0 warnings

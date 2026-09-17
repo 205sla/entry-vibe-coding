@@ -1,0 +1,490 @@
+{
+  "date": "2026-09-17",
+  "status": "tested-uncommitted-candidate",
+  "repository": "https://github.com/205sla/entry-vibe-coding",
+  "baseMain": "9538c61dc421d1e6ca665be24d431a9daf9043f8",
+  "selectedAudioSource": "09b6c1b496db75433ca8b5d993a3aed74f1e76dd",
+  "audioSourceAlreadyOnRemoteBranch": "docs/textbox-layout-knowledge",
+  "environment": {
+    "os": "Windows",
+    "shell": "Git Bash",
+    "tar": "GNU tar 1.35",
+    "node": "22.17.0",
+    "npm": "10.9.2",
+    "engine": "@entrylabs/entry@4.0.20"
+  },
+  "isolation": {
+    "secondNetworkClone": true,
+    "pathContainsSpaces": true,
+    "siblingRepositoriesPresent": false,
+    "copiedNodeModulesOrSetupCacheOrPublicLib": false,
+    "machineNpmCacheAndExistingPlaywrightBrowserAllowed": true,
+    "newOSImage": false,
+    "freshDedicatedServers": {
+      "e2e": 3319,
+      "runtime": 3320
+    }
+  },
+  "checks": {
+    "setup": {
+      "command": "npm install && npm run setup",
+      "result": "PASS",
+      "bootFiles": 37
+    },
+    "setupRerun": {
+      "command": "node scripts/setup.mjs --skip-vendor",
+      "result": "PASS"
+    },
+    "l1": {
+      "command": "node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --check",
+      "errors": 0,
+      "warnings": 0
+    },
+    "smoke": {
+      "command": "npm run test:smoke",
+      "passed": 37,
+      "failed": 0
+    },
+    "linksAtInitialRuntimeValidation": {
+      "checked": 840,
+      "broken": 0
+    },
+    "linksAfterFinalDocumentation": {
+      "checked": 854,
+      "broken": 0
+    },
+    "e2e": {
+      "command": "npm run test:e2e",
+      "passed": 29,
+      "failed": 0,
+      "duration": "2.3m"
+    },
+    "memoryRankingSeparateRepeats": {
+      "passed": 3,
+      "failed": 0
+    },
+    "runtime": {
+      "command": "node tools/run-all-verify.mjs",
+      "passed": 28,
+      "failed": 1,
+      "exitCode": 1,
+      "defaultTimeoutMs": 600000,
+      "scripts": [
+        {
+          "script": "games/audio-check/verify.mjs",
+          "result": "PASS",
+          "seconds": 11.3
+        },
+        {
+          "script": "games/brick-kingdom/verify.mjs",
+          "result": "FAIL",
+          "seconds": 600.2
+        },
+        {
+          "script": "games/hexo/verify.mjs",
+          "result": "PASS",
+          "seconds": 30.1
+        },
+        {
+          "script": "games/number-to-hangul/verify.mjs",
+          "result": "PASS",
+          "seconds": 7
+        },
+        {
+          "script": "games/online-match/verify-casual.mjs",
+          "result": "PASS",
+          "seconds": 23.9
+        },
+        {
+          "script": "games/online-match/verify.mjs",
+          "result": "PASS",
+          "seconds": 56.5
+        },
+        {
+          "script": "games/vampire-survival/verify.mjs",
+          "result": "PASS",
+          "seconds": 19.3
+        },
+        {
+          "script": "tools/verify-bounce-ball.mjs",
+          "result": "PASS",
+          "seconds": 9.9
+        },
+        {
+          "script": "tools/verify-bullet-circle.mjs",
+          "result": "PASS",
+          "seconds": 18.8
+        },
+        {
+          "script": "tools/verify-bullethell.mjs",
+          "result": "PASS",
+          "seconds": 12.3
+        },
+        {
+          "script": "tools/verify-circle-recursive.mjs",
+          "result": "PASS",
+          "seconds": 9
+        },
+        {
+          "script": "tools/verify-clock-run.mjs",
+          "result": "PASS",
+          "seconds": 8.7
+        },
+        {
+          "script": "tools/verify-clock.mjs",
+          "result": "PASS",
+          "seconds": 7.6
+        },
+        {
+          "script": "tools/verify-coord-test.mjs",
+          "result": "PASS",
+          "seconds": 7
+        },
+        {
+          "script": "tools/verify-es-hangul-demo.mjs",
+          "result": "PASS",
+          "seconds": 18.9
+        },
+        {
+          "script": "tools/verify-es-hangul.mjs",
+          "result": "PASS",
+          "seconds": 8.8
+        },
+        {
+          "script": "tools/verify-fibonacci.mjs",
+          "result": "PASS",
+          "seconds": 10.9
+        },
+        {
+          "script": "tools/verify-frontier-guard.mjs",
+          "result": "PASS",
+          "seconds": 49.9
+        },
+        {
+          "script": "tools/verify-fruit-hunt.mjs",
+          "result": "PASS",
+          "seconds": 9.6
+        },
+        {
+          "script": "tools/verify-healthbar-brush.mjs",
+          "result": "PASS",
+          "seconds": 8.4
+        },
+        {
+          "script": "tools/verify-media-art.mjs",
+          "result": "PASS",
+          "seconds": 18
+        },
+        {
+          "script": "tools/verify-name-circle-anim.mjs",
+          "result": "PASS",
+          "seconds": 25
+        },
+        {
+          "script": "tools/verify-name-circle.mjs",
+          "result": "PASS",
+          "seconds": 18
+        },
+        {
+          "script": "tools/verify-name-loop.mjs",
+          "result": "PASS",
+          "seconds": 8.4
+        },
+        {
+          "script": "tools/verify-platformer.mjs",
+          "result": "PASS",
+          "seconds": 12.6
+        },
+        {
+          "script": "tools/verify-recursion.mjs",
+          "result": "PASS",
+          "seconds": 38
+        },
+        {
+          "script": "tools/verify-repeat-timing.mjs",
+          "result": "PASS",
+          "seconds": 9.8
+        },
+        {
+          "script": "tools/verify-textbox-click.mjs",
+          "result": "PASS",
+          "seconds": 8.3
+        },
+        {
+          "script": "tools/verify-textbox-layout.mjs",
+          "result": "PASS",
+          "seconds": 9.2
+        }
+      ]
+    },
+    "workspaceKnowledge": {
+      "projects": 19,
+      "clusters": 9,
+      "dependencies": 33,
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "baselineAudio": {
+    "capturedAt": "2026-09-17T11:07:47.372Z",
+    "fixtureSha256": "1229c870016b529e9d53f5661349836421d7734a244ee76141db5712bb298c6e",
+    "pageErrors": [],
+    "versions": {
+      "soundjs": "1.0.0",
+      "preloadjs": "0.4.1"
+    },
+    "initialSounds": [
+      {
+        "id": "wav1",
+        "registered": false,
+        "decoded": false
+      },
+      {
+        "id": "mp31",
+        "registered": false,
+        "decoded": false
+      }
+    ],
+    "cases": [
+      {
+        "phase": "wav",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": "playFailed"
+      },
+      {
+        "phase": "mp3",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": "playFailed"
+      },
+      {
+        "phase": "mute",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": "playFailed"
+      }
+    ]
+  },
+  "candidateAudio": {
+    "capturedAt": "2026-09-17T11:46:25.431Z",
+    "fixtureSha256": "1229c870016b529e9d53f5661349836421d7734a244ee76141db5712bb298c6e",
+    "pageErrors": [],
+    "versions": {
+      "soundjs": "0.6.0",
+      "preloadjs": "0.6.0"
+    },
+    "initialSounds": [
+      {
+        "id": "wav1",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "id": "mp31",
+        "registered": true,
+        "decoded": true
+      }
+    ],
+    "cases": [
+      {
+        "phase": "wav",
+        "signal": {
+          "peak": 0.13576935231685638,
+          "rms": 0.09239353295233065
+        },
+        "nativeCall": "playSucceeded"
+      },
+      {
+        "phase": "mp3",
+        "signal": {
+          "peak": 0.1289866715669632,
+          "rms": 0.08755123982692584
+        },
+        "nativeCall": "playSucceeded"
+      },
+      {
+        "phase": "mute",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "nativeCall": "playSucceeded"
+      }
+    ]
+  },
+  "hashes": {
+    "base": "9538c61dc421d1e6ca665be24d431a9daf9043f8",
+    "vendors": [
+      {
+        "file": "preloadjs-0.6.0.min.js",
+        "expected": "671d2d4201bf3fe25c22d343ea377ed88c0646b2bb8bb490e1ce6aa6143426b9",
+        "actual": "671d2d4201bf3fe25c22d343ea377ed88c0646b2bb8bb490e1ce6aa6143426b9"
+      },
+      {
+        "file": "soundjs-0.6.0.min.js",
+        "expected": "09c0c658a5d0a5fe8db0ba8f2e55513bd9a7f8525e678ca344430521e8559ca6",
+        "actual": "09c0c658a5d0a5fe8db0ba8f2e55513bd9a7f8525e678ca344430521e8559ca6"
+      },
+      {
+        "file": "flashaudioplugin-0.6.0.min.js",
+        "expected": "2f0325655de628188e6b5bb62b5f9b15e3b1b67b3ccd23d028c58d51679a9194",
+        "actual": "2f0325655de628188e6b5bb62b5f9b15e3b1b67b3ccd23d028c58d51679a9194"
+      }
+    ],
+    "engine": {
+      "installed": "a653431f87c7a58d7e5af21a0fc5f3b332e168271e46d83df7d8e23de4c9ec87",
+      "prebuilt": "a653431f87c7a58d7e5af21a0fc5f3b332e168271e46d83df7d8e23de4c9ec87"
+    },
+    "brickFixture": "4b3a0de8812fee4920324efcbc56d8f2f739ad1d2c5b46583206afa047856a07",
+    "audioFixture": "1229c870016b529e9d53f5661349836421d7734a244ee76141db5712bb298c6e"
+  },
+  "knownFailure": {
+    "script": "games/brick-kingdom/verify.mjs",
+    "fixture": "brick-kingdom_002.ent",
+    "decision": "Preserve and document the unfinished legacy full-route checks; keep assertions, timeout and nonzero status.",
+    "shellScenario6": {
+      "passed": 13,
+      "failed": 0,
+      "gameOrEngineMutation": false
+    },
+    "failures": [
+      {
+        "scenario": 3,
+        "assertions": [
+          "Reach column 346 past the goal stairs"
+        ]
+      },
+      {
+        "scenario": 4,
+        "assertions": [
+          "Land after head collision",
+          "Collect growth item",
+          "Power becomes BIG",
+          "Break brick while BIG"
+        ],
+        "cause": "Game logic versus bot input not yet isolated"
+      }
+    ],
+    "timedOutDuringScenario": 9,
+    "notCompleted": [
+      9
+    ],
+    "notExecutedThisRun": [
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "aggregateVerifyIsGreen": false
+  },
+  "notVerifiedThisSession": [
+    "Physical speaker listening / L5",
+    "Official playentry.org upload and playback",
+    "Official offline Entry app",
+    "Linux execution",
+    "Remote GitHub Actions"
+  ],
+  "testedCode": [
+    {
+      "path": "scripts/setup.mjs",
+      "normalizedLFsha256": "e6ff414c242f71e203386fe23adc326ff5b62c84ff1693e4e783198c2c48d887"
+    },
+    {
+      "path": "scripts/setup-audio.mjs",
+      "normalizedLFsha256": "d270283febcbf911b302d6d41f477caf688dd58ac07c3ade38a6d43e54f2c231"
+    },
+    {
+      "path": "scripts/lib/extract-tar.mjs",
+      "normalizedLFsha256": "d9b73aecfe2611226d13c5cd4c11005d1d80fb39a1228a355a8573fb468882d2"
+    },
+    {
+      "path": "scripts/lib/boot-files.mjs",
+      "normalizedLFsha256": "3e7c7f33838d6797ef196d302e44f497e139bc692f9a1f331ded62401c4c9726"
+    },
+    {
+      "path": "public/js/editor.js",
+      "normalizedLFsha256": "61061231aad8b5aeb7fbedaf47ab3000c2b2c432d0ab854e25208af1cdbe94cf"
+    },
+    {
+      "path": "tools/lib/editor-harness.mjs",
+      "normalizedLFsha256": "b7ea1c3173a9ab15b1a22cad3f1246919713f033028b504c687501ebbd69abe8"
+    },
+    {
+      "path": "tools/lib/audio-harness.mjs",
+      "normalizedLFsha256": "a36043539711d58bc738e5f52ad0038e8839200e36c57cdc61bd29f03838e8ea"
+    },
+    {
+      "path": "tools/check-knowledge-links.mjs",
+      "normalizedLFsha256": "78a43d1ba507ab28004bfa8a2443675ce16e642edac7324f37d63c24f42d2cf6"
+    },
+    {
+      "path": "tools/run-all-verify.mjs",
+      "normalizedLFsha256": "e478035dd3d6d7e673c3fa07d0dc4326017666acb6bb59a5dffd95980cb3572b"
+    },
+    {
+      "path": "games/brick-kingdom/verify.mjs",
+      "normalizedLFsha256": "e88f73b24009816e376b068eb27d01e4e13bcf57a72a8cb8e708183a14de7921"
+    },
+    {
+      "path": "games/brick-kingdom/enemy-check.mjs",
+      "normalizedLFsha256": "f8ffe7691eb37154d33809f87cdc16ab84e95c8ccc5adf90ae3880479bdcaf71"
+    },
+    {
+      "path": "tests/setup.test.js",
+      "normalizedLFsha256": "c585829189f234791baefca11f21b59f0aec30424a66b9c3aefcc9b781fc58dd"
+    },
+    {
+      "path": "tests/audio-e2e.spec.js",
+      "normalizedLFsha256": "b094f5a089727fcdf7734d13e09a095e8c32a279096a848b7623b3212e615cef"
+    },
+    {
+      "path": "tests/audio-vendor.test.js",
+      "normalizedLFsha256": "a0eecf8a4de283a06a0245d24645fd2583eafc98076c5b7ee6899af478f6a5fe"
+    },
+    {
+      "path": "tests/knowledge-links.test.js",
+      "normalizedLFsha256": "e04e33abf102b3077375be8250a7551f756a838783468702c91c867511eecaf8"
+    }
+  ],
+  "logs": [
+    {
+      "path": "cold-clone-install-20260917.log",
+      "normalizedLFsha256": "3202311b560e2347aa091c0985ac8e9084eeee6cb44ca4c7004efdeb3c59f7df",
+      "ansiColorsRemoved": true,
+      "trailingWhitespaceRemoved": true
+    },
+    {
+      "path": "cold-clone-e2e-20260917.log",
+      "normalizedLFsha256": "02dbfd736db192521488fc8d2da01e2ad6857ea6c76c7e069157da15370d5ac7",
+      "ansiColorsRemoved": true,
+      "trailingWhitespaceRemoved": true
+    },
+    {
+      "path": "cold-clone-runtime-20260917.log",
+      "normalizedLFsha256": "767706bf3a625ac5dcde40946cd8ee0efac95dae319f4b8b74aba17e040a87ac",
+      "ansiColorsRemoved": true,
+      "trailingWhitespaceRemoved": true
+    },
+    {
+      "path": "cold-clone-links-20260917.log",
+      "normalizedLFsha256": "587826162969701c91de52e2ea87fc34935f8431d78f65fc1f362f7437636542",
+      "ansiColorsRemoved": true,
+      "trailingWhitespaceRemoved": true
+    },
+    {
+      "path": "brick-kingdom-runtime-20260917.log",
+      "normalizedLFsha256": "86239bf32245cf42ee51bb7bda88d35ca9688c658fb589b93f1ae5566445b126",
+      "ansiColorsRemoved": true,
+      "trailingWhitespaceRemoved": true
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+
+> myentry-game@0.1.0 verify:links
+> node tools/check-knowledge-links.mjs
+
+[links] scanning 29 markdown files...
+[links] 854 links checked, 0 broken
+
+[links] all good ✓

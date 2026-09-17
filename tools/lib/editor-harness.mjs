@@ -35,6 +35,7 @@ export async function bootEditor({
     try {
         await page.goto(`${baseUrl}/editor.html`);
         await page.waitForFunction(() => typeof Entry !== 'undefined', null, { timeout: 15_000 });
+        await page.evaluate(() => window.__myentryReady);
         await page.waitForTimeout(settleMs);
     } catch (e) {
         await browser.close();

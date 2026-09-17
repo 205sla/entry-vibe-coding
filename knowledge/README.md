@@ -7,6 +7,8 @@
 
 | 상황 | 읽을 문서 | 파일 유형 |
 |------|-----------|-----------|
+| 새 환경 설치·재현 실패·공개 저장소 경계 | [17-cold-clone.md](17-cold-clone.md) | Guide · 현행 · 2026-09-17 |
+| 소리 등록·디코딩·블록 출력·음소거·내보내기 왕복 | [15-audio-verification.md](15-audio-verification.md) | Guide · 현행 · 2026-09-17 |
 | **처음 들어왔다 · 30초 요약** | [quick-reference.md](quick-reference.md) | 진입점 |
 | 공식 typedef·API 직접 확인 / 어떤 필드가 공식인지 | [00-official-sources.md](00-official-sources.md) | Reference |
 | `.ent` 바이너리가 깨짐 / tar 구조 확인 | [01-binary-format.md](01-binary-format.md) | Reference |
@@ -26,7 +28,7 @@
 | 사례의 원본 버전과 블록 근거를 다시 검사할 때 | [evidence/README.md](evidence/README.md) | 재검증 절차 · 2026-09-10 |
 | 과거 해결된 버그 요약 (가드 파일 링크) | [lessons.md](lessons.md) | Lessons |
 | 날짜별로 뭘 배웠는지 | [CHANGELOG.md](CHANGELOG.md) | History |
-| 초기 부트스트랩 지시문 확인 | [bootstrap-prompt.txt](bootstrap-prompt.txt) | Historical prompt |
+| 보관된 초기 지시문 확인 (실행 금지) | [bootstrap-prompt.txt](bootstrap-prompt.txt) | Historical prompt |
 
 활성 함정 문서(`06-gotchas.md`)는 현재 **비어 있음** — 알려진 활성 함정이 없는 상태.
 구조적으로 해결 불가능한 새 함정이 발견되면 그때 이 파일을 신설.
@@ -51,6 +53,8 @@
 
 | 사실 | 정본 (full) | 다른 파일에선 한 줄 + 링크 |
 |------|-------------|--------------------------|
+| 콜드 클론 재현 조건·문서 경계·검증 결과 | [17 콜드 클론](17-cold-clone.md) | README, CLAUDE |
+| 오디오 의존성·작품별 출력 검사 | [15 소리 검증](15-audio-verification.md) | README, CLAUDE, 05 |
 | 음악 시작 기준 시각·프레임 대조·준비 지연 재현·동기화 검사 범위 | [16 음악 동기화](16-music-synchronization.md) | 10, lessons, evidence |
 | 프로젝트 초시계 START/RESET과 저장값 갱신 지연 | [07 초시계](07-runtime-quirks.md#프로젝트-초시계의-원점과-표시값은-다르다) | 16, lessons |
 | 크기 정하기의 폭·높이 평균 단위와 긴 자막 검사 | [07 크기](07-runtime-quirks.md#크기-정하기는-퍼센트가-아니다) | 03, lessons |

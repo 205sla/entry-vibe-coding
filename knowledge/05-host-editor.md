@@ -62,7 +62,9 @@ clamp돼 화면에 나타나지만 우리 사본에서는 숨은 채로 보인�
 `4.0.20`(2025-05-30)이고 develop의 `package.json`은 `4.0.22`다. 새 버전이 나오면
 `node scripts/setup.mjs --entry-version=<새버전>`으로 갱신하고, 이 표의 심볼을 다시 대조한다.
 
-전체 변경 목록·판정 근거: [`upstream/지식/entryjs-4.56.0-2026-07-update.md`](../../../upstream/지식/entryjs-4.56.0-2026-07-update.md)
+위 표는 2026-07-31의 관측 기록이다. 새 버전의 소스 확인은
+[공식 소스 인덱스](00-official-sources.md)를 따르고, 설치 재현 범위는
+[콜드 클론 정본](17-cold-clone.md)에서 확인한다.
 
 ## Entry.init 옵션
 
@@ -322,49 +324,10 @@ if (assets.length) throw new Error(`에셋 ${assets.length}개 — 콘솔 붙여
 
 ## 필수 vendor 라이브러리 패치
 
-### preload-js npm 패키지 — `module.exports` 제거
-
-`npm install preload-js`로 받은 파일 끝에 `;module.exports=window.createjs;`가 붙어있어
-브라우저에서 `ReferenceError: module is not defined`.
-
-수정:
-```bash
-perl -i -pe 's/;module\.exports=[^;]*;\s*$/;/' public/lib/vendor/preloadjs-0.6.0.min.js
-```
-
-### soundjs 1.x 호환 패치 (editor.js에서)
-
-npm `soundjs@1.0.1`의 `_parsePath`가 undefined src에 대해 `toString()` 호출로 크래시.
-playentry.org가 쓰는 0.6.0은 관대하게 null 반환. 방어 래퍼:
-
-```js
-function patchCreateJSSoundParsePath() {
-    if (typeof createjs === 'undefined' || !createjs.Sound) return;
-    const proto = Object.getPrototypeOf(createjs.Sound);
-    ['_parsePath', 'parsePath'].forEach(fn => {
-        const target = createjs.Sound[fn] || (proto && proto[fn]);
-        if (typeof target !== 'function' || target.__patched) return;
-        const wrapped = function (src) {
-            if (src == null) return null;
-            try { return target.apply(this, arguments); }
-            catch (e) { return null; }
-        };
-        wrapped.__patched = true;
-        createjs.Sound[fn] = wrapped;
-        if (proto && proto[fn]) proto[fn] = wrapped;
-    });
-}
-```
-
-`Entry.init()` 호출 직전에 실행.
-
-### CreateJS 버전 주의
-
-- playentry.org CDN: PreloadJS 0.6.0, EaselJS 0.8.0, SoundJS 0.6.0 (legacy).
-- npm latest: PreloadJS 0.6.3, EaselJS 1.0.2, SoundJS 1.0.1.
-- npm 최신으로도 엔트리 엔진은 돌아간다(API drift 작음). 완전한 바이너리 round-trip 호환이
-  중요하면 playentry.org 파일을 직접 복사해서 써야 하지만, 외부 호스트 금지 규칙과 충돌.
-  우리는 npm latest + 위 패치로 타협.
+이전 npm 별칭 조합과 예외를 삼키는 방어 래퍼는 폐기됐다. 현재는 공식 CreateJS 0.6.0
+브라우저 배포본의 해시를 검사하고, 초기화 전에 실제 버전을 확인한다.
+설치·복구·작품별 검증은 [소리 검증 정본](15-audio-verification.md)을 따른다.
+파일명이나 콘솔 오류 0만으로 재생 성공을 판단하지 않는다.
 
 ## 헤드리스 런타임 검증 — 이벤트 직접 dispatch
 

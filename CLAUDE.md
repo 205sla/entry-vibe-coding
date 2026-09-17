@@ -23,9 +23,11 @@ npm run setup                      # 편집기 의존성 자동 구성 (~수 분
 npx playwright install chromium    # 헤드리스 검증용 (한 번만)
 ```
 
-- setup 마지막 줄 `verify editor boot files … OK` 가 나오면 편집기 + 헤드리스 검증 환경 완성.
+- `verify editor boot files … OK`는 설치 파일 검사 통과다. Chromium 설치 후 L3로 실제
+  부팅·로드·소리 출력을 검증해야 하며, 작품별 동작은 L4로 확인한다.
 - setup 실패 시: 에러 메시지의 지시를 따른 뒤 **재실행** (idempotent).
 - 형제 저장소(`../entryjs`, `../MYentry`)는 **없어도 된다** — 있으면 우선 사용할 뿐.
+- 새 환경 재현 조건·알려진 한계·회귀 검사는 [콜드 클론 정본](knowledge/17-cold-clone.md)을 따른다.
 
 ## 제작 사이클
 
@@ -46,7 +48,7 @@ npx playwright install chromium    # 헤드리스 검증용 (한 번만)
    배경 제거·실제 알파 검사·등록을 진행한다. 실패하거나 사용할 수 없으면 SVG 제작으로 이어간다.
 3. **정적 검증** — `node tools/make-ent.mjs games/<이름>/spec.mjs --check` (< 1초).
    통과할 때까지 2↔3 반복.
-4. **빌드** — `node tools/make-ent.mjs games/<이름>/spec.mjs --out games/<이름>/<이름>_001.ent`
+4. **빌드** — `node tools/make-ent.mjs games/<이름>/spec.mjs games/<이름>/<이름>_001.ent`
 5. **검증 사다리** (아래) — 새 게임이면 `games/<이름>/verify.mjs`도 작성
    (기존 `tools/verify-*.mjs` 또는 `games/vampire-survival/verify.mjs` 복제·수정).
 6. **보고** — `.ent` 경로 + 조작법/동작 설명 + 통과한 검증 레이어 명시.
@@ -67,12 +69,20 @@ npx playwright install chromium    # 헤드리스 검증용 (한 번만)
   필터 등 인자가 필요하면 위처럼 **`node tools/...` 직접 호출**을 쓴다.
 - L4 실패가 **게임 로직 문제**면: [knowledge/lessons.md](knowledge/lessons.md)(과거 해결 이슈)와
   [knowledge/07-runtime-quirks.md](knowledge/07-runtime-quirks.md)(엔진 함정)부터 확인.
+- **소리가 있는 작품은 오디오 기능 검사를 필수로 추가한다.** 배경음·효과음·음소거를 실제 입력으로
+  발화시키고 등록·디코딩·블록 호출·출력 신호를 기록한다. console error 0이나 tar에 음원이 있다는
+  사실만으로 소리 성공을 보고하지 않는다. 호스트 최소 검사는 `node games/audio-check/verify.mjs`이며,
+  개별 작품의 소리 검사를 대체하지 않는다. [15 소리 검증](knowledge/15-audio-verification.md)의 절차와
+  웹·오프라인·청취 검증 범위를 따른다.
+- **공식 웹에 공개할 새 작품의 음원은 MP3를 기본으로 포함한다.** 합성 WAV는 실제 MP3로
+  변환해서 번들하며 확장자만 바꾸지 않는다. [형식 선택 근거와 웹 검증](knowledge/15-audio-verification.md#공식-웹용-음원-형식-선택)을 따른다.
 
 ## 트러블슈팅
 
 | 증상 | 처방 |
 |---|---|
 | verify가 **전부** 깨짐 / 편집기 부팅 실패 | `public/lib` 손상 의심 → `npm run setup` 재실행 (boot files 체크가 진단해줌) |
+| 소리만 안 남 / 소리 라이브러리 버전 오류 | [15 소리 검증](knowledge/15-audio-verification.md) 순서로 에셋·등록·출력을 구분. 호스트 vendor 오류면 `node scripts/setup-audio.mjs` |
 | 블록 type/param 에러 | `tools/block-registry.json`에서 검색: `node -e "console.log(JSON.stringify(require('./tools/block-registry.json').blocks['move_direction'],null,2))"` |
 | Field 슬롯 드롭다운 매칭 실패 | `{"__field":"값"}` sentinel 사용 (README "필드 vs 블록 슬롯") |
 | 엔진 고유 동작이 이상 | [knowledge/07-runtime-quirks.md](knowledge/07-runtime-quirks.md) — 60fps 틱, message fan-out 등 |

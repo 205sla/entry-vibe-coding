@@ -1,0 +1,164 @@
+{
+  "date": "2026-09-17T11:46:25.431Z",
+  "file": "audio-check_003.ent",
+  "sha256": "1229c870016b529e9d53f5661349836421d7734a244ee76141db5712bb298c6e",
+  "pageErrors": [],
+  "audio": {
+    "initial": {
+      "soundjs": "0.6.0",
+      "preloadjs": "0.6.0",
+      "context": "running",
+      "volume": 1,
+      "sounds": [
+        {
+          "id": "wav1",
+          "name": "tone-wav",
+          "path": "/api/ent-asset/8e8790c1mu5grxbn/temp/21/ed/sound/21ed1ec3mtwos0oy0ebs5b23a67c5uxs.wav",
+          "registered": true,
+          "decoded": true
+        },
+        {
+          "id": "mp31",
+          "name": "tone-mp3",
+          "path": "/api/ent-asset/8e8790c1mu5grxbn/temp/1e/d1/sound/1ed1ec37mtwos0oz0ebs5b23a67cabqo.mp3",
+          "registered": true,
+          "decoded": true
+        }
+      ],
+      "calls": [],
+      "phase": "idle"
+    },
+    "cases": [
+      {
+        "phase": "wav",
+        "expectedId": "wav1",
+        "signal": {
+          "peak": 0.13576935231685638,
+          "rms": 0.09239353295233065
+        },
+        "runtime": {
+          "soundjs": "0.6.0",
+          "preloadjs": "0.6.0",
+          "context": "running",
+          "volume": 0.6,
+          "sounds": [
+            {
+              "id": "wav1",
+              "name": "tone-wav",
+              "path": "/api/ent-asset/8e8790c1mu5grxbn/temp/21/ed/sound/21ed1ec3mtwos0oy0ebs5b23a67c5uxs.wav",
+              "registered": true,
+              "decoded": true
+            },
+            {
+              "id": "mp31",
+              "name": "tone-mp3",
+              "path": "/api/ent-asset/8e8790c1mu5grxbn/temp/1e/d1/sound/1ed1ec37mtwos0oz0ebs5b23a67cabqo.mp3",
+              "registered": true,
+              "decoded": true
+            }
+          ],
+          "calls": [
+            {
+              "id": "wav1",
+              "state": "playSucceeded",
+              "src": "/api/ent-asset/8e8790c1mu5grxbn/temp/21/ed/sound/21ed1ec3mtwos0oy0ebs5b23a67c5uxs.wav"
+            }
+          ],
+          "phase": "wav"
+        }
+      },
+      {
+        "phase": "mp3",
+        "expectedId": "mp31",
+        "signal": {
+          "peak": 0.1289866715669632,
+          "rms": 0.08755123982692584
+        },
+        "runtime": {
+          "soundjs": "0.6.0",
+          "preloadjs": "0.6.0",
+          "context": "running",
+          "volume": 0.6,
+          "sounds": [
+            {
+              "id": "wav1",
+              "name": "tone-wav",
+              "path": "/api/ent-asset/8e8790c1mu5grxbn/temp/21/ed/sound/21ed1ec3mtwos0oy0ebs5b23a67c5uxs.wav",
+              "registered": true,
+              "decoded": true
+            },
+            {
+              "id": "mp31",
+              "name": "tone-mp3",
+              "path": "/api/ent-asset/8e8790c1mu5grxbn/temp/1e/d1/sound/1ed1ec37mtwos0oz0ebs5b23a67cabqo.mp3",
+              "registered": true,
+              "decoded": true
+            }
+          ],
+          "calls": [
+            {
+              "id": "wav1",
+              "state": "playSucceeded",
+              "src": "/api/ent-asset/8e8790c1mu5grxbn/temp/21/ed/sound/21ed1ec3mtwos0oy0ebs5b23a67c5uxs.wav"
+            },
+            {
+              "id": "mp31",
+              "state": "playSucceeded",
+              "src": "/api/ent-asset/8e8790c1mu5grxbn/temp/1e/d1/sound/1ed1ec37mtwos0oz0ebs5b23a67cabqo.mp3"
+            }
+          ],
+          "phase": "mp3"
+        }
+      },
+      {
+        "phase": "mute",
+        "expectedId": "wav1",
+        "signal": {
+          "peak": 0,
+          "rms": 0
+        },
+        "runtime": {
+          "soundjs": "0.6.0",
+          "preloadjs": "0.6.0",
+          "context": "running",
+          "volume": 0,
+          "sounds": [
+            {
+              "id": "wav1",
+              "name": "tone-wav",
+              "path": "/api/ent-asset/8e8790c1mu5grxbn/temp/21/ed/sound/21ed1ec3mtwos0oy0ebs5b23a67c5uxs.wav",
+              "registered": true,
+              "decoded": true
+            },
+            {
+              "id": "mp31",
+              "name": "tone-mp3",
+              "path": "/api/ent-asset/8e8790c1mu5grxbn/temp/1e/d1/sound/1ed1ec37mtwos0oz0ebs5b23a67cabqo.mp3",
+              "registered": true,
+              "decoded": true
+            }
+          ],
+          "calls": [
+            {
+              "id": "wav1",
+              "state": "playSucceeded",
+              "src": "/api/ent-asset/8e8790c1mu5grxbn/temp/21/ed/sound/21ed1ec3mtwos0oy0ebs5b23a67c5uxs.wav"
+            },
+            {
+              "id": "mp31",
+              "state": "playSucceeded",
+              "src": "/api/ent-asset/8e8790c1mu5grxbn/temp/1e/d1/sound/1ed1ec37mtwos0oz0ebs5b23a67cabqo.mp3"
+            },
+            {
+              "id": "wav1",
+              "state": "playSucceeded",
+              "src": "/api/ent-asset/8e8790c1mu5grxbn/temp/21/ed/sound/21ed1ec3mtwos0oy0ebs5b23a67c5uxs.wav"
+            }
+          ],
+          "phase": "mute"
+        }
+      }
+    ]
+  },
+  "passed": true
+}

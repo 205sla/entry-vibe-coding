@@ -1,0 +1,48 @@
+
+> myentry-game@0.1.0 test:e2e
+> playwright test
+
+[WebServer] (node:13064) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 29 tests using 2 workers
+
+(node:26360) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:34420) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26360) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:34420) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 tests\e2e.spec.js:13:1 › editor UI saves, releases replaced sessions, and reports missing assets without downloading (3.1s)
+  ok  3 tests\e2e.spec.js:48:5 › editor boots cleanly › loads with no page errors (4.9s)
+  ok  4 tests\e2e.spec.js:81:5 › fixture bounce-ball.ent loads and runs without warnings (5.4s)
+  ok  2 tests\audio-e2e.spec.js:17:1 › WAV and MP3 native blocks emit audio; mute is silent; export preserves both sounds (14.6s)
+  ok  6 tests\audio-e2e.spec.js:51:2 › editor rejects misleading SoundJS filename before initializing (2.3s)
+  ok  5 tests\e2e.spec.js:81:5 › fixture bullet-circle.ent loads and runs without warnings (5.6s)
+  ok  7 tests\audio-e2e.spec.js:51:2 › editor rejects misleading PreloadJS filename before initializing (2.2s)
+  ok  8 tests\e2e.spec.js:81:5 › fixture bullethell.ent loads and runs without warnings (5.5s)
+  ok  9 tests\e2e.spec.js:81:5 › fixture chase-hp.ent loads and runs without warnings (5.4s)
+  ok 10 tests\e2e.spec.js:81:5 › fixture circle-recursive.ent loads and runs without warnings (5.3s)
+  ok 11 tests\e2e.spec.js:81:5 › fixture empty.ent loads and runs without warnings (5.2s)
+  ok 12 tests\e2e.spec.js:81:5 › fixture fibonacci.ent loads and runs without warnings (5.3s)
+  ok 13 tests\e2e.spec.js:81:5 › fixture frontier-guard.ent loads and runs without warnings (5.5s)
+  ok 14 tests\e2e.spec.js:81:5 › fixture fruit-hunt.ent loads and runs without warnings (5.5s)
+  ok 15 tests\e2e.spec.js:81:5 › fixture healthbar-brush.ent loads and runs without warnings (5.4s)
+  ok 16 tests\e2e.spec.js:81:5 › fixture known-good.ent loads and runs without warnings (5.4s)
+  ok 17 tests\e2e.spec.js:81:5 › fixture media-art.ent loads and runs without warnings (6.3s)
+  ok 18 tests\e2e.spec.js:81:5 › fixture memory-ranking.ent loads and runs without warnings (5.7s)
+  ok 19 tests\e2e.spec.js:81:5 › fixture move.ent loads and runs without warnings (5.4s)
+  ok 20 tests\e2e.spec.js:81:5 › fixture name-loop.ent loads and runs without warnings (5.4s)
+  ok 21 tests\e2e.spec.js:81:5 › fixture platformer.ent loads and runs without warnings (5.4s)
+  ok 22 tests\e2e.spec.js:81:5 › fixture recursion.ent loads and runs without warnings (5.4s)
+  ok 23 tests\e2e.spec.js:81:5 › fixture repeat-timing-wait.ent loads and runs without warnings (5.3s)
+  ok 24 tests\e2e.spec.js:81:5 › fixture repeat-timing.ent loads and runs without warnings (5.2s)
+  ok 25 tests\e2e.spec.js:81:5 › fixture scene-custom-id.ent loads and runs without warnings (5.2s)
+  ok 26 tests\e2e.spec.js:81:5 › fixture textbox-click.ent loads and runs without warnings (5.3s)
+  ok 27 tests\e2e.spec.js:81:5 › fixture textbox-layout.ent loads and runs without warnings (5.2s)
+  ok 28 tests\e2e.spec.js:81:5 › fixture variable.ent loads and runs without warnings (5.2s)
+  ok 29 tests\e2e.spec.js:128:1 › round-trip export (4.9s)
+
+  29 passed (2.3m)

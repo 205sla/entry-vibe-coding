@@ -19,6 +19,7 @@ import { runFresh, holdKey, createReporter } from '../../tools/lib/verify-harnes
 
 import { TILE, GROUND, ROWS, STAGES } from './levels.mjs';
 import { PHYS } from './physics.mjs';
+import { exerciseShell } from './enemy-check.mjs';
 
 const argEnt = process.argv.indexOf('--ent');
 const FIXTURE = argEnt >= 0 ? process.argv[argEnt + 1]
@@ -107,8 +108,8 @@ async function release(page) {
 // 한 루프가 300ms 를 넘고, 달리기 속도(5px/frame)에서는 그 사이 플레이어가
 // 90px 을 지나가 적을 감지하기 전에 부딪힌다 (실측: 28 열 적에게 3 연속 사망).
 // 격자 상수는 **인자로 넘긴다** — evaluate 안은 별 컨텍스트라 import 가 안 보인다.
-async function sense(page) {
-    return page.evaluate(([TILE, ROWS]) => {
+async function sense(page, { forwardOnly = false } = {}) {
+    return page.evaluate(([TILE, ROWS, forwardOnly]) => {
         const SOLID = '#=B?uPp';
         const V = (n) => Number(Entry.variableContainer.variables_.find(x => x.name_ === n).getValue());
         const LST = (n) => Entry.variableContainer.lists_.find(x => x.name_ === n).array_.map(o => o.data);
@@ -144,13 +145,13 @@ async function sense(page) {
             // 뒤쪽 -10px 에서 끊으면 안 된다: 왼쪽으로 걸어오는 적이 플레이어를
             // 스쳐 지나가면 en=null 이 되어 "적이 처리됐다" 로 오인한다 (실측:
             // 28 열 walker 가 est 그대로인데 en=null, stomps=0).
-            if (d > -60 && d < 320 && (en === null || d < en)) {
+            if ((forwardOnly ? d >= 0 : d > -60) && d < 320 && (en === null || d < en)) {
                 en = d; enKind = ek[i]; enState = est[i];
             }
         }
         return { px, py, state: V('state'), grounded: V('grounded'), vx: V('vx'),
                  lives: V('lives'), gap, wall, step, en, enKind, enState };
-    }, [TILE, ROWS]);
+    }, [TILE, ROWS, forwardOnly]);
 }
 
 // 앞쪽 적 한 마리를 **밟는다**. 타이밍은 실측으로 정했다 (_diag6b.mjs):
@@ -164,7 +165,7 @@ async function sense(page) {
 // 리스트를 따로 읽으면 왕복 4 회 ≈ 60ms 를 잡아먹어 그 사이 플레이어가 셸
 // 중심을 넘어가 방향이 뒤집힌다 (실측: 매 라운드 vx=-6). 그래서 관측값은
 // **한 번의 evaluate** 로 모으고, 키 입력을 그보다 먼저 걸 수 있게 한다.
-async function stompNext(page, { tries = 6, onStomp = null } = {}) {
+async function stompNext(page, { tries = 6, onStomp = null, forwardOnly = false } = {}) {
     let stomped = false, shellAtStomp = -1, shellVxAtStomp = null;
     let exAtStomp = null, estAtStomp = null;
     const base = Number((await snap(page)).dbg_stomps);
@@ -173,7 +174,7 @@ async function stompNext(page, { tries = 6, onStomp = null } = {}) {
         // 범위(±64px) 밖에서 정지해 있어 카메라가 밀리지 않으면 오지 않는다.
         let bailGap = false;
         for (let i = 0; i < 80; i++) {
-            const s = await sense(page);
+            const s = await sense(page, { forwardOnly });
             if (s.state !== ST.PLAYING) break;
             // 발동 거리 120px. **마주 걸어오는 적**을 기준으로 실측해 정했다
             // (`_diagrow2.mjs` 로 266·271 열 3 연속 walker 구간에서 스윕):
@@ -191,7 +192,7 @@ async function stompNext(page, { tries = 6, onStomp = null } = {}) {
         }
         await up(page, 'ArrowRight');
         if (bailGap) break;
-        const s0 = await sense(page);
+        const s0 = await sense(page, { forwardOnly });
         if (s0.state !== ST.PLAYING) break;
         if (s0.grounded !== 1) { await page.waitForTimeout(200); continue; }
         await down(page, 'ArrowUp');
@@ -233,6 +234,8 @@ async function stompNext(page, { tries = 6, onStomp = null } = {}) {
 // 상황에 따라 20 초일 수도 120 초일 수도 있다. 그래서 tick 예산으로는 원거리
 // 이동이 **간헐적으로** 실패했다.
 async function runTo(page, col, { run = true, budgetMs = 150_000, jump = true, trace = false } = {}) {
+    // A handled shell behind the player must not trap forward navigation in
+    // repeated in-place jumps. Keep the backward-aware sensor for other probes.
     const target = col * TILE;
     const deadline = Date.now() + budgetMs;
     let stuck = 0, prev = -1;
@@ -243,7 +246,7 @@ async function runTo(page, col, { run = true, budgetMs = 150_000, jump = true, t
     };
     await press();
     while (Date.now() < deadline) {
-        const s = await sense(page);
+        const s = await sense(page, { forwardOnly: true });
         if (s.px >= target) { await release(page); return true; }
         if (s.state !== ST.PLAYING) {
             // 사망 연출 / READY — 키를 놓고 기다린 뒤 다시 진행한다.
@@ -256,7 +259,7 @@ async function runTo(page, col, { run = true, budgetMs = 150_000, jump = true, t
             if (s.state === ST.OVER) {
                 for (let k = 0; k < 60; k++) {
                     await page.waitForTimeout(150);
-                    if ((await sense(page)).state === ST.TITLE) break;
+                    if ((await sense(page, { forwardOnly: true })).state === ST.TITLE) break;
                 }
                 await holdKey(page, 'Enter', 150);
                 await page.waitForTimeout(1200);
@@ -264,7 +267,7 @@ async function runTo(page, col, { run = true, budgetMs = 150_000, jump = true, t
                 await page.waitForTimeout(300);
             }
             prev = -1; stuck = 0;
-            if ((await sense(page)).state === ST.PLAYING) await press();
+            if ((await sense(page, { forwardOnly: true })).state === ST.PLAYING) await press();
             continue;
         }
         // ① 앞에 적 — **걷기 속도로 전진하며 계속 뛴다**(포고 워크).
@@ -293,7 +296,7 @@ async function runTo(page, col, { run = true, budgetMs = 150_000, jump = true, t
             // A. 접근 — 걷기로만. 접근 중에는 뛰지 않는다. 걸으면서 뛰면 착지
             //    지점이 적의 옆이 되어 착지 프레임에 측면 피격된다 (실측: 82 열).
             for (let k = 0; k < 60; k++) {
-                const w = await sense(page);
+                const w = await sense(page, { forwardOnly: true });
                 if (w.state !== ST.PLAYING) break;
                 if (w.en === null || w.en < 80) break;
                 if (w.px >= target) break;
@@ -305,7 +308,7 @@ async function runTo(page, col, { run = true, budgetMs = 150_000, jump = true, t
             //    밟을 수 없는 적(스파이크샤드 · 이동 중 셸)은 크게 뛰어 넘는다.
             await up(page, 'ArrowRight');
             if (!unsafe) {
-                const rs = await stompNext(page, { tries: 3 });
+                const rs = await stompNext(page, { tries: 3, forwardOnly: true });
                 // C. **줄지어 선 적** 대응. 266·271·276 열은 5 칸 간격이라 세 마리가
                 //    활성 범위(±64px) 안에 함께 들어오고, 한 마리를 밟아 셸로 만든
                 //    자리에 서 있으면 다음 마리에 측면 피격된다 (실측: 267~271 열에서
@@ -322,7 +325,7 @@ async function runTo(page, col, { run = true, budgetMs = 150_000, jump = true, t
                 //    (실측: BIG 등급으로도 268 열에서 전멸). 거리를 보며 물러난다.
                 if (rs.stomped) {
                     for (let k = 0; k < 30; k++) {
-                        const w = await sense(page);
+                        const w = await sense(page, { forwardOnly: true });
                         if (w.state !== ST.PLAYING) break;
                         // 다음 표적이 밟기 발동 거리(135px) 밖으로 나가면 충분하다.
                         if (w.en === null || w.en > 150) break;
@@ -338,7 +341,7 @@ async function runTo(page, col, { run = true, budgetMs = 150_000, jump = true, t
                 }
             } else {
                 for (let hop = 0; hop < 12; hop++) {
-                    const w = await sense(page);
+                    const w = await sense(page, { forwardOnly: true });
                     if (w.state !== ST.PLAYING) break;
                     if (w.en === null || w.en > 260) break;
                     await down(page, 'ArrowRight');
@@ -351,7 +354,7 @@ async function runTo(page, col, { run = true, budgetMs = 150_000, jump = true, t
                     }
                 }
             }
-            if ((await sense(page)).state === ST.PLAYING) await press();
+            if ((await sense(page, { forwardOnly: true })).state === ST.PLAYING) await press();
             stuck = 0; prev = -1;
             continue;
         }
@@ -757,58 +760,26 @@ async function scCamera(page) {
 
 async function scEnemy(page) {
     t.ok(await start(page), 'PLAYING 진입');
-    // 첫 적을 향해 **걸어서** 접근한다 (runTo 는 적을 뛰어 넘으므로 쓰지 않는다).
-    await down(page, 'ArrowRight');
-    for (let i = 0; i < 120; i++) {
-        await page.waitForTimeout(80);
-        const s = await sense(page);
-        if (s.state !== ST.PLAYING) break;
-        if (s.en !== null && s.en < 210) break;
+    // The old 120px/160ms bot mixed the 32px tile calibration with the current
+    // 24px game. Read every game frame in-page so a short shell state is captured
+    // before the next Node/browser round trip. Assertions still inspect the game.
+    const r = await exerciseShell(page, TILE);
+    if (r.error) {
+        t.ok(false, r.error + ' — ' + JSON.stringify(r));
+        return;
     }
-    await release(page);
-    t.ok(Number((await snap(page)).dbg_active_enemies) > 0, '적 활성화 범위 동작');
-
-    const r = await stompNext(page);
-    const { stomped, shellAtStomp, shellVxAtStomp } = r;
-    await release(page);
-
-    // 밟힌 슬롯을 **찾아서** 본다. 0 번으로 고정하면 안 된다 — 봇이 어느 적을
-    // 밟았는지는 접근 경로에 따라 달라져서, 0 번을 지나친 뒤 1 번을 밟으면
-    // 셸 상태 검사가 엉뚱한 슬롯을 읽는다 (실측: est=0, evx=-1).
-    // 슬롯 0 으로 되돌리면 안 된다 — 0 번은 250 열의 다른 적이라 셸 검사가
-    // 전혀 관련 없는 슬롯을 읽고 "8016 → 8016 (움직이지 않음)" 처럼 실패한다.
-    // 셸(1) 이 없으면 이동 중인 셸(2) 까지 찾는다: 포고 도중 방금 만든 셸을
-    // 그대로 차 버렸을 수 있다.
-    const est0 = (await L(page, 'en_state')).map(Number);
-    let shellIdx = shellAtStomp >= 0 ? shellAtStomp : est0.findIndex(v => v === 1);
-    if (shellIdx < 0) shellIdx = est0.findIndex(v => v === 2);
-    const ENI = shellIdx;
-    const s1 = await snap(page);
-    t.ok(stomped, `위에서 밟기 성공 (stomps=${s1.dbg_stomps})`);
-    t.eq(s1.dbg_stomps, 1, '한 번 밟으면 한 번만 판정 (중복 없음)');
-    t.ok(s1.score >= 100, `밟기 점수 획득 (score=${s1.score})`);
-    t.ok(shellAtStomp >= 0, `밟힌 적이 셸 정지 상태(1) (slot=${shellAtStomp})`);
-    t.eq(shellVxAtStomp, 0, '정지한 셸의 속도 0');
-
-    // 셸 차기 — 옆에서 접촉. 셸이 플레이어의 **어느 쪽**에 있는지 보고 그 방향으로
-    // 걷는다 (항상 오른쪽으로 가면 셸이 왼쪽에 있을 때 영원히 못 찬다).
-    await page.waitForTimeout(400);
-    let kicked = false;
-    for (let i = 0; i < 24 && !kicked; i++) {
-        const s = await snap(page);
-        const sx = Number((await L(page, 'en_x'))[ENI]);
-        const dir = s.px < sx ? 'ArrowRight' : 'ArrowLeft';
-        await down(page, dir); await page.waitForTimeout(120); await up(page, dir);
-        kicked = Number((await snap(page)).dbg_kicks) > 0;
-    }
-    const s2 = await snap(page);
-    t.ok(kicked, `정지한 셸 차기 (kicks=${s2.dbg_kicks})`);
-    t.eq(s2.dbg_deaths, 0, '셸 차기는 피격이 아니다 (deaths=0)');
-    t.eq(Number((await L(page, 'en_state'))[ENI]), 2, '차인 셸이 이동 상태(2)');
-    const kx0 = Number((await L(page, 'en_x'))[ENI]);
-    await page.waitForTimeout(700);
-    const kx1 = Number((await L(page, 'en_x'))[ENI]);
-    t.ok(Math.abs(kx1 - kx0) > 60, `차인 셸이 실제로 날아간다 (${kx0.toFixed(0)} → ${kx1.toFixed(0)})`);
+    const { initial, approach, stomp, kick, travel, index } = r;
+    t.ok(approach.active > 0, '적 활성화 범위 동작');
+    t.eq(stomp.kinds[index], 'r', '관측 대상은 셸로 변하는 롤스톤');
+    t.eq(stomp.stomps - initial.stomps, 1, '한 번 밟으면 한 번만 판정 (중복 없음)');
+    t.ok(stomp.score - approach.score >= 100, '밟기 점수 획득');
+    t.eq(stomp.states[index], 1, '밟힌 적이 셸 정지 상태(1)');
+    t.eq(stomp.vxs[index], 0, '정지한 셸의 속도 0');
+    t.eq(kick.kicks - initial.kicks, 1, '정지한 셸 차기');
+    t.eq(travel.deaths, initial.deaths, '셸 차기는 피격이 아니다');
+    t.eq(kick.states[index], 2, '차인 셸이 이동 상태(2)');
+    t.ok(Math.abs(kick.vxs[index]) > 0, '차인 셸의 속도');
+    t.ok(Math.abs(travel.xs[index] - kick.xs[index]) > TILE * 2.5, '차인 셸이 실제로 날아간다');
 }
 
 async function scHurt(page) {

@@ -56,12 +56,14 @@ npm start            # → http://localhost:3000
 | entryjs **소스** (`src/`) | [github.com/entrylabs/entryjs](https://github.com/entrylabs/entryjs) | 선택사항 — `node scripts/setup.mjs --with-entryjs-src` 로만 클론. `build:registry`·소스 ground-truth 인용에만 필요, 편집기 동작엔 불필요 |
 | entry-tool | entrylabs **공개** repo | `dist/develop` 브랜치 자동 클론 (실패 시 정적 파일 다운로드 폴백) |
 | entry-paint · entry-lms · sound-editor · legacy-video | playentry.org · code.205.kr **정적 서빙** | 빌드가 공개 repo/npm 에 없는 패키지들 — 형제 `../MYentry` 있으면 링크, 없으면 편집기가 로드하는 **빌드 파일만 자동 다운로드** (legacy-video 의 GitHub repo 는 소스만 있어 클론으로는 부팅 불가) |
-| vendor (jQuery·jQuery-UI·lodash·CreateJS·Velocity·CodeMirror·React·socket.io) | npm | 임시 설치 후 dist 파일만 `public/lib/vendor/` 로 복사 + preload-js 패치 |
+| vendor (jQuery·jQuery-UI·lodash·EaselJS·Velocity·CodeMirror·React·socket.io) | npm | 임시 설치 후 dist 파일만 `public/lib/vendor/` 로 복사 |
+| 소리 vendor (PreloadJS·SoundJS·FlashAudioPlugin) | 공식 CreateJS 고정 커밋 | [setup-audio.mjs](scripts/setup-audio.mjs)가 0.6.0 배포본의 SHA-256을 검증하고 로컬 설치 |
 | mascot 이미지·커서 | **repo 에 커밋됨** | 형제 `../MYentry` 있으면 최신으로 갱신만 |
 
-✅ **순수 외부 클론(형제 저장소 없음)도 편집기 완전 부팅 + 헤드리스 검증까지 동작한다.**
-필요한 건 인터넷 연결뿐. setup 마지막의 `verify editor boot files` 단계가 부팅 필수 파일
-전부를 점검하므로, 이 단계가 OK 면 환경은 완성이다.
+형제 저장소 없이 설치할 수 있다. Node·npm·Git·tar와 설치 시 인터넷 접속이 필요하고,
+헤드리스 검증에는 Chromium 및 OS 실행 의존성도 필요하다.
+`verify editor boot files … OK`는 설치 파일 검사이며 실제 부팅·로드·소리 출력은 L3,
+작품별 동작은 L4로 확인한다. [재현 조건과 검증 근거](knowledge/17-cold-clone.md)를 따른다.
 
 ### 3. 작업 사이클 (spec → `.ent` → 테스트)
 ```bash
@@ -90,8 +92,8 @@ node tools/run-all-verify.mjs --filter bounce-ball                              
 |------|------|-------------|
 | `window.PUBLIC_PATH_FOR_ENTRYJS = 'lib/entry-js/dist/'` | [`public/js/editor.js`](public/js/editor.js) | `entry.min.js` 가 async chunk(`522.*.js` 등) 를 찾는 경로 지정 |
 | `Entry.init(el, { type:'workspace', hardwareEnable:false, textCodingEnable:false, libDir:'', entryDir:'' })` | editor.js `initEntry` | **HW 동반앱(`localhost:23518` WebSocket) 연결 시도 차단**(콘솔 에러 폭주 방지) + 텍스트코딩 비활성 |
-| SoundJS `_parsePath` 방어 래핑 | editor.js `patchCreateJSSoundParsePath` | npm `soundjs` 1.x 가 src=undefined 사운드에서 `toString` throw(실제 playentry 0.6.0 은 무시) → 가드 |
-| preload-js 말미 `;module.exports=window.createjs;` 제거 | [`scripts/setup.mjs`](scripts/setup.mjs) `patchPreloadjs` | 브라우저에서 `module is not defined` 방지 |
+| 소리 vendor 실제 버전 검사 | editor.js `checkAudioVersions` | 불일치 시 초기화 중단·복구 명령 표시. 예외를 삼켜 무음으로 실행되는 것을 방지 |
+| 공식 소리 vendor 설치·해시 검사 | [`scripts/setup-audio.mjs`](scripts/setup-audio.mjs) | PreloadJS·SoundJS 0.6.0 호환 세트 고정. [진단·회귀 검사 정본](knowledge/15-audio-verification.md) |
 
 ### B. 로드·테스트 적응 — `.ent` 왕복 + 헤드리스 검증
 
@@ -402,6 +404,7 @@ Field 슬롯에 `{"type":"text",...}`로 감싸면 엔진이 "text 블록의 결
 - `Entry.container.objects_.length > 0`, `Entry.scene.scenes_.length > 0`
 - 2 초 대기 후 `_warningBlock` 가 한 개도 없는지 (블록 type·params 형태가 유효)
 - round-trip export (Entry → `/api/export` → gzip 마법 숫자 확인)
+- WAV·MP3 네이티브 블록의 실제 출력·음소거, 음원 바이트를 보존한 내보내기 왕복 재생, 잘못된 소리 vendor 부팅 차단 ([검증 정본](knowledge/15-audio-verification.md))
 
 ### Layer 4. verify-runtime (`npm run verify:runtime`)
 
@@ -412,7 +415,7 @@ Field 슬롯에 `{"type":"text",...}`로 감싸면 엔진이 "text 블록의 결
 - 클릭 hit-test — `Entry.dispatchEvent('entityClick', e)` (핸들러 로직) + `page.mouse.click(px, py)` (pixel hit-test)
 - 좌표 변환 검증 (stage 논리 480×270 ↔ canvas 렌더 픽셀)
 
-`node tools/run-all-verify.mjs --list`로 서버 없이 목록을 확인한다. `--filter <name>`으로 일부만, `--timeout-ms 600000`으로 스크립트별 제한 시간을 지정한다(기본 10분). 실패·시간 초과는 전체 실패로 집계하며 직접 띄운 서버는 종료한다. `--keep-server`는 서버를 유지한다. 개인 원본 인자가 필요한 `verify-case-study-evidence.mjs`는 사유를 출력하고 제외한다. 실행 전에 브라우저 설치 여부를 한 번 확인한다.
+`node tools/run-all-verify.mjs --list`로 서버 없이 목록을 확인한다. `--filter <name>`으로 일부만, `--timeout-ms 600000`으로 스크립트별 제한 시간을 지정한다(기본 10분). 실패·시간 초과는 전체 실패로 집계하며 직접 띄운 서버는 종료한다. `--keep-server`는 서버를 유지한다. 개인 원본 인자가 필요한 `verify-case-study-evidence.mjs`와 공식 앱 설치 경로가 필요한 `verify-audio-offline.mjs`는 사유를 출력하고 제외한다. 실행 전에 브라우저 설치 여부를 한 번 확인한다.
 
 ### Layer 5. knowledge links (`npm run verify:links`, < 1 초)
 
@@ -484,10 +487,10 @@ npm run verify   # smoke + verify:links + e2e + verify:runtime 순차
 4. **Mascot 이미지 + 커서** — repo 에 커밋돼 있음. 형제 `../MYentry` 있으면 최신으로 덮어쓰기만.
 5. **Vendor npm 패키지** — jQuery / jQuery-UI / lodash / Velocity / CodeMirror / React / CreateJS 등을
    임시 설치 후 dist 파일만 `public/lib/vendor/` 로.
-6. **preload-js 패치** — `;module.exports=window.createjs;` 제거 (`module is not defined` 방지).
-7. **부팅 파일 검사** — `editor.html` 이 로드하는 필수 파일 전부 존재 확인. 여기가 OK 면 부팅 보장.
+6. **소리 vendor 설치** — 공식 PreloadJS·SoundJS 0.6.0 배포본을 고정 커밋·해시로 검증하여 설치.
+7. **부팅 파일 검사** — `editor.html` 필수 파일의 존재와 소리 vendor 해시 검사. 실제 소리 출력은 별도 런타임 검사로 확인.
 
-벤더만 스킵: `node scripts/setup.mjs --skip-vendor`. entryjs 버전 핀을 올렸으면
+npm vendor만 스킵: `node scripts/setup.mjs --skip-vendor` (소리 vendor 검사는 유지). entryjs 버전 핀을 올렸으면
 `node scripts/setup.mjs --with-entryjs-src` 후 `npm run build:registry` 로 레지스트리 재생성.
 (⚠️ setup 에 플래그를 줄 땐 `node scripts/setup.mjs` 직접 호출 — PowerShell 은 `npm run setup -- --flag` 의 인자를 삼킨다.)
 

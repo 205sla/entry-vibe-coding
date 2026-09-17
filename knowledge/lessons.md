@@ -10,6 +10,8 @@
 
 ## 편집기 부팅
 
+- [2026-09-17] 아래 2026-04-23의 SoundJS 래퍼·preload-js strip은 폐기됐다. 현재 가드는 [공식 오디오 설치·검증](15-audio-verification.md)이며 예외를 무시한 부팅은 무음을 숨겼다.
+- [2026-09-17] Git Bash 설치·저장소 밖 링크·Brick Kingdom 봇 실패 — 재현과 가드: [17 콜드 클론](17-cold-clone.md#재발-방지-검사).
 - [2026-04-23] SoundJS `_parsePath`가 undefined src로 crash — 가드: [`public/js/editor.js`](../public/js/editor.js) `patchCreateJSSoundParsePath` (defensive wrapper)
 - [2026-04-23] preload-js npm dist 말미의 `;module.exports=window.createjs;`가 브라우저에서 `module is not defined` — 가드: [`scripts/setup.mjs`](../scripts/setup.mjs) perl strip
 - [2026-04-23] 하드웨어 모듈이 `ws://127.0.0.1:23518` 연결 실패 로그 스팸 — 가드: [`editor.js`](../public/js/editor.js) init option `hardwareEnable: false`

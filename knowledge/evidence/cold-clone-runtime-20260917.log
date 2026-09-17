@@ -1,0 +1,63 @@
+[runner] excluded tools/verify-audio-offline.mjs: requires an installed official Entry app and --entry-exe; see knowledge/15-audio-verification.md
+[runner] excluded tools/verify-case-study-evidence.mjs: requires --source and --evidence; see knowledge/evidence/README.md
+PASS games/audio-check/verify.mjs (11.3s)
+FAIL games/brick-kingdom/verify.mjs (600.2s)
+Timed out
+  ✓ 밟힌 적이 셸 정지 상태(1)
+  ✓ 정지한 셸의 속도 0
+  ✓ 정지한 셸 차기
+  ✓ 셸 차기는 피격이 아니다
+  ✓ 차인 셸이 이동 상태(2)
+  ✓ 차인 셸의 속도
+  ✓ 차인 셸이 실제로 날아간다
+  ✓ [6] 적 밟기·셸 정지·차기: console error 0
+
+── [7] 측면 접촉 피격·사망·재시작
+  ✓ PLAYING 진입
+  ✓ 측면 접촉으로 피격·사망 (deaths=1)
+  ✓ 사망 원인 = 적 접촉(2)
+  ✓ 사망 후 자동 재시작 → PLAYING 복귀
+  ✓ 사망으로 목숨 1 감소 (연출 종료 시점)
+  ✓ 재시작 시 파워 초기화
+  ✓ 재시작 카운터 증가
+  ✓ [7] 측면 접촉 피격·사망·재시작: console error 0
+
+── [8] 추락 사망
+  ✓ PLAYING 진입
+  ✓ 구멍 앞(58 열) 도달
+  ✓ 구멍으로 추락 (cause=1)
+  ✓ 사망 원인 = 추락(1)
+  ✓ 사망 연출 중 좌표 폭주 없음 (py=283)
+  ✓ [8] 추락 사망: console error 0
+
+── [9] 고속 낙하 바닥 관통 방지
+  ✓ PLAYING 진입
+
+PASS games/hexo/verify.mjs (30.1s)
+PASS games/number-to-hangul/verify.mjs (7.0s)
+PASS games/online-match/verify-casual.mjs (23.9s)
+PASS games/online-match/verify.mjs (56.5s)
+PASS games/vampire-survival/verify.mjs (19.3s)
+PASS tools/verify-bounce-ball.mjs (9.9s)
+PASS tools/verify-bullet-circle.mjs (18.8s)
+PASS tools/verify-bullethell.mjs (12.3s)
+PASS tools/verify-circle-recursive.mjs (9.0s)
+PASS tools/verify-clock-run.mjs (8.7s)
+PASS tools/verify-clock.mjs (7.6s)
+PASS tools/verify-coord-test.mjs (7.0s)
+PASS tools/verify-es-hangul-demo.mjs (18.9s)
+PASS tools/verify-es-hangul.mjs (8.8s)
+PASS tools/verify-fibonacci.mjs (10.9s)
+PASS tools/verify-frontier-guard.mjs (49.9s)
+PASS tools/verify-fruit-hunt.mjs (9.6s)
+PASS tools/verify-healthbar-brush.mjs (8.4s)
+PASS tools/verify-media-art.mjs (18.0s)
+PASS tools/verify-name-circle-anim.mjs (25.0s)
+PASS tools/verify-name-circle.mjs (18.0s)
+PASS tools/verify-name-loop.mjs (8.4s)
+PASS tools/verify-platformer.mjs (12.6s)
+PASS tools/verify-recursion.mjs (38.0s)
+PASS tools/verify-repeat-timing.mjs (9.8s)
+PASS tools/verify-textbox-click.mjs (8.3s)
+PASS tools/verify-textbox-layout.mjs (9.2s)
+[runner] passed: 28, failed: 1

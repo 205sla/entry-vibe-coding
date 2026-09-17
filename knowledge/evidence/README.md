@@ -12,6 +12,15 @@
 
 ## 음악 동기화 실행 근거
 
+오디오의 2026-09-11 기록은 [audio-verification-20260911.json](audio-verification-20260911.json)에 있다.
+이는 해당 날짜의 호스트·공식 오프라인·사용자 웹 관측을 구분한 역사 근거다. 이번 main 반영 후보의
+재현 범위는 [17 콜드 클론](../17-cold-clone.md), 실행 절차는 [15 소리 검증](../15-audio-verification.md)을 따른다.
+
+2026-09-17의 새 사본 설치·오디오·검증 결과와 해시는
+[cold-clone-20260917.json](cold-clone-20260917.json)에, 알려진 Brick Kingdom 실패의
+실제 출력은 [brick-kingdom-runtime-20260917.log](brick-kingdom-runtime-20260917.log)에 있다.
+이는 로컬 호스트의 실행 근거이며 공식 웹·오프라인 앱을 이번에 재검증한 기록은 아니다.
+
 [music-sync-20260915.json](music-sync-20260915.json)은 2026-09-15의 별도 외부 작품 실행 기록이다.
 위 5개 정적 사례와 다르며, [16 음악 동기화](../16-music-synchronization.md)에 측정 방법과 범위를 정리했다.
 파일·로그 해시와 최소 집계만 담아 원본 대본·에셋을 포함하지 않는다. 집계는 원본 로그에서 재계산해 대조했지만,

@@ -32,7 +32,10 @@ function walk(dir, out = []) {
             || name === 'public' || name === 'vendor-install' || name === 'test-results'
             || name === 'temp') continue;
         const full = path.join(dir, name);
-        const st = fs.statSync(full);
+        const st = fs.lstatSync(full);
+        // A linked directory can escape the checkout or introduce a cycle.
+        // Explicit links to its contents are still checked by checkLink.
+        if (st.isSymbolicLink()) continue;
         if (st.isDirectory()) walk(full, out);
         else if (name.endsWith('.md')) out.push(full);
     }
@@ -111,7 +114,12 @@ function anchorMatches(headings, anchor) {
 
 // ── Resolve link target ──────────────────────────────────────────
 
-function checkLink(link, headingsByFile) {
+function outside(root, target) {
+    const relative = path.relative(root, target);
+    return relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative);
+}
+
+export function checkLink(link, headingsByFile, root = ROOT) {
     const u = link.url;
     // External — skip
     if (/^(https?:|mailto:|ftp:|tel:)/i.test(u)) return null;
@@ -130,9 +138,21 @@ function checkLink(link, headingsByFile) {
     const [filePart, anchorPart] = u.split('#');
     if (!filePart) return null;  // shouldn't happen after the # check above
 
-    const targetAbs = path.resolve(path.dirname(link.file), filePart);
+    let decodedFile;
+    try { decodedFile = decodeURIComponent(filePart).replace(/\\/g, '/'); }
+    catch { return { ...link, reason: 'invalid percent encoding in local path' }; }
+    if (path.posix.isAbsolute(decodedFile) || path.win32.isAbsolute(decodedFile)) {
+        return { ...link, reason: 'absolute local path is not portable' };
+    }
+    const targetAbs = path.resolve(path.dirname(link.file), decodedFile);
+    if (outside(root, targetAbs)) {
+        return { ...link, reason: 'local link escapes repository; use a public source URL or an in-repo reference' };
+    }
     if (!fs.existsSync(targetAbs)) {
         return { ...link, reason: `target file not found: ${path.relative(ROOT, targetAbs)}` };
+    }
+    if (outside(fs.realpathSync(root), fs.realpathSync(targetAbs))) {
+        return { ...link, reason: 'local link resolves outside repository through a symlink' };
     }
     if (!anchorPart) return null;
     // Markdown anchor — only check for .md targets
@@ -146,6 +166,7 @@ function checkLink(link, headingsByFile) {
 
 // ── Main ─────────────────────────────────────────────────────────
 
+function main() {
 const files = walk(ROOT).sort();
 if (!QUIET) console.log(`[links] scanning ${files.length} markdown files...`);
 
@@ -186,4 +207,9 @@ if (broken.length > 0) {
     console.log('[links] all good ✓');
 }
 
-process.exit(broken.length > 0 ? 1 : 0);
+return broken.length > 0 ? 1 : 0;
+}
+
+if (process.argv[1] && import.meta.url === url.pathToFileURL(path.resolve(process.argv[1])).href) {
+    process.exitCode = main();
+}

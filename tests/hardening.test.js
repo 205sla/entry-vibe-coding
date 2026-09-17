@@ -132,7 +132,7 @@ test('every fixture source builds with automatic validation and embedded local a
 test('runtime discovery includes nested game verifiers, excludes argument-only CLI and propagates failure/timeout', async t => {
     const { discoverScripts, runScript } = await import('../tools/run-all-verify.mjs');
     const root = await fs.mkdtemp(path.join(os.tmpdir(), 'entry-runner-test-'));
-    const names = ['tools/verify-a.mjs', 'tools/verify-case-study-evidence.mjs', 'games/demo/verify.mjs', 'games/demo/nested/verify-extra.mjs', 'games/demo/spec.mjs'];
+    const names = ['tools/verify-a.mjs', 'tools/verify-case-study-evidence.mjs', 'tools/verify-audio-offline.mjs', 'games/demo/verify.mjs', 'games/demo/nested/verify-extra.mjs', 'games/demo/spec.mjs'];
     for (const name of names) {
         await fs.mkdir(path.dirname(path.join(root, name)), { recursive: true });
         await fs.writeFile(path.join(root, name), name.includes('extra') ? 'process.exitCode = 2;' : 'console.log("ok");');
@@ -145,7 +145,7 @@ test('runtime discovery includes nested game verifiers, excludes argument-only C
     });
     const found = discoverScripts(root);
     assert.deepEqual(found.scripts, ['games/demo/nested/verify-extra.mjs', 'games/demo/verify.mjs', 'tools/verify-a.mjs']);
-    assert.equal(found.excluded.length, 1);
+    assert.equal(found.excluded.length, 2);
     assert.equal((await runScript('tools/verify-a.mjs', { root })).code, 0);
     assert.equal((await runScript('games/demo/nested/verify-extra.mjs', { root })).code, 2);
     await fs.writeFile(path.join(root, 'tools/verify-a.mjs'), 'setInterval(() => {}, 1000);');

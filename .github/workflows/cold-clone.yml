@@ -1,0 +1,56 @@
+name: Cold clone verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      CI: '1'
+      PORT: '3317'
+      BASE_URL: http://localhost:3317
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Confirm no sibling repositories
+        run: |
+          test ! -e ../entryjs
+          test ! -e ../MYentry
+      - name: Install and exercise setup from a clean checkout
+        run: |
+          export PATH="/usr/bin:$PATH"
+          tar --version
+          npm ci
+          npm run setup
+          node scripts/setup.mjs --skip-vendor
+          npx playwright install --with-deps chromium
+      - name: Verify generation, links, audio and game behavior
+        run: |
+          export PATH="/usr/bin:$PATH"
+          node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --check
+          npm run verify 2>&1 | tee verification.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-${{ matrix.os }}
+          path: |
+            verification.log
+            test-results/
+            games/audio-check/verification.json
