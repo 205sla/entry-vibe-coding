@@ -100,7 +100,7 @@ test('semantic validation accepts declared scopes, sentinels, scene names and st
     assert.deepEqual(validateSpec(spec).filter(issue => issue.severity === 'error'), []);
     const result = await buildProject(spec);
     assert.equal(result.project.variables[0].object, 'o');
-    assert.equal(result.project.objects[0].scene, 's');
+    assert.equal(result.project.objects[0].scene, result.project.scenes[0].id);
     assert.equal(JSON.parse(result.project.objects[0].script)[0].length, 4);
     const badFn = structuredClone(spec);
     badFn.functions[0].content = JSON.stringify([[{ type: 'get_variable', params: ['missing', null] }]]);

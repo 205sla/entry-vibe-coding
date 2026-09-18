@@ -39,6 +39,7 @@ import { checkSpecReferences } from './lib/spec-references.mjs';
 const require = createRequire(import.meta.url);
 const { makeTar } = require('../lib/tar-portable.js');
 const { createAssetBundler } = require('../lib/asset-bundler.js');
+const { finalizeGeneratedProject } = require('../lib/project-data.js');
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const REGISTRY_PATH = path.resolve(__dirname, 'block-registry.json');
@@ -356,14 +357,6 @@ function buildAssets(_spec) {
 export async function buildProject(spec) {
     const errors = validateSpec(spec).filter(issue => issue.severity === 'error');
     if (errors.length) throw new Error('Invalid spec:\n' + errors.map(issue => issue.path + ': ' + issue.msg).join('\n'));
-    // Scene ids are plain 4-char random (same style as objects/pictures).
-    // Entry's starter project uses '7dwq' (see entryjs src/class/project.js:82),
-    // but that's only an implementation detail of the no-args Entry.loadProject().
-    // When loading user .ent files we call Entry.clearProject() first
-    // (editor.js:loadEntFile), which resets Entry.scene.scenes_ entirely — so any
-    // scene id loads cleanly. Real playentry.org projects also have arbitrary
-    // scene ids (users delete the initial scene, add new ones, etc.).
-    // Regression guard: tests/fixtures/spec-scene-custom-id.json uses 'zzzz'.
     const specScenes = spec.scenes || [{ name: '장면 1' }];
     const scenes = specScenes.map((s, i) => ({
         name: s.name || `장면 ${i + 1}`,
@@ -561,6 +554,7 @@ export async function buildProject(spec) {
     // AI Learning model id — optional; pass through when spec provides it.
     // (entrylabs/docs project-data typedef: `learning: ID`.)
     if (spec.learning) project.learning = spec.learning;
+    finalizeGeneratedProject(project, loadRegistry().blocks);
 
     const projectJson = {
         name: 'temp/project.json',

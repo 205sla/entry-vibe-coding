@@ -18,6 +18,7 @@ const {
 } = require('./lib/tar-portable.js');
 // Asset bundling (image rasterize + thumb + tar layout) is shared with make-ent.
 const { createAssetBundler } = require('./lib/asset-bundler.js');
+const { restoreBuildMetadata } = require('./lib/project-data.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -224,6 +225,7 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
             }
         }
 
+        restoreBuildMetadata(project);
         const projectJson = {
             name: 'temp/project.json',
             data: Buffer.from(JSON.stringify(project), 'utf8'),

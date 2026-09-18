@@ -101,19 +101,20 @@ async function clickSlotByDirection(dir) {
 }
 
 const t = createReporter();
+const sceneIds = await page.evaluate(() => Object.fromEntries(Entry.scene.scenes_.map(scene => [scene.name, scene.id])));
 
 // ── Step 0: intro → play ──
 console.log('\n=== Step 0: intro 장면 + play 진입 ===');
 await runFresh(page);
 await page.waitForTimeout(500);
 let s = await dumpState();
-t.eq(s.sceneId, 'intro', '런 직후 sceneId = intro');
+t.eq(s.sceneId, sceneIds['시작 화면'], '시작 화면 진입');
 
 await clickById('intro_start_btn');
 await page.waitForTimeout(1500);  // 슬롯 spawn 시간
 s = await dumpState();
 console.log(`  scene=${s.sceneId}, gold=${s.gold}, life=${s.life}, prep=${s.prep_done}`);
-t.eq(s.sceneId, 'play', 'play 장면 진입');
+t.eq(s.sceneId, sceneIds['게임 화면'], '게임 화면 진입');
 t.eq(s.gold, 100, '초기 골드 100');
 t.eq(s.life, 5, '초기 체력 5');
 t.eq(s.prep_done, 0, '준비 단계 (prep_done=0)');

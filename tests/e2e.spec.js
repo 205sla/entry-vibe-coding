@@ -4,11 +4,67 @@
 const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const path = require('node:path');
+const zlib = require('node:zlib');
+const { extractTarFile } = require('../lib/tar-portable.js');
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 const FIXTURES = fs.existsSync(FIXTURES_DIR)
     ? fs.readdirSync(FIXTURES_DIR).filter(n => n.endsWith('.ent'))
     : [];
+
+test('built projects run scene transitions and functions after repeated editor saves', async ({ page }) => {
+    const { buildProject } = await import('../tools/make-ent.mjs');
+    const { when, startScene, setVar, fn, call } = await import('../tools/lib/spec-dsl.mjs');
+    const { project, buffer } = await buildProject({
+        name: 'Scene test',
+        scenes: [{ id: 'intro', name: 'Intro' }, { id: 'play', name: 'Play' }],
+        variables: [{ id: 'state', name: 'state', value: 0 }],
+        functions: [fn.normal('back', [], () => [startScene('intro')])],
+        objects: [
+            { name: 'Intro object', scene: 'intro', script: [
+                [when.run(), startScene('play')],
+                [when.sceneStart(), setVar('state', 1)],
+            ] },
+            { name: 'Play object', scene: 'play', script: [
+                [when.sceneStart(), setVar('state', 2)],
+                [when.keyPressed(65), call('back')],
+            ] },
+        ],
+    });
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto('/editor.html');
+    await expect(page.locator('#status')).toHaveText('준비됨');
+    let payload = buffer;
+    for (let pass = 0; pass < 2; pass++) {
+        await page.locator('#open-ent').setInputFiles({ name: 'scene-test.ent', mimeType: 'application/gzip', buffer: payload });
+        await expect(page.locator('#status')).toContainText('불러오기 완료');
+        await expect(page.locator('body')).not.toContainText('entry_vibe_coding_v1_');
+        await page.locator('.entryRunButtonWorkspace_w').click();
+        await expect.poll(() => page.evaluate(() => ({
+            scene: Entry.scene.selectedScene.name,
+            state: Number(Entry.variableContainer.getVariable('state').getValue()),
+        }))).toEqual({ scene: 'Play', state: 2 });
+        await page.keyboard.press('a');
+        await expect.poll(() => page.evaluate(() => ({
+            scene: Entry.scene.selectedScene.name,
+            state: Number(Entry.variableContainer.getVariable('state').getValue()),
+        }))).toEqual({ scene: 'Intro', state: 1 });
+        await page.locator('.entryStopButtonWorkspace_w').click();
+        await expect.poll(() => page.evaluate(() => Entry.engine.state)).toBe('stop');
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole('button', { name: '내 컴퓨터에 저장', exact: true }).click();
+        const download = await downloadPromise;
+        await expect(page.locator('#status')).toHaveText('저장 완료');
+        payload = fs.readFileSync(await download.path());
+        const saved = JSON.parse(extractTarFile(zlib.gunzipSync(payload), 'temp/project.json'));
+        expect(saved._entryVibeCoding).toEqual(project._entryVibeCoding);
+        expect(saved.scenes.map(scene => ({ name: scene.name, id: scene.id }))).toEqual(project.scenes);
+        expect(saved.objects.map(object => object.scene)).toEqual(project.objects.map(object => object.scene));
+        expect(await page.evaluate(() => Entry.container.getAllObjects().some(object => object._warningBlock))).toBe(false);
+    }
+    expect(errors).toEqual([]);
+});
 
 test('editor UI saves, releases replaced sessions, and reports missing assets without downloading', async ({ page }) => {
     await page.goto('/editor.html');
