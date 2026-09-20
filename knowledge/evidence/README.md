@@ -26,6 +26,20 @@
 파일·로그 해시와 최소 집계만 담아 원본 대본·에셋을 포함하지 않는다. 집계는 원본 로그에서 재계산해 대조했지만,
 로그가 공개되지 않아 이 JSON만으로 재생을 다시 검증할 수는 없다. 아래 정적 assertion 검증기의 입력도 아니다.
 
+## CHROMA 네이티브 리듬게임 실행 근거
+
+[chroma-prism-20260920.json](chroma-prism-20260920.json)은 2026-09-20 제작한
+`chroma_009.ent`의 구조 단언과 별도의 로컬 실행 집계다. [18 CHROMA](../18-chroma-native-rhythm-case-study.md)에
+채보·음악 재개·이미지 배율·초기 화면·입력 검증을 정리했다. 원본 작품·에셋·사이트 코드는 포함하지 않는다.
+
+`assertions`는 아래 도구로 원본 해시와 함께 검사할 수 있다. `localRuntime`과 `packageRuntime`은
+당시 로그에서 뽑은 기록이며, 구조 검사 통과가 그 실행 결과를 재현하는 것은 아니다.
+원본 로그의 해시도 남겼지만 로그 자체는 이 지식 반영에 포함하지 않았다.
+
+```powershell
+node tools/verify-case-study-evidence.mjs --source "C:/작품/chroma_009.ent" --evidence knowledge/evidence/chroma-prism-20260920.json
+```
+
 ## 무엇을 증명하는가
 
 - `source.sha256`: 분석한 원본 압축 파일의 바이트를 고정한다. 이름이 같아도 해시가 다르면 다른 버전이다.

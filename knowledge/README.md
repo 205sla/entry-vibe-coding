@@ -18,6 +18,7 @@
 | 블록 type 이름 / params 쉐이프 / 필드 vs 블록 슬롯 / 설계 패턴 (플랫포머·HUD) | [04-script-and-blocks.md](04-script-and-blocks.md) | Reference + Guide |
 | 편집기가 안 뜨거나 콘솔 에러 / 헤드리스 테스트 / **playentry 기존 작품에 덮어쓰기** | [05-host-editor.md](05-host-editor.md) | Guide |
 | 음악과 장면·자막이 어긋남 / 로딩·준비 지연 / 시계 원점과 표시값 구분 | [16-music-synchronization.md](16-music-synchronization.md) | Guide · 현행 · 로컬 실행 근거 · 2026-09-15 |
+| **리듬게임**의 채보·판정·일시정지 복귀·고해상도 자산·입력 완주 검증 | [18 CHROMA 네이티브 리듬게임](18-chroma-native-rhythm-case-study.md) | Case study · 현행 · 로컬 `.ent` 실행 근거 · 2026-09-20 |
 | Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [07-runtime-quirks.md](07-runtime-quirks.md) | Runtime quirks |
 | **온라인 대전 작품**을 만들 때 (Entry Online 확장 계약·동기화 설계) | [08-entry-online.md](08-entry-online.md) | Reference + Guide |
 | **대규모 RPG**의 맵·복제본·대화·저장 설계를 참고할 때 | [09-rpg-case-study.md](09-rpg-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
@@ -58,6 +59,8 @@
 | 음악 시작 기준 시각·프레임 대조·준비 지연 재현·동기화 검사 범위 | [16 음악 동기화](16-music-synchronization.md) | 10, lessons, evidence |
 | 프로젝트 초시계 START/RESET과 저장값 갱신 지연 | [07 초시계](07-runtime-quirks.md#프로젝트-초시계의-원점과-표시값은-다르다) | 16, lessons |
 | 크기 정하기의 폭·높이 평균 단위와 긴 자막 검사 | [07 크기](07-runtime-quirks.md#크기-정하기는-퍼센트가-아니다) | 03, lessons |
+| 리듬 채보의 공통 시각·저장 위치에서 음악 재개·판정 결과 기반 연출 | [18 CHROMA](18-chroma-native-rhythm-case-study.md) | 16 (일반 동기화), lessons (회귀 확인) |
+| CHROMA의 이미지 치수·배율·초기 표시와 자동 연주/입력 완주의 검증 범위 | [18 화면·검증 사례](18-chroma-native-rhythm-case-study.md#4-선명한-자산과-초기-화면도-작품-데이터다) | evidence (버전 고정·구조 단언) |
 | 기존 script의 단일 파싱 트리·깊은 복제·블록 id와 변경 수 대조 | [04 기존 스크립트 수정](04-script-and-blocks.md#기존-스크립트의-여러-항목을-수정할-때) | 01, lessons |
 | 외부 작품 tar 엔트리 보존과 허용 변경 검사 | [01 부분 수정](01-binary-format.md#기존-작품의-일부만-수정하기) | 16 |
 | 글상자 초기 두 text 필드와 동적 text_write 데이터 출처 | [03 글상자](03-objects-and-assets.md#️-글상자-문자열은-objecttext-와-entitytext-두-곳에-있다) | lessons |
@@ -137,7 +140,7 @@
 
 "이런 걸 하려면 이렇게" 유형. 패턴이 개선되면 기존 글을 고쳐서 최신 방법을 유지.
 
-### Case study — `09~13`, `evidence/`
+### Case study — `09~13`, `18`, `evidence/`
 
 영속 레퍼런스의 사례 분석이다. 파일 버전·관측 범위를 명시하고 증거와 함께 수정한다. 기존 패턴과 엔진 특성은 정본에 링크하고, 작품의 설계 선택만 해당 사례에서 설명한다. 성능 수치나 실행 보장은 실제 측정 전에는 추가하지 않는다.
 
