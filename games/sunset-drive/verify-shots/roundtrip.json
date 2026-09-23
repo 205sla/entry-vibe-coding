@@ -1,0 +1,93 @@
+{
+  "scenario": "roundtrip",
+  "checks": [
+    {
+      "name": "editor export produces a gzip .ent",
+      "ok": true,
+      "detail": {
+        "size": 2166677
+      }
+    },
+    {
+      "name": "re-imported project keeps every picture, sound, block and list item",
+      "ok": true,
+      "detail": {
+        "pictures": 98,
+        "sounds": 8,
+        "blocks": 3031,
+        "lists": 6506
+      }
+    },
+    {
+      "name": "re-imported game boots to the title and animates",
+      "ok": true,
+      "detail": {
+        "state": 0,
+        "frames": 188
+      }
+    },
+    {
+      "name": "re-imported sounds register and decode",
+      "ok": true,
+      "detail": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "name": "re-imported game starts a race",
+      "ok": true
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "no console errors",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "data": {
+    "project": {
+      "objects": 13,
+      "functions": 11,
+      "lists": 26,
+      "variables": 57,
+      "blocks": 3031
+    },
+    "roundtrip": {
+      "ok": true,
+      "size": 2166677,
+      "magic": [
+        31,
+        139
+      ],
+      "before": {
+        "pictures": 98,
+        "sounds": 8,
+        "blocks": 3031,
+        "lists": 6506
+      },
+      "after": {
+        "pictures": 98,
+        "sounds": 8,
+        "blocks": 3031,
+        "lists": 6506
+      }
+    }
+  },
+  "shots": [
+    "verify-shots\\roundtrip-reimported.png"
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "passed": true
+}

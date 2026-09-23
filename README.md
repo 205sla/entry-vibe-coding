@@ -468,6 +468,10 @@ npm run verify   # smoke + verify:links + e2e + verify:runtime 순차
 
 신규 게임은 가장 비슷한 것부터 복사해 수정하면 빠르다. 복합 게임은 `spec-frontier-guard.mjs` 가 좋은 출발점.
 
+아웃런 스타일 유사 3D 레이싱은 [선셋 드라이브 · SUNSET DRIVE](games/sunset-drive/README.md)를 참고한다.
+커브·언덕 도로를 붓 채우기로 매 프레임 그리고 라이벌 7대·3바퀴 랩 타임·엔진 음높이를 블록으로 구현했으며,
+블록별 실행 비용 실측과 키 입력 봇 1위 완주 검증을 포함한다.
+
 ---
 
 ## 처음 설치 (상세) — `npm run setup` 이 하는 일

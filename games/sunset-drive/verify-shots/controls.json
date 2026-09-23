@@ -1,0 +1,138 @@
+{
+  "scenario": "controls",
+  "checks": [
+    {
+      "name": "SPACE starts the countdown (state 1)",
+      "ok": true,
+      "detail": {
+        "state": 1,
+        "cd": 3.1991213462354584,
+        "pD": 1400
+      }
+    },
+    {
+      "name": "car stays on the grid during the countdown",
+      "ok": true,
+      "detail": {
+        "state": 1,
+        "pD": 1400,
+        "speed": 0,
+        "cd": 1.7907925200163377
+      }
+    },
+    {
+      "name": "countdown banner visible",
+      "ok": true
+    },
+    {
+      "name": "GO after ~3.6 s",
+      "ok": true,
+      "detail": 3500
+    },
+    {
+      "name": "holding ↑ accelerates (≥ 180 km/h after 3 s)",
+      "ok": true,
+      "detail": 198
+    },
+    {
+      "name": "releasing ↑ coasts down",
+      "ok": true,
+      "detail": {
+        "before": 8178,
+        "after": 6297
+      }
+    },
+    {
+      "name": "↓ brakes hard (brake lights on)",
+      "ok": true,
+      "detail": {
+        "brake": 1,
+        "from": 6646,
+        "to": 2351
+      }
+    },
+    {
+      "name": "← steers left",
+      "ok": true,
+      "detail": {
+        "from": 0.014849443478723306,
+        "to": -0.6502190082950612
+      }
+    },
+    {
+      "name": "→ steers right",
+      "ok": true,
+      "detail": {
+        "from": -0.6502190082950612,
+        "to": 0.26644432455045797
+      }
+    },
+    {
+      "name": "leaving the asphalt sets offroad and caps speed (~36%)",
+      "ok": true,
+      "detail": {
+        "px": 1.2492647968845298,
+        "speed": 1552
+      }
+    },
+    {
+      "name": "hitting a roadside object crashes the car (crash timer, speed < 20%, pushed toward the road)",
+      "ok": true,
+      "detail": {
+        "speed": 1893,
+        "px": 0.95,
+        "crash": 0.56
+      }
+    },
+    {
+      "name": "P pauses the race (distance and clock frozen)",
+      "ok": true,
+      "detail": {
+        "pD": [
+          59507.4057383562,
+          59507.4057383562
+        ]
+      }
+    },
+    {
+      "name": "P resumes",
+      "ok": true,
+      "detail": {
+        "paused": 0,
+        "raceT": 11.518073359555098
+      }
+    },
+    {
+      "name": "R returns to the title",
+      "ok": true
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "no console errors",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "data": {
+    "project": {
+      "objects": 13,
+      "functions": 11,
+      "lists": 26,
+      "variables": 57,
+      "blocks": 3031
+    }
+  },
+  "shots": [
+    "verify-shots\\controls-countdown.png",
+    "verify-shots\\controls-offroad.png",
+    "verify-shots\\controls-crash.png",
+    "verify-shots\\controls-pause.png"
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "passed": true
+}

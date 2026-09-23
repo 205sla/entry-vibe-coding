@@ -19,6 +19,7 @@
 | 편집기가 안 뜨거나 콘솔 에러 / 헤드리스 테스트 / **playentry 기존 작품에 덮어쓰기** | [05-host-editor.md](05-host-editor.md) | Guide |
 | 음악과 장면·자막이 어긋남 / 로딩·준비 지연 / 시계 원점과 표시값 구분 | [16-music-synchronization.md](16-music-synchronization.md) | Guide · 현행 · 로컬 실행 근거 · 2026-09-15 |
 | **리듬게임**의 채보·판정·일시정지 복귀·고해상도 자산·입력 완주 검증 | [18 CHROMA 네이티브 리듬게임](18-chroma-native-rhythm-case-study.md) | Case study · 현행 · 로컬 `.ent` 실행 근거 · 2026-09-20 |
+| **유사 3D 레이싱**(커브·언덕 도로 렌더러·라이벌 AI·랩 타임·엔진음)과 블록별 실행 비용을 참고할 때 | [19 선셋 드라이브](19-sunset-drive-case-study.md) | Case study · 현행 · 로컬 런타임·키 입력 완주·실서비스 구현 대조 · 2026-09-23 |
 | Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [07-runtime-quirks.md](07-runtime-quirks.md) | Runtime quirks |
 | **온라인 대전 작품**을 만들 때 (Entry Online 확장 계약·동기화 설계) | [08-entry-online.md](08-entry-online.md) | Reference + Guide |
 | **대규모 RPG**의 맵·복제본·대화·저장 설계를 참고할 때 | [09-rpg-case-study.md](09-rpg-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
@@ -61,6 +62,14 @@
 | 크기 정하기의 폭·높이 평균 단위와 긴 자막 검사 | [07 크기](07-runtime-quirks.md#크기-정하기는-퍼센트가-아니다) | 03, lessons |
 | 리듬 채보의 공통 시각·저장 위치에서 음악 재개·판정 결과 기반 연출 | [18 CHROMA](18-chroma-native-rhythm-case-study.md) | 16 (일반 동기화), lessons (회귀 확인) |
 | CHROMA의 이미지 치수·배율·초기 표시와 자동 연주/입력 완주의 검증 범위 | [18 화면·검증 사례](18-chroma-native-rhythm-case-study.md#4-선명한-자산과-초기-화면도-작품-데이터다) | evidence (버전 고정·구조 단언) |
+| 세그먼트 방식 유사 3D 도로 — 투영식·언덕 가림·재귀가 돌아오며 도장(화가 알고리즘)·거리 안개 팔레트 | [19 선셋 드라이브](19-sunset-drive-case-study.md) | 게임 README |
+| 블록별 실행 비용 실측(전역 쓰기 5µs·BigNumber 나눗셈·지역 변수·도장) | [19 §5](19-sunset-drive-case-study.md#5-블록-비용을-재고-설계했다) | 07 (전역 쓰기 한 줄) |
+| 전역 `변수 정하기`는 숨긴 변수여도 모니터 배치 계산 — 반복 안에서는 매개변수·지역 변수 | [07 전역 쓰기](07-runtime-quirks.md#전역-변수-정하기는-숨긴-변수여도-약-5µs--모니터-배치-계산이-매번-돈다) | 19 |
+| 붓 선·채우기 레이어는 처음 만든 순서, 도장은 항상 위 | [07 레이어 순서](07-runtime-quirks.md#붓-선과-채우기-레이어는-처음-만든-순서대로-쌓이고-도장은-항상-그-위다) | 19 |
+| `배경음악 재생하기`는 `소리 재생 속도`와 분리 — 엔진음 음높이와 음악 공존 | [07 BGM](07-runtime-quirks.md#배경음악-재생하기는-소리-재생-속도의-영향을-받지-않는다) | 19, 15 |
+| 크기 정하기는 현재 모양의 치수 기준 — 모양을 바꾼 뒤 다시 정한다 | [07 모양 뒤 크기](07-runtime-quirks.md#크기-정하기는-현재-모양의-치수로-계산된다--모양을-바꾼-뒤-다시-정한다) | lessons, 19 |
+| 사용 블록 구현을 실서비스와 해시로 대조(업로드 없이 호환성 근거) | [05 엔진 사본](05-host-editor.md#2026-09-23-실측--게임이-쓰는-블록실행-경로는-실서비스와-같다) | 19 §8 |
+| 움직이는 썸네일(APNG) — Entry Debugger 변환 예산·달린 거리 기준 캡처(줄무늬 역행 방지)·작은 물체 색을 살리는 팔레트 | [19 §9](19-sunset-drive-case-study.md#9-홍보용-움직이는-썸네일apng) | — |
 | 기존 script의 단일 파싱 트리·깊은 복제·블록 id와 변경 수 대조 | [04 기존 스크립트 수정](04-script-and-blocks.md#기존-스크립트의-여러-항목을-수정할-때) | 01, lessons |
 | 외부 작품 tar 엔트리 보존과 허용 변경 검사 | [01 부분 수정](01-binary-format.md#기존-작품의-일부만-수정하기) | 16 |
 | 글상자 초기 두 text 필드와 동적 text_write 데이터 출처 | [03 글상자](03-objects-and-assets.md#️-글상자-문자열은-objecttext-와-entitytext-두-곳에-있다) | lessons |

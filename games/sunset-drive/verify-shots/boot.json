@@ -1,0 +1,108 @@
+{
+  "scenario": "boot",
+  "checks": [
+    {
+      "name": "title screen state (0) after start",
+      "ok": true,
+      "detail": 0
+    },
+    {
+      "name": "attract mode: demo car drives itself",
+      "ok": true,
+      "detail": {
+        "from": 12816,
+        "to": 32144
+      }
+    },
+    {
+      "name": "attract mode: all 7 rivals drive",
+      "ok": true,
+      "detail": [
+        18744,
+        18443,
+        18186,
+        17886,
+        17832,
+        17747,
+        18014
+      ]
+    },
+    {
+      "name": "title logo and PRESS SPACE are shown, race HUD hidden",
+      "ok": true
+    },
+    {
+      "name": "sky at the top is dark (sunset sky drawn)",
+      "ok": true,
+      "detail": {
+        "gray": 0,
+        "dark": 0.6988562091503268,
+        "colors": 497
+      }
+    },
+    {
+      "name": "asphalt pixels in the lower third (road filled)",
+      "ok": true,
+      "detail": {
+        "gray": 0.35517053453835323,
+        "dark": 0.0884917571188519,
+        "colors": 722
+      }
+    },
+    {
+      "name": "frame has rich detail (>300 distinct colours)",
+      "ok": true,
+      "detail": 1219
+    },
+    {
+      "name": "title/attract fps ≥ 55",
+      "ok": true,
+      "detail": 62.4
+    },
+    {
+      "name": "project structure",
+      "ok": true,
+      "detail": {
+        "objects": 13,
+        "functions": 11,
+        "lists": 26,
+        "variables": 57,
+        "blocks": 3031
+      }
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "no console errors",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "data": {
+    "project": {
+      "objects": 13,
+      "functions": 11,
+      "lists": 26,
+      "variables": 57,
+      "blocks": 3031
+    },
+    "fpsTitle": 62.4,
+    "perfTitle": {
+      "ticks": 515,
+      "workMed": 8.1,
+      "workP95": 9.2,
+      "gapMed": 16.1,
+      "gapP99": 18.6,
+      "gapMax": 31.9
+    }
+  },
+  "shots": [
+    "verify-shots\\boot-title.png"
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "passed": true
+}

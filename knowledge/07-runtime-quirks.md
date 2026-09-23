@@ -1726,3 +1726,81 @@ fontSize를 줄여도 같은 크기 블록이 뒤에서 실행되면 다시 커�
 글자 수만으로 폭을 추정하거나, 보통 sprite의 퍼센트 확대처럼 해석하지 않는다.
 줄바꿈 글상자는 별도로 [height에 의한 세로 잘림](#linebreak-true-는-height-를-넘는-줄을-그리지-않고-버린다)을
 검사한다. 줄 높이는 서체·크기·간격에 따라 달라지므로 줄 수에 곱하는 단일 상수를 일반 규칙으로 삼지 않는다.
+
+## 전역 `변수 정하기`는 숨긴 변수여도 약 5µs — 모니터 배치 계산이 매번 돈다
+
+`set_variable`·`change_variable`은 값을 바꾼 뒤 `Variable.setValue` → `updateView()`를 부른다.
+`updateView()`는 변수 모니터가 **숨겨져 있어도** 끝에서 `bpReplace(id, x, y, getRealWidth(), getRealHeight())`
+(변수창 자동 배치용 bin-packer, throttle 래퍼)를 호출하고 `Entry.requestUpdate`를 세운다
+([variable.js `updateView`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/variable/variable.js#L184),
+[`bpReplace` 호출](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/variable/variable.js#L235)).
+함수 지역 변수(`set_func_variable`)와 리스트 항목 쓰기에는 이 경로가 없다.
+
+2026-09-23 실측(npm 4.0.20, 헤드리스 Chromium, 반복당 같은 블록 10개 × 300회, 틱 실행 시간 ÷ 블록 수):
+
+| 블록 | µs/블록 (재귀 몫 ≈1.25 포함) |
+| --- | ---: |
+| 전역 변수 정하기(상수) | 5.7 |
+| 함수 지역 변수 정하기 + 읽기 | 2.1 |
+| 리스트 항목 바꾸기 | 2.4 |
+| 전역 변수 읽기만 추가 | +0.5 |
+
+한 프레임에 수백~수천 번 도는 계산(렌더러 루프, 파티클, 경로 탐색)은 **전역 변수에 쓰지 않는다.**
+반복마다 바뀌는 값은 재귀 매개변수로, 한 반복 안의 중간값은 함수 지역 변수로 둔다.
+값 함수 재귀의 관례 `setVar('sink', call(…))`도 단계마다 이 비용을 낸다 — 반환값이 필요 없으면
+보통 함수(문장) 재귀를 쓴다. 변수·리스트를 찾는 조회 비용은 이것과 별개다.
+
+근거: `games/sunset-drive/spike/micro.mjs`·`micro-run.mjs`, 적용과 전체 비용 표는
+[19 선셋 드라이브 §5](19-sunset-drive-case-study.md#5-블록-비용을-재고-설계했다).
+
+## 붓 선과 채우기 레이어는 처음 만든 순서대로 쌓이고, 도장은 항상 그 위다
+
+한 스프라이트의 붓 선(brush) 레이어와 채우기(paint) 레이어는 **그 기능을 처음 쓸 때** 만들어져
+스프라이트 바로 아래에 끼워진다
+([utils.js](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/util/utils.js#L1627) —
+`setBasicBrush`·`setBasicPaint` 모두 `addChildAt(shape, getChildIndex(sprite.object))`).
+도장(`brush_stamp`)은 찍을 때마다 같은 자리에 끼워진다
+([entity.js `addStamp`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L1630)).
+결과적으로 **먼저 만든 레이어 < 나중에 만든 레이어 < 도장(찍은 순서대로)** 이 된다.
+`모두 지우기`는 레이어를 비울 뿐 순서를 바꾸지 않는다.
+
+- 채우기 도형 위에 선을 그리려면 시작할 때 `채우기 색 정하기`를 `붓 색 정하기`보다 먼저 실행한다.
+  반대 순서로 만들면 선이 채우기에 가려진다.
+- 같은 스프라이트로는 "채우기 → 도장 → 다시 채우기"처럼 도장 사이에 채우기를 끼울 수 없다.
+  깊이 순서가 섞여야 하면 도장끼리 순서를 맞추거나(재귀가 돌아오는 순서 등) 오브젝트를 나눈다.
+
+근거: [19 선셋 드라이브 §3](19-sunset-drive-case-study.md#3-한-오브젝트-안의-레이어-순서는-만든-순서다),
+회귀 확인: `games/sunset-drive/verify.mjs`의 픽셀·스크린샷(차선이 아스팔트 위, 차·나무가 도로 위).
+
+## `배경음악 재생하기`는 `소리 재생 속도`의 영향을 받지 않는다
+
+`sound_speed_set`은 `Entry.playbackRateValue`를 바꾸고 **`Entry.soundInstances`**의 재생 중 인스턴스에만
+적용한다([block_sound.js](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_sound.js#L703)).
+새로 재생하는 효과음은 `Entry.Utils.playSound`에서 같은 값을 받는다
+([utils.js](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/util/utils.js#L2830)).
+`play_bgm`은 `Entry.Utils.playBGM`으로 재생해 **`Entry.bgmInstances`**에 넣고 재생 속도를 설정하지 않는다
+([block_sound.js `play_bgm`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_sound.js#L813),
+[utils.js `playBGM`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/util/utils.js#L2802)).
+BGM은 음량도 1로 고정이라 `소리 크기 정하기`의 영향도 받지 않는다.
+
+그래서 **엔진음처럼 음높이를 바꿔야 하는 소리는 일반 소리로, 음악은 BGM으로** 재생하면 둘이 섞이지 않는다.
+BGM은 반복 옵션이 없고 새 BGM을 틀면 이전 BGM이 멈춘다. 반복은 곡 길이를 초시계로 재서 다시 튼다.
+
+실측(2026-09-23): 레이스 중 엔진 인스턴스 재생 속도 0.55 → 1.9 상승, 같은 시점 BGM 인스턴스의
+`sourceNode.playbackRate.value`는 1. 근거: `games/sunset-drive/verify.mjs` audio 시나리오,
+[19 §7](19-sunset-drive-case-study.md#7-소리--음악은-bgm-채널-엔진은-재생-속도).
+
+## 크기 정하기는 현재 모양의 치수로 계산된다 — 모양을 바꾼 뒤 다시 정한다
+
+`set_scale_size`는 **그 순간의 모양**의 폭·높이와 배율로 평균 크기를 계산해 배율을 정한다
+([entity.js `setSize`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L477),
+단위는 [크기 정하기는 퍼센트가 아니다](#크기-정하기는-퍼센트가-아니다)). 모양을 바꾸면 배율은 그대로 두고
+새 그림의 치수만 바뀐다([entity.js `setImage`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L1071)).
+따라서 크기가 다른 모양 사이를 오가며 도장을 찍을 때 **크기를 먼저 정하고 모양을 바꾸면 크기가 틀어진다.**
+
+실패 사례(2026-09-23): 4×4 빈 모양 상태에서 `크기 정하기 20`을 한 뒤 64×64 숫자 모양으로 바꿔 찍자 배율 5가
+그대로 적용돼 숫자가 약 320px로 찍혔다. 해결은 도장마다 `모양 바꾸기 → 크기 정하기 → 이동 → 도장` 순서.
+`setImage`는 중심점도 **이전 모양 중심에서의 절대 거리**로 옮기므로, 중심점을 가운데가 아닌 곳에 둔
+오브젝트는 크기가 다른 모양으로 바꿀 때 기준점이 어긋난다. 도장용 그림은 같은 비율의 캔버스와 가운데 중심점을 쓴다.
+
+근거·회귀 확인: [lessons](lessons.md#유사-3d-레이싱-제작), `games/sunset-drive/spec.mjs`의 `num` 함수.
