@@ -7,6 +7,7 @@
 // on BASE_URL), presses ▶, and reports what actually happens:
 //   - 2 s untouched: how each object moves, which variables/texts/shapes change
 //   - shown objects that add no pixel to the stage (covered by a layer above)
+//   - text boxes that lie mostly off the stage (their text is cut off)
 //   - every key the first scene listens for (arrows + space when none): held 0.6 s,
 //     compared with an untouched run of the same length (Math.random is seeded
 //     identically, so random spawns do not count as a key effect)
@@ -40,6 +41,12 @@ function snapshot(page) {
                 shape: e.picture?.name, text: o.objectType === 'textBox' ? e.getText() : undefined,
                 clones: (o.clonedEntities || []).length,
             };
+            if (o.objectType === 'textBox') {
+                // Share of the text box that lies on the stage (x -240~240, y -135~135).
+                const w = e.getWidth() * Math.abs(e.getScaleX()), h = e.getHeight() * Math.abs(e.getScaleY());
+                const span = (c, half, lim) => Math.max(0, Math.min(c + half, lim) - Math.max(c - half, -lim));
+                out.objects[o.id].onStage = w && h ? span(e.getX(), w / 2, 240) * span(e.getY(), h / 2, 135) / (w * h) : 1;
+            }
         }
         for (const v of Entry.variableContainer.variables_) out.vars[v.name_] = String(v.getValue());
         for (const l of Entry.variableContainer.lists_) out.vars['리스트 ' + l.name_] = (l.array_ || []).length + '칸';
@@ -219,6 +226,10 @@ try {
     console.log(idleLines.length ? idleLines.map(s => '  ' + s).join('\n') : '  아무 변화 없음');
     const texts = Object.values(idle.last.objects).filter(o => o.visible && o.text !== undefined && o.text.trim());
     if (texts.length) console.log('  지금 화면의 글: ' + texts.map(o => `${o.name} "${o.text}"`).join(', '));
+    for (const o of texts.filter(t => t.onStage < 0.5)) {
+        console.log(`⚠ 글상자 ${o.name}: ${Math.round((1 - o.onStage) * 100)}%가 무대 밖이라 글이 잘린다 `
+            + `(중심 x ${Math.round(o.x)}, y ${Math.round(o.y)} — 무대 x -240~240, y -135~135).`);
+    }
     for (const c of await findCovered(page) || []) {
         failed = true;
         console.log(`✗ ${c.name}: 보이는 상태인데 ${c.by.join('·')}에 완전히 가려져 화면에 안 나온다 — `
