@@ -151,8 +151,11 @@ export async function tapKey(page, code) { return holdKey(page, code, 50); }
 // time, so a verify that holds a key for 500 ms or waits 300 ms for a jump
 // sees the same game progress on a slow or jittery CI runner as on a desktop.
 //
-// Every engine tick (Entry.engine.update → _processEngineTimeouts, run state
-// only) advances a page clock by the game's own step:
+// Every engine tick advances a page clock by the game's own step. The tick is seen
+// where Entry.engine.update runs the scripts — Entry.container.mapObjectOnScene(
+// engine.computeFunction), run state only — which exists both in the npm build
+// (@entrylabs/entry 4.0.20, used by cold clones and CI) and in newer sources;
+// helpers added later such as engine._processEngineTimeouts are not in 4.0.20.
 //   step = 1/60 (default)  — the game moves a fixed amount per frame
 //   step = '<variable>'    — the game moves by a delta it keeps in that variable
 //                            (e.g. 'dt' = min(.12, timer − last)); its value is added
@@ -172,18 +175,21 @@ export async function useGameTimeWaits(page, { step = 1 / 60, slack = 40 } = {})
         await cdp.send('Emulation.setCPUThrottlingRate', { rate: throttle });
     }
     const install = () => page.evaluate((step) => {
-        const engine = Entry.engine;
-        if (engine.__gameClock) return;
-        const clock = engine.__gameClock = { t: 0 };
+        const engine = Entry.engine, container = Entry.container;
+        engine.__gameClock ??= { t: 0 };
+        if (container.__gameClockHooked) return;
         const read = typeof step === 'number' ? () => step : () => {
             const v = Entry.variableContainer.variables_.find(x => x.name_ === step);
             return Math.max(0, Number(v?.getValue()) || 0);
         };
-        const original = engine._processEngineTimeouts.bind(engine);
-        engine._processEngineTimeouts = (...args) => {
-            clock.t += read();
-            return original(...args);
+        const original = container.mapObjectOnScene.bind(container);
+        container.mapObjectOnScene = (fn, ...rest) => {
+            const out = original(fn, ...rest);
+            // Only the engine's per-tick script pass counts, after the scripts ran.
+            if (fn === Entry.engine.computeFunction && Entry.engine.__gameClock) Entry.engine.__gameClock.t += read();
+            return out;
         };
+        container.__gameClockHooked = true;
         window.__gameWait = (ms, cap) => new Promise((resolve, reject) => {
             const engine = Entry.engine, c = engine.__gameClock;
             const target = c.t + ms / 1000;
