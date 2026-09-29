@@ -1175,7 +1175,7 @@ locateXY(0, -400)          // 커서 sprite 자체는 화면 밖
 
 ### 증거
 
-- [`games/brick-kingdom/`](../games/brick-kingdom/) 스파이크 — 붓/stamp 각 방식의 fps·픽셀·stamps 길이 실측
+- 2026-07-31 사이드스크롤 작품(로컬 전용으로 옮김)의 스파이크 — 붓/stamp 각 방식의 fps·픽셀·stamps 길이 실측. 결과는 위 표가 정본
 
 ## `char_at` · `substring` 은 범위를 벗어나면 **`throw`** — 문자열 타일맵에 가드 필수
 
@@ -1205,7 +1205,7 @@ if (start < 0 || end < 0 || start > strLen || end > strLen) { throw new Error();
 `char_at` 이 이미 평가돼 던진다.
 
 ```js
-// games/brick-kingdom/spec.mjs — fnTileAt
+// 좌표 → 문자 함수 fnTileAt (문자열 타일맵)
 L.set('out', txt('#')),                    // 기본값 = 벽 (경계 밖으로 못 나감)
 if_(cmp(r, '>=', 0), [ if_(cmp(r, '<', ROWS), [
   if_(cmp(c, '>=', 0), [ if_(cmp(c, '<', WORLD_COLS), [
@@ -1230,7 +1230,7 @@ setListAt('lvl', r + 1, combine(combine(L.get('left'), ch), L.get('right'))),
 
 ### 증거
 
-- [`games/brick-kingdom/spec.mjs`](../games/brick-kingdom/spec.mjs) `fnTileAt`(가드) · `fnSetTile`(한 칸 교체)
+- 위 두 코드(`fnTileAt` 가드 · `fnSetTile` 한 칸 교체)는 사이드스크롤 작품(로컬 전용으로 옮김)에서 가져왔다
 - 문자열 타일맵 설계 전체는 [04 §문자열 타일맵 + 서브스텝 스윕](04-script-and-blocks.md#문자열-타일맵--서브스텝-스윕-충돌--사이드스크롤-플랫포머)
 
 ## 헤드리스 검증에서 브라우저를 ~10 회 재부팅하면 키 이벤트가 게임에 도달하지 않는다
@@ -1249,7 +1249,7 @@ setListAt('lvl', r + 1, combine(combine(L.get('left'), ch), L.get('right'))),
 실패 시나리오를 `--only N` 으로 단독 재현할 수 있다.
 
 ```js
-// games/brick-kingdom/verify.mjs — runAllIsolated()
+// 시나리오마다 자식 프로세스 — runAllIsolated()
 for (let i = 0; i < SCENARIOS.length; i++) {
     await new Promise((resolve) => {
         const ch = spawn(process.execPath, [process.argv[1], '--only', String(i)],
@@ -1264,13 +1264,14 @@ for (let i = 0; i < SCENARIOS.length; i++) {
 
 ### 증거
 
-- [`games/brick-kingdom/verify.mjs`](../games/brick-kingdom/verify.mjs) `runAllIsolated` (주석에 실측 기록)
+- 16 시나리오 사이드스크롤 작품 검사(로컬 전용으로 옮김)의 `runAllIsolated` — 한 프로세스 13 개 연속 실행 시 10 번째쯤부터 스폰 지점(px=112)에서 못 움직였고, 같은 시나리오 단독 실행은 통과
 
 ## brush_stamp 렌더 예산은 **방문 칸이 아니라 그린 칸**으로 센다 — 타일 크기를 바꾸면 다시 재야 한다
 
 `brush_stamp` 타일 렌더러의 예산을 "프레임당 N 칸" 하나로 관리하면 **타일 크기를 줄일 때
-틀린다.** 2026-07-31 brick-kingdom Phase 2-1 에서 TILE 32/24/20 을 밀도 4 단계로 실측했다
-(케이스마다 브라우저 재기동, 3 회 반복 중앙값).
+틀린다.** 2026-07-31 사이드스크롤 작품의 타일 배율 재조정에서 TILE 32/24/20 을 밀도 4 단계로 실측했다
+(케이스마다 브라우저 재기동, 1.5 s 워밍업 뒤 4 s 창의 `frames` 증가량 ÷ 실경과시간, 3 회 반복 중앙값).
+밀도는 `empty`(순회만, stamp 0) · `sparse`(지상) · `dense`(지하: 천장 2 줄 + 기둥) · `solid`(전면 벽, 상한).
 
 | TILE | 행 | empty (stamp 0) | sparse | dense | solid |
 | --- | --- | --- | --- | --- | --- |
@@ -1297,7 +1298,7 @@ for (let i = 0; i < SCENARIOS.length; i++) {
 
 ### 증거
 
-- `games/brick-kingdom/기획/Phase2-4-계획.md` §4 (측정 표·결정 기록)
+- 측정 원본은 로컬 전용으로 옮긴 작품의 기획서 §4. 공개 저장소에서는 위 표가 정본이다. 그 작품은 이 표로 TILE=24·12 행을 골랐다
 - 기존 단발 실측(252 칸 62fps)은 이 문서 §brush_stamp 타일 렌더러
 
 ---

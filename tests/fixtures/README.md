@@ -24,7 +24,7 @@
 | **원-원 거리 충돌 + 시간 점수 + 클라우드 랭킹 + 동적 배경** | [`bullet-circle`](spec-bullet-circle.mjs) | ✓ | 종합 데모 (10 오브젝트, 3 장면, 2 함수) |
 | **공유 리스트 (`isCloud`) + ask_and_wait + insertion sort** | [`memory-ranking`](spec-memory-ranking.json) | | |
 | **시차 스크롤 플랫포머 + reach_something 충돌** | [`platformer`](spec-platformer.json) | | 발판 3~10 개까지. 수백 칸 스테이지는 아래 타일맵 쪽 |
-| **대규모 사이드스크롤 플랫포머 — 문자열 타일맵 + 서브스텝 스윕 충돌 + 클론 없는 액터** | (fixture 아님) [`games/brick-kingdom/spec.mjs`](../../games/brick-kingdom/spec.mjs) | ✓ | 356 열 × 9 행을 오브젝트 6 개로. 맵 = 리스트 한 개, 충돌 = AABB 질의, 적·아이템·발사체 = 고정 길이 병렬 리스트, 렌더 = 가시창만 `brush_stamp`. 설계 해설: [knowledge/04 §문자열 타일맵](../../knowledge/04-script-and-blocks.md#문자열-타일맵--서브스텝-스윕-충돌--사이드스크롤-플랫포머) |
+| **대규모 사이드스크롤 플랫포머 — 문자열 타일맵 + 서브스텝 스윕 충돌 + 클론 없는 액터** | (공개 예제 없음 — 설계 해설에 코드) | ✓ | 356 열 × 9 행을 오브젝트 6 개로. 맵 = 리스트 한 개, 충돌 = AABB 질의, 적·아이템·발사체 = 고정 길이 병렬 리스트, 렌더 = 가시창만 `brush_stamp`. 설계 해설: [knowledge/04 §문자열 타일맵](../../knowledge/04-script-and-blocks.md#문자열-타일맵--서브스텝-스윕-충돌--사이드스크롤-플랫포머) |
 | **3 장면 게임 (메뉴 → 플레이 → 결과)** | [`bullethell`](spec-bullethell.json) | | |
 | **붓 + slide 변수로 동적 그래픽** | [`healthbar-brush`](spec-healthbar-brush.json) | | |
 | **반복하기 60fps 암묵 틱 측정** | [`repeat-timing`](spec-repeat-timing.json) | | `repeat-timing-wait` (wait 비교) |

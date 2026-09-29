@@ -67,6 +67,10 @@ tests/fixtures/*-shots/
 # 포함하고 용량도 크므로 공개 저장소에 올리지 않는다. 개조 결과물도 같은 이유로 로컬 전용.
 games/shogi/
 
+# 미완성 작품 — 검사가 다 통과하지 않은 상태라 공개 저장소에서 내렸다 (2026-09-29, 로컬 전용).
+# 여기서 나온 일반 지식은 knowledge/04·05·07 에, 도트 그림 도구는 tools/lib/pixel-art.mjs 에 옮겼다.
+games/brick-kingdom/
+
 # 작품 홍보용 썸네일은 로컬 보관 (사용자 요청)
 games/sunset-drive/thumbnail/
 games/abyssal-keep/thumbnail/

@@ -17,8 +17,9 @@
 재현 범위는 [17 콜드 클론](../17-cold-clone.md), 실행 절차는 [15 소리 검증](../15-audio-verification.md)을 따른다.
 
 2026-09-17의 새 사본 설치·오디오·검증 결과와 해시는
-[cold-clone-20260917.json](cold-clone-20260917.json)에, 알려진 Brick Kingdom 실패의
-실제 출력은 [brick-kingdom-runtime-20260917.log](brick-kingdom-runtime-20260917.log)에 있다.
+[cold-clone-20260917.json](cold-clone-20260917.json)에 있다. 당시 알려진 Brick Kingdom 실패의
+실행 로그는 그 작품을 2026-09-29 로컬 전용으로 옮기면서 함께 내렸다
+(전체 런타임 로그 [cold-clone-runtime-20260917.log](cold-clone-runtime-20260917.log)에는 요약이 남아 있다).
 이는 로컬 호스트의 실행 근거이며 공식 웹·오프라인 앱을 이번에 재검증한 기록은 아니다.
 
 [music-sync-20260915.json](music-sync-20260915.json)은 2026-09-15의 별도 외부 작품 실행 기록이다.

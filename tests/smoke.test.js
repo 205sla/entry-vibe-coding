@@ -300,3 +300,14 @@ test('key fields must hold key codes; DSL converts key names', async () => {
     ] }] });
     assert.deepEqual(coded.filter(i => /is not a key code/.test(i.msg)), []);
 });
+
+test('pixel-art turns a character grid into a crisp scaled SVG', async () => {
+    const { px, mirror } = await import('../tools/lib/pixel-art.mjs');
+    const art = px(['a..a', 'abba'], { a: '#111111', b: '#eeeeee' });
+    assert.deepEqual(art.dimension, { width: 12, height: 6 });   // 4×2 dots × scale 3
+    assert.equal(art.imageType, 'svg');
+    assert.match(art.svgString, /shape-rendering="crispEdges"/);
+    assert.equal((art.svgString.match(/<rect /g) || []).length, 5); // a,a / a,bb,a — the 'bb' run is one rect
+    assert.deepEqual(mirror(['ab.']), ['.ba']);
+    assert.throws(() => px(['x'], {}), /palette/);
+});

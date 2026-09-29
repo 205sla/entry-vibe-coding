@@ -272,6 +272,9 @@ A 의 자산은 사실상 B 의 산출물을 동결한 것 — `build-game-asset
 3. 캐릭터·몬스터·장비·배경은 `path`, `circle`, `rect`, `polygon`, 그라데이션을 조합해
    게임별 SVG를 직접 작성한다. `{ svgString, dimension, imageType: 'svg' }`를 `obj()`의
    `picture` 또는 `pictures` 배열에 연결한다. 기본 도형만 늘어놓지 말고 실루엣·색·명암으로 역할을 구분한다.
+   도트 느낌의 캐릭터·타일은 [`pixel-art.mjs`](../tools/lib/pixel-art.mjs)의 `px(행 배열, 팔레트)`로
+   문자 그리드를 그린다(한 문자 = 한 도트, `.`은 투명). SVG 단계에서 정수배(기본 3배)로 키우므로
+   엔트리에서 확대할 때처럼 흐려지지 않는다. 좌우 반전은 `mirror(rows)`로 모양을 따로 만든다.
 4. 캐릭터·아이템은 캔버스 전체를 덮는 배경 도형을 넣지 않아 투명 영역을 유지한다.
    무대 배경에는 전체 배경색을 넣어도 된다. 외부 이미지·폰트·스크립트 참조 없이 SVG 안에서 완결한다.
    애니메이션은 같은 캔버스 크기·중심으로 여러 모양을 만들고 엔트리 모양 전환 블록으로 재생한다.
@@ -282,6 +285,7 @@ A 의 자산은 사실상 B 의 산출물을 동결한 것 — `build-game-asset
 // games/<game>/spec.mjs — 이미지 생성 도구 없이 만드는 투명 캐릭터
 import { obj } from '../../tools/lib/spec-dsl.mjs';
 import * as gen from '../../tools/lib/sprite-gen.mjs';
+import { px } from '../../tools/lib/pixel-art.mjs';
 
 const slime = {
     svgString: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
@@ -299,6 +303,7 @@ export default {
     objects: [
         obj('slime', '슬라임', { picture: slime }),
         obj('star', '보상 별', { picture: gen.star(20, 9, 5, '#facc15') }),
+        obj('bat', '도트 박쥐', { picture: px(['a..a', 'abba', '.bb.'], { a: '#4c1d95', b: '#a78bfa' }) }),
     ],
 };
 ```
