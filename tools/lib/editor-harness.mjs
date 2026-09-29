@@ -26,8 +26,9 @@ export async function bootEditor({
     baseUrl = DEFAULT_BASE_URL,
     viewport = { width: 1280, height: 800 },
     settleMs = 2500,
+    launchOptions = {},
 } = {}) {
-    const browser = await chromium.launch();
+    const browser = await chromium.launch(launchOptions);
     const page = await browser.newPage({ viewport });
     const pageErrors = [];
     page.on('pageerror', (e) => pageErrors.push(e.message));

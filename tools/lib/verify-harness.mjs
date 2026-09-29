@@ -168,6 +168,17 @@ export async function tapKey(page, code) { return holdKey(page, code, 50); }
 //
 // VERIFY_CPU_THROTTLE=<n> slows the page CPU n× (CDP) for a local stress run.
 // It also slows the verify's own page.evaluate calls, so it is harsher than CI.
+class GameWaitTimeout extends Error {}
+
+// Reject when `promise` has not settled within `ms` — a hung renderer never answers.
+function withLimit(promise, ms, what) {
+    let timer;
+    const limit = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new GameWaitTimeout(`game-time wait: ${what} did not answer within ${ms} ms`)), ms);
+    });
+    return Promise.race([promise, limit]).finally(() => clearTimeout(timer));
+}
+
 export async function useGameTimeWaits(page, { step = 1 / 60, slack = 40 } = {}) {
     const throttle = Number(process.env.VERIFY_CPU_THROTTLE || 0);
     if (throttle > 1) {
@@ -213,26 +224,19 @@ export async function useGameTimeWaits(page, { step = 1 / 60, slack = 40 } = {})
             }, 5);
         });
     }, step);
-    await install();
+    await withLimit(install(), 30000, 'installing the game clock');
     const wallWait = page.waitForTimeout.bind(page);
     page.wallWait = wallWait;
     page.waitForTimeout = async (ms) => {
         if (!(ms > 0)) return;
         try {
-            await install();  // Entry.engine may be replaced after a reload
-        } catch {
+            await withLimit(install(), 30000, 'installing the game clock');  // Entry.engine may be replaced after a reload
+        } catch (error) {
+            if (error instanceof GameWaitTimeout) throw error;  // hung page: fail, do not fall back
             return wallWait(ms);  // no Entry on this page (yet): a plain wall-clock wait
         }
         const cap = ms * slack + 5000;
-        let timer;
-        const unresponsive = new Promise((_, reject) => {
-            timer = setTimeout(() => reject(new Error(`game-time wait: page did not answer within ${cap + 10000} ms`)), cap + 10000);
-        });
-        try {
-            await Promise.race([page.evaluate(([m, c]) => window.__gameWait(m, c), [ms, cap]), unresponsive]);
-        } finally {
-            clearTimeout(timer);
-        }
+        await withLimit(page.evaluate(([m, c]) => window.__gameWait(m, c), [ms, cap]), cap + 10000, `waiting ${ms} ms of game time`);
     };
 }
 

@@ -140,26 +140,58 @@ function noiseOf(a, b) {
             pos: Math.hypot(o.x - q.x, o.y - q.y),
         };
     }
-    return { ids: new Set(stateDiff(a.last, b.last, '', '').map(d => d.id)), motion };
+    // Numeric variables: how much each changes over the window, and how much that
+    // change itself varies between the two runs.
+    const vars = {};
+    for (const name of Object.keys(a.last.vars)) {
+        const da = delta(a, name), db = delta(b, name);
+        if (da !== null && db !== null) vars[name] = { ref: da, jitter: Math.abs(da - db) };
+    }
+    return { ids: new Set(stateDiff(a.last, b.last, '', '').map(d => d.id)), motion, vars };
+}
+
+// Change of a numeric variable over one run, or null when it is not a number.
+function delta(run, name) {
+    const x = Number(run.first.vars[name]), y = Number(run.last.vars[name]);
+    return Number.isFinite(x) && Number.isFinite(y) && run.first.vars[name] !== '' ? y - x : null;
 }
 
 // What a key run did that the untouched run did not, beyond run-to-run noise.
-// Smooth motion, teleports (grid steps, locateXY) and final positions all count.
+// Smooth motion counts with a tolerance for objects that move on their own;
+// teleports (grid steps, locateXY) and end positions count for objects that were
+// still in the untouched runs, where a frame of timing difference cannot fake them.
+// Numeric variables compare their change over the run with the untouched change,
+// so a key that adds 100 to an ever-rising score still shows; other values that
+// change on their own (texts, shapes) cannot be told apart and are left out.
 function keyEffect(run, base, noise) {
     const lines = [];
     for (const [id, o] of Object.entries(run.last.objects)) {
         const m = run.motion[id] || NO_MOTION, b = base.motion[id] || NO_MOTION;
         const nz = noise.motion[id] || { d: 0, jumps: 0, pos: 0 };
         const p = base.last.objects[id] || o;
+        const still = Math.hypot(b.dx, b.dy) < 2 && b.jumps === 0 && nz.jumps === 0 && nz.pos < 1;
         const moved = Math.hypot(m.dx - b.dx, m.dy - b.dy) > Math.max(4, 0.25 * Math.hypot(b.dx, b.dy), 2 * nz.d);
-        const jumped = Math.abs(m.jumps - b.jumps) > nz.jumps;
-        const displaced = Math.hypot(o.x - p.x, o.y - p.y) > Math.max(12, 3 * nz.pos);
+        const jumped = still ? m.jumps > 0 : Math.abs(m.jumps - b.jumps) > nz.jumps + 1;
+        const displaced = still && Math.hypot(o.x - p.x, o.y - p.y) > 12;
         if (!moved && !jumped && !displaced) continue;
         lines.push(describeMotion(o.name, m, run.ms)
             || (displaced ? `${o.name}: 가만히 둘 때 (${Math.round(p.x)}, ${Math.round(p.y)}) → 키 (${Math.round(o.x)}, ${Math.round(o.y)})` : `${o.name}: 가만히 둘 때와 달리 멈춤`));
     }
-    return lines.concat(stateDiff(base.last, run.last, '가만히', '키').filter(d => !noise.ids.has(d.id)).map(d => d.text));
+    for (const d of stateDiff(base.last, run.last, '가만히', '키')) {
+        const name = d.id.startsWith('var:') ? d.id.slice(4) : null;
+        const v = name !== null && noise.vars[name];
+        if (v) {
+            const dk = delta(run, name);
+            const beyond = dk !== null && Math.abs(dk - v.ref) > Math.max(3 * v.jitter, 0.1 * Math.abs(v.ref), 1e-9);
+            if (beyond) lines.push(v.ref === 0 && v.jitter === 0 ? d.text : `변수 ${name}: 0.6초 변화 ${round(v.ref)} → 키 ${round(dk)}`);
+            continue;
+        }
+        if (!noise.ids.has(d.id)) lines.push(d.text);
+    }
+    return lines;
 }
+
+const round = (x) => Math.round(x * 1000) / 1000;
 
 // Objects that are shown and on stage but add no pixel to the picture because an
 // upper layer covers them: render with and without the object (same task, so no
@@ -207,6 +239,9 @@ function findCovered(page) {
     });
 }
 
+// Playwright would otherwise close the browser and exit on its own SIGINT handler
+// before the editor server this script started is stopped.
+const QUIET_SIGNALS = { handleSIGINT: false, handleSIGTERM: false, handleSIGHUP: false };
 let server, browser, failed = false;
 const cleanup = async () => {
     await browser?.close().catch(() => {});
@@ -218,14 +253,14 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
 try {
     try {
         const { chromium } = await import('@playwright/test');
-        await (await chromium.launch()).close();
+        await (await chromium.launch(QUIET_SIGNALS)).close();
     } catch (e) {
         console.error('Chromium 을 띄울 수 없다 — `npx playwright install chromium` 을 먼저 실행한다.\n' + e.message.split('\n')[0]);
         process.exit(2);
     }
     server = await startEditorServer(baseURL, (spawned) => { server = spawned; });
     let page, pageErrors;
-    ({ browser, page, pageErrors } = await bootEditor({ baseUrl: baseURL }));
+    ({ browser, page, pageErrors } = await bootEditor({ baseUrl: baseURL, launchOptions: QUIET_SIGNALS }));
     await loadFixture(page, path.resolve(file));
 
     const keys = await page.evaluate(() => {
@@ -302,8 +337,8 @@ try {
         // Two untouched runs: the first is the reference, their disagreement is the noise floor.
         const baseline = await playWindow(page, 600, null, delay);
         const noise = noiseOf(baseline, await playWindow(page, 600, null, delay));
-        // Values that already change while untouched (frame counters, timers) cannot show a key effect.
-        for (const id of drifting) noise.ids.add(id);
+        // Non-numeric values that already change while untouched cannot show a key effect.
+        for (const id of drifting) if (!id.startsWith('var:')) noise.ids.add(id);
         console.log(title);
         let dead = 0;
         deadInObject = 0;

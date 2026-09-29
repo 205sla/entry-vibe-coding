@@ -71,6 +71,9 @@ games/shogi/
 # 여기서 나온 일반 지식은 knowledge/04·05·07 에, 도트 그림 도구는 tools/lib/pixel-art.mjs 에 옮겼다.
 games/brick-kingdom/
 
+# 하네스(이 저장소 자체)를 고칠 때만 필요한 지식 — 작품을 만드는 사용자에겐 필요 없어 로컬 전용
+knowledge/_harness/
+
 # 작품 홍보용 썸네일은 로컬 보관 (사용자 요청)
 games/sunset-drive/thumbnail/
 games/abyssal-keep/thumbnail/
