@@ -100,7 +100,7 @@ npm `@entrylabs/entry` 4.0.20 엔진입니다.
 
 ## 다시 만들거나 검증하기
 
-`apps/MYentry-game` 디렉터리에서 실행합니다. 소리 합성에는 `ffmpeg`가 필요합니다.
+클론한 저장소 루트(`package.json` 이 있는 폴더)에서 실행합니다. 소리 합성에는 `ffmpeg`가 필요합니다.
 
 ```powershell
 node games/sunset-drive/build.mjs

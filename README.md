@@ -71,9 +71,9 @@ npm start            # → http://localhost:3000
 ### 3. 작업 사이클 (spec → `.ent` → 테스트)
 ```bash
 node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --check                       # ① 정적 검증 < 1초
-node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --out tests/fixtures/x.ent    # ② 빌드
-node tools/play-check.mjs tests/fixtures/bounce-ball.ent                                 # ③ 실행해서 움직임·키 반응 보기 (작성 불필요)
-node tools/run-all-verify.mjs --filter bounce-ball                                        # ④ 작품별 헤드리스 런타임 검증
+node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs tests/fixtures/x.ent          # ② 빌드 (두 번째 인자 = 출력 .ent)
+node tools/play-check.mjs tests/fixtures/x.ent                                            # ③ ②에서 만든 파일을 실행해 움직임·키 반응 보기 (작성 불필요)
+node tools/run-all-verify.mjs --filter bounce-ball                                        # ④ 예제에 딸린 verify 로 회귀 검사 (저장소의 bounce-ball.ent 대상)
 # 전체: npm run verify  (smoke + links + e2e + runtime)
 # ⚠️ PowerShell 에선 `npm run x -- --flag` 의 `--` 가 삼켜진다 — 인자 필요하면 node 직접 호출
 ```
@@ -159,7 +159,7 @@ node tools/run-all-verify.mjs --filter bounce-ball                              
         │
         ▼
   ┌────────────────────┐
-  │ ④ make-ent 빌드    │  node tools/make-ent.mjs spec.mjs --out out.ent
+  │ ④ make-ent 빌드    │  node tools/make-ent.mjs spec.mjs out.ent
   │   → .ent 파일      │  · 이미지 rasterize (sharp), 콘텐츠 해시 dedup
   └────────────────────┘   · block params 를 Entry JSON shape 로 정규화
         │                  · script 필드 JSON.stringify (이중 직렬화)
@@ -556,7 +556,7 @@ npm start                         # http://localhost:3000
 
 # spec → .ent
 node tools/make-ent.mjs tests/fixtures/spec-foo.mjs --check                 # 정적 검증만 (< 1 초)
-node tools/make-ent.mjs tests/fixtures/spec-foo.mjs --out tests/fixtures/foo.ent
+node tools/make-ent.mjs tests/fixtures/spec-foo.mjs tests/fixtures/foo.ent
 
 # 검증 (4 레이어)
 npm run test:smoke                # Node 스모크 (~ 5 초, 23 fixture)
