@@ -98,7 +98,7 @@ server.js `/api/export`는 아직 `crypto.randomBytes → base36` 근사치(회�
 
 | 항목 | 출처 |
 |------|------|
-| Starter (`Entry.loadProject()` no-args) scene id가 `'7dwq'` | [`entryjs/src/class/project.js:82`](../../entryjs/src/class/project.js#L82) 소스 — 공식 typedef에는 언급 없음. 사용자 `.ent` 측은 임의 id 가능 (`clearProject` 선행 전제) |
+| Starter (`Entry.loadProject()` no-args) scene id가 `'7dwq'` | [`entryjs/src/class/project.js:82`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/project.js#L82) 소스 — 공식 typedef에는 언급 없음. 사용자 `.ent` 측은 임의 id 가능 (`clearProject` 선행 전제) |
 | `object.script`가 JSON.stringify 문자열 | typedef에 `script: string`으로만 기재 — 문자열 내부가 이중 JSON임은 소스 확인 필요 |
 | `"[[]]"` 최소 단위 | 소스에서 관찰 — 공식 문서엔 없음 |
 | ustar 헤더 portable의 바이트 레벨 요건 | npm `tar` 패키지의 `portable: true` 동작과 동일. 공식 문서는 고수준 API만 언급 |

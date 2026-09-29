@@ -62,6 +62,16 @@ clamp돼 화면에 나타나지만 우리 사본에서는 숨은 채로 보인�
 `4.0.20`(2025-05-30)이고 develop의 `package.json`은 `4.0.22`다. 새 버전이 나오면
 `node scripts/setup.mjs --entry-version=<새버전>`으로 갱신하고, 이 표의 심볼을 다시 대조한다.
 
+### 2026-09-23 실측 — 게임이 쓰는 블록·실행 경로는 실서비스와 같다
+
+격차가 있어도 **작품이 실제로 쓰는 코드 경로**는 같을 수 있다. 선셋 드라이브가 쓰는 블록 49종과
+실행기·Scope·도장·크기·모양·붓·소리·변수 내부 함수 39개의 소스를 playentry.org 만들기 화면(비로그인,
+저장하지 않음)과 이 사본에서 해시로 비교했더니 모두 같았다. 차이는 EaselJS `Graphics.clear()`가
+`_oldStrokeStyle`을 초기화하지 않는 것 하나였다. 두 곳 모두 WebGL이 있어도 붓·채우기를
+CreateJS(Canvas 2D) 경로로 그렸다. 방법과 한계는 [19 §8](19-sunset-drive-case-study.md#8-검증-설계).
+새 작품의 공식 사이트 호환성을 판단할 때 전체 버전 번호보다 **사용 블록 목록의 구현 대조**가 직접적인 근거다.
+이것은 코드 동일성 근거이며 업로드·저장 후 실행을 대신하지 않는다.
+
 전체 변경 목록·판정 근거: [`upstream/지식/entryjs-4.56.0-2026-07-update.md`](../../../upstream/지식/entryjs-4.56.0-2026-07-update.md)
 
 ## Entry.init 옵션
@@ -155,9 +165,9 @@ async function loadEntFile(file) {
 
 **`Entry.clearProject()`를 반드시 먼저 호출.** 생략하면 `setObjects()`가 `objects_.push()`로
 기존 오브젝트 위에 **덧붙여서** — 엔트리봇 옆에 사용자 오브젝트가 달라붙고, 선택된 오브젝트의
-블록/이미지가 뒤섞인다. [`entryjs/src/class/container.js:285`](../../entryjs/src/class/container.js#L285).
+블록/이미지가 뒤섞인다. [`entryjs/src/class/container.js:285`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/container.js#L285).
 
-MYentry의 같은 패턴: [`MYentry/public/js/editor.js:345`](../../MYentry/public/js/editor.js#L345).
+기존 상태 정리의 원리와 확인 위치는 [07의 clearProject 항목](07-runtime-quirks.md#entryclearproject--loadproject-전-필수)을 따른다.
 
 ## playentry.org 배포 — 기존 작품에 `project.json` 만 갈아끼우기 (콘솔 붙여넣기)
 
@@ -339,10 +349,10 @@ Playwright 헤드리스에서 **클릭/키 기반 게임**을 검증하려면 �
 
 ### 클릭 — `Entry.dispatchEvent`
 
-Entry의 클릭 처리는 [`entity.js:90`](../../entryjs/src/class/entity.js#L90)에서
+Entry의 클릭 처리는 [`entity.js:90`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/entity.js#L90)에서
 `Entry.dispatchEvent('entityClick', this.entity)` 한 줄로 이벤트 버스에 쏜다.
 `when_object_click` 트리거는 이 이벤트를 구독
-([`block_start.js:229`](../../entryjs/src/playground/blocks/block_start.js#L229)).
+([`block_start.js:229`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_start.js#L229)).
 
 따라서 Playwright `page.evaluate` 안에서:
 ```js
@@ -375,6 +385,66 @@ for (let i = 0; i < 10; i++) {
 document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowRight', key: 'ArrowRight' }));
 document.dispatchEvent(new KeyboardEvent('keyup',   { code: 'ArrowRight', key: 'ArrowRight' }));
 ```
+
+### 장면으로 바로 가기 — `selectScene` 만으로는 `when_scene_start` 가 안 불린다
+
+디버그 스크립트에서 특정 장면부터 보려고 `Entry.scene.selectScene(s)` 만 부르면 화면은 바뀌어도 그 장면의 시작 스크립트(감독 등)가 돌지 않는다.
+`장면 시작하기` 블록은 고른 **다음** `Entry.engine.fireEvent('when_scene_start')` 를 부른다
+([block_start.js:630](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_start.js#L630),
+[07 §when_scene_start](07-runtime-quirks.md#when_scene_start-는-시작-시-첫-장면에서-발화-안-함--start_scene-전환에서만)). 같이 부른다:
+
+```js
+await page.evaluate(() => { Entry.scene.selectScene(Entry.scene.getScenes().find((x) => x.name === '장면 2')); Entry.engine.fireEvent('when_scene_start'); });
+```
+
+앞 장면에서 채웠어야 할 변수는 직접 넣는다 — 그래도 **처음부터 끝까지 플레이하는 검사를 대신하지 못한다**(아래 "멈춤 진단"의 리스트 끝 오류는 끝까지 가야 났다).
+
+### 누르고 떼기 — 폴링 대기는 60ms 쯤 눌러야 본다
+
+`… 될 때까지 기다리기(클릭했는가?)` 는 눌린 동안만 참인 값을 틱마다 본다([07 is_clicked](07-runtime-quirks.md#클릭했는가is_clicked는-누르고-있는-동안만-참--틱-사이에-눌렀다-뗀-클릭은-못-본다)).
+`page.mouse.click()` 은 누르고 곧바로 떼서 놓칠 수 있다 → `mouse.move` → `mouse.down()` → 60ms → `mouse.up()`.
+
+### 그릴 때마다 재기 — `Entry.stage.update` 감싸기
+
+"한 프레임만 비쳤다", "조각이 정한 순서로 붙었다" 같은 것은 `page.evaluate` 폴링(수십~수백 ms 간격)으로는 못 잡는다.
+화면을 그리는 함수를 감싸면 **그린 화면마다** 잴 수 있다.
+
+```js
+await page.evaluate(() => {
+    const rec = { frames: 0, first: {} };
+    const orig = Entry.stage.update.bind(Entry.stage);
+    Entry.stage.update = function (...a) {
+        const r = orig(...a);
+        try {                                   // 탐침 오류가 게임을 멈추지 않게
+            rec.frames++;
+            for (const o of Entry.container.getCurrentObjects())
+                if (o.entity.getVisible() && !(o.name in rec.first)) rec.first[o.name] = performance.now();
+        } catch { /* 무시 */ }
+        return r;
+    };
+    window.__rec = rec;
+});
+```
+
+- 여러 탐침을 차례로 감싸도 된다(각자 앞의 것을 부른다). 끝까지 플레이한 한 판에서 약 1만 프레임을 쟀다(탐침이 없을 때와 속도 비교는 하지 않았다).
+- 예: 대사를 넘길 때 **다음 대사가 한 프레임 통째로 비쳤다가 숨는** 깜빡임 — 보이는 글자가 "지금 대사의 앞부분이면서 줄었다가 다시 늘면" 실패.
+  대사 변수가 바뀐 직후 한 프레임은 지난 글자가 남는 것이 정상이라 "지금 대사의 앞부분이 아닌 프레임"은 세지 않는다.
+
+### 소리·연출을 창으로 세기 — 창의 시작은 **페이지 안 시각**으로
+
+소리 호출(`Entry.Utils.playSound`)을 감싸 `performance.now()` 를 붙여 두고, 대사·장면이 시작된 순간부터 끝날 때까지의 **창** 안에서 센다
+([15 자동 검사](15-audio-verification.md#자동-검사가-확인하는-것)).
+
+- 창의 시작을 **Node 쪽 폴링으로 알아챈 시각**으로 잡으면 60~300ms 늦게 열려 앞부분을 놓친다. 그래서 처음엔 "기대 수의 60% 이상"으로 느슨하게 잡았고,
+  그 느슨함이 **대사 경계마다 첫 소리가 두 번 나는 실제 버그**를 가렸다(2026-09-29). 창 시작을 위 프레임 탐침이 기록한 "대사가 바뀐 프레임 시각"으로 바꾸자
+  모든 대사가 기대 수 +1 로 드러났고, 고친 뒤엔 **정확히 같았다**. 기대 수는 빌드 때 계산해 두고 정확히 비교한다.
+- 창 안의 소리 **이름**도 본다(화자마다 다른 소리면 다른 화자의 소리가 섞이지 않았는지).
+
+### 멈춤 진단 — 시간 초과 메시지에 엔진 상태를 싣는다
+
+대기 루프가 "시간 초과"로만 끝나면 원인을 모른다. 런타임 오류는 작품을 멈추고 변수를 처음 값으로 되돌리므로
+([07 런타임 오류](07-runtime-quirks.md#런타임-오류throw는-작품을-멈추고-변수리스트를-실행-시작-값으로-되돌린다--증상이-원인에서-멀리-보인다)),
+시간 초과 때 `Entry.engine.state`, `toggleStop` 을 감싸 모은 호출 스택, `page.on('pageerror')` 메시지를 함께 적는다.
 
 ### 관련 도구
 

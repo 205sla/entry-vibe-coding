@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "kind": "music-synchronization-runtime-summary",
+  "measuredOn": "2026-09-15",
+  "scope": "A separate external multi-scene animation; not the static music-video-remake case.",
+  "sourceArtifactsPublished": false,
+  "sources": {
+    "baseline": {
+      "sha256": "4ca11d879ad9cea97da2552abe6af38dfc4d874192b15043b7deba3055d441fd",
+      "bytes": 14342096
+    },
+    "corrected": {
+      "sha256": "5e734eb7e68b15125a65bcfa816f09c623dad7fd2658031a0c47e8901cc0d7b3",
+      "bytes": 14342966
+    }
+  },
+  "environment": {
+    "host": "MYentry-game local editor on Windows",
+    "automation": "Playwright browser runtime; first scene; uninterrupted playback",
+    "exactBrowserVersion": null,
+    "exactEntryDistVersionInLogs": null,
+    "sourceRevisionForSemantics": "53e121523760f15961cd14ab7cb93563a79eaab3",
+    "sourceRepository": "https://github.com/entrylabs/entryjs",
+    "soundjs": "0.6.0",
+    "preloadjs": "0.6.0",
+    "audioContextState": "running",
+    "decodedAndRegistered": true
+  },
+  "measurement": {
+    "clock": "Native BGM SoundJS instance getPosition(), milliseconds",
+    "eventSampling": "requestAnimationFrame, scene and visible text changes",
+    "target": "Manually reviewed source frames at constant 24 fps with zero video origin",
+    "videoFps": 24,
+    "sceneEventsPerRun": 24,
+    "captionEventsPerRun": 61,
+    "captionCoverage": "Two selected caption scenes, including their initial text; not all lyric fragments",
+    "strictThresholdsMs": {
+      "scene": 80,
+      "caption": 80,
+      "freshClockWhenRecorded": 40
+    },
+    "freshClockFormula": "Date.now() - timer.start - timer.pausedTime, running and unpaused only",
+    "cachedClockIsNotFreshClock": true
+  },
+  "baseline": {
+    "musicStartRunMs": 327.4,
+    "maxAbsSceneErrorMs": 892,
+    "maxAbsCaptionErrorMs": 643.666667,
+    "verificationReport": {
+      "sha256": "22dab6f55325bb764584ee18885fce5701f50cd474d4904bcbf91d76fc1b0da8",
+      "bytes": 14395
+    }
+  },
+  "correctedRuns": [
+    {
+      "id": "normal",
+      "warmupPlayStopCount": 20,
+      "projectChangedOnlyInTestMemory": false,
+      "extraLoadSettleMs": 1500,
+      "requestedRunSeconds": 180,
+      "loadFunctionMsIncludingSettle": 1833,
+      "nativePlayCalls": 21,
+      "finalNativePlayState": "playSucceeded",
+      "musicStartRunMs": 335.4,
+      "sceneEventsChecked": 24,
+      "captionEventsChecked": 61,
+      "maxAbsSceneErrorMs": 18.666667,
+      "maxAbsCaptionErrorMs": 44.666667,
+      "maxAbsCachedTimerVsMusicMs": 31,
+      "maxAbsFreshTimerVsMusicMs": null,
+      "freshClockStatus": "not-recorded",
+      "pageErrors": 0,
+      "rawLog": {
+        "sha256": "e85d2a2a2fa24f8eae43bd7133063e971909d179977278edf8d4b3b81bf95cb0",
+        "bytes": 82007
+      },
+      "verificationReport": {
+        "sha256": "a612c068c18ccde0c2e5adbc208e73d9cf5c5f513ec944aa728a00bd7b71b8d7",
+        "bytes": 42020
+      }
+    },
+    {
+      "id": "delayed-capture",
+      "warmupPlayStopCount": 100,
+      "projectChangedOnlyInTestMemory": true,
+      "extraLoadSettleMs": 5000,
+      "requestedRunSeconds": 200,
+      "loadFunctionMsIncludingSettle": null,
+      "nativePlayCalls": 101,
+      "finalNativePlayState": "playSucceeded",
+      "musicStartRunMs": 1601.1,
+      "sceneEventsChecked": 24,
+      "captionEventsChecked": 61,
+      "maxAbsSceneErrorMs": 47.333333,
+      "maxAbsCaptionErrorMs": 55.333333,
+      "maxAbsCachedTimerVsMusicMs": 114.666667,
+      "maxAbsFreshTimerVsMusicMs": null,
+      "freshClockStatus": "not-recorded",
+      "pageErrors": 0,
+      "rawLog": {
+        "sha256": "a9f15c405332e10bebe020ef4fa373f41347dc80652592ab14509b41d8ee79cd",
+        "bytes": 277066
+      },
+      "verificationReport": {
+        "sha256": "8b49c95e5f23e001afe57268115084ac550da16b7febe1e17c8489c14e00ec6c",
+        "bytes": 43525
+      }
+    },
+    {
+      "id": "delayed-origin-probe",
+      "warmupPlayStopCount": 100,
+      "projectChangedOnlyInTestMemory": true,
+      "extraLoadSettleMs": 0,
+      "requestedRunSeconds": 180,
+      "loadFunctionMsIncludingSettle": 360,
+      "nativePlayCalls": 101,
+      "finalNativePlayState": "playSucceeded",
+      "musicStartRunMs": 1602,
+      "sceneEventsChecked": 24,
+      "captionEventsChecked": 61,
+      "maxAbsSceneErrorMs": 29.333333,
+      "maxAbsCaptionErrorMs": 36.666667,
+      "maxAbsCachedTimerVsMusicMs": 82.666667,
+      "maxAbsFreshTimerVsMusicMs": 7.666667,
+      "freshClockStatus": "measured",
+      "pageErrors": 0,
+      "rawLog": {
+        "sha256": "a30673a385f5d616c33894b6ea55bbe9894f2f4380d45cfa6ed1744f615b7deb",
+        "bytes": 101075
+      },
+      "verificationReport": {
+        "sha256": "2993df028260bd67cee4e99336aca6a02f4ac3b0516c94c74169be71335e98e3",
+        "bytes": 67866
+      }
+    }
+  ],
+  "immediateAfterLoad": {
+    "extraLoadSettleMs": 0,
+    "loadFunctionMs": 371,
+    "nativePlayCalls": 21,
+    "musicStartRunMs": 322.5,
+    "finalNativePlayState": "playSucceeded",
+    "positionAdvances": true,
+    "pageErrors": 0,
+    "rawLog": {
+      "sha256": "b2dc802860017a95f946550a16338f00c449dbf5a2b93b2a938260dff002a6c6",
+      "bytes": 5772
+    }
+  },
+  "outputSignal": {
+    "peak": 0.22562,
+    "rms": 0.075374
+  },
+  "audioAlignment": {
+    "method": "Decoded mono 4 kHz waveform correlation over first 12 seconds, lag search within +/-250 ms",
+    "lagSamples": 0,
+    "lagSeconds": 0,
+    "correlation": 0.999018,
+    "fullTrackRateAlignmentProven": false,
+    "verificationReport": {
+      "sha256": "d1e619de8b34c208e1dc43efcebf889b1f94be9062761b2466dacc8fd182cee9",
+      "bytes": 238
+    }
+  },
+  "structure": {
+    "tarEntries": 1831,
+    "changedPayloads": [
+      "temp/project.json"
+    ],
+    "unchangedOtherEntries": 1830,
+    "beforeBlocks": 2888,
+    "afterBlocks": 2914,
+    "addedBlocks": 26,
+    "scenes": 17,
+    "objects": 185,
+    "textBoxes": 31,
+    "textWriteBlocks": 101,
+    "exactAllowedProjectChanges": true,
+    "musicBytesUnchanged": true,
+    "musicSha256": "244536bd6a1c91a7ccca941b85f0423e8edee5417ed7a6a4c69da4c68975e869",
+    "verificationReport": {
+      "sha256": "953fac5b3594d64b10c8311ffbe7f2d19311c305041e3e86ad9108d67255d1d9",
+      "bytes": 376
+    }
+  },
+  "evidenceUse": {
+    "aggregatesRecomputedFromReports": true,
+    "correctedEventMeasurementsMatchedToRawLogs": true,
+    "publicSummaryAloneCanReproducePlayback": false,
+    "inputToStaticCaseStudyVerifier": false
+  },
+  "limitations": [
+    "No source lyrics, images, audio, full project JSON or private raw logs are included.",
+    "Browser-observed state transitions and output waveform are not physical display or speaker latency measurements.",
+    "No claim of official web upload, other-machine performance, pause/resume, seeking or background-tab validation.",
+    "Null fresh-clock measurements remain not-recorded; cached timer samples do not retroactively prove origin alignment.",
+    "Thresholds, warmup counts and measured compensation values are specific to this case.",
+    "Inspected source revision is recorded separately from the runtime distribution version, which the logs did not record."
+  ]
+}

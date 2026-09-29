@@ -16,11 +16,15 @@
 | 블록 type 이름 / params 쉐이프 / 필드 vs 블록 슬롯 / 설계 패턴 (플랫포머·HUD) | [04-script-and-blocks.md](04-script-and-blocks.md) | Reference + Guide |
 | 편집기가 안 뜨거나 콘솔 에러 / 헤드리스 테스트 / **playentry 기존 작품에 덮어쓰기** | [05-host-editor.md](05-host-editor.md) | Guide |
 | **소리가 안 남** / 실제 WAV·MP3 출력·음소거 / 소리 vendor·웹 음원 404 | [15-audio-verification.md](15-audio-verification.md) | Reference + Guide · 현행 · 2026-09-11 |
+| 가만히 있는 그림을 살리기(**보일링**) / 장면을 조각이 붙으며 열기(**팝업북**) | [04 보일링](04-script-and-blocks.md#보일링선-떨림--모양-세-장을-타이머-박자로-돌리기) · [04 장면 조립](04-script-and-blocks.md#장면-조립팝업북--조각을-하나씩-붙이며-장면-열기) | Guide · 현행 · 로컬 끝까지 플레이 검사 · 2026-09-29 |
+| 음악과 장면·자막이 어긋남 / 로딩·준비 지연 / 시계 원점과 표시값 구분 | [16-music-synchronization.md](16-music-synchronization.md) | Guide · 현행 · 로컬 실행 근거 · 2026-09-15 |
+| **리듬게임**의 채보·판정·일시정지 복귀·고해상도 자산·입력 완주 검증 | [18 CHROMA 네이티브 리듬게임](18-chroma-native-rhythm-case-study.md) | Case study · 현행 · 로컬 `.ent` 실행 근거 · 2026-09-20 |
 | Entry 엔진의 불변 동작 (60fps 반복, short-circuit, 키 이벤트 등) | [07-runtime-quirks.md](07-runtime-quirks.md) | Runtime quirks |
 | **온라인 대전 작품**을 만들 때 (Entry Online 확장 계약·동기화 설계) | [08-entry-online.md](08-entry-online.md) | Reference + Guide |
 | **대규모 RPG**의 맵·복제본·대화·저장 설계를 참고할 때 | [09-rpg-case-study.md](09-rpg-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
 | **뮤직비디오**의 모양 시퀀스·타이머·신호별 레이어를 설계할 때 | [10-music-video-case-study.md](10-music-video-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
 | **3D 표현**의 직교투영·법선·면 선택·회전 수식을 참고할 때 | [11-3d-game-case-study.md](11-3d-game-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
+| **유사 3D 레이싱**(커브·언덕 도로 렌더러·라이벌 AI·랩 타임·엔진음)과 블록별 실행 비용을 참고할 때 | [19 선셋 드라이브](19-sunset-drive-case-study.md) | Case study · 현행 · 로컬 런타임·키 입력 완주·실서비스 구현 대조 · 2026-09-23 |
 | **실행 가능한 1인칭 던전**의 DDA·깊이 버퍼·길찾기·전투·로그라이크를 참고할 때 | [14-abyssal-keep-case-study.md](14-abyssal-keep-case-study.md) | Case study · 현행 · 로컬 런타임·키 입력 완주 검증 · 2026-09-10 |
 | **공 타격 전투·웨이브·스킬 선택**을 설계할 때 | [12-a-ball-2-case-study.md](12-a-ball-2-case-study.md) | Case study · 현행 · 정적 확인 · 2026-09-10 |
 | **자동 바운스·맵 편집·클리어 후 저장**을 설계할 때 | [13-bouncy-ball-case-study.md](13-bouncy-ball-case-study.md) | Case study · 정적 확인 · 2026-09-10 |
@@ -47,9 +51,9 @@
 ## 사실의 출처 (우선 순위)
 
 1. **[entrylabs/docs](https://github.com/entrylabs/docs)** — 공식 문서. 최고 권위. [00-official-sources.md](00-official-sources.md)에 인덱스.
-2. **엔트리 원본 소스** — `C:\Users\young\prg\ENTRY\upstream\entryjs\src\…`. 공식 문서에 없는 세부 동작의 ground truth.
-3. **공식 export 레퍼런스** — `C:\Users\young\Downloads\260423_작품.ent` (playentry.org에서 내려받은 정상 동작 파일).
-4. **형제 프로젝트 MYentry 커밋** — `C:\Users\young\prg\ENTRY\apps\MYentry\server.js` 의 역사 (`git log`).
+2. **[엔트리 원본 소스](https://github.com/entrylabs/entryjs/tree/53e121523760f15961cd14ab7cb93563a79eaab3/src)** — 공식 문서에 없는 세부 동작의 근거. 인용한 파일·리비전과 실제 실행 배포본의 버전을 구분한다.
+3. **공식 내보내기 파일** — 정상 동작하는 `.ent`의 구조 근거. 원본은 공개하지 않으며 [사례 근거](evidence/README.md)에 파일 해시와 검증 범위를 남긴다.
+4. **이 저장소의 구현·검증 기록** — [server.js](../server.js)와 [실측 근거](evidence/README.md). 특정 파일의 관측을 엔진 전체 규칙으로 일반화하지 않는다.
 
 주장 옆에는 가능하면 `파일:줄번호` 또는 `commit <hash>` 형태로 출처를 남긴다.
 공식 문서에 있는 사실은 그쪽을 1순위로 인용.
@@ -67,6 +71,14 @@
 
 | 사실 | 정본 (full) | 다른 파일에선 한 줄 + 링크 |
 |------|-------------|--------------------------|
+| 음악 시작 기준 시각·프레임 대조·준비 지연 재현·동기화 검사 범위 | [16 음악 동기화](16-music-synchronization.md) | 10, lessons, evidence |
+| 프로젝트 초시계 START/RESET과 저장값 갱신 지연 | [07 초시계](07-runtime-quirks.md#프로젝트-초시계의-원점과-표시값은-다르다) | 16, lessons |
+| 크기 정하기의 폭·높이 평균 단위와 긴 자막 검사 | [07 크기](07-runtime-quirks.md#크기-정하기는-퍼센트가-아니다) | 03, lessons |
+| 리듬 채보의 공통 시각·저장 위치에서 음악 재개·판정 결과 기반 연출 | [18 CHROMA](18-chroma-native-rhythm-case-study.md) | 16 (일반 동기화), lessons (회귀 확인) |
+| CHROMA의 이미지 치수·배율·초기 표시와 자동 연주/입력 완주의 검증 범위 | [18 화면·검증 사례](18-chroma-native-rhythm-case-study.md#4-선명한-자산과-초기-화면도-작품-데이터다) | evidence (버전 고정·구조 단언) |
+| 기존 script의 단일 파싱 트리·깊은 복제·블록 id와 변경 수 대조 | [04 기존 스크립트 수정](04-script-and-blocks.md#기존-스크립트의-여러-항목을-수정할-때) | 01, lessons |
+| 외부 작품 tar 엔트리 보존과 허용 변경 검사 | [01 부분 수정](01-binary-format.md#기존-작품의-일부만-수정하기) | 16 |
+| 글상자 초기 두 text 필드와 동적 text_write 데이터 출처 | [03 글상자](03-objects-and-assets.md#️-글상자-문자열은-objecttext-와-entitytext-두-곳에-있다) | lessons |
 | 60fps 암묵 틱 + `wait_second` 비용 | [07 §반복하기 블록](07-runtime-quirks.md#반복하기-블록--1-프레임반복-60fps-암묵-틱) | 04 (브러쉬 패턴 안에서) |
 | 꼬리 재귀가 틱 우회 | [07 §함수 호출은 반복하기의 60fps 틱을 우회](07-runtime-quirks.md#함수-호출은-반복하기의-60fps-틱을-우회-꼬리-재귀-최적화) | 04 (함수 정의), CHANGELOG |
 | `boolean_and_or` 단락 평가 없음 | [07 §`boolean_and_or`](07-runtime-quirks.md#boolean_and_or에-단락-평가short-circuit-없음) | 04 (플랫포머 패턴 안에서) |
@@ -133,7 +145,24 @@
 | 낮은 알파 카드의 마우스 실패 재현 | [07 낮은 알파 재현](07-runtime-quirks.md#낮은-알파의-클릭판도-pixelperfect-검사에서-탈락할-수-있다) | 14, lessons (원리는 기존 sprite pixelPerfect 항목) |
 | 카메라 평면 DDA·조각별 가림·벽 캐시·완료 후 교체하는 BFS | [14 심연의 성채 사례](14-abyssal-keep-case-study.md) | 04, 게임 README |
 | fixture 기능 검사와 상태 읽기·입력만의 완주, 버전별 결과 기록 | [05 검증 분리](05-host-editor.md#기능-검사와-입력-완주는-별도로-기록한다) | 14 (구체적인 결과) |
+| 세그먼트 방식 유사 3D 도로 — 투영식·언덕 가림·재귀가 돌아오며 도장(화가 알고리즘)·거리 안개 팔레트 | [19 선셋 드라이브](19-sunset-drive-case-study.md) | 게임 README |
+| 블록별 실행 비용 실측(전역 쓰기 5µs·BigNumber 나눗셈·지역 변수·도장) | [19 §5](19-sunset-drive-case-study.md#5-블록-비용을-재고-설계했다) | 07 (전역 쓰기 한 줄) |
+| 전역 `변수 정하기`는 숨긴 변수여도 모니터 배치 계산 — 반복 안에서는 매개변수·지역 변수 | [07 전역 쓰기](07-runtime-quirks.md#전역-변수-정하기는-숨긴-변수여도-약-5µs--모니터-배치-계산이-매번-돈다) | 19 |
+| 붓 선·채우기 레이어는 처음 만든 순서, 도장은 항상 위 | [07 레이어 순서](07-runtime-quirks.md#붓-선과-채우기-레이어는-처음-만든-순서대로-쌓이고-도장은-항상-그-위다) | 19 |
+| `배경음악 재생하기`는 `소리 재생 속도`와 분리 — 엔진음 음높이와 음악 공존 | [07 BGM](07-runtime-quirks.md#배경음악-재생하기는-소리-재생-속도의-영향을-받지-않는다) | 19, 15 |
+| 크기 정하기는 현재 모양의 치수 기준 — 모양을 바꾼 뒤 다시 정한다 | [07 모양 뒤 크기](07-runtime-quirks.md#크기-정하기는-현재-모양의-치수로-계산된다--모양을-바꾼-뒤-다시-정한다) | lessons, 19 |
+| 사용 블록 구현을 실서비스와 해시로 대조(업로드 없이 호환성 근거) | [05 엔진 사본](05-host-editor.md#2026-09-23-실측--게임이-쓰는-블록실행-경로는-실서비스와-같다) | 19 §8 |
+| 움직이는 썸네일(APNG) — Entry Debugger 변환 예산·달린 거리 기준 캡처(줄무늬 역행 방지)·작은 물체 색을 살리는 팔레트 | [19 §9](19-sunset-drive-case-study.md#9-홍보용-움직이는-썸네일apng) | — |
 | 합성 PCM WAV 번들·효과음과 별도 음악 스레드 | [03 WAV 재생 사례](03-objects-and-assets.md#합성-wav를-포함하고-음악을-별도-스레드에서-반복하기) | 14, 게임 README |
+| 런타임 오류(`throw`) → 작품 정지·변수를 실행 시작 값으로 되돌림 · 헤드리스 진단(엔진 상태·멈춤 스택·pageerror) | [07 런타임 오류](07-runtime-quirks.md#런타임-오류throw는-작품을-멈추고-변수리스트를-실행-시작-값으로-되돌린다--증상이-원인에서-멀리-보인다) | 05 (멈춤 진단), lessons |
+| 신호 핸들러는 받는 오브젝트 차례에 돈다 — 이름 변수 하나 + 신호로 낸 효과음이 사라짐 → 리스트 줄 | [07 신호 핸들러 차례](07-runtime-quirks.md#신호-핸들러는-받는-오브젝트의-차례에-돈다--보낸-쪽이-곧바로-바꾼-변수를-읽는다) | 15 (진단 단계), 04 (장면 조립), lessons |
+| `message_cast_wait` 는 현재 장면의 **모든** 리스너(복제본 포함)가 끝날 때까지 기다린다 | [07 §message_cast race 의 정정](07-runtime-quirks.md#message_cast-핸들러는-동시-실행--같은-메시지-다중-리스너-race) | 04 (장면 조립) |
+| `클릭했는가?` 는 누른 동안만 참 — 틱 사이 클릭을 폴링이 놓침(헤드리스는 down·60ms·up) | [07 is_clicked](07-runtime-quirks.md#클릭했는가is_clicked는-누르고-있는-동안만-참--틱-사이에-눌렀다-뗀-클릭은-못-본다) | 05, lessons |
+| 오브젝트 목록 앞쪽 = 위 레이어(spec 에서 먼저 `push` 한 것이 위) | [07 레이어](07-runtime-quirks.md#오브젝트-목록의-앞쪽이-위에-그려진다--spec-objects-배열-순서가-곧-레이어) | lessons |
+| 보일링(선 떨림) — 후처리 세 장·모양 번호와 타이머 박자·`다음 모양` 금지·용량 | [04 보일링](04-script-and-blocks.md#보일링선-떨림--모양-세-장을-타이머-박자로-돌리기) | 03, lessons |
+| 장면 조립(팝업북) — 장면 시작에 숨기고 신호 하나로 시차를 두고 붙이기 | [04 장면 조립](04-script-and-blocks.md#장면-조립팝업북--조각을-하나씩-붙이며-장면-열기) | 07 (message_cast_wait) |
+| 헤드리스 장면 바로 가기(`fireEvent('when_scene_start')`)·그릴 때마다 재기·페이지 안 시각의 창으로 정확히 세기 | [05 헤드리스 런타임 검증](05-host-editor.md#그릴-때마다-재기--entrystageupdate-감싸기) | 15, lessons |
+| 이미지 편집 요청의 지정 밖 변화 → 바뀐 곳만 조각으로 얹기, "사라진 먹"으로 바뀐 곳 찾기 | [03 편집 요청](03-objects-and-assets.md#편집-요청은-지정한-곳-밖도-조금-바꾼다--바뀐-곳만-얹는다) | lessons |
 
 **규칙**: 새 사실 추가 시 위 표에 한 줄 추가. 정본을 두 곳에 둘 일이 생기면 둘 중
 하나가 더 적합한 위치. 모호하면 07 (불변 동작) 또는 04 (블록·패턴) 우선.
@@ -147,11 +176,11 @@
 **자유롭게 수정·리팩터링**. 사실이 바뀌면 그 자리를 덮어쓴다. 역사 추적은 `git log`.
 섹션을 지우는 것도 OK — 지금 틀린 정보를 계속 남겨두면 독자가 헷갈린다.
 
-### 🛠️ Guide — `04`의 설계 패턴 섹션들, `05-host-editor`
+### 🛠️ Guide — `04`의 설계 패턴 섹션들, `05-host-editor`, `16-music-synchronization`
 
 "이런 걸 하려면 이렇게" 유형. 패턴이 개선되면 기존 글을 고쳐서 최신 방법을 유지.
 
-### Case study — `09~14`, `evidence/`
+### Case study — `09~14`, `18`, `evidence/`
 
 영속 레퍼런스의 사례 분석이다. 파일 버전·관측 범위를 명시하고 증거와 함께 수정한다. 기존 패턴과 엔진 특성은 정본에 링크하고, 작품의 설계 선택만 해당 사례에서 설명한다. 성능 수치나 실행 보장은 실제 측정 전에는 추가하지 않는다.
 

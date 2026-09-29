@@ -71,7 +71,7 @@
 
 ## 변수 좌표 함정
 
-- **`x === 0` 또는 `y === 0` → bin-packer 폴백** ([`variable.js:136`](../../entryjs/src/class/variable/variable.js#L136) truthy check). 그리드/원형 배치 시 ±1 시프트나 0.5 오프셋으로 회피. 자세히는 [`07-runtime-quirks.md`](07-runtime-quirks.md) "변수 좌표 x=0 또는 y=0".
+- **`x === 0` 또는 `y === 0` → bin-packer 폴백** ([`variable.js:136`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/variable/variable.js#L136) truthy check). 그리드/원형 배치 시 ±1 시프트나 0.5 오프셋으로 회피. 자세히는 [`07-runtime-quirks.md`](07-runtime-quirks.md) "변수 좌표 x=0 또는 y=0".
 - **Variable y > 0 = 화면 아래** (entity 와 부호 반대). entity 는 `setY` 에서 반전하지만 variable 은 안 함. 원형 배치 시 `y = cy - r*cos(θ)` (cos 앞 마이너스). 자세히는 [`07-runtime-quirks.md`](07-runtime-quirks.md) "Variable Y vs Entity Y".
 
 ## 어디를 더 읽을지

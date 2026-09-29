@@ -1,0 +1,1842 @@
+{
+  "source": {
+    "filename": "chroma_009.ent",
+    "sha256": "ad14ea1e937855a2a2d358a84204eb8e656c1945e5b510a7d714125af665ae9f",
+    "bytes": 7458763,
+    "projectEntry": "temp/project.json",
+    "projectJsonBytes": 551155
+  },
+  "method": {
+    "analysis": "native archive structure with separately recorded local runtime observations",
+    "normalization": "JSON.parse objects[*].script and functions[*].content before applying RFC6901 pointers",
+    "assetDefinition": "Picture and sound records are metadata references, not unique archive files",
+    "sourceHandling": "Read-only gzip/tar parsing; no source scripts evaluated",
+    "scope": "Entry project blocks, assets, state and validation only. No website implementation or deployment."
+  },
+  "stats": {
+    "scenes": 1,
+    "objects": 127,
+    "functions": 12,
+    "variableEntries": 82,
+    "listEntries": 9,
+    "initialVisibleObjects": 9,
+    "visibleVariables": 0,
+    "pictureRecords": 896,
+    "soundRecords": 8
+  },
+  "localRuntime": {
+    "date": "2026-09-20T06:14:01.147Z",
+    "environment": "Windows / local EntryJS / Chrome",
+    "report": {
+      "filename": "verification.json",
+      "sha256": "c2f0bce36676f4bcd8a1237d678543066477038b474353159651c086300a8e43",
+      "published": false
+    },
+    "passed": true,
+    "checkCount": 65,
+    "checks": [
+      "native title screen boots",
+      "all chart and record lists stay hidden",
+      "left selects WARMUP",
+      "difficulty wraps backward",
+      "difficulty wraps forward",
+      "instructions open",
+      "latency increases by 15ms",
+      "reduced motion toggles",
+      "instructions return to menu",
+      "title help button opens the native guide",
+      "guide return button opens the title",
+      "guide practice button starts the sixteen-note chart",
+      "pause menu button returns to track selection",
+      "clickable start loads selected complete chart",
+      "eight bundled MP3 assets register and decode",
+      "native soundtrack produces a nonzero audio signal",
+      "native sound block starts original track",
+      "M mutes actual audio output",
+      "correct color at beat receives PERFECT",
+      "SPACE repeats selected color and receives GREAT",
+      "late hit within WARMUP window receives GOOD",
+      "timing feedback measures signed offset for each successful hit",
+      "timing histogram counts successful judgments",
+      "wrong color breaks combo and shows WRONG COLOR",
+      "wrong color breaks the FLOW charge",
+      "early color change does not consume a note",
+      "expired note becomes one MISS",
+      "pause freezes timeline and ignores hits",
+      "pause stops audio output",
+      "resume begins a three-count lead-in",
+      "resume returns to play",
+      "resumed music aligns with the native game clock",
+      "paused game returns to track menu",
+      "guided practice starts sixteen-note chart",
+      "OVERDRIVE selected",
+      "demo mode starts",
+      "full song reaches section 1",
+      "section 1 audio drift stays below 80ms",
+      "full song reaches section 2",
+      "consecutive accurate hits activate FLOW during real-time play",
+      "section 2 audio drift stays below 80ms",
+      "full song reaches section 3",
+      "section 3 audio drift stays below 80ms",
+      "full song reaches section 4",
+      "section 4 audio drift stays below 80ms",
+      "full song reaches section 5",
+      "section 5 audio drift stays below 80ms",
+      "full song reaches section 6",
+      "section 6 audio drift stays below 80ms",
+      "entire OVERDRIVE chart completes with every note judged",
+      "all-perfect performance reaches 1,000,000 / 100% / S+",
+      "full-song timing average and repeated FLOW activations are consistent",
+      "results histogram includes every note of the completed chart",
+      "automatic play never writes a player record",
+      "result score animation reaches the exact final score",
+      "clicking replay retains mode and clears performance analysis",
+      "pause screen resume button starts native countdown",
+      "unanswered STANDARD/OVERDRIVE notes lead to a recoverable signal loss",
+      "retry after failure resets notes, score and health",
+      "204 real keyboard presses finish STANDARD without a miss",
+      "real play earns S+ and a new personal session record",
+      "personal record survives returning to the menu",
+      "practice never replaces the personal record",
+      "zero browser runtime or console errors",
+      "zero failed asset requests"
+    ],
+    "errorCount": 0,
+    "httpErrorCount": 0,
+    "sync": {
+      "unit": "ms",
+      "reference": "native SoundJS position plus segment start versus fresh native timer origin plus base",
+      "acceptanceMaxAbsoluteMs": 80,
+      "sampleCount": 7,
+      "maxAbsoluteDriftMs": 9.00000000000091,
+      "samples": [
+        {
+          "label": "resumed",
+          "musicMs": 577.6666666666674,
+          "timerMs": 576,
+          "freshMs": 580,
+          "state": "playSucceeded",
+          "driftMs": -2.3333333333325754
+        },
+        {
+          "label": "section-1",
+          "musicMs": 2912.000000000001,
+          "timerMs": 2891,
+          "freshMs": 2903,
+          "state": "playSucceeded",
+          "driftMs": 9.00000000000091
+        },
+        {
+          "label": "section-2",
+          "musicMs": 17912,
+          "timerMs": 17897,
+          "freshMs": 17906,
+          "state": "playSucceeded",
+          "driftMs": 6
+        },
+        {
+          "label": "section-3",
+          "musicMs": 32920,
+          "timerMs": 32905,
+          "freshMs": 32921,
+          "state": "playSucceeded",
+          "driftMs": -1
+        },
+        {
+          "label": "section-4",
+          "musicMs": 47912,
+          "timerMs": 47897,
+          "freshMs": 47903,
+          "state": "playSucceeded",
+          "driftMs": 9
+        },
+        {
+          "label": "section-5",
+          "musicMs": 62901.33333333334,
+          "timerMs": 62889,
+          "freshMs": 62902,
+          "state": "playSucceeded",
+          "driftMs": -0.6666666666569654
+        },
+        {
+          "label": "section-6",
+          "musicMs": 77912,
+          "timerMs": 77897,
+          "freshMs": 77906,
+          "state": "playSucceeded",
+          "driftMs": 6
+        }
+      ]
+    },
+    "automaticRun": {
+      "auto": 1,
+      "practice": 0,
+      "total": 284,
+      "score": 1000000,
+      "accuracy": 100,
+      "perfect": 284,
+      "great": 0,
+      "good": 0,
+      "miss": 0,
+      "maxCombo": 284,
+      "hitCount": 284,
+      "flowCount": 12,
+      "timingSum": 2384,
+      "meanMs": 8,
+      "newBest": 0
+    },
+    "keyboardRun": {
+      "auto": 0,
+      "practice": 0,
+      "total": 204,
+      "score": 1000000,
+      "accuracy": 100,
+      "perfect": 204,
+      "great": 0,
+      "good": 0,
+      "miss": 0,
+      "maxCombo": 204,
+      "hitCount": 204,
+      "flowCount": 10,
+      "timingSum": 1414,
+      "meanMs": 7,
+      "newBest": 1
+    },
+    "audio": {
+      "registeredAndDecoded": true,
+      "soundCount": 8,
+      "signal": {
+        "peak": 0.07752382755279541,
+        "rms": 0.021275382143989562
+      }
+    }
+  },
+  "packageRuntime": {
+    "report": {
+      "filename": "package-verification.json",
+      "sha256": "662446f578e1839701429ea3e5c559bf6ce90917454659c50daa15acc71779e8",
+      "published": false
+    },
+    "file": "chroma_009.ent",
+    "checks": [
+      "archive contains every picture and eight MP3 sounds",
+      "archive has no exposed implementation lists or variables",
+      "unmodified workspace editor imports all native objects",
+      "workspace contains no unknown or warning blocks",
+      "stopped project opens directly on its clean title screen",
+      "game also plays inside the original workspace editor",
+      "editor export preserves object and function counts",
+      "saved and reimported project runs the guided practice",
+      "workspace import, play, save and reimport produce zero runtime errors"
+    ],
+    "errors": [],
+    "nativeObjects": 127,
+    "pictures": 896,
+    "sounds": 8,
+    "passed": true
+  },
+  "limitations": [
+    "Source .ent, complete local reports, assets and game source are not published by this knowledge-only change.",
+    "The generic evidence verifier checks source identity and assertions; it does not rerun or certify the runtime section.",
+    "The timing result is seven diagnostic observations in one local run; it is not physical audio output latency or a continuous bound.",
+    "Boundary fixtures set next/base; only the separate keyboard completion uses state reads and keydown/keyup without writing game state.",
+    "Official online publication, a separate official offline app run, manual listening, background-tab behavior and other devices were not verified for this artifact."
+  ],
+  "assertions": [
+    {
+      "label": "scenes count",
+      "path": "/scenes/length",
+      "expected": 1
+    },
+    {
+      "label": "objects count",
+      "path": "/objects/length",
+      "expected": 127
+    },
+    {
+      "label": "functions count",
+      "path": "/functions/length",
+      "expected": 12
+    },
+    {
+      "label": "variables count",
+      "path": "/variables/length",
+      "expected": 82
+    },
+    {
+      "label": "counts identity",
+      "path": "/variables/76/id",
+      "expected": "counts"
+    },
+    {
+      "label": "counts items",
+      "path": "/variables/76/array",
+      "expected": [
+        {
+          "data": "104"
+        },
+        {
+          "data": "204"
+        },
+        {
+          "data": "284"
+        },
+        {
+          "data": "16"
+        }
+      ]
+    },
+    {
+      "label": "offsets identity",
+      "path": "/variables/77/id",
+      "expected": "offsets"
+    },
+    {
+      "label": "offsets items",
+      "path": "/variables/77/array",
+      "expected": [
+        {
+          "data": "0"
+        },
+        {
+          "data": "104"
+        },
+        {
+          "data": "308"
+        },
+        {
+          "data": "592"
+        }
+      ]
+    },
+    {
+      "label": "timingBins identity",
+      "path": "/variables/81/id",
+      "expected": "timingBins"
+    },
+    {
+      "label": "timingBins items",
+      "path": "/variables/81/array",
+      "expected": [
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        },
+        {
+          "data": "0"
+        }
+      ]
+    },
+    {
+      "label": "hidden variable state",
+      "path": "/variables/0/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable difficulty",
+      "path": "/variables/1/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable color",
+      "path": "/variables/2/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable muted",
+      "path": "/variables/3/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable reduced",
+      "path": "/variables/4/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable offset",
+      "path": "/variables/5/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable next",
+      "path": "/variables/6/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable total",
+      "path": "/variables/7/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable chartOffset",
+      "path": "/variables/8/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable raw",
+      "path": "/variables/9/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable time",
+      "path": "/variables/10/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable base",
+      "path": "/variables/11/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable frames",
+      "path": "/variables/12/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable score",
+      "path": "/variables/13/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable points",
+      "path": "/variables/14/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable accuracy",
+      "path": "/variables/15/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable combo",
+      "path": "/variables/16/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable maxCombo",
+      "path": "/variables/17/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable perfect",
+      "path": "/variables/18/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable great",
+      "path": "/variables/19/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable good",
+      "path": "/variables/20/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable miss",
+      "path": "/variables/21/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable energy",
+      "path": "/variables/22/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable judge",
+      "path": "/variables/23/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable judgeAt",
+      "path": "/variables/24/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable hitAt",
+      "path": "/variables/25/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable hitColor",
+      "path": "/variables/26/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable auto",
+      "path": "/variables/27/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable practice",
+      "path": "/variables/28/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable section",
+      "path": "/variables/29/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable beat",
+      "path": "/variables/30/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable window",
+      "path": "/variables/31/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable failed",
+      "path": "/variables/32/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable grade",
+      "path": "/variables/33/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable newBest",
+      "path": "/variables/34/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable request",
+      "path": "/variables/35/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable previousState",
+      "path": "/variables/36/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable sink",
+      "path": "/variables/37/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable delta",
+      "path": "/variables/38/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable countdown",
+      "path": "/variables/39/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable endTime",
+      "path": "/variables/40/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable best",
+      "path": "/variables/41/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable flowCharge",
+      "path": "/variables/42/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable flowUntil",
+      "path": "/variables/43/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable flowActive",
+      "path": "/variables/44/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable flowCount",
+      "path": "/variables/45/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable lastMs",
+      "path": "/variables/46/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable timingSum",
+      "path": "/variables/47/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable hitCount",
+      "path": "/variables/48/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable meanMs",
+      "path": "/variables/49/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable timingBin",
+      "path": "/variables/50/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable timingMax",
+      "path": "/variables/51/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable milestone",
+      "path": "/variables/52/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable milestoneAt",
+      "path": "/variables/53/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable resultFrame",
+      "path": "/variables/54/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable displayScore",
+      "path": "/variables/55/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key13",
+      "path": "/variables/56/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key27",
+      "path": "/variables/57/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key32",
+      "path": "/variables/58/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key37",
+      "path": "/variables/59/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key39",
+      "path": "/variables/60/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key65",
+      "path": "/variables/61/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key66",
+      "path": "/variables/62/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key68",
+      "path": "/variables/63/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key70",
+      "path": "/variables/64/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key72",
+      "path": "/variables/65/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key74",
+      "path": "/variables/66/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key77",
+      "path": "/variables/67/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key82",
+      "path": "/variables/68/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key84",
+      "path": "/variables/69/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key86",
+      "path": "/variables/70/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key219",
+      "path": "/variables/71/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable key221",
+      "path": "/variables/72/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable times",
+      "path": "/variables/73/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable colors",
+      "path": "/variables/74/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable accents",
+      "path": "/variables/75/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable counts",
+      "path": "/variables/76/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable offsets",
+      "path": "/variables/77/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable bests",
+      "path": "/variables/78/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable motionLabels",
+      "path": "/variables/79/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable soundLabels",
+      "path": "/variables/80/visible",
+      "expected": false
+    },
+    {
+      "label": "hidden variable timingBins",
+      "path": "/variables/81/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility muteIcon",
+      "path": "/objects/0/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility menuBest",
+      "path": "/objects/1/entity/visible",
+      "expected": true
+    },
+    {
+      "label": "initial visibility backButton",
+      "path": "/objects/2/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility retryButton",
+      "path": "/objects/3/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility meanTiming",
+      "path": "/objects/4/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist13",
+      "path": "/objects/5/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist12",
+      "path": "/objects/6/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist11",
+      "path": "/objects/7/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist10",
+      "path": "/objects/8/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist9",
+      "path": "/objects/9/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist8",
+      "path": "/objects/10/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist7",
+      "path": "/objects/11/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist6",
+      "path": "/objects/12/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist5",
+      "path": "/objects/13/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist4",
+      "path": "/objects/14/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist3",
+      "path": "/objects/15/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist2",
+      "path": "/objects/16/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist1",
+      "path": "/objects/17/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingHist0",
+      "path": "/objects/18/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility newBestBadge",
+      "path": "/objects/19/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility resultStatus",
+      "path": "/objects/20/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility resultCombo",
+      "path": "/objects/21/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility resultCounts",
+      "path": "/objects/22/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility resultAccuracy",
+      "path": "/objects/23/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility resultScore",
+      "path": "/objects/24/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility grade",
+      "path": "/objects/25/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility helpBack",
+      "path": "/objects/26/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility helpPractice",
+      "path": "/objects/27/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility settings",
+      "path": "/objects/28/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility resumeCount",
+      "path": "/objects/29/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility pauseBack",
+      "path": "/objects/30/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility resumeButton",
+      "path": "/objects/31/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility pauseOverlay",
+      "path": "/objects/32/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility milestone",
+      "path": "/objects/33/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility flowLabel",
+      "path": "/objects/34/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility flowMeter",
+      "path": "/objects/35/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility flowBadge",
+      "path": "/objects/36/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingLabel",
+      "path": "/objects/37/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingNeedle",
+      "path": "/objects/38/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility timingRail",
+      "path": "/objects/39/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility countPrompt",
+      "path": "/objects/40/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility countIn",
+      "path": "/objects/41/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tutorialHint",
+      "path": "/objects/42/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility energyLabel",
+      "path": "/objects/43/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility energy",
+      "path": "/objects/44/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility progress",
+      "path": "/objects/45/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility runLabel",
+      "path": "/objects/46/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility scoreText",
+      "path": "/objects/47/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility comboLabel",
+      "path": "/objects/48/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility comboText",
+      "path": "/objects/49/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility keycap2",
+      "path": "/objects/50/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility keycap1",
+      "path": "/objects/51/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility keycap0",
+      "path": "/objects/52/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility judgment",
+      "path": "/objects/53/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark9",
+      "path": "/objects/54/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark8",
+      "path": "/objects/55/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark7",
+      "path": "/objects/56/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark6",
+      "path": "/objects/57/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark5",
+      "path": "/objects/58/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark4",
+      "path": "/objects/59/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark3",
+      "path": "/objects/60/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark2",
+      "path": "/objects/61/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark1",
+      "path": "/objects/62/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spark0",
+      "path": "/objects/63/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility burst",
+      "path": "/objects/64/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note13",
+      "path": "/objects/65/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note12",
+      "path": "/objects/66/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note11",
+      "path": "/objects/67/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note10",
+      "path": "/objects/68/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note9",
+      "path": "/objects/69/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note8",
+      "path": "/objects/70/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note7",
+      "path": "/objects/71/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note6",
+      "path": "/objects/72/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note5",
+      "path": "/objects/73/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note4",
+      "path": "/objects/74/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note3",
+      "path": "/objects/75/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note2",
+      "path": "/objects/76/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note1",
+      "path": "/objects/77/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility note0",
+      "path": "/objects/78/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility hitTrail",
+      "path": "/objects/79/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility reactorArc",
+      "path": "/objects/80/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility reactor",
+      "path": "/objects/81/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick11",
+      "path": "/objects/82/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick10",
+      "path": "/objects/83/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick9",
+      "path": "/objects/84/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick8",
+      "path": "/objects/85/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick7",
+      "path": "/objects/86/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick6",
+      "path": "/objects/87/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick5",
+      "path": "/objects/88/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick4",
+      "path": "/objects/89/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick3",
+      "path": "/objects/90/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick2",
+      "path": "/objects/91/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick1",
+      "path": "/objects/92/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility tick0",
+      "path": "/objects/93/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum21",
+      "path": "/objects/94/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum20",
+      "path": "/objects/95/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum19",
+      "path": "/objects/96/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum18",
+      "path": "/objects/97/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum17",
+      "path": "/objects/98/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum16",
+      "path": "/objects/99/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum15",
+      "path": "/objects/100/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum14",
+      "path": "/objects/101/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum13",
+      "path": "/objects/102/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum12",
+      "path": "/objects/103/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum11",
+      "path": "/objects/104/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum10",
+      "path": "/objects/105/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum9",
+      "path": "/objects/106/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum8",
+      "path": "/objects/107/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum7",
+      "path": "/objects/108/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum6",
+      "path": "/objects/109/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum5",
+      "path": "/objects/110/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum4",
+      "path": "/objects/111/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum3",
+      "path": "/objects/112/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum2",
+      "path": "/objects/113/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum1",
+      "path": "/objects/114/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility spectrum0",
+      "path": "/objects/115/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility phaseImpact",
+      "path": "/objects/116/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility sectionTitle",
+      "path": "/objects/117/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility menuAction2",
+      "path": "/objects/118/entity/visible",
+      "expected": true
+    },
+    {
+      "label": "initial visibility menuAction1",
+      "path": "/objects/119/entity/visible",
+      "expected": true
+    },
+    {
+      "label": "initial visibility menuAction0",
+      "path": "/objects/120/entity/visible",
+      "expected": true
+    },
+    {
+      "label": "initial visibility startButton",
+      "path": "/objects/121/entity/visible",
+      "expected": true
+    },
+    {
+      "label": "initial visibility difficulty",
+      "path": "/objects/122/entity/visible",
+      "expected": true
+    },
+    {
+      "label": "initial visibility menuHero",
+      "path": "/objects/123/entity/visible",
+      "expected": true
+    },
+    {
+      "label": "initial visibility menuOrbit",
+      "path": "/objects/124/entity/visible",
+      "expected": true
+    },
+    {
+      "label": "initial visibility controller",
+      "path": "/objects/125/entity/visible",
+      "expected": false
+    },
+    {
+      "label": "initial visibility background",
+      "path": "/objects/126/entity/visible",
+      "expected": true
+    },
+    {
+      "label": "background id",
+      "path": "/objects/126/id",
+      "expected": "background"
+    },
+    {
+      "label": "background entity/scaleX",
+      "path": "/objects/126/entity/scaleX",
+      "expected": 0.3333333333333333
+    },
+    {
+      "label": "background entity/scaleY",
+      "path": "/objects/126/entity/scaleY",
+      "expected": 0.3333333333333333
+    },
+    {
+      "label": "background sprite/pictures/length",
+      "path": "/objects/126/sprite/pictures/length",
+      "expected": 10
+    },
+    {
+      "label": "background sprite/pictures/0/dimension",
+      "path": "/objects/126/sprite/pictures/0/dimension",
+      "expected": {
+        "width": 1440,
+        "height": 810
+      }
+    },
+    {
+      "label": "background sprite/pictures/0/imageType",
+      "path": "/objects/126/sprite/pictures/0/imageType",
+      "expected": "png"
+    },
+    {
+      "label": "note0 id",
+      "path": "/objects/78/id",
+      "expected": "note0"
+    },
+    {
+      "label": "note0 entity/scaleX",
+      "path": "/objects/78/entity/scaleX",
+      "expected": 0.3333333333333333
+    },
+    {
+      "label": "note0 entity/scaleY",
+      "path": "/objects/78/entity/scaleY",
+      "expected": 0.3333333333333333
+    },
+    {
+      "label": "note0 sprite/pictures/length",
+      "path": "/objects/78/sprite/pictures/length",
+      "expected": 6
+    },
+    {
+      "label": "note0 sprite/pictures/0/dimension",
+      "path": "/objects/78/sprite/pictures/0/dimension",
+      "expected": {
+        "width": 96,
+        "height": 96
+      }
+    },
+    {
+      "label": "note0 sprite/pictures/0/imageType",
+      "path": "/objects/78/sprite/pictures/0/imageType",
+      "expected": "png"
+    },
+    {
+      "label": "menuHero id",
+      "path": "/objects/123/id",
+      "expected": "menuHero"
+    },
+    {
+      "label": "menuHero entity/scaleX",
+      "path": "/objects/123/entity/scaleX",
+      "expected": 0.16507177033492823
+    },
+    {
+      "label": "menuHero entity/scaleY",
+      "path": "/objects/123/entity/scaleY",
+      "expected": 0.16507177033492823
+    },
+    {
+      "label": "menuHero sprite/pictures/length",
+      "path": "/objects/123/sprite/pictures/length",
+      "expected": 1
+    },
+    {
+      "label": "menuHero sprite/pictures/0/dimension",
+      "path": "/objects/123/sprite/pictures/0/dimension",
+      "expected": {
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    {
+      "label": "menuHero sprite/pictures/0/imageType",
+      "path": "/objects/123/sprite/pictures/0/imageType",
+      "expected": "png"
+    },
+    {
+      "label": "timingHist0 id",
+      "path": "/objects/18/id",
+      "expected": "timingHist0"
+    },
+    {
+      "label": "timingHist0 entity/scaleX",
+      "path": "/objects/18/entity/scaleX",
+      "expected": 0.3333333333333333
+    },
+    {
+      "label": "timingHist0 entity/scaleY",
+      "path": "/objects/18/entity/scaleY",
+      "expected": 0.3333333333333333
+    },
+    {
+      "label": "timingHist0 sprite/pictures/length",
+      "path": "/objects/18/sprite/pictures/length",
+      "expected": 20
+    },
+    {
+      "label": "timingHist0 sprite/pictures/0/dimension",
+      "path": "/objects/18/sprite/pictures/0/dimension",
+      "expected": {
+        "width": 24,
+        "height": 60
+      }
+    },
+    {
+      "label": "timingHist0 sprite/pictures/0/imageType",
+      "path": "/objects/18/sprite/pictures/0/imageType",
+      "expected": "png"
+    },
+    {
+      "label": "pause identity",
+      "path": "/functions/7/id",
+      "expected": "pause"
+    },
+    {
+      "label": "pause function type",
+      "path": "/functions/7/type",
+      "expected": "value"
+    },
+    {
+      "label": "pause native sequence",
+      "path": "/functions/7/content/0/0/statements/0",
+      "expected": [
+        {
+          "type": "set_variable",
+          "params": [
+            "base",
+            {
+              "type": "get_variable",
+              "params": [
+                "raw",
+                null
+              ]
+            },
+            null
+          ]
+        },
+        {
+          "type": "choose_project_timer_action",
+          "params": [
+            null,
+            "STOP",
+            null,
+            null
+          ]
+        },
+        {
+          "type": "sound_silent_all",
+          "params": [
+            "all",
+            null
+          ]
+        },
+        {
+          "type": "set_variable",
+          "params": [
+            "state",
+            {
+              "type": "number",
+              "params": [
+                "2"
+              ]
+            },
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "label": "resumeCountdown identity",
+      "path": "/functions/8/id",
+      "expected": "resumeCountdown"
+    },
+    {
+      "label": "resumeCountdown function type",
+      "path": "/functions/8/type",
+      "expected": "value"
+    },
+    {
+      "label": "resumeCountdown native sequence",
+      "path": "/functions/8/content/0/0/statements/0",
+      "expected": [
+        {
+          "type": "choose_project_timer_action",
+          "params": [
+            null,
+            "START",
+            null,
+            null
+          ]
+        },
+        {
+          "type": "choose_project_timer_action",
+          "params": [
+            null,
+            "RESET",
+            null,
+            null
+          ]
+        },
+        {
+          "type": "set_variable",
+          "params": [
+            "state",
+            {
+              "type": "number",
+              "params": [
+                "5"
+              ]
+            },
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "label": "resume identity",
+      "path": "/functions/9/id",
+      "expected": "resume"
+    },
+    {
+      "label": "resume function type",
+      "path": "/functions/9/type",
+      "expected": "value"
+    },
+    {
+      "label": "resume native sequence",
+      "path": "/functions/9/content/0/0/statements/0",
+      "expected": [
+        {
+          "type": "choose_project_timer_action",
+          "params": [
+            null,
+            "RESET",
+            null,
+            null
+          ]
+        },
+        {
+          "type": "sound_from_to",
+          "params": [
+            {
+              "type": "text",
+              "params": [
+                "chromatic-drive"
+              ]
+            },
+            {
+              "type": "get_variable",
+              "params": [
+                "base",
+                null
+              ]
+            },
+            {
+              "type": "number",
+              "params": [
+                "93.875"
+              ]
+            },
+            null
+          ]
+        },
+        {
+          "type": "set_variable",
+          "params": [
+            "state",
+            {
+              "type": "number",
+              "params": [
+                "1"
+              ]
+            },
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "label": "sound controller identity",
+      "path": "/objects/125/id",
+      "expected": "controller"
+    },
+    {
+      "label": "sound count",
+      "path": "/objects/125/sprite/sounds/length",
+      "expected": 8
+    },
+    {
+      "label": "sound 0 name",
+      "path": "/objects/125/sprite/sounds/0/name",
+      "expected": "chromatic-drive"
+    },
+    {
+      "label": "sound 0 ext",
+      "path": "/objects/125/sprite/sounds/0/ext",
+      "expected": ".mp3"
+    },
+    {
+      "label": "sound 0 duration",
+      "path": "/objects/125/sprite/sounds/0/duration",
+      "expected": 93.875
+    },
+    {
+      "label": "sound 1 name",
+      "path": "/objects/125/sprite/sounds/1/name",
+      "expected": "hit-mint"
+    },
+    {
+      "label": "sound 1 ext",
+      "path": "/objects/125/sprite/sounds/1/ext",
+      "expected": ".mp3"
+    },
+    {
+      "label": "sound 1 duration",
+      "path": "/objects/125/sprite/sounds/1/duration",
+      "expected": 0.22
+    },
+    {
+      "label": "sound 2 name",
+      "path": "/objects/125/sprite/sounds/2/name",
+      "expected": "hit-coral"
+    },
+    {
+      "label": "sound 2 ext",
+      "path": "/objects/125/sprite/sounds/2/ext",
+      "expected": ".mp3"
+    },
+    {
+      "label": "sound 2 duration",
+      "path": "/objects/125/sprite/sounds/2/duration",
+      "expected": 0.22
+    },
+    {
+      "label": "sound 3 name",
+      "path": "/objects/125/sprite/sounds/3/name",
+      "expected": "hit-lime"
+    },
+    {
+      "label": "sound 3 ext",
+      "path": "/objects/125/sprite/sounds/3/ext",
+      "expected": ".mp3"
+    },
+    {
+      "label": "sound 3 duration",
+      "path": "/objects/125/sprite/sounds/3/duration",
+      "expected": 0.22
+    },
+    {
+      "label": "sound 4 name",
+      "path": "/objects/125/sprite/sounds/4/name",
+      "expected": "select"
+    },
+    {
+      "label": "sound 4 ext",
+      "path": "/objects/125/sprite/sounds/4/ext",
+      "expected": ".mp3"
+    },
+    {
+      "label": "sound 4 duration",
+      "path": "/objects/125/sprite/sounds/4/duration",
+      "expected": 0.3
+    },
+    {
+      "label": "sound 5 name",
+      "path": "/objects/125/sprite/sounds/5/name",
+      "expected": "clear"
+    },
+    {
+      "label": "sound 5 ext",
+      "path": "/objects/125/sprite/sounds/5/ext",
+      "expected": ".mp3"
+    },
+    {
+      "label": "sound 5 duration",
+      "path": "/objects/125/sprite/sounds/5/duration",
+      "expected": 1.2
+    },
+    {
+      "label": "sound 6 name",
+      "path": "/objects/125/sprite/sounds/6/name",
+      "expected": "miss"
+    },
+    {
+      "label": "sound 6 ext",
+      "path": "/objects/125/sprite/sounds/6/ext",
+      "expected": ".mp3"
+    },
+    {
+      "label": "sound 6 duration",
+      "path": "/objects/125/sprite/sounds/6/duration",
+      "expected": 0.3
+    },
+    {
+      "label": "sound 7 name",
+      "path": "/objects/125/sprite/sounds/7/name",
+      "expected": "flow"
+    },
+    {
+      "label": "sound 7 ext",
+      "path": "/objects/125/sprite/sounds/7/ext",
+      "expected": ".mp3"
+    },
+    {
+      "label": "sound 7 duration",
+      "path": "/objects/125/sprite/sounds/7/duration",
+      "expected": 0.85
+    }
+  ]
+}

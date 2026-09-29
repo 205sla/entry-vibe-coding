@@ -45,11 +45,20 @@
 - 런타임에 `text_write` 로 덮는 글상자라면 세 번째 출처(**블록 파라미터**)도 있다.
   정적 두 필드는 그 블록이 실행되기 **전 첫 프레임**에 보이는 값이다.
 
+`text_write` 입력이 항상 문자열 리터럴인 것은 아니다. 변수·리스트 값을 읽는 **반환 블록**이면
+그 타입과 참조를 따라 실제 데이터 출처를 찾는다. JSON의 빈 슬롯 `null`, 문자열 `"null"`,
+분석기가 해석하지 못한 값을 구분한다. 입력의 고정 인덱스만 읽고 정적 text가 계속 보인다고 결론 내리면 안 된다.
+엔진도 [text_write 실행 시 입력을 평가](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_text.js#L113)한다.
+초기 필드 일치는 파일 검사이며, 실행 중에는 **그 시점의 기대 문구**와 렌더 문자열을 비교한다.
+
+문구가 길어졌다면 [크기 블록의 실제 단위](07-runtime-quirks.md#크기-정하기는-퍼센트가-아니다)와
+줄바꿈 높이를 함께 확인한다. 폰트만 줄이면 뒤의 크기 블록이 다시 확대할 수 있다.
+
 make-ent 로 새로 만들 때는 DSL 이 둘 다 채워주므로 문제가 없다. **기존 작품을 외과적으로
 수정할 때** 걸린다.
 - `sprite.pictures`는 보통 비어있거나 무시됨
 - `entity.bgColor` 는 hex(`'#xxxxxx'`) 일 때만 사각 전체 클릭 — 투명이면 글자(glyph) 픽셀만 hit. 자세한 건 [`07-runtime-quirks.md` textBox 클릭 영역](07-runtime-quirks.md#textbox-클릭-영역--bgcolor-에-따라-사각-전체-vs-glyph-픽셀만)
-- 썸네일은 `text_icon_ko.svg` / `text_icon.svg` 자동 사용 ([`object.js:240-243`](../../entryjs/src/class/object.js#L240))
+- 썸네일은 `text_icon_ko.svg` / `text_icon.svg` 자동 사용 ([`object.js:240-243`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/object.js#L240))
 
 #### ⚠️ 보이는 글상자는 entity 를 **전부** 명시한다
 
@@ -140,7 +149,7 @@ JSON.stringify 결과는 키 순서에 의존하지 않고 엔진도 순서 체�
 
 1. **현재 생성기는 `imageType: "png"`를 출력한다.** `lib/asset-bundler.js`가 이미지를 PNG로 변환하는 정책이며, 모든 외부 `.ent`의 형식 제약은 아니다.
 2. **`thumbUrl` 필드를 쓰지 않는다.** Entry의 `updateThumbnailView`
-   ([`object.js:223-245`](../../entryjs/src/class/object.js#L223))가 `thumbUrl || fileurl`로
+   ([`object.js:223-245`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/object.js#L223))가 `thumbUrl || fileurl`로
    fallback하는데, fileurl이 PNG면 CSS `background-image`로 썸네일을 바로 띄운다.
 3. **`fileurl`은 tar 경로** — `temp/<d1>/<d2>/image/<hash>.png`.
 4. **`filename`은 해시만** (확장자 없음) — Entry가 필요시 `<defaultPath>/uploads/…/thumb/<hash>.png`로 derive.
@@ -354,6 +363,24 @@ export default {
 별도 유료 API/CLI 방식은 사용자가 선택한 경우에만 사용한다. 자동으로 키를 찾거나 다른 모델로 바꾸지 않는다.
 검증 근거: [가져오기·알파 보존 회귀 검사](../tests/generated-assets.test.js)는 투명·반투명 픽셀이
 가져오기와 `.ent` 번들링 뒤에도 유지되는지, 불투명 sprite와 덮어쓰기가 차단되는지 확인한다.
+
+#### 편집 요청은 지정한 곳 **밖도 조금** 바꾼다 — 바뀐 곳만 얹는다
+
+"이 그림에서 ○○ 만 바꿔라(나머지는 그대로)"는 편집 요청은 대체로 지켜지지만, 결과를 통째로 쓰면 종이결·얼룩 같은 **지정 밖의 미세한 변화**가 따라온다
+(2026-09-29 제목 그림에서 글자 몇 개만 지우는 편집: 도구가 스스로 "지정 영역 밖 종이결도 바뀌었다"고 보고했고, 멀리 떨어진 물감 얼룩의 색이 달라져 있었다).
+
+- **바뀐 곳만 조각으로 얹는다**: 원본과 편집본을 **원본과 똑같은 자르기·배율**로 맞춘 뒤, 바꾼 상자(+여백 10px)만 잘라 원본 위 제자리에 둔다.
+  여백은 원본과 같은 픽셀이라 이음매가 없다(측정: 조각 테두리와 원본 차이 최대 1/255). 조각 가운데 − 원본 가운데 오프셋을 기록해 두고 같은 배율로 놓는다.
+- **바꾼 곳을 찾을 때 색 차이를 쓰지 않는다** — 위의 지정 밖 변화까지 잡힌다(실제로 엉뚱한 얼룩 영역이 가장 크게 잡혔다).
+  "지웠다"면 **사라진 먹**: 원본에서 어둡던(글자) 픽셀 중 편집본에선 근처(3×3)에도 어두운 게 없는 곳 → 닫기 연산 → 가장 큰 덩어리.
+- 단계 애니메이션(반쯤 지움 → 다 지움)은 상자 안에서만 편집본을 왼쪽부터 드러낸 몇 장으로 만든다.
+- 용량: 제목 전체를 네 장 두던 것을 작은 조각 세 장으로 바꿔 `.ent` 가 약 1.4 MB 줄었다(제목 그림은 다른 장면과 같은 파일이라 번들에 한 번만).
+
+배경 속 물건을 그려 넣고 오려 누를 수 있게 만드는 경우도 같은 원리다(편집본 전체 대신 바뀐 곳만 쓰기).
+
+#### 가만히 있는 그림에 "선 떨림"(보일링)을 줄 때
+
+생성 AI 로 세 번 다시 그리지 말고 완성 PNG 를 후처리로 조금씩 민 세 장을 쓴다 → [04 보일링](04-script-and-blocks.md#보일링선-떨림--모양-세-장을-타이머-박자로-돌리기).
 
 ### 자산이 tar에 들어가야 하는 이유
 
