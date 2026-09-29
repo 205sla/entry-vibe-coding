@@ -1,0 +1,387 @@
+#!/usr/bin/env node
+// Zero-authoring runtime check (L4 minimum) — no verify.mjs needed.
+//
+//   node tools/play-check.mjs games/<name>/<name>_001.ent
+//
+// Loads the .ent into the offline editor (starts server.js if nothing answers
+// on BASE_URL), presses ▶, and reports what actually happens:
+//   - 2 s untouched: how each object moves, which variables/texts/shapes change
+//   - shown objects that add no pixel to the stage (covered by a layer above)
+//   - text boxes that lie mostly off the stage (their text is cut off)
+//   - every key the first scene listens for (arrows + space when none): held 0.6 s,
+//     compared with an untouched run of the same length (Math.random is seeded
+//     identically, so random spawns do not count as a key effect)
+//   - a stage screenshot for a visual look
+// It does not judge game rules — compare the report with what the game should do.
+// Exit 1 on load failure, page errors, key fields that are not key codes, shown
+// objects that are never drawn, or when no first-scene key changes anything.
+import fs from 'node:fs';
+import path from 'node:path';
+import { bootEditor, loadFixture } from './lib/editor-harness.mjs';
+import { runFresh } from './lib/verify-harness.mjs';
+import { startEditorServer, stopChild } from './run-all-verify.mjs';
+
+const file = process.argv[2];
+if (!file || !fs.existsSync(file)) {
+    console.error('usage: node tools/play-check.mjs <file.ent>');
+    process.exit(2);
+}
+const baseURL = process.env.BASE_URL || 'http://localhost:3000';
+const JUMP = 40;  // a move this long between ~10 ms samples is a teleport (respawn, locateXY)
+const KEY_LABEL = { 37: '←', 38: '↑', 39: '→', 40: '↓', 32: '스페이스', 13: '엔터', 27: 'Esc' };
+const keyLabel = (code) => KEY_LABEL[code] || (code >= 65 && code <= 90 ? String.fromCharCode(code) : '키 ' + code);
+
+function snapshot(page) {
+    return page.evaluate(() => {
+        const out = { objects: {}, vars: {}, scene: Entry.scene.selectedScene?.name };
+        for (const o of Entry.container.getAllObjects()) {
+            const e = o.entity;
+            out.objects[o.id] = {
+                name: o.name, x: e.getX(), y: e.getY(), visible: e.getVisible(),
+                shape: e.picture?.name, text: o.objectType === 'textBox' ? e.getText() : undefined,
+                clones: (o.clonedEntities || []).length,
+            };
+            if (o.objectType === 'textBox') {
+                // Share of the text box that lies on the stage (x -240~240, y -135~135).
+                const w = e.getWidth() * Math.abs(e.getScaleX()), h = e.getHeight() * Math.abs(e.getScaleY());
+                const span = (c, half, lim) => Math.max(0, Math.min(c + half, lim) - Math.max(c - half, -lim));
+                out.objects[o.id].onStage = w && h ? span(e.getX(), w / 2, 240) * span(e.getY(), h / 2, 135) / (w * h) : 1;
+            }
+        }
+        for (const v of Entry.variableContainer.variables_) out.vars[v.name_] = String(v.getValue());
+        for (const l of Entry.variableContainer.lists_) out.vars['리스트 ' + l.name_] = (l.array_ || []).length + '칸';
+        return out;
+    });
+}
+
+// Run from ▶ with a fixed random seed, wait `delay` ms, then watch for `ms` ms,
+// optionally holding a key. Motion is tracked inside the page every ~10 ms so
+// fast movers are not mistaken for jumps.
+async function playWindow(page, ms, code = null, delay = 300) {
+    await page.evaluate(() => {
+        let seed = 20260929;
+        Math.random = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+    });
+    await runFresh(page);
+    await page.waitForTimeout(delay);
+    const first = await snapshot(page);
+    await page.evaluate((jump) => {
+        const prev = {}, motion = {};
+        const read = () => {
+            for (const o of Entry.container.getAllObjects()) {
+                const x = o.entity.getX(), y = o.entity.getY(), p = prev[o.id];
+                if (p) {
+                    const m = motion[o.id] ??= { dx: 0, dy: 0, jumps: 0 };
+                    if (Math.hypot(x - p.x, y - p.y) > jump) m.jumps++;
+                    else { m.dx += x - p.x; m.dy += y - p.y; }
+                }
+                prev[o.id] = { x, y };
+            }
+        };
+        read();
+        window.__playCheck = { motion, read, timer: setInterval(read, 10) };
+    }, JUMP);
+    if (code) await page.evaluate(c => document.dispatchEvent(new KeyboardEvent('keydown', { code: c, key: c })), code);
+    await page.waitForTimeout(ms);
+    if (code) await page.evaluate(c => document.dispatchEvent(new KeyboardEvent('keyup', { code: c, key: c })), code);
+    const motion = await page.evaluate(() => {
+        clearInterval(window.__playCheck.timer);
+        window.__playCheck.read();
+        return window.__playCheck.motion;
+    });
+    return { first, last: await snapshot(page), motion, ms };
+}
+
+function direction(dx, dy) {
+    const h = dx > 2 ? '오른쪽' : dx < -2 ? '왼쪽' : '';
+    const v = dy > 2 ? '위' : dy < -2 ? '아래' : '';
+    if (h && v) return `${h} ${v}로`;
+    return h ? h + '으로' : v + '로';
+}
+
+function describeMotion(name, m, ms) {
+    const dist = Math.hypot(m.dx, m.dy);
+    const parts = [];
+    if (dist > 2) parts.push(`${direction(m.dx, m.dy)} 이동 (초당 약 ${Math.round(dist / (ms / 1000))})`);
+    if (m.jumps) parts.push(`순간이동 ${m.jumps}번`);
+    return parts.length ? `${name}: ${parts.join(', ')}` : null;
+}
+
+// Non-motion differences between two end states, as { id, text } so that
+// values which differ between two untouched runs can be filtered out as noise.
+function stateDiff(a, b, labelA, labelB) {
+    const out = [];
+    for (const [id, o] of Object.entries(b.objects)) {
+        const p = a.objects[id];
+        if (!p) continue;
+        if (o.visible !== p.visible) out.push({ id: id + ':vis', text: `${o.name}: ${labelA} ${p.visible ? '보임' : '숨김'} / ${labelB} ${o.visible ? '보임' : '숨김'}` });
+        if (o.shape !== p.shape) out.push({ id: id + ':shape', text: `${o.name}: 모양 ${p.shape} → ${o.shape}` });
+        if (o.text !== p.text) out.push({ id: id + ':text', text: `${o.name}: 글 "${p.text}" → "${o.text}"` });
+        if (o.clones !== p.clones) out.push({ id: id + ':clones', text: `${o.name}: 복제본 ${p.clones} → ${o.clones}개` });
+    }
+    for (const [name, v] of Object.entries(b.vars)) {
+        if (a.vars[name] !== v) out.push({ id: 'var:' + name, text: `변수 ${name}: ${a.vars[name]} → ${v}` });
+    }
+    if (a.scene !== b.scene) out.push({ id: 'scene', text: `장면: ${a.scene} → ${b.scene}` });
+    return out;
+}
+
+const NO_MOTION = { dx: 0, dy: 0, jumps: 0 };
+
+// How much two untouched runs of the same length disagree — frame timing alone
+// moves timers, counters and fast objects a little between runs.
+function noiseOf(a, b) {
+    const motion = {};
+    for (const [id, o] of Object.entries(a.last.objects)) {
+        const m = a.motion[id] || NO_MOTION, n = b.motion[id] || NO_MOTION, q = b.last.objects[id] || o;
+        motion[id] = {
+            d: Math.hypot(m.dx - n.dx, m.dy - n.dy),
+            jumps: Math.abs(m.jumps - n.jumps),
+            pos: Math.hypot(o.x - q.x, o.y - q.y),
+        };
+    }
+    // Numeric variables: how much each changes over the window, and how much that
+    // change itself varies between the two runs.
+    const vars = {};
+    for (const name of Object.keys(a.last.vars)) {
+        const da = delta(a, name), db = delta(b, name);
+        if (da !== null && db !== null) vars[name] = { ref: da, jitter: Math.abs(da - db) };
+    }
+    return { ids: new Set(stateDiff(a.last, b.last, '', '').map(d => d.id)), motion, vars };
+}
+
+// Change of a numeric variable over one run, or null when it is not a number.
+function delta(run, name) {
+    const x = Number(run.first.vars[name]), y = Number(run.last.vars[name]);
+    return Number.isFinite(x) && Number.isFinite(y) && run.first.vars[name] !== '' ? y - x : null;
+}
+
+// What a key run did that the untouched run did not, beyond run-to-run noise.
+// Smooth motion counts with a tolerance for objects that move on their own;
+// teleports (grid steps, locateXY) and end positions count for objects that were
+// still in the untouched runs, where a frame of timing difference cannot fake them.
+// Numeric variables compare their change over the run with the untouched change,
+// so a key that adds 100 to an ever-rising score still shows; other values that
+// change on their own (texts, shapes) cannot be told apart and are left out.
+function keyEffect(run, base, noise) {
+    const lines = [];
+    for (const [id, o] of Object.entries(run.last.objects)) {
+        const m = run.motion[id] || NO_MOTION, b = base.motion[id] || NO_MOTION;
+        const nz = noise.motion[id] || { d: 0, jumps: 0, pos: 0 };
+        const p = base.last.objects[id] || o;
+        const still = Math.hypot(b.dx, b.dy) < 2 && b.jumps === 0 && nz.jumps === 0 && nz.pos < 1;
+        const moved = Math.hypot(m.dx - b.dx, m.dy - b.dy) > Math.max(4, 0.25 * Math.hypot(b.dx, b.dy), 2 * nz.d);
+        const jumped = still ? m.jumps > 0 : Math.abs(m.jumps - b.jumps) > nz.jumps + 1;
+        const displaced = still && Math.hypot(o.x - p.x, o.y - p.y) > 12;
+        if (!moved && !jumped && !displaced) continue;
+        lines.push(describeMotion(o.name, m, run.ms)
+            || (displaced ? `${o.name}: 가만히 둘 때 (${Math.round(p.x)}, ${Math.round(p.y)}) → 키 (${Math.round(o.x)}, ${Math.round(o.y)})` : `${o.name}: 가만히 둘 때와 달리 멈춤`));
+    }
+    for (const d of stateDiff(base.last, run.last, '가만히', '키')) {
+        const name = d.id.startsWith('var:') ? d.id.slice(4) : null;
+        const v = name !== null && noise.vars[name];
+        if (v) {
+            const dk = delta(run, name);
+            const beyond = dk !== null && Math.abs(dk - v.ref) > Math.max(3 * v.jitter, 0.1 * Math.abs(v.ref), 1e-9);
+            if (beyond) lines.push(v.ref === 0 && v.jitter === 0 ? d.text : `변수 ${name}: 0.6초 변화 ${round(v.ref)} → 키 ${round(dk)}`);
+            continue;
+        }
+        if (!noise.ids.has(d.id)) lines.push(d.text);
+    }
+    return lines;
+}
+
+const round = (x) => Math.round(x * 1000) / 1000;
+
+// Objects that are shown and on stage but add no pixel to the picture because an
+// upper layer covers them: render with and without the object (same task, so no
+// tick in between); if nothing changes, hide the upper layers and try again —
+// only objects that appear then count (blank stamp sources and the like do not).
+// Returns null when the stage canvas has no 2D context (WebGL renderer).
+function findCovered(page) {
+    return page.evaluate(() => {
+        const canvas = Entry.stage.canvas?.canvas;
+        const ctx = canvas?.getContext?.('2d');
+        if (!ctx) return null;
+        const grab = () => { Entry.stage.updateForce(); return ctx.getImageData(0, 0, canvas.width, canvas.height).data; };
+        const differs = (a, b) => {
+            let diff = 0;
+            for (let i = 0; i < a.length && diff < 4; i += 4) {
+                if (a[i] !== b[i] || a[i + 1] !== b[i + 1] || a[i + 2] !== b[i + 2]) diff++;
+            }
+            return diff >= 4;
+        };
+        // Does object `e` change the picture while the objects in `hidden` are hidden?
+        const draws = (e, hidden) => {
+            hidden.forEach(h => { h.object.visible = false; });
+            const shown = grab();
+            e.object.visible = false;
+            const gone = grab();
+            e.object.visible = true;
+            hidden.forEach(h => { h.object.visible = true; });
+            return differs(shown, gone);
+        };
+        const objects = Entry.container.getCurrentObjects();  // first = top layer
+        const covered = [];
+        objects.forEach((o, i) => {
+            const e = o.entity;
+            if (!e.getVisible() || e.object.alpha < 0.01) return;
+            if (Math.abs(e.getX()) > 240 || Math.abs(e.getY()) > 135) return;
+            if (draws(e, [])) return;
+            const above = objects.slice(0, i).map(a => a.entity).filter(a => a.getVisible());
+            // Still nothing with every upper layer hidden: blank/transparent by design.
+            if (!above.length || !draws(e, above)) return;
+            const by = above.filter(a => draws(e, [a])).map(a => a.parent.name);
+            covered.push({ name: o.name, by: by.length ? by : above.map(a => a.parent.name).slice(0, 3) });
+        });
+        Entry.stage.updateForce();
+        return covered;
+    });
+}
+
+// Playwright would otherwise close the browser and exit on its own SIGINT handler
+// before the editor server this script started is stopped.
+const QUIET_SIGNALS = { handleSIGINT: false, handleSIGTERM: false, handleSIGHUP: false };
+let server, browser, failed = false;
+const cleanup = async () => {
+    await browser?.close().catch(() => {});
+    await stopChild(server);
+};
+for (const signal of ['SIGINT', 'SIGTERM']) {
+    process.once(signal, () => { void cleanup().finally(() => process.exit(130)); });
+}
+try {
+    try {
+        const { chromium } = await import('@playwright/test');
+        await (await chromium.launch(QUIET_SIGNALS)).close();
+    } catch (e) {
+        console.error('Chromium 을 띄울 수 없다 — `npx playwright install chromium` 을 먼저 실행한다.\n' + e.message.split('\n')[0]);
+        process.exit(2);
+    }
+    server = await startEditorServer(baseURL, (spawned) => { server = spawned; });
+    let page, pageErrors;
+    ({ browser, page, pageErrors } = await bootEditor({ baseUrl: baseURL, launchOptions: QUIET_SIGNALS }));
+    await loadFixture(page, path.resolve(file));
+
+    const keys = await page.evaluate(() => {
+        // raw field value → { held: is_press_some_key, here: pressed in the first scene,
+        //                     inObject: used by a first-scene object script, not only in a function }
+        const found = new Map();
+        const first = Entry.scene.selectedScene;
+        const collect = (blocks, here, inObject) => {
+            for (const b of blocks) {
+                const raw = b.type === 'when_some_key_pressed' ? String(b.params[1])
+                    : b.type === 'is_press_some_key' ? String(b.params[0]) : null;
+                if (raw === null) continue;
+                const k = found.get(raw) || { held: false, here: false, inObject: false };
+                found.set(raw, { held: k.held || b.type === 'is_press_some_key', here: k.here || here, inObject: k.inObject || inObject });
+            }
+        };
+        for (const o of Entry.container.getAllObjects()) collect(o.script.getBlockList(false), o.scene === first, o.scene === first);
+        // Function bodies are shared by every scene, so their keys are pressed too.
+        for (const f of Object.values(Entry.variableContainer.functions_ || {})) collect(f.content?.getBlockList?.(false) || [], true, false);
+        const toCode = {};
+        for (const [code, k] of Object.entries(Entry.KeyboardCode.codeToKeyCode)) toCode[k] ??= code;
+        return [...found].map(([raw, k]) => ({ raw, ...k, key: Number(raw), code: toCode[raw] || null }));
+    });
+
+    console.log(`[play-check] ${path.basename(file)}`);
+    const idle = await playWindow(page, 2000);
+    const idleLines = Object.entries(idle.last.objects)
+        .map(([id, o]) => idle.motion[id] && describeMotion(o.name, idle.motion[id], idle.ms))
+        .filter(Boolean)
+        .concat(stateDiff(idle.first, idle.last, '처음', '2초 뒤').map(d => d.text));
+    console.log('\n가만히 2초:');
+    console.log(idleLines.length ? idleLines.map(s => '  ' + s).join('\n') : '  아무 변화 없음');
+    const texts = Object.values(idle.last.objects).filter(o => o.visible && o.text !== undefined && o.text.trim());
+    if (texts.length) console.log('  지금 화면의 글: ' + texts.map(o => `${o.name} "${o.text}"`).join(', '));
+    for (const o of texts.filter(t => t.onStage < 0.5)) {
+        console.log(`⚠ 글상자 ${o.name}: ${Math.round((1 - o.onStage) * 100)}%가 무대 밖이라 글이 잘린다 `
+            + `(중심 x ${Math.round(o.x)}, y ${Math.round(o.y)} — 무대 x -240~240, y -135~135).`);
+    }
+    for (const c of await findCovered(page) || []) {
+        failed = true;
+        console.log(`✗ ${c.name}: 보이는 상태인데 ${c.by.join('·')}에 완전히 가려져 화면에 안 나온다 — `
+            + 'objects 배열은 앞쪽이 위 레이어다(배경은 맨 뒤에). 일부러 겹쳐 숨긴 것이면 무시한다.');
+    }
+
+    const shotDir = path.resolve('test-results/play-check');
+    fs.mkdirSync(shotDir, { recursive: true });
+    const shot = path.join(shotDir, path.basename(file, '.ent') + '.png');
+    const canvas = await page.evaluate(() => {
+        const c = [...document.querySelectorAll('canvas')].sort((a, b) => b.width * b.height - a.width * a.height)[0];
+        const r = c.getBoundingClientRect();
+        return { x: r.x, y: r.y, width: r.width, height: r.height };
+    });
+    await page.screenshot({ path: shot, clip: canvas });
+
+    const badKeys = keys.filter(k => !/^\d+$/.test(k.raw));
+    for (const k of badKeys) {
+        failed = true;
+        console.log(`\n✗ 키 값 "${k.raw}" 는 키 코드가 아니다 — 이 키 블록은 절대 실행되지 않는다. 숫자 코드('37' ←, '39' →, '32' 스페이스)나 DSL isPressed('ArrowLeft') 를 쓴다.`);
+    }
+    for (const k of keys.filter(k => /^\d+$/.test(k.raw) && !k.code)) {
+        failed = true;
+        console.log(`\n✗ 키 코드 ${k.raw} 는 엔트리가 아는 키가 아니다(Entry.KeyboardCode 에 없음) — 이 키 블록은 실행되지 않는다.`);
+    }
+    const usable = keys.filter(k => k.code && k.here);
+    const later = keys.filter(k => k.code && !k.here);
+    if (later.length) console.log(`\n다른 장면에서만 쓰는 키: ${later.map(k => keyLabel(k.key)).join(' ')} (첫 장면에서는 누르지 않는다)`);
+    const tested = usable.length ? usable : keys.length ? [] : [37, 39, 38, 40, 32].map(key => ({ key, unused: true }));
+    const FALLBACK = { 37: 'ArrowLeft', 38: 'ArrowUp', 39: 'ArrowRight', 40: 'ArrowDown', 32: 'Space' };
+    let deadKeys = 0, deadInObject = 0;
+    const drifting = stateDiff(idle.first, idle.last, '', '').map(d => d.id);
+    const stepKeys = [];
+    // Press every key after `delay` ms of running; returns the number of dead keys.
+    async function pressKeys(delay, title) {
+        // Two untouched runs: the first is the reference, their disagreement is the noise floor.
+        const baseline = await playWindow(page, 600, null, delay);
+        const noise = noiseOf(baseline, await playWindow(page, 600, null, delay));
+        // Non-numeric values that already change while untouched cannot show a key effect.
+        for (const id of drifting) if (!id.startsWith('var:')) noise.ids.add(id);
+        console.log(title);
+        let dead = 0;
+        deadInObject = 0;
+        for (const k of tested) {
+            const code = k.code || FALLBACK[k.key];
+            const lines = keyEffect(await playWindow(page, 600, code, delay), baseline, noise);
+            if (!lines.length && !k.unused) { dead++; if (k.inObject) deadInObject++; }
+            console.log(`  ${keyLabel(k.key)}: ${lines.length ? lines.join(' / ') : k.unused ? '반응 없음' : '⚠ 반응 없음'}`);
+            if (!k.unused && !k.held && lines.some(l => l.includes('이동 (초당')) && !stepKeys.includes(keyLabel(k.key))) stepKeys.push(keyLabel(k.key));
+        }
+        return dead;
+    }
+    if (tested.length) {
+        deadKeys = await pressKeys(300, usable.length ? '\n키를 0.6초 누르고 있을 때 (가만히 둘 때와 다른 점):' : '\n키를 쓰는 블록이 없다 — 방향키·스페이스만 눌러 본다:');
+        // Keys may be ignored during an intro, a pattern display and so on — try later once.
+        if (usable.length && deadKeys === usable.length) {
+            deadKeys = await pressKeys(3000, '\n처음에는 반응이 없어 실행 3초 뒤에 다시 눌러 본다:');
+        }
+    }
+
+    if (pageErrors.length) {
+        failed = true;
+        console.log('\n✗ page error ' + pageErrors.length + '건:\n  ' + pageErrors.slice(0, 5).join('\n  '));
+    }
+    // Keys that live only in functions may belong to a later scene, so they alone never fail the run.
+    if (usable.length && deadKeys === usable.length && deadInObject > 0) {
+        failed = true;
+        console.log('\n✗ 이 작품이 쓰는 키를 모두 눌러 봤지만 아무것도 바뀌지 않았다 — 키 블록·조건·좌표를 확인한다. '
+            + '안내 화면처럼 3초 넘게 일부러 키를 막는 작품이면 verify.mjs 로 그 상태를 만든 뒤 확인한다.');
+    } else if (deadKeys) {
+        console.log(`\n⚠ 반응 없는 키 ${deadKeys}개 — 게임 오버 뒤 재시작처럼 특정 상태에서만 쓰는 키가 아니라면 확인한다.`);
+    }
+    if (stepKeys.length) {
+        console.log(`\n참고: ${stepKeys.join(' ')} 이동은 "키를 눌렀을 때" 블록이라 누를 때마다 한 번 움직이고, 누르고 있으면 `
+            + 'OS 키 반복 전까지 멈칫한다. 누르고 있는 동안 부드럽게 움직이려면 계속 반복 + isPressed(\'ArrowLeft\') 를 쓴다.');
+    }
+    console.log(`\n무대 스크린샷: ${path.relative(process.cwd(), shot)}`);
+    console.log('좌표: x 는 오른쪽이 +, y 는 위쪽이 + (무대 x -240~240, y -135~135).');
+    console.log(failed ? '\n[play-check] FAIL' : '\n[play-check] 완료 — 위 보고가 만들려던 게임과 맞는지 비교한다.');
+} catch (e) {
+    failed = true;
+    console.error('[play-check] ' + e.message);
+} finally {
+    await cleanup();
+}
+process.exit(failed ? 1 : 0);

@@ -1,0 +1,1894 @@
+{
+  "date": "2026-09-23T10:32:11.130Z",
+  "file": "sunset-drive_002.ent",
+  "sha256": "6ac52ee2d22d25526983479a25a6692b1be88cb511e4a2c75f78405d102954f2",
+  "bytes": 1935698,
+  "scenarios": {
+    "boot": {
+      "scenario": "boot",
+      "checks": [
+        {
+          "name": "title screen state (0) after start",
+          "ok": true,
+          "detail": 0
+        },
+        {
+          "name": "attract mode: demo car drives itself",
+          "ok": true,
+          "detail": {
+            "from": 12816,
+            "to": 32144
+          }
+        },
+        {
+          "name": "attract mode: all 7 rivals drive",
+          "ok": true,
+          "detail": [
+            18744,
+            18443,
+            18186,
+            17886,
+            17832,
+            17747,
+            18014
+          ]
+        },
+        {
+          "name": "title logo and PRESS SPACE are shown, race HUD hidden",
+          "ok": true
+        },
+        {
+          "name": "sky at the top is dark (sunset sky drawn)",
+          "ok": true,
+          "detail": {
+            "gray": 0,
+            "dark": 0.6988562091503268,
+            "colors": 497
+          }
+        },
+        {
+          "name": "asphalt pixels in the lower third (road filled)",
+          "ok": true,
+          "detail": {
+            "gray": 0.35517053453835323,
+            "dark": 0.0884917571188519,
+            "colors": 722
+          }
+        },
+        {
+          "name": "frame has rich detail (>300 distinct colours)",
+          "ok": true,
+          "detail": 1219
+        },
+        {
+          "name": "title/attract fps ≥ 55",
+          "ok": true,
+          "detail": 62.4
+        },
+        {
+          "name": "project structure",
+          "ok": true,
+          "detail": {
+            "objects": 13,
+            "functions": 11,
+            "lists": 26,
+            "variables": 57,
+            "blocks": 3031
+          }
+        },
+        {
+          "name": "no page errors",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "name": "no console errors",
+          "ok": true,
+          "detail": []
+        }
+      ],
+      "data": {
+        "project": {
+          "objects": 13,
+          "functions": 11,
+          "lists": 26,
+          "variables": 57,
+          "blocks": 3031
+        },
+        "fpsTitle": 62.4,
+        "perfTitle": {
+          "ticks": 515,
+          "workMed": 8.1,
+          "workP95": 9.2,
+          "gapMed": 16.1,
+          "gapP99": 18.6,
+          "gapMax": 31.9
+        }
+      },
+      "shots": [
+        "verify-shots\\boot-title.png"
+      ],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "passed": true
+    },
+    "controls": {
+      "scenario": "controls",
+      "checks": [
+        {
+          "name": "SPACE starts the countdown (state 1)",
+          "ok": true,
+          "detail": {
+            "state": 1,
+            "cd": 3.1991213462354584,
+            "pD": 1400
+          }
+        },
+        {
+          "name": "car stays on the grid during the countdown",
+          "ok": true,
+          "detail": {
+            "state": 1,
+            "pD": 1400,
+            "speed": 0,
+            "cd": 1.7907925200163377
+          }
+        },
+        {
+          "name": "countdown banner visible",
+          "ok": true
+        },
+        {
+          "name": "GO after ~3.6 s",
+          "ok": true,
+          "detail": 3500
+        },
+        {
+          "name": "holding ↑ accelerates (≥ 180 km/h after 3 s)",
+          "ok": true,
+          "detail": 198
+        },
+        {
+          "name": "releasing ↑ coasts down",
+          "ok": true,
+          "detail": {
+            "before": 8178,
+            "after": 6297
+          }
+        },
+        {
+          "name": "↓ brakes hard (brake lights on)",
+          "ok": true,
+          "detail": {
+            "brake": 1,
+            "from": 6646,
+            "to": 2351
+          }
+        },
+        {
+          "name": "← steers left",
+          "ok": true,
+          "detail": {
+            "from": 0.014849443478723306,
+            "to": -0.6502190082950612
+          }
+        },
+        {
+          "name": "→ steers right",
+          "ok": true,
+          "detail": {
+            "from": -0.6502190082950612,
+            "to": 0.26644432455045797
+          }
+        },
+        {
+          "name": "leaving the asphalt sets offroad and caps speed (~36%)",
+          "ok": true,
+          "detail": {
+            "px": 1.2492647968845298,
+            "speed": 1552
+          }
+        },
+        {
+          "name": "hitting a roadside object crashes the car (crash timer, speed < 20%, pushed toward the road)",
+          "ok": true,
+          "detail": {
+            "speed": 1893,
+            "px": 0.95,
+            "crash": 0.56
+          }
+        },
+        {
+          "name": "P pauses the race (distance and clock frozen)",
+          "ok": true,
+          "detail": {
+            "pD": [
+              59507.4057383562,
+              59507.4057383562
+            ]
+          }
+        },
+        {
+          "name": "P resumes",
+          "ok": true,
+          "detail": {
+            "paused": 0,
+            "raceT": 11.518073359555098
+          }
+        },
+        {
+          "name": "R returns to the title",
+          "ok": true
+        },
+        {
+          "name": "no page errors",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "name": "no console errors",
+          "ok": true,
+          "detail": []
+        }
+      ],
+      "data": {
+        "project": {
+          "objects": 13,
+          "functions": 11,
+          "lists": 26,
+          "variables": 57,
+          "blocks": 3031
+        }
+      },
+      "shots": [
+        "verify-shots\\controls-countdown.png",
+        "verify-shots\\controls-offroad.png",
+        "verify-shots\\controls-crash.png",
+        "verify-shots\\controls-pause.png"
+      ],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "passed": true
+    },
+    "audio": {
+      "scenario": "audio",
+      "checks": [
+        {
+          "name": "8 MP3 sounds registered and decoded",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "name": "title music plays on the BGM channel",
+          "ok": true,
+          "detail": [
+            "title"
+          ]
+        },
+        {
+          "name": "title music is audible (rms > 0.01)",
+          "ok": true,
+          "detail": {
+            "peak": 0.4955,
+            "rms": 0.1413
+          }
+        },
+        {
+          "name": "countdown beeps start with the countdown",
+          "ok": true,
+          "detail": {
+            "peak": 0.2149,
+            "rms": 0.0497
+          }
+        },
+        {
+          "name": "engine idles during the countdown",
+          "ok": true
+        },
+        {
+          "name": "race music starts on the BGM channel after GO",
+          "ok": true
+        },
+        {
+          "name": "engine pitch follows speed (playback rate rises)",
+          "ok": true,
+          "detail": {
+            "low": 1.075481999834722,
+            "high": 1.8729844586117763
+          }
+        },
+        {
+          "name": "engine sample re-triggers with overlap (≥ 8 starts)",
+          "ok": true,
+          "detail": 12
+        },
+        {
+          "name": "race audio is audible (rms > 0.01)",
+          "ok": true,
+          "detail": {
+            "peak": 0.7468,
+            "rms": 0.22
+          }
+        },
+        {
+          "name": "music stays at normal pitch while the engine is pitched",
+          "ok": true,
+          "detail": [
+            1
+          ]
+        },
+        {
+          "name": "crashing plays the crash sound",
+          "ok": true,
+          "detail": "playSucceeded"
+        },
+        {
+          "name": "M mutes all audio (peak ≈ 0)",
+          "ok": true,
+          "detail": {
+            "peak": 0,
+            "rms": 0
+          }
+        },
+        {
+          "name": "M again restores the audio",
+          "ok": true,
+          "detail": {
+            "peak": 0.6482,
+            "rms": 0.2115
+          }
+        },
+        {
+          "name": "no page errors",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "name": "no console errors",
+          "ok": true,
+          "detail": []
+        }
+      ],
+      "data": {
+        "project": {
+          "objects": 13,
+          "functions": 11,
+          "lists": 26,
+          "variables": 57,
+          "blocks": 3031
+        },
+        "sounds": [
+          {
+            "name": "race",
+            "ext": ".mp3",
+            "registered": true,
+            "decoded": true
+          },
+          {
+            "name": "title",
+            "ext": ".mp3",
+            "registered": true,
+            "decoded": true
+          },
+          {
+            "name": "countdown",
+            "ext": ".mp3",
+            "registered": true,
+            "decoded": true
+          },
+          {
+            "name": "finish",
+            "ext": ".mp3",
+            "registered": true,
+            "decoded": true
+          },
+          {
+            "name": "engine",
+            "ext": ".mp3",
+            "registered": true,
+            "decoded": true
+          },
+          {
+            "name": "crash",
+            "ext": ".mp3",
+            "registered": true,
+            "decoded": true
+          },
+          {
+            "name": "lap",
+            "ext": ".mp3",
+            "registered": true,
+            "decoded": true
+          },
+          {
+            "name": "skid",
+            "ext": ".mp3",
+            "registered": true,
+            "decoded": true
+          }
+        ],
+        "engineRates": [
+          0.55,
+          0.55,
+          0.55,
+          0.64,
+          1.03,
+          1.28,
+          1.17,
+          1.42,
+          1.61,
+          1.76,
+          1.89,
+          1.9
+        ],
+        "audioCalls": [
+          {
+            "kind": "playBGM",
+            "id": "title",
+            "name": "title",
+            "state": "playSucceeded",
+            "t": 10971,
+            "rate": 1
+          },
+          {
+            "kind": "playBGM",
+            "id": "countdown",
+            "name": "countdown",
+            "state": "playSucceeded",
+            "t": 14076,
+            "rate": 1
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 14077,
+            "rate": 0.55
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 15726,
+            "rate": 0.55
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 17375,
+            "rate": 0.55
+          },
+          {
+            "kind": "playBGM",
+            "id": "race",
+            "name": "race",
+            "state": "playSucceeded",
+            "t": 18383,
+            "rate": 0.5
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 18797,
+            "rate": 0.6431383930153215
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 19680,
+            "rate": 1.0256829529626397
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 20380,
+            "rate": 1.2843904685181877
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 21168,
+            "rate": 1.1738549121940753
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 21805,
+            "rate": 1.4158245734409578
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 22380,
+            "rate": 1.608386617296721
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 22895,
+            "rate": 1.7606289805430142
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 23372,
+            "rate": 1.8892835775953878
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 23853,
+            "rate": 1.9
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 24330,
+            "rate": 1.9
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 24810,
+            "rate": 1.9
+          },
+          {
+            "kind": "playSound",
+            "id": "crash",
+            "name": "crash",
+            "state": "playSucceeded",
+            "t": 25119,
+            "rate": 0.73
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 26669,
+            "rate": 0.7950465295943403
+          },
+          {
+            "kind": "playSound",
+            "id": "crash",
+            "name": "crash",
+            "state": "playSucceeded",
+            "t": 26669,
+            "rate": 0.7950465295943403
+          },
+          {
+            "kind": "playBGM",
+            "id": "race",
+            "name": "race",
+            "state": "playSucceeded",
+            "t": 27378,
+            "rate": 1.079781641740134
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 27470,
+            "rate": 1.123491323936476
+          },
+          {
+            "kind": "playSound",
+            "id": "engine",
+            "name": "engine",
+            "state": "playSucceeded",
+            "t": 28320,
+            "rate": 1.0709464286453487
+          }
+        ]
+      },
+      "shots": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "passed": true
+    },
+    "race": {
+      "scenario": "race",
+      "checks": [
+        {
+          "name": "the race finishes after 3 laps (state 3)",
+          "ok": true,
+          "detail": {
+            "state": 3,
+            "place": 1,
+            "finishT": 110.89517914893837,
+            "bestLap": 35.99954121876822,
+            "record": 110.89517914893837,
+            "newRecord": 1,
+            "lap": 3,
+            "raceT": 110.89517914893837
+          }
+        },
+        {
+          "name": "three lap times recorded (30–70 s each)",
+          "ok": true,
+          "detail": [
+            38.9,
+            36,
+            36
+          ]
+        },
+        {
+          "name": "finish time = sum of lap times",
+          "ok": true,
+          "detail": {
+            "sum": 110.895,
+            "finishT": 110.895
+          }
+        },
+        {
+          "name": "best lap = fastest lap",
+          "ok": true,
+          "detail": 35.99954121876822
+        },
+        {
+          "name": "first finish sets the record (NEW RECORD)",
+          "ok": true
+        },
+        {
+          "name": "LAP 2 and FINAL LAP banners shown",
+          "ok": true,
+          "detail": [
+            5,
+            6
+          ]
+        },
+        {
+          "name": "all three scenery themes visited",
+          "ok": true,
+          "detail": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "name": "the keyboard-only bot wins the race (1st)",
+          "ok": true,
+          "detail": 1
+        },
+        {
+          "name": "median frame rate ≥ 58 fps over the whole race",
+          "ok": true,
+          "detail": 62
+        },
+        {
+          "name": "no second below 45 fps",
+          "ok": true,
+          "detail": 55
+        },
+        {
+          "name": "results panel shown with place and times",
+          "ok": true
+        },
+        {
+          "name": "lap chime played at each lap",
+          "ok": true,
+          "detail": 2
+        },
+        {
+          "name": "finish fanfare played",
+          "ok": true
+        },
+        {
+          "name": "hard cornering at speed smokes the tyres and screeches",
+          "ok": true,
+          "detail": {
+            "skidSamples": 217,
+            "screeches": 66
+          }
+        },
+        {
+          "name": "SPACE on the results starts a new race",
+          "ok": true,
+          "detail": {
+            "state": 1,
+            "lap": 1,
+            "raceT": 0,
+            "place": 8
+          }
+        },
+        {
+          "name": "no page errors",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "name": "no console errors",
+          "ok": true,
+          "detail": []
+        }
+      ],
+      "data": {
+        "project": {
+          "objects": 13,
+          "functions": 11,
+          "lists": 26,
+          "variables": 57,
+          "blocks": 3031
+        },
+        "race": {
+          "crashes": [
+            {
+              "t": 6.2,
+              "px": 0.6,
+              "crash": 0.41,
+              "curve": 0,
+              "nearest": {
+                "k": 3,
+                "gap": 36,
+                "dx": -0.6
+              }
+            }
+          ],
+          "timeline": [
+            {
+              "t": 1,
+              "lap": 1,
+              "place": 7,
+              "kmh": 86,
+              "frames": 383,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 2,
+              "lap": 1,
+              "place": 7,
+              "kmh": 157,
+              "frames": 446,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 3,
+              "lap": 1,
+              "place": 8,
+              "kmh": 213,
+              "frames": 508,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 4,
+              "lap": 1,
+              "place": 8,
+              "kmh": 263,
+              "frames": 577,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 5,
+              "lap": 1,
+              "place": 6,
+              "kmh": 278,
+              "frames": 635,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 6,
+              "lap": 1,
+              "place": 4,
+              "kmh": 290,
+              "frames": 692,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 7,
+              "lap": 1,
+              "place": 5,
+              "kmh": 243,
+              "frames": 751,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 8,
+              "lap": 1,
+              "place": 4,
+              "kmh": 190,
+              "frames": 806,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 9,
+              "lap": 1,
+              "place": 5,
+              "kmh": 242,
+              "frames": 867,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 10,
+              "lap": 1,
+              "place": 4,
+              "kmh": 283,
+              "frames": 929,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 11,
+              "lap": 1,
+              "place": 3,
+              "kmh": 290,
+              "frames": 991,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 12,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 1053,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 13,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 1114,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 14,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 1177,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 15,
+              "lap": 1,
+              "place": 1,
+              "kmh": 269,
+              "frames": 1238,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 16,
+              "lap": 1,
+              "place": 1,
+              "kmh": 270,
+              "frames": 1301,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 17,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 1363,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 18,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 1425,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 19,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 1488,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 20,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 1550,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 21,
+              "lap": 1,
+              "place": 1,
+              "kmh": 259,
+              "frames": 1613,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 22,
+              "lap": 1,
+              "place": 1,
+              "kmh": 238,
+              "frames": 1681,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 23,
+              "lap": 1,
+              "place": 1,
+              "kmh": 279,
+              "frames": 1743,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 24,
+              "lap": 1,
+              "place": 1,
+              "kmh": 246,
+              "frames": 1805,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 25,
+              "lap": 1,
+              "place": 1,
+              "kmh": 247,
+              "frames": 1867,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 26,
+              "lap": 1,
+              "place": 1,
+              "kmh": 285,
+              "frames": 1928,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 27,
+              "lap": 1,
+              "place": 1,
+              "kmh": 281,
+              "frames": 1990,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 28,
+              "lap": 1,
+              "place": 1,
+              "kmh": 269,
+              "frames": 2053,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 29,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2115,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 30,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2177,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 31,
+              "lap": 1,
+              "place": 1,
+              "kmh": 270,
+              "frames": 2239,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 32,
+              "lap": 1,
+              "place": 1,
+              "kmh": 271,
+              "frames": 2301,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 33,
+              "lap": 1,
+              "place": 1,
+              "kmh": 278,
+              "frames": 2363,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 34,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2424,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 35,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2493,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 36,
+              "lap": 1,
+              "place": 1,
+              "kmh": 270,
+              "frames": 2556,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 37,
+              "lap": 1,
+              "place": 1,
+              "kmh": 280,
+              "frames": 2612,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 38,
+              "lap": 1,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2681,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 39,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2743,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 40,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2805,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 41,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2864,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 42,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2927,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 43,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 2988,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 44,
+              "lap": 2,
+              "place": 1,
+              "kmh": 269,
+              "frames": 3050,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 45,
+              "lap": 2,
+              "place": 1,
+              "kmh": 276,
+              "frames": 3113,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 46,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 3176,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 47,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 3238,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 48,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 3300,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 49,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 3363,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 50,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 3426,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 51,
+              "lap": 2,
+              "place": 1,
+              "kmh": 270,
+              "frames": 3488,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 52,
+              "lap": 2,
+              "place": 1,
+              "kmh": 270,
+              "frames": 3550,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 53,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 3613,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 54,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 3675,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 55,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 3738,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 56,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 3800,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 57,
+              "lap": 2,
+              "place": 1,
+              "kmh": 258,
+              "frames": 3863,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 58,
+              "lap": 2,
+              "place": 1,
+              "kmh": 234,
+              "frames": 3926,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 59,
+              "lap": 2,
+              "place": 1,
+              "kmh": 275,
+              "frames": 3988,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 60,
+              "lap": 2,
+              "place": 1,
+              "kmh": 251,
+              "frames": 4050,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 61,
+              "lap": 2,
+              "place": 1,
+              "kmh": 244,
+              "frames": 4112,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 62,
+              "lap": 2,
+              "place": 1,
+              "kmh": 287,
+              "frames": 4180,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 63,
+              "lap": 2,
+              "place": 1,
+              "kmh": 279,
+              "frames": 4242,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 64,
+              "lap": 2,
+              "place": 1,
+              "kmh": 270,
+              "frames": 4304,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 65,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 4368,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 66,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 4431,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 67,
+              "lap": 2,
+              "place": 1,
+              "kmh": 270,
+              "frames": 4493,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 68,
+              "lap": 2,
+              "place": 1,
+              "kmh": 270,
+              "frames": 4554,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 69,
+              "lap": 2,
+              "place": 1,
+              "kmh": 279,
+              "frames": 4616,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 70,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 4678,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 71,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 4739,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 72,
+              "lap": 2,
+              "place": 1,
+              "kmh": 270,
+              "frames": 4801,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 73,
+              "lap": 2,
+              "place": 1,
+              "kmh": 280,
+              "frames": 4863,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 74,
+              "lap": 2,
+              "place": 1,
+              "kmh": 290,
+              "frames": 4925,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 75,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 4992,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 76,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5054,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 77,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5116,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 78,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5178,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 79,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5240,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 80,
+              "lap": 3,
+              "place": 1,
+              "kmh": 270,
+              "frames": 5303,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 81,
+              "lap": 3,
+              "place": 1,
+              "kmh": 277,
+              "frames": 5364,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 82,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5427,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 83,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5489,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 84,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5550,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 85,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5612,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 86,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5681,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 87,
+              "lap": 3,
+              "place": 1,
+              "kmh": 269,
+              "frames": 5743,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 88,
+              "lap": 3,
+              "place": 1,
+              "kmh": 269,
+              "frames": 5805,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 89,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5867,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 90,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5929,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 91,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 5991,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 92,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 6053,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 93,
+              "lap": 3,
+              "place": 1,
+              "kmh": 256,
+              "frames": 6116,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 94,
+              "lap": 3,
+              "place": 1,
+              "kmh": 235,
+              "frames": 6178,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 95,
+              "lap": 3,
+              "place": 1,
+              "kmh": 277,
+              "frames": 6240,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 96,
+              "lap": 3,
+              "place": 1,
+              "kmh": 249,
+              "frames": 6303,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 97,
+              "lap": 3,
+              "place": 1,
+              "kmh": 246,
+              "frames": 6365,
+              "theme": 1,
+              "crash": 0
+            },
+            {
+              "t": 98,
+              "lap": 3,
+              "place": 1,
+              "kmh": 285,
+              "frames": 6427,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 99,
+              "lap": 3,
+              "place": 1,
+              "kmh": 282,
+              "frames": 6489,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 100,
+              "lap": 3,
+              "place": 1,
+              "kmh": 270,
+              "frames": 6552,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 101,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 6612,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 102,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 6680,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 103,
+              "lap": 3,
+              "place": 1,
+              "kmh": 270,
+              "frames": 6742,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 104,
+              "lap": 3,
+              "place": 1,
+              "kmh": 269,
+              "frames": 6804,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 105,
+              "lap": 3,
+              "place": 1,
+              "kmh": 279,
+              "frames": 6865,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 106,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 6927,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 107,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 6989,
+              "theme": 2,
+              "crash": 0
+            },
+            {
+              "t": 108,
+              "lap": 3,
+              "place": 1,
+              "kmh": 270,
+              "frames": 7051,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 109,
+              "lap": 3,
+              "place": 1,
+              "kmh": 280,
+              "frames": 7113,
+              "theme": 0,
+              "crash": 0
+            },
+            {
+              "t": 110,
+              "lap": 3,
+              "place": 1,
+              "kmh": 290,
+              "frames": 7175,
+              "theme": 0,
+              "crash": 0
+            }
+          ],
+          "botLog": {
+            "laneChanges": 1,
+            "brakes": 6
+          },
+          "perf": {
+            "ticks": 6930,
+            "workMed": 7.7,
+            "workP95": 9.3,
+            "gapMed": 16.1,
+            "gapP99": 18.4,
+            "gapMax": 28
+          },
+          "fpsMedian": 62,
+          "fpsMin": 55,
+          "fpsP5": 59
+        },
+        "result": {
+          "state": 3,
+          "place": 1,
+          "finishT": 110.89517914893837,
+          "bestLap": 35.99954121876822,
+          "record": 110.89517914893837,
+          "newRecord": 1,
+          "lap": 3,
+          "raceT": 110.89517914893837,
+          "laps": [
+            38.895198255196654,
+            36.0004396749735,
+            35.99954121876822
+          ]
+        }
+      },
+      "shots": [
+        "verify-shots\\race-grid.png",
+        "verify-shots\\race-skid.png",
+        "verify-shots\\race-beach.png",
+        "verify-shots\\race-banner-lap2.png",
+        "verify-shots\\race-forest.png",
+        "verify-shots\\race-canyon.png",
+        "verify-shots\\race-banner-lap3.png",
+        "verify-shots\\race-lap3.png",
+        "verify-shots\\race-finish.png",
+        "verify-shots\\race-results.png"
+      ],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "passed": true
+    },
+    "roundtrip": {
+      "scenario": "roundtrip",
+      "checks": [
+        {
+          "name": "editor export produces a gzip .ent",
+          "ok": true,
+          "detail": {
+            "size": 2166677
+          }
+        },
+        {
+          "name": "re-imported project keeps every picture, sound, block and list item",
+          "ok": true,
+          "detail": {
+            "pictures": 98,
+            "sounds": 8,
+            "blocks": 3031,
+            "lists": 6506
+          }
+        },
+        {
+          "name": "re-imported game boots to the title and animates",
+          "ok": true,
+          "detail": {
+            "state": 0,
+            "frames": 188
+          }
+        },
+        {
+          "name": "re-imported sounds register and decode",
+          "ok": true,
+          "detail": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "name": "re-imported game starts a race",
+          "ok": true
+        },
+        {
+          "name": "no page errors",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "name": "no console errors",
+          "ok": true,
+          "detail": []
+        }
+      ],
+      "data": {
+        "project": {
+          "objects": 13,
+          "functions": 11,
+          "lists": 26,
+          "variables": 57,
+          "blocks": 3031
+        },
+        "roundtrip": {
+          "ok": true,
+          "size": 2166677,
+          "magic": [
+            31,
+            139
+          ],
+          "before": {
+            "pictures": 98,
+            "sounds": 8,
+            "blocks": 3031,
+            "lists": 6506
+          },
+          "after": {
+            "pictures": 98,
+            "sounds": 8,
+            "blocks": 3031,
+            "lists": 6506
+          }
+        }
+      },
+      "shots": [
+        "verify-shots\\roundtrip-reimported.png"
+      ],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "passed": true
+    }
+  },
+  "summary": {
+    "checks": 66,
+    "failed": []
+  },
+  "passed": true
+}

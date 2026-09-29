@@ -1,0 +1,363 @@
+{
+  "scenario": "audio",
+  "checks": [
+    {
+      "name": "8 MP3 sounds registered and decoded",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "title music plays on the BGM channel",
+      "ok": true,
+      "detail": [
+        "title"
+      ]
+    },
+    {
+      "name": "title music is audible (rms > 0.01)",
+      "ok": true,
+      "detail": {
+        "peak": 0.4955,
+        "rms": 0.1413
+      }
+    },
+    {
+      "name": "countdown beeps start with the countdown",
+      "ok": true,
+      "detail": {
+        "peak": 0.2149,
+        "rms": 0.0497
+      }
+    },
+    {
+      "name": "engine idles during the countdown",
+      "ok": true
+    },
+    {
+      "name": "race music starts on the BGM channel after GO",
+      "ok": true
+    },
+    {
+      "name": "engine pitch follows speed (playback rate rises)",
+      "ok": true,
+      "detail": {
+        "low": 1.075481999834722,
+        "high": 1.8729844586117763
+      }
+    },
+    {
+      "name": "engine sample re-triggers with overlap (≥ 8 starts)",
+      "ok": true,
+      "detail": 12
+    },
+    {
+      "name": "race audio is audible (rms > 0.01)",
+      "ok": true,
+      "detail": {
+        "peak": 0.7468,
+        "rms": 0.22
+      }
+    },
+    {
+      "name": "music stays at normal pitch while the engine is pitched",
+      "ok": true,
+      "detail": [
+        1
+      ]
+    },
+    {
+      "name": "crashing plays the crash sound",
+      "ok": true,
+      "detail": "playSucceeded"
+    },
+    {
+      "name": "M mutes all audio (peak ≈ 0)",
+      "ok": true,
+      "detail": {
+        "peak": 0,
+        "rms": 0
+      }
+    },
+    {
+      "name": "M again restores the audio",
+      "ok": true,
+      "detail": {
+        "peak": 0.6482,
+        "rms": 0.2115
+      }
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "no console errors",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "data": {
+    "project": {
+      "objects": 13,
+      "functions": 11,
+      "lists": 26,
+      "variables": 57,
+      "blocks": 3031
+    },
+    "sounds": [
+      {
+        "name": "race",
+        "ext": ".mp3",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "name": "title",
+        "ext": ".mp3",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "name": "countdown",
+        "ext": ".mp3",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "name": "finish",
+        "ext": ".mp3",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "name": "engine",
+        "ext": ".mp3",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "name": "crash",
+        "ext": ".mp3",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "name": "lap",
+        "ext": ".mp3",
+        "registered": true,
+        "decoded": true
+      },
+      {
+        "name": "skid",
+        "ext": ".mp3",
+        "registered": true,
+        "decoded": true
+      }
+    ],
+    "engineRates": [
+      0.55,
+      0.55,
+      0.55,
+      0.64,
+      1.03,
+      1.28,
+      1.17,
+      1.42,
+      1.61,
+      1.76,
+      1.89,
+      1.9
+    ],
+    "audioCalls": [
+      {
+        "kind": "playBGM",
+        "id": "title",
+        "name": "title",
+        "state": "playSucceeded",
+        "t": 10971,
+        "rate": 1
+      },
+      {
+        "kind": "playBGM",
+        "id": "countdown",
+        "name": "countdown",
+        "state": "playSucceeded",
+        "t": 14076,
+        "rate": 1
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 14077,
+        "rate": 0.55
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 15726,
+        "rate": 0.55
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 17375,
+        "rate": 0.55
+      },
+      {
+        "kind": "playBGM",
+        "id": "race",
+        "name": "race",
+        "state": "playSucceeded",
+        "t": 18383,
+        "rate": 0.5
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 18797,
+        "rate": 0.6431383930153215
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 19680,
+        "rate": 1.0256829529626397
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 20380,
+        "rate": 1.2843904685181877
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 21168,
+        "rate": 1.1738549121940753
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 21805,
+        "rate": 1.4158245734409578
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 22380,
+        "rate": 1.608386617296721
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 22895,
+        "rate": 1.7606289805430142
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 23372,
+        "rate": 1.8892835775953878
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 23853,
+        "rate": 1.9
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 24330,
+        "rate": 1.9
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 24810,
+        "rate": 1.9
+      },
+      {
+        "kind": "playSound",
+        "id": "crash",
+        "name": "crash",
+        "state": "playSucceeded",
+        "t": 25119,
+        "rate": 0.73
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 26669,
+        "rate": 0.7950465295943403
+      },
+      {
+        "kind": "playSound",
+        "id": "crash",
+        "name": "crash",
+        "state": "playSucceeded",
+        "t": 26669,
+        "rate": 0.7950465295943403
+      },
+      {
+        "kind": "playBGM",
+        "id": "race",
+        "name": "race",
+        "state": "playSucceeded",
+        "t": 27378,
+        "rate": 1.079781641740134
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 27470,
+        "rate": 1.123491323936476
+      },
+      {
+        "kind": "playSound",
+        "id": "engine",
+        "name": "engine",
+        "state": "playSucceeded",
+        "t": 28320,
+        "rate": 1.0709464286453487
+      }
+    ]
+  },
+  "shots": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "passed": true
+}

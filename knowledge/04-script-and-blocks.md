@@ -185,7 +185,7 @@ reg['repeat_basic']
 | type | params | paramsKeyMap | 비고 |
 |------|:------:|--------------|------|
 | `when_run_button_click`    | 1 | — | 시작 ▶ 클릭 |
-| `when_some_key_pressed`    | 2 | `VALUE=1` | VALUE=키 이름 (`"space"`, `"up"`, `"left"`, `"a"`, …). **필드 문자열** |
+| `when_some_key_pressed`    | 2 | `VALUE=1` | VALUE=**숫자 키 코드 문자열** (`"37"` ←, `"38"` ↑, `"39"` →, `"40"` ↓, `"32"` 스페이스, `"65"` A). 엔진이 코드로 대조하므로([`code.js:137`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/code.js#L137)) `"left"` 같은 이름은 로드는 되지만 **절대 발화하지 않는다**. DSL `when.keyPressed('space')` 는 이름을 코드로 바꿔 준다. keydown 마다 한 번(누르고 있으면 OS 키 반복 지연 뒤 연속) → 점프·발사·재시작용 |
 | `when_message_cast`        | 2 | `VALUE=1` | VALUE=신호 id (messages[*].id). **필드 문자열** |
 | `mouse_clicked`            | 1 | — | 마우스 클릭 순간 |
 | `when_object_click`        | 1 | — | 이 오브젝트 클릭 시 |
@@ -197,7 +197,7 @@ reg['repeat_basic']
 |------|:------:|:----------:|--------------|------|
 | `repeat_basic`      | 2 | 1 | `VALUE=0` | N번 반복 |
 | `repeat_inf`        | 2 | 1 | — | 계속 반복 |
-| `repeat_while_true` | 3 | 1 | `BOOL=0` | 조건 동안 반복 |
+| `repeat_while_true` | 3 | 1 | `BOOL=0`, `OPTION=1` | 필드 `'until'`(될 때까지) / `'while'`(동안). ⚠️ DSL 주석의 `repeat.until` 은 **구현이 없다**(2026-09-29) → `{ type: 'repeat_while_true', params: [cond, 'until', null], statements: [body] }` 를 직접 쓴다 |
 | `wait_second`       | 2 | 0 | `SECOND=0` | N초 대기 |
 | `wait_until_true`   | 2 | 0 | `BOOL=0` | 조건 될 때까지 |
 | `stop_repeat`       | 1 | 0 | — | 반복 끊기 |
@@ -226,7 +226,7 @@ reg['repeat_basic']
 |------|:------:|--------------|------|
 | `boolean_and_or`         | 3 | `LEFTHAND=0, OPERATOR=1, RIGHTHAND=2` | OPERATOR 필드: `"AND"`/`"OR"` |
 | `boolean_basic_operator` | 3 | 동상 | OPERATOR: `"EQUAL"`, `"GREATER"`, `"LESS"`, `"NOT_EQUAL"`, `"GREATER_OR_EQUAL"`, `"LESS_OR_EQUAL"` |
-| `is_press_some_key`      | 2 | `VALUE=0` | 키 누름 감지. **필드**: 키 이름 |
+| `is_press_some_key`      | 2 | `VALUE=0` | 지금 눌려 있는가. **필드**: 숫자 키 코드 문자열(`Number(값)` 으로 대조 — [`block_judgement.js:102`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_judgement.js#L102)). **부드러운 이동은 `repeat.inf` + 이 블록**(DSL `isPressed('ArrowLeft')`) |
 | `reach_something`        | 2 | `VALUE=0` | **필드**: `"mouse"` / `"wall"` / `"wall_up"` / `"wall_down"` / 오브젝트 id |
 
 ### 생김새
@@ -236,9 +236,9 @@ reg['repeat_basic']
 | `dialog`                 | 3 | `VALUE=0, OPTION=1` | OPTION: `"speak"` / `"think"` |
 | `dialog_time`            | 4 | `VALUE=0, SECOND=1, OPTION=2` | 일정 시간 말하기 |
 | `change_to_next_shape`   | 2 | `DRIECTION=0` | **오탈자 주의**: 키 이름은 `DRIECTION`. 필드값 `"next"` / `"prev"` |
-| `change_to_some_shape`   | 2 | `VALUE=0` | **필드**: pictures[*].id |
+| `change_to_some_shape`   | 2 | `VALUE=0` | 값: pictures 의 id → 이름 → **1부터 순번** 차례로 찾는다([07](07-runtime-quirks.md#change_to_some_shape-매칭-우선순위--id--name--index)). 현재 번호는 `coordinate_object(self, 'picture_index')` |
 | `set_effect`             | 3 | `EFFECT=0, VALUE=1` | EFFECT: `"color"`/`"brightness"`/`"transparency"` |
-| `set_scale_size`         | 2 | `VALUE=0` | 크기를 N%로 |
+| `set_scale_size`         | 2 | `VALUE=0` | 퍼센트가 아니라 **폭·높이 평균 px**([07 크기](07-runtime-quirks.md#크기-정하기는-퍼센트가-아니다)) |
 | `show` / `hide`          | 1 | — | 보이기/숨기기 |
 
 ### 자료 (변수 · 리스트)
@@ -1026,7 +1026,7 @@ const fnMoveY = fn.value('my', ['remain', 'dir'], (remain, dir, L) => [
 ### 타일 크기는 **한 곳**에서 유도한다 — 검증 코드까지
 
 타일 스케일은 나중에 바뀐다. 원작 대비 세로 행 수가 안 맞거나 렌더 예산이 남으면 조정하게 되는데,
-그때 **"현재 타일 크기를 전제로 박아둔 숫자"가 전부 조용한 버그가 된다.** brick-kingdom 이
+그때 **"현재 타일 크기를 전제로 박아둔 숫자"가 전부 조용한 버그가 된다.** 한 사이드스크롤 작품을
 TILE 32 → 24 로 옮길 때 실제로 걸린 곳:
 
 | 박혀 있던 값 | 무엇이었나 |
@@ -1050,17 +1050,17 @@ verify 도 게임과 같은 모듈에서 `TILE`/`GROUND`/`ROWS`/`PHYS` 를 impor
 await page.evaluate(([TILE, ROWS]) => { /* ... */ }, [TILE, ROWS]);
 ```
 
-체감이 배율에 안전한지 확인하는 방법: **칸 단위로 환산해서 비교한다.** brick-kingdom 은
+체감이 배율에 안전한지 확인하는 방법: **칸 단위로 환산해서 비교한다.** 그 작품은
 `S` 를 2 → 1.5 로 바꿨을 때 최대 점프가 112px 로 줄었지만 4.7 칸으로 그대로였다
 (속도와 중력이 같은 배율로 스케일되므로 칸 단위 궤적이 보존된다).
 
-### 참고 구현
+### 이 절의 출처
 
-[`games/brick-kingdom/`](../games/brick-kingdom/) — 356 열 × 12 행 스테이지, 오브젝트 6 개,
-적·아이템·발사체 전부 리스트, 평지에서 프레임당 45 스탬프. spec 1,699 줄 / verify 16 시나리오.
-물리 상수는 [`games/brick-kingdom/physics.mjs`](../games/brick-kingdom/physics.mjs) 에 분리
-(TILE 은 [`levels.mjs`](../games/brick-kingdom/levels.mjs), 렌더 예산 실측은
-[07 §렌더 예산은 그린 칸으로](07-runtime-quirks.md)).
+이 절의 설계와 코드는 356 열 × 12 행 스테이지를 오브젝트 6 개로 만든 사이드스크롤 작품
+(적·아이템·발사체 전부 리스트, 평지에서 프레임당 45 스탬프, 검사 16 시나리오)에서 나왔다.
+작품은 검사 일부가 통과하지 않은 미완성이라 2026-09-29 공개 저장소에서 내려 로컬 전용으로
+옮겼다. 필요한 코드는 이 절과 [07](07-runtime-quirks.md#char_at--substring-은-범위를-벗어나면-throw--문자열-타일맵에-가드-필수)에
+옮겨 두었고, 렌더 예산 실측은 [07 §렌더 예산은 그린 칸으로](07-runtime-quirks.md#brush_stamp-렌더-예산은-방문-칸이-아니라-그린-칸으로-센다--타일-크기를-바꾸면-다시-재야-한다)에 있다.
 
 ## 원-원 거리 기반 충돌 (`reach_something` 대체)
 
@@ -1224,6 +1224,32 @@ await page.evaluate(async () => {
 [`tests/fixtures/spec-fibonacci.mjs`](../tests/fixtures/spec-fibonacci.mjs) — `value` 타입
 함수 + 1개 파라미터 (DSL 작성). [`tools/verify-fibonacci.mjs`](../tools/verify-fibonacci.mjs) —
 fib(0)~fib(15) 결과 + 수열 리스트 자동 검증.
+
+## DSL 수식은 실행 시점에 따라 구분한다
+
+[`spec-dsl.mjs`](../tools/lib/spec-dsl.mjs)의 `fn.value` 콜백에 전달되는 인자는 숫자가 아니라
+`{ type: 'stringParam_…', params: [] }` 형태의 **블록 참조 객체**다. `getVar()`와
+`L.get()`도 값을 즉시 읽지 않고 블록을 만든다.
+
+```js
+// row는 실행 중에 결정되는 함수 인자다.
+// 잘못: row => 98 - row * 2   → spec 생성 중 JS가 객체를 곱해 NaN
+fn.value('mapy', ['row'], () => [],
+    row => calc(98, '-', calc(row, '*', 2)));
+
+// x는 제작 시 정해지는 JS 숫자이므로 일반 수식으로 계산해도 된다.
+Array.from({ length: 19 }, (_, x) => 174 + x * 2);
+```
+
+판단 기준은 수식의 길이가 아니라 **피연산자 중 실행 중 값이 있는가**다. 하나라도 블록
+참조이면 사칙연산·비교·문자 결합을 `calc`·`cmp`·`combine`으로 구성한다. 정해진 개수의
+블록을 `Array.from`으로 펼칠 때에도 JS 인덱스와 엔트리 함수 인자를 구별한다.
+
+심연의 성채에서는 `mapdrawrow`의 X는 JS 상수, Y는 엔트리 함수 인자여서 같은 좌표식에서도
+두 방식을 나눠야 했다. [수정된 소스](../games/abyssal-keep/spec.mjs)의
+`locateXY(174+x*2, sub(98, mul(y,2)))`가 재사용 예다.
+구조 검사가 통과했다는 것만으로 수식의 의도까지 확인되지는 않는다. 생성 전 블록 값의
+`NaN`·`Infinity`와 잘못 문자열화된 객체를 살피고, 실행 화면에서 좌표를 확인한다.
 
 ## 함수 지역 변수 (function local variables)
 
@@ -1529,6 +1555,75 @@ repeat.inf([
 ]),
 ```
 
+## 보일링(선 떨림) — 모양 세 장을 타이머 박자로 돌리기
+
+손그림 애니메이션의 "보일링": 가만히 있는 그림도 **선과 윤곽만 조금씩 다른 세 장**을 약 0.15초마다 돌려 살아 있게 보이게 한다.
+2026-09-29 비공개 로컬 스토리 게임(인물 그림 약 15장 + 대사창 종이)에서 만들고 끝까지 플레이 검사로 확인한 방법이다.
+
+### 세 장 만들기 — 이미지 생성 AI 로 다시 그리지 않는다
+
+AI 로 세 번 다시 그리면 자세·표정·옷 주름까지 달라져 "떨림"이 아니라 "튐"이 된다. 세 장은 **픽셀 단위로 같은 자리에 겹쳐야** 하므로
+완성된 번들 PNG 를 후처리로 조금씩 민다.
+
+- **부드러운 무작위 변위장**: 정규분포 잡음을 가우스로 흐린 것(가로·세로 각각)을 표준편차 **약 0.25 무대 px**(최대 약 1px), 물결 크기 약 3 무대 px 로 맞춘다.
+  무대 px → 번들 px 는 그 그림을 주로 쓰는 표시 배율로 나눈다(배율 0.5 면 ×2) — 그림마다 화면에서 같은 크기로 흔들린다.
+- **다시 뽑기**: 알파를 **미리 곱한** RGBA 를 3차 스플라인(`scipy.ndimage.map_coordinates(order=3)`)으로 — 선이 흐려지지 않고 가장자리 색이 번지지 않는다.
+  색이 고른 면은 밀려도 그대로라 눈에 보이는 차이는 선·흰 테두리뿐이다.
+- **캔버스 크기·중심점을 바꾸지 않는다** — 모양을 바꿀 때 중심이 튄다([07 모양 치수](07-runtime-quirks.md#크기-정하기는-현재-모양의-치수로-계산된다--모양을-바꾼-뒤-다시-정한다)).
+- **글자가 얹히는 판(대사창 종이 등)은 가장자리 띠만**: 알파 가장자리에서의 거리(`distance_transform_edt`)로 변위에 가중치 — 6px 안쪽까지 1, 16px 에서 0.
+  안쪽(글자 자리)은 세 장이 픽셀 단위로 같아 가독성이 그대로다.
+- seed 를 에셋 이름에서 정하면(`crc32(id) + 장 번호`) 다시 돌려도 같은 세 장.
+- **용량 약 3배**(보일링 PNG 는 원본보다 5~10% 크다). 실측 `.ent` 12.8 → 17.5 MB. 잠깐(1초 미만)만 보이는 큰 그림은 빼는 편이 낫다.
+
+### 작품에 끼우기 — 그림 한 장 → 세 장 연속, 모양 번호로 차례 계산
+
+```js
+// pictures: [A~1, A~2, A~3, B~1, B~2, B~3, …] — 첫 장이 원래 이름을 가져 changeShape('A') 는 그 자세의 첫 장으로 간다
+const idx = coord('self', 'picture_index');                          // 현재 모양 번호(1부터)
+const target = add(sub(idx, mod(sub(idx, 1), 3)),                     // 자세(세 장 묶음)의 첫 번호
+                   mod(floorOf(calc(timer.value(), '/', 0.15)), 3));  // + 타이머로 정한 차례 0·1·2
+starts(sc, [repeat.inf([if_(and_(eq(getVar('pen'), 0), cmp(idx, '!=', target)), [changeShape(target)])])]);
+```
+
+- `모양 바꾸기`에 **숫자**를 넣으면 순번으로 찾는다([07 매칭 순서](07-runtime-quirks.md#change_to_some_shape-매칭-우선순위--id--name--index)). 그림 이름을 숫자로 짓지 않는다.
+- **타이머로 차례를 정하면** 모든 오브젝트가 같은 박자로 바뀌고 `기다리기` 누적 오차도 없다. 프로젝트 타이머는 실행 시작 때 켜 둔다([07 초시계](07-runtime-quirks.md#프로젝트-초시계의-원점과-표시값은-다르다)).
+- 같은 모양이면 바꾸지 않는다 → 매 틱 모양 바꾸기 비용이 없다.
+- 중요한 연출 중(예: 단서를 강조하는 연출이 진행되는 동안)엔 멈춤 조건을 둔다 — 화면 전체가 멈춰 그 순간이 선다.
+- ⚠️ **보일링 오브젝트에 `다음 모양`(`change_to_next_shape`) 금지** — 같은 자세의 다음 장으로 간다. 두 자세를 번갈아 걷던 오브젝트는
+  `만약 모양 번호 < 4 이면 B 로, 아니면 A 로` 처럼 자세 이름·번호로 바꾼다.
+- 한 오브젝트에 보일링 없는 그림이 섞이면 같은 그림을 세 번 넣는다 — 같은 파일 경로는 번들에 한 번만 들어간다(`make-ent` 는 경로로 중복을 거른다).
+
+### 검증
+
+모양 번호를 30ms 마다 1.2초 재서: 세 장이 모두 나옴 · 바뀐 횟수 5~10 · 자세(세 장 묶음) 그대로 · 여러 오브젝트의 차례(`(번호−1) mod 3`)가 90% 이상 같음.
+대사 중에는 글자 칸의 자리·크기가 전후 같은지, 멈춤 조건 동안 바뀐 횟수가 0 인지 본다. 움직임의 느낌(세기)은 사람 눈으로 따로 본다.
+
+## 장면 조립(팝업북) — 조각을 하나씩 붙이며 장면 열기
+
+장면이 처음 보일 때 **배경만 먼저** 드러나고 문·창·물건·인물 스티커가 하나씩 "붙는" 연출. 종이 콜라주 화풍에 맞고, 대사가 시작되기 전에
+무엇을 누를 수 있는지 한 번씩 보여 준다(2026-09-29 비공개 로컬 스토리 게임, 장면 6개).
+
+```js
+// 1) 조각은 장면 시작 때 숨긴다(첫 공개 전 — 암막 뒤)
+o.script.push(...starts(sc, [hide()]),
+// 2) 감독의 신호에 맞춰 시차를 두고 붙는다: 조금 크고 기운 채 나타나 두 계단 만에 제자리
+    [when.message('assemble'), wait(0.12 + i * 0.08),
+        scaleTo(key, s * 1.14), rotAbs(rot + 4), show(), ...sfx('stick'), wait(0.05),
+        scaleTo(key, s * 1.05), rotAbs(rot + 1.5), wait(0.05), scaleTo(key, s), rotAbs(rot)]);
+// scaleTo = set_scale_size 에 (폭+높이)/2 × 배율 — 퍼센트가 아니다(07 크기)
+// 3) 감독: 첫 공개(암막 걷기) 바로 뒤
+sendMessageWait('fade_in'), sendMessageWait('assemble'), ...says(…)
+```
+
+- **`신호 보내고 기다리기`는 모든 리스너의 `기다리기`까지 기다린다**([07 정정](07-runtime-quirks.md#message_cast-핸들러는-동시-실행--같은-메시지-다중-리스너-race)) — 조각이 다 붙은 뒤에 대사가 시작된다.
+- 기존 시작 스크립트가 `보이기`를 해도, 뒤에 덧붙인 `숨기기` 스크립트가 같은 틱에 이어 돌아 첫 공개 때 조각은 0개였다(측정).
+  이 순서에 기대기 싫으면 시작 스크립트의 `보이기`를 빼고 조립만 보이게 한다.
+- 순서는 **환경(문·창·표지판) → 물건 → 인물**, 간격 0.08초, 조각마다 작은 종이 소리. 조각 6~9개면 0.3~0.7초.
+- 빼는 것: 보이기/숨기기를 매 틱 스스로 정하는 오브젝트(대사창·소지품 표시 등), 이미 움직이는 장면(낙하 등), 처음엔 숨어 있다 연출로 나오는 것.
+- 배경에서 오려 낸 조각은 배경 그림에도 같은 물건이 그려져 있어, 빈 배경 → 흰 테두리 스티커가 제자리에 "붙는" 모습이 된다.
+- 효과음을 조각마다 내면 짧은 간격으로 여러 번 부르게 된다 → 이름 변수 하나로 내면 앞 소리가 사라진다([07 신호 핸들러 차례](07-runtime-quirks.md#신호-핸들러는-받는-오브젝트의-차례에-돈다--보낸-쪽이-곧바로-바꾼-변수를-읽는다)). 리스트 줄로 낸다.
+- 검증: 화면을 그릴 때마다(`Entry.stage.update` 감싸기, [05](05-host-editor.md#그릴-때마다-재기--entrystageupdate-감싸기)) 암막이 처음 걷힌 프레임의 조각 수(0), 조각별 처음 보인 시각의 순서, 전체 폭을 잰다.
+
 ## `wait_until` 패턴 — `repeat.inf + stopRepeat`
 
 DSL 에 직접 `wait_until` 이 없지만 자주 필요 (특정 조건 만족까지 블로킹). Entry 의 `repeat_while_true` 블록을 쓰는 대신 `repeat.inf` + `stopRepeat` 으로 표현:
@@ -1608,8 +1703,11 @@ frontier-guard 의 회귀 가드 (46/46 pass) 는 4 레이어 + 모든 sub-layer
 | 회전하는 3D 정육면체 | 직교투영, 꼭짓점과 법선의 회전, 앞면 선택과 조명 | [3D 사례](11-3d-game-case-study.md) |
 | 공 타격 전투·웨이브·스킬 보상 | 단계별 전투, 고정 인덱스와 활성 ID 목록, 접촉별 피해 가드, 중복 없는 후보 추첨 | [A Ball 2 사례](12-a-ball-2-case-study.md) |
 | 자동 바운스 + 맵 편집기 | 한글 타일 코드, 시간 설정을 본문 뒤에 저장, 시험 클리어와 저장 허용, 편집 시 검증 무효화 | [BOUNCY BALL 사례](13-bouncy-ball-case-study.md) |
+| 1인칭 던전 로그라이크 | 카메라 평면 DDA, 조각별 깊이 가림, 벽 캐시, BFS 작업 버퍼, 입력 완주 검증 | [심연의 성채 사례](14-abyssal-keep-case-study.md) |
 
-이 사례들은 2026-09-10 제공된 파일의 정적 분석이다. 동작 의도와 관측 가능한 블록 구조를 구분하며, 원본 해시와 블록 위치는 [근거 재검증 절차](evidence/README.md)로 확인한다.
+09〜13은 2026-09-10 제공된 파일의 정적 분석이다. 동작 의도와 관측 가능한 블록 구조를 구분하며,
+원본 해시와 블록 위치는 [근거 재검증 절차](evidence/README.md)로 확인한다.
+14는 직접 제작한 작품의 로컬 런타임 사례이며, 해당 문서에 실행 환경·측정값·완주 기록을 연결했다.
 
 ## 검증 — 잘못된 블록 잡기
 

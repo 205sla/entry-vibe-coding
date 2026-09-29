@@ -271,3 +271,43 @@ test('validateSpec finds statement-position value calls nested in loops', async 
         issues.filter(i => /value function used as a statement/.test(i.msg)).length, 1,
         `nested case missed: ${JSON.stringify(issues, null, 2)}`);
 });
+
+test('key fields must hold key codes; DSL converts key names', async () => {
+    // A key *name* in a Keyboard field loads and passes every structural check,
+    // but the engine matches the numeric code, so the key never fires — a
+    // game whose basket never moves. Found by a low-effort model trial.
+    const { validateSpec } = await import('../tools/make-ent.mjs');
+    const { isPressed, when, keyCode } = await import('../tools/lib/spec-dsl.mjs');
+    const run = { type: 'when_run_button_click', params: [] };
+
+    const named = validateSpec({ objects: [{ id: 'o', script: [
+        [{ type: 'when_some_key_pressed', params: [null, 'left'] }],
+        [run, { type: '_if', params: [{ type: 'is_press_some_key', params: ['ArrowRight', null] }], statements: [[]] }],
+    ] }] });
+    assert.equal(named.filter(i => i.severity === 'error' && /is not a key code/.test(i.msg)).length, 2,
+        JSON.stringify(named, null, 2));
+
+    assert.equal(isPressed('ArrowLeft').params[0], '37');
+    assert.equal(when.keyPressed('space').params[1], '32');
+    assert.equal(keyCode('a'), '65');
+    assert.equal(keyCode('KeyZ'), '90');
+    assert.equal(keyCode('Digit1'), '49');
+    assert.equal(keyCode(39), '39');
+    assert.throws(() => keyCode('ArrowSideways'), /unknown key/);
+    const coded = validateSpec({ objects: [{ id: 'o', script: [
+        [when.keyPressed('up')],
+        [run, { type: '_if', params: [isPressed('d')], statements: [[]] }],
+    ] }] });
+    assert.deepEqual(coded.filter(i => /is not a key code/.test(i.msg)), []);
+});
+
+test('pixel-art turns a character grid into a crisp scaled SVG', async () => {
+    const { px, mirror } = await import('../tools/lib/pixel-art.mjs');
+    const art = px(['a..a', 'abba'], { a: '#111111', b: '#eeeeee' });
+    assert.deepEqual(art.dimension, { width: 12, height: 6 });   // 4×2 dots × scale 3
+    assert.equal(art.imageType, 'svg');
+    assert.match(art.svgString, /shape-rendering="crispEdges"/);
+    assert.equal((art.svgString.match(/<rect /g) || []).length, 5); // a,a / a,bb,a — the 'bb' run is one rect
+    assert.deepEqual(mirror(['ab.']), ['.ba']);
+    assert.throws(() => px(['x'], {}), /palette/);
+});

@@ -17,8 +17,9 @@
 재현 범위는 [17 콜드 클론](../17-cold-clone.md), 실행 절차는 [15 소리 검증](../15-audio-verification.md)을 따른다.
 
 2026-09-17의 새 사본 설치·오디오·검증 결과와 해시는
-[cold-clone-20260917.json](cold-clone-20260917.json)에, 알려진 Brick Kingdom 실패의
-실제 출력은 [brick-kingdom-runtime-20260917.log](brick-kingdom-runtime-20260917.log)에 있다.
+[cold-clone-20260917.json](cold-clone-20260917.json)에 있다. 당시 알려진 Brick Kingdom 실패의
+실행 로그는 그 작품을 2026-09-29 로컬 전용으로 옮기면서 함께 내렸다
+(전체 런타임 로그 [cold-clone-runtime-20260917.log](cold-clone-runtime-20260917.log)에는 요약이 남아 있다).
 이는 로컬 호스트의 실행 근거이며 공식 웹·오프라인 앱을 이번에 재검증한 기록은 아니다.
 
 [music-sync-20260915.json](music-sync-20260915.json)은 2026-09-15의 별도 외부 작품 실행 기록이다.
@@ -41,6 +42,10 @@ node tools/verify-case-study-evidence.mjs --source "C:/작품/chroma_009.ent" --
 ```
 
 ## 무엇을 증명하는가
+
+소리 실행 검증은 위 정적 사례와 다른 형식의 [audio-verification-20260911.json](audio-verification-20260911.json)에
+보관한다. 재현 방법과 환경별 범위는 [15 소리 검증](../15-audio-verification.md)을 따른다.
+아래 `verify-case-study-evidence.mjs`의 입력으로 사용하지 않는다.
 
 - `source.sha256`: 분석한 원본 압축 파일의 바이트를 고정한다. 이름이 같아도 해시가 다르면 다른 버전이다.
 - `assertions`: 특정 변수, 함수, 블록과 계수가 그 위치에 존재하는지 재검사한다.

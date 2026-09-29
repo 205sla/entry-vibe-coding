@@ -17,6 +17,7 @@
 - [2026-04-23] 하드웨어 모듈이 `ws://127.0.0.1:23518` 연결 실패 로그 스팸 — 가드: [`editor.js`](../public/js/editor.js) init option `hardwareEnable: false`
 - [2026-04-23] `/images/*`와 `/lib/entry-js/images/*` 404 (Entry가 두 경로 모두 요청) — 가드: [`scripts/setup.mjs`](../scripts/setup.mjs) 양쪽에 복사
 - [2026-04-23] `Entry.engine.toggleRun()`이 tickEnabled 에러로 간헐 crash (헤드리스) — 가드: [`tools/lib/editor-harness.mjs`](../tools/lib/editor-harness.mjs) try/catch 래핑
+- [2026-09-11] PreloadJS 0.4.1 + SoundJS 1.0.0 혼용을 방어 래퍼가 숨겨 WAV·MP3가 무음 — 가드: [공식 0.6.0 해시 설치](../scripts/setup-audio.mjs), [부팅 버전 차단·네이티브 출력·왕복 재생 검사](../tests/audio-e2e.spec.js), [진단 정본](15-audio-verification.md).
 
 ## `.ent` 로드 · 렌더
 
@@ -39,14 +40,17 @@
 - [2026-06-04] 검색 자동완성이 **긴 문자열 입력 시** "can not insert value to array" 크래시 (편집기가 `repeat` 블록 빨갛게 표시) — `updateSuggestions` 의 `repeat 100`(반복=1프레임 양보)이 빠른 키 입력마다 동시 실행돼 전역 카운터 `si` 가 100 초과 → list 범위 밖. **클론 아닌** 이벤트 핸들러 재발화 race — 가드: 순회를 동기 재귀 `fn.value`(`scanSug`)로 위임 ([`07-runtime-quirks.md` repeat 글로벌 race](07-runtime-quirks.md#다중-클론의-repeatinf-본체--글로벌-scratch-변수-race))
 
 - [2026-06-17] 글상자(textBox)에 투명도/효과(`set_effect`/`add_effect` `'transparency'`)를 적용하면 `Cannot set properties of undefined (setting 'alpha')` 런타임 에러로 **엔진 전체가 정지** — 같은 프레임의 다른 오브젝트 스크립트·키 이벤트(`when_some_key_pressed`)까지 멈춘다(증상이 엉뚱한 곳에 나타나 디버깅 어려움). textBox 의 textObject 는 sprite 처럼 effect 대상 객체가 없음. 가드: textBox 는 **색/`show`·`hide`** 로만 연출, 페이드 전환은 **sprite 풀스크린 오버레이**의 transparency 로 ([`games/online-match/spec.mjs`](../games/online-match/spec.mjs) `fader`)
-- [2026-07-31] 플랫포머에서 **가속도 < 기어가기 스냅 임계값**이면 캐릭터가 영원히 안 움직인다 — `vx += ACCEL(0.074)` 직후 `if |vx| < MIN_SPEED(0.10) → vx = 0` 이 매 프레임 되돌려서 `vx` 가 항상 0. 키 입력·물리 함수·충돌 전부 정상인데 위치만 안 바뀌므로 원인이 엉뚱한 곳(입력 블록·히트박스)으로 보인다. 기어가기 방지는 **마찰 분기 안에서 부호가 바뀌는 순간 0 으로** 클램프해 처리하고, 가속 경로에는 스냅을 걸지 않는다 — 가드: [`games/brick-kingdom/spec.mjs`](../games/brick-kingdom/spec.mjs) `horizontalPhysics` 말미 주석 + `verify.mjs` 의 좌우 이동 Δ 측정
+- [2026-07-31] 플랫포머에서 **가속도 < 기어가기 스냅 임계값**이면 캐릭터가 영원히 안 움직인다 — `vx += ACCEL(0.074)` 직후 `if |vx| < MIN_SPEED(0.10) → vx = 0` 이 매 프레임 되돌려서 `vx` 가 항상 0. 키 입력·물리 함수·충돌 전부 정상인데 위치만 안 바뀌므로 원인이 엉뚱한 곳(입력 블록·히트박스)으로 보인다. 기어가기 방지는 **마찰 분기 안에서 부호가 바뀌는 순간 0 으로** 클램프해 처리하고, 가속 경로에는 스냅을 걸지 않는다 — 가드: 검사에서 좌우 이동량(Δpx)을 직접 잰다
 - [2026-07-31] 여러 오브젝트가 각자 `repeat.inf` 를 돌 때 **글로벌 스크래치 변수 한 개를 여러 용도로 돌려쓰면** 프레임 중간에 서로 덮어쓴다 (한 오브젝트의 카메라 계산이 다른 오브젝트의 "최대 속도" 스크래치를 클로버). 클론이 아니어도 발생하는 [글로벌 scratch race](07-runtime-quirks.md#다중-클론의-repeatinf-본체--글로벌-scratch-변수-race) 의 2-오브젝트 변형 — 가드: 스크래치는 **용도별 전용 변수**로 (`cam_tmp`/`box_h`/`max_spd`/`accel`/`grav`/`bumped`/`tile_ch`/`shape`), 스레드 경계를 넘는 값은 이름에 소유 스레드를 남긴다
-- [2026-07-31] 문자열 타일맵에서 캐릭터가 맵 경계로 나가면 **물리 스레드만 조용히 죽는다** — `char_at`/`substring` 이 범위 밖에서 값이 아니라 `throw` 하고([07 §char_at·substring throw](07-runtime-quirks.md#char_at--substring-은-범위를-벗어나면-throw--문자열-타일맵에-가드-필수)), 예외는 그 스레드만 정지시켜 "화면은 살아 있는데 조작이 안 먹는" 증상이 된다. `and_` 는 단락 평가가 없어 `and_(r>=0, r<ROWS, …)` 로 묶으면 이미 평가돼 던진다 — 가드: 좌표→문자 함수에서 **중첩 `if_`** 로 한 조건씩 검사하고 밖이면 상수 반환 ([`games/brick-kingdom/spec.mjs`](../games/brick-kingdom/spec.mjs) `fnTileAt` — 기본값 `'#'`)
-- [2026-07-31] 타일 한 칸을 `replace_string` 으로 바꾸면 **그 행의 같은 문자가 전부** 바뀐다 (`split(old).join(new)` 구현) — 벽돌 하나를 깨면 행 전체가 사라진다. 가드: `substring` 좌/우 + `combine` 으로 교체 ([`games/brick-kingdom/spec.mjs`](../games/brick-kingdom/spec.mjs) `fnSetTile`)
-- [2026-07-31] AABB 충돌에서 `py` 를 **발 위치(하단 경계 배타적)** 로 정의하면 하단 샘플을 `py` 로 잡는 순간 `quotient(py, TILE)` 이 지면 행을 가리켜 "항상 충돌" → **걷기가 아예 멈춘다**. 가드: 하단 샘플은 `py - 1`, 상단은 `py - h` ([`games/brick-kingdom/spec.mjs`](../games/brick-kingdom/spec.mjs) `fnBoxHits` 주석)
-- [2026-07-31] 한 Node 프로세스에서 편집기를 ~10 회 재부팅하면 **키 이벤트가 게임에 도달하지 않는다**(클릭은 계속 먹음) — 게임이 아니라 하네스 누적 문제이고 단독 실행하면 통과한다. 가드: 키 hold 검증은 시나리오마다 자식 프로세스로 격리 ([`games/brick-kingdom/verify.mjs`](../games/brick-kingdom/verify.mjs) `runAllIsolated`, [07 §브라우저 ~10 회 재부팅](07-runtime-quirks.md#헤드리스-검증에서-브라우저를-10-회-재부팅하면-키-이벤트가-게임에-도달하지-않는다))
-- [2026-07-31] 타일 배율을 바꿀 때(brick-kingdom TILE 32→24) 실패가 아니라 **단정이 헐거워져서 통과하는** 쪽이 더 위험하다 — verify 가 `TILE`/`MAX_FALL` 사본을 들고 있으면 `MAX_FALL` 이 9 로 줄어도 `maxVy <= 12.01` 이 그냥 통과해 아무것도 안 지킨다. 속도·중력만 배율을 곱하고 **길이 상수**(히트박스·서브스텝·카메라 스텝·활성 범위·`ROW0_Y`)를 놓치는 것도 같은 계열 — 가드: 배율은 `S` 하나에서 `L=(b)=>Math.round(b*S)` 로 유도([`games/brick-kingdom/physics.mjs`](../games/brick-kingdom/physics.mjs)), verify 는 게임 모듈에서 `TILE`/`GROUND`/`ROWS`/`PHYS` 를 import 하고 `page.evaluate` 에는 인자로 넘긴다 ([04 §타일 크기는 한 곳에서 유도](04-script-and-blocks.md#타일-크기는-한-곳에서-유도한다--검증-코드까지))
+- [2026-07-31] 문자열 타일맵에서 캐릭터가 맵 경계로 나가면 **물리 스레드만 조용히 죽는다** — `char_at`/`substring` 이 범위 밖에서 값이 아니라 `throw` 하고([07 §char_at·substring throw](07-runtime-quirks.md#char_at--substring-은-범위를-벗어나면-throw--문자열-타일맵에-가드-필수)), 예외는 그 스레드만 정지시켜 "화면은 살아 있는데 조작이 안 먹는" 증상이 된다. `and_` 는 단락 평가가 없어 `and_(r>=0, r<ROWS, …)` 로 묶으면 이미 평가돼 던진다 — 가드: 좌표→문자 함수에서 **중첩 `if_`** 로 한 조건씩 검사하고 밖이면 상수 반환 ([07 §char_at·substring throw](07-runtime-quirks.md#char_at--substring-은-범위를-벗어나면-throw--문자열-타일맵에-가드-필수) `fnTileAt` — 기본값 `'#'`)
+- [2026-07-31] 타일 한 칸을 `replace_string` 으로 바꾸면 **그 행의 같은 문자가 전부** 바뀐다 (`split(old).join(new)` 구현) — 벽돌 하나를 깨면 행 전체가 사라진다. 가드: `substring` 좌/우 + `combine` 으로 교체 ([07 §한 칸만 바꾸려면](07-runtime-quirks.md#한-칸만-바꾸려면-replace_string-이-아니라-substring--combine))
+- [2026-07-31] AABB 충돌에서 `py` 를 **발 위치(하단 경계 배타적)** 로 정의하면 하단 샘플을 `py` 로 잡는 순간 `quotient(py, TILE)` 이 지면 행을 가리켜 "항상 충돌" → **걷기가 아예 멈춘다**. 가드: 하단 샘플은 `py - 1`, 상단은 `py - h` ([04 §문자열 타일맵](04-script-and-blocks.md#문자열-타일맵--서브스텝-스윕-충돌--사이드스크롤-플랫포머))
+- [2026-07-31] 한 Node 프로세스에서 편집기를 ~10 회 재부팅하면 **키 이벤트가 게임에 도달하지 않는다**(클릭은 계속 먹음) — 게임이 아니라 하네스 누적 문제이고 단독 실행하면 통과한다. 가드: 키 hold 검증은 시나리오마다 자식 프로세스로 격리 (`runAllIsolated`, [07 §브라우저 ~10 회 재부팅](07-runtime-quirks.md#헤드리스-검증에서-브라우저를-10-회-재부팅하면-키-이벤트가-게임에-도달하지-않는다))
+- [2026-07-31] 타일 배율을 바꿀 때(사이드스크롤 작품 TILE 32→24) 실패가 아니라 **단정이 헐거워져서 통과하는** 쪽이 더 위험하다 — verify 가 `TILE`/`MAX_FALL` 사본을 들고 있으면 `MAX_FALL` 이 9 로 줄어도 `maxVy <= 12.01` 이 그냥 통과해 아무것도 안 지킨다. 속도·중력만 배율을 곱하고 **길이 상수**(히트박스·서브스텝·카메라 스텝·활성 범위·`ROW0_Y`)를 놓치는 것도 같은 계열 — 가드: 배율은 `S` 하나에서 `L=(b)=>Math.round(b*S)` 로 유도, verify 는 게임 모듈에서 `TILE`/`GROUND`/`ROWS`/`PHYS` 를 import 하고 `page.evaluate` 에는 인자로 넘긴다 ([04 §타일 크기는 한 곳에서 유도](04-script-and-blocks.md#타일-크기는-한-곳에서-유도한다--검증-코드까지))
 - [2026-06-17] textBox `textAlign` 상수가 직관과 반대 — **0=center / 1=left / 2=right** (`entry.js` `TEXT_ALIGN_CENTER=0`). `textAlign:1` 로 두면 좌측정렬돼 가운데로 안 옴. center 정렬은 `alignTextBox` 가 `textObject.x=0`(엔티티 로컬 원점)으로 두므로 `regX:0` 이면 stage x 에 중앙배치되고, `lineBreak:true` 로 width 자동축소를 막아야 안정적. 가드: [`tests/fixtures/spec-textbox-click.mjs`](../tests/fixtures/spec-textbox-click.mjs) 주석 정정 + [`games/online-match/spec.mjs`](../games/online-match/spec.mjs) `tbox`
+- [2026-09-29] 키 블록 값에 이름(`'ArrowLeft'`)을 넣은 게임이 로드·`--check`·smoke 를 모두 통과했지만 바구니가 전혀 안 움직임(엔진은 숫자 키 코드로 대조) — 가드: [`tools/make-ent.mjs`](../tools/make-ent.mjs) Keyboard 슬롯 숫자 검사 + DSL `keyCode()` 이름 변환 + [`tests/smoke.test.js`](../tests/smoke.test.js) `key fields must hold key codes`
+- [2026-09-29] 이 PC 에서 통과한 심연의 성채·선셋 드라이브 검사가 CI 러너에서 실패(키 0.5초에 이동 4분의 1, fps 기준 미달) — 원인: 검사는 실제 시간을 기다리는데 게임은 초시계 기준 게임 시간으로 진행하고, 바쁜 러너에선 초시계가 늦게 갱신돼 게임 시간이 느려짐 — 가드: [`tools/lib/verify-harness.mjs`](../tools/lib/verify-harness.mjs) `useGameTimeWaits`, CI 에서는 fps 기준 기록만 ([05 느린 러너](05-host-editor.md#느린-러너에서는-시간을-게임-시계로-잰다)). 실제 시간 요소가 섞인 게임(벽돌 왕국)에는 프레임 기준 대기가 오히려 실패를 늘렸다 — 게임이 시간을 어떻게 세는지 확인하고 고른다
+- [2026-09-29] 먼저 베끼는 예제(공 튕기기)가 `when.keyPressed` 로 패들을 움직여, 그걸 베낀 게임도 누르고 있으면 멈칫함 — 가드: 예제를 반복 + `isPressed` 로 교체, [`tools/play-check.mjs`](../tools/play-check.mjs) 가 이 경우를 원인·처방과 함께 알림
 
 ## 클론 / 메시지 (디펜스 게임 시리즈)
 
@@ -85,6 +89,12 @@
 
 ---
 
+## 1인칭 던전 제작
+
+- [2026-09-10] DSL 함수 인자에 JS 곱셈을 써 미니맵 Y 수식이 `NaN`이 됨 — 가드: [spec.mjs](../games/abyssal-keep/spec.mjs)의 `mapdrawrow`에서 `sub(98, mul(y, 2))`로 블록 수식 구성 ([04 DSL 수식](04-script-and-blocks.md#dsl-수식은-실행-시점에-따라-구분한다)).
+- [2026-09-10] 불리언 `moving`을 숫자 0과 같음 비교하여 정지 중 회피가 안 됨 — 가드: [spec.mjs](../games/abyssal-keep/spec.mjs)의 `moveplayer`에서 원래 숫자 입력 검사, [verify.mjs](../games/abyssal-keep/verify.mjs)의 단독 Shift 이동 검사 ([07 불리언 비교](07-runtime-quirks.md#불리언-false와-숫자-0은-같음-비교에서-다르다)).
+- [2026-09-10] 알파가 매우 낮은 유물 클릭판은 키보드 검증이 통과해도 마우스에 반응하지 않음 — 가드: [assets.mjs](../games/abyssal-keep/assets.mjs)의 불투명 `relicCard`, [verify.mjs](../games/abyssal-keep/verify.mjs)의 실제 캔버스 카드 클릭 ([07 재현 사례](07-runtime-quirks.md#낮은-알파의-클릭판도-pixelperfect-검사에서-탈락할-수-있다)).
+
 ## 음악 동기화와 기존 작품 수정
 
 - [2026-09-15] **Run 경과 시간을 음악 시각으로 사용** — 실제 본 재생 인스턴스의 위치와 준비 호출을 구분한다. 회귀 확인: 로드 뒤 추가 대기 0, 준비 시간을 늘린 전 구간 재생에서도 장면·자막 수와 오차를 대조한다 ([16](16-music-synchronization.md)).
@@ -100,6 +110,26 @@
 - [2026-09-20] 작은 자산을 확대하거나 막대 높이를 `setSize`로 바꿔 폭까지 변형하지 않는다 — 가드: [CHROMA 근거](evidence/chroma-prism-20260920.json)의 모양 치수·배율·고정 캔버스 모양 수, 별도 렌더 검수 ([18 화면](18-chroma-native-rhythm-case-study.md#4-선명한-자산과-초기-화면도-작품-데이터다)).
 - [2026-09-20] 시작 뒤 `hide`만 처리하면 정지 화면에 내부 요소가 남는다 — 가드: [CHROMA 근거](evidence/chroma-prism-20260920.json)의 모든 변수·리스트 및 오브젝트 초기 visible 단언과 편집기 왕복 기록 ([18 초기 화면](18-chroma-native-rhythm-case-study.md#시작-버튼을-누르기-전부터-타이틀이-보여야-한다)).
 - [2026-09-20] 자동 연주 성공이 실제 키 입력 성공을 보장하지 않는다 — 가드: [CHROMA 실행 기록](evidence/chroma-prism-20260920.json)의 자동 284노트와 상태 읽기·키 이벤트만의 204노트 완주를 구분 ([18 검증](18-chroma-native-rhythm-case-study.md#6-자동-연주-성공과-키-입력-완주는-다른-증거다)).
+
+## 유사 3D 레이싱 제작
+
+- [2026-09-23] 계기판 숫자가 5배로 찍힘 — 4×4 빈 모양에서 크기를 정한 뒤 64×64 숫자로 바꿔 배율이 유지됐다. 가드: [spec.mjs](../games/sunset-drive/spec.mjs) `num`의 `모양 바꾸기 → 크기 정하기` 순서 ([07 모양 뒤 크기](07-runtime-quirks.md#크기-정하기는-현재-모양의-치수로-계산된다--모양을-바꾼-뒤-다시-정한다)).
+- [2026-09-23] 뒤에서 따라붙은 라이벌이 옆에 겹치면 내 차가 감속됨 — 추돌 간격을 −200~430으로 대칭 판정했다. 앞차만 들이받게 `0 < 간격`으로 고쳤다. 가드: [verify.mjs](../games/sunset-drive/verify.mjs) race의 충돌 원인 기록과 1위 완주 단언 ([19 §6](19-sunset-drive-case-study.md#6-게임-규칙에서-지킨-조건)).
+- [2026-09-23] 같은 라이벌과 끝없이 추돌 — 출발 그리드 가로 위치(±0.45)를 그대로 차선으로 써서 가운데 차선과 접촉 폭 안에 겹쳤다. 가드: `GRID_LANES`와 목표 차선 `snapLane`(−0.62/0/0.62), race 시나리오 충돌 원인 기록.
+- [2026-09-23] 카운트다운 중 내 차가 옆 차선으로 흐름 — 타이틀 데모용 자동 조향이 상태 1에서도 돌았다. 가드: `physics`·`ai`의 상태 0·3 조건, controls 시나리오 `car stays on the grid during the countdown`.
+- [2026-09-23] 결과만 보면 봇 탓으로 보이는 패배 — 순위 대신 충돌 순간의 가장 가까운 차·가로 간격을 기록하자 게임 규칙 버그 두 개가 드러났다. 가드: [verify.mjs](../games/sunset-drive/verify.mjs) `crashes` 진단 기록.
+
+## 스토리 게임 연출·소리 (비공개 로컬 작품)
+
+작품 폴더는 공개하지 않는다(로컬 전용). 가드는 공개 문서의 메커니즘으로 적는다.
+
+- [2026-09-29] 마지막 장면의 버튼을 누르자 작품이 멈추고 변수가 처음 값으로 돌아감(검사는 90초 시간 초과) — 리스트 범위 검사와 읽기를 같은 `그리고` 에 둬 **리스트 맨 끝** 대사에서만 범위를 넘었다. 가드: 검사를 바깥 `만약` 으로 중첩 + 시간 초과 메시지에 엔진 상태·멈춤 스택·pageerror 기록 ([07 런타임 오류](07-runtime-quirks.md#런타임-오류throw는-작품을-멈추고-변수리스트를-실행-시작-값으로-되돌린다--증상이-원인에서-멀리-보인다)).
+- [2026-09-29] 대사 넘김 소리가 가끔 사라지고 다음 글자 소리가 두 번 — 효과음을 이름 변수 하나 + 신호로 냈다(171번 중 9번 누락). 가드: 효과음 리스트 줄 + 촘촘한 소리는 별도 채널, 넘김 소리 수 ≥ 넘긴 대사 수 검사 ([07 신호 핸들러 차례](07-runtime-quirks.md#신호-핸들러는-받는-오브젝트의-차례에-돈다--보낸-쪽이-곧바로-바꾼-변수를-읽는다)).
+- [2026-09-29] 느슨한 소리 수 기준(기대의 60%↑)이 위의 "두 번" 버그를 가림 — 창 시작을 Node 폴링 시각으로 잡아 앞부분을 놓쳤다. 가드: 창 시작 = 페이지 안 프레임 시각, 기대 수와 정확히 비교 ([05 창으로 세기](05-host-editor.md#소리연출을-창으로-세기--창의-시작은-페이지-안-시각으로)).
+- [2026-09-29] 두 자세를 번갈아 뛰던 인물이 보일링을 넣은 뒤 발을 안 바꿈 — `다음 모양` 이 같은 자세의 다음 장으로 갔다. 가드: 자세 이름·번호로 바꾸기 + 뛰는 동안 자세 번호가 번갈아 바뀌는지 검사 ([04 보일링](04-script-and-blocks.md#보일링선-떨림--모양-세-장을-타이머-박자로-돌리기)).
+- [2026-09-29] 그림 위를 덮으며 움직여야 할 오브젝트가 보이지 않음 — 덮을 그림보다 뒤에 넣어 아래에 깔렸다. 가드: 덮는 것을 먼저 `push` ([07 레이어](07-runtime-quirks.md#오브젝트-목록의-앞쪽이-위에-그려진다--spec-objects-배열-순서가-곧-레이어)).
+- [2026-09-29] 디버그 스크립트에서 대사가 안 넘어가고 장면 감독이 안 돎 — `mouse.click()` 은 폴링 대기가 못 보고, `selectScene` 만으로는 장면 시작이 안 불린다. 가드: down·60ms·up, `fireEvent('when_scene_start')` ([05 장면으로 바로 가기](05-host-editor.md#장면으로-바로-가기--selectscene-만으로는-when_scene_start-가-안-불린다)).
+- [2026-09-29] 편집 요청으로 받은 그림을 통째로 쓰면 지정 밖(얼룩·종이결)도 바뀌어 있음 — 가드: 바뀐 상자만 조각으로 원본 위에, 바뀐 곳은 "사라진 먹"으로 찾기 ([03 편집 요청](03-objects-and-assets.md#편집-요청은-지정한-곳-밖도-조금-바꾼다--바뀐-곳만-얹는다)).
 
 ## 재발 시 재구성 절차
 

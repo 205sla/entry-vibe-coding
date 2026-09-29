@@ -14,7 +14,7 @@
 //           when.run(),
 //           setVar('hp', 3),
 //           repeat.inf([
-//             if_(get('press', 'ArrowRight'), [ moveX(4) ]),
+//             if_(isPressed('ArrowRight'), [ moveX(4) ]),   // → 키를 누르고 있는 동안
 //           ]),
 //         ],
 //       }),
@@ -138,8 +138,31 @@ export const and_ = (a, b) => ({ type: 'boolean_and_or', params: [_val(a), 'AND'
 export const or_  = (a, b) => ({ type: 'boolean_and_or', params: [_val(a), 'OR',  _val(b)] });
 export const not_ = (a)    => ({ type: 'boolean_not', params: [null, _val(a), null] });
 
-// is_press_some_key — slot 0 is Keyboard (field), accepts bare key code string.
-export const isPressed = (keyCode) => ({ type: 'is_press_some_key', params: [String(keyCode), null] });
+// Keyboard fields hold the numeric key code as a string ('37' = ←). The engine
+// matches that code (code.js raiseEvent `params.indexOf(String(keyCode))`,
+// is_press_some_key `Number(field)`), so a name like 'left' silently never fires.
+// keyCode() turns common names into codes: 'ArrowLeft'/'left' → '37',
+// 'space' → '32', 'a'/'KeyA' → '65', 'Digit1' → '49'. Numbers pass through.
+const KEY_NAMES = {
+    arrowleft: 37, left: 37, arrowup: 38, up: 38, arrowright: 39, right: 39,
+    arrowdown: 40, down: 40, space: 32, enter: 13, escape: 27, esc: 27,
+    tab: 9, backspace: 8, shift: 16, control: 17, ctrl: 17, alt: 18,
+};
+export function keyCode(key) {
+    if (key === ' ') return '32';
+    const s = String(key).trim();
+    if (/^\d+$/.test(s)) return s;
+    if (KEY_NAMES[s.toLowerCase()] !== undefined) return String(KEY_NAMES[s.toLowerCase()]);
+    const letter = /^(?:key)?([a-z])$/i.exec(s);
+    if (letter) return String(letter[1].toUpperCase().charCodeAt(0));
+    const digit = /^digit([0-9])$/i.exec(s);
+    if (digit) return String(48 + Number(digit[1]));
+    throw new Error(`keyCode: unknown key "${key}" — use a code like 37 or a name like 'ArrowLeft', 'space', 'a', 'Digit1'`);
+}
+
+// is_press_some_key — true while the key is held. Put it in repeat.inf for
+// smooth movement; when.keyPressed fires per keydown and stalls on OS key repeat.
+export const isPressed = (key) => ({ type: 'is_press_some_key', params: [keyCode(key), null] });
 
 // reach_something — params [Text, DropdownDynamic('collision'), Text]; VALUE at idx 1.
 // 0/2 are UI labels, leave null. Target = sprite id or 'mouse'/'wall'/edge/...
@@ -258,7 +281,8 @@ export const when = {
     cloneStart:    () => ({ type: 'when_clone_start',      params: [null] }),
     objectClick:   () => ({ type: 'when_object_click',     params: [null] }),
     message:       (id) => ({ type: 'when_message_cast',   params: [null, id] }),
-    keyPressed:    (keyCode) => ({ type: 'when_some_key_pressed', params: [null, String(keyCode)] }),
+    // Fires once per keydown (then OS key-repeat) — good for jump/fire/restart.
+    keyPressed:    (key) => ({ type: 'when_some_key_pressed', params: [null, keyCode(key)] }),
 };
 
 // ── Scene / message control ──────────────────────────────────────

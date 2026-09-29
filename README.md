@@ -5,6 +5,9 @@
 
 > 자연어 요청 → DSL `.mjs` (또는 JSON) spec → `.ent` (tar.gz) → 편집기에서 로드·실행
 
+> 🤖 **AI 에이전트(Codex·Claude 등)라면** 저장소를 받은 뒤 [AGENTS.md](AGENTS.md) → [CLAUDE.md](CLAUDE.md)를
+> 먼저 읽는다. 설치·제작·검증 절차와 틀리기 쉬운 엔트리 기본 사실이 거기 있다.
+
 ---
 
 ## 📑 문서 구성
@@ -68,8 +71,9 @@ npm start            # → http://localhost:3000
 ### 3. 작업 사이클 (spec → `.ent` → 테스트)
 ```bash
 node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --check                       # ① 정적 검증 < 1초
-node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --out tests/fixtures/x.ent    # ② 빌드
-node tools/run-all-verify.mjs --filter bounce-ball                                        # ③ 헤드리스 런타임 검증
+node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs tests/fixtures/x.ent          # ② 빌드 (두 번째 인자 = 출력 .ent)
+node tools/play-check.mjs tests/fixtures/x.ent                                            # ③ ②에서 만든 파일을 실행해 움직임·키 반응 보기 (작성 불필요)
+node tools/run-all-verify.mjs --filter bounce-ball                                        # ④ 예제에 딸린 verify 로 회귀 검사 (저장소의 bounce-ball.ent 대상)
 # 전체: npm run verify  (smoke + links + e2e + runtime)
 # ⚠️ PowerShell 에선 `npm run x -- --flag` 의 `--` 가 삼켜진다 — 인자 필요하면 node 직접 호출
 ```
@@ -155,7 +159,7 @@ node tools/run-all-verify.mjs --filter bounce-ball                              
         │
         ▼
   ┌────────────────────┐
-  │ ④ make-ent 빌드    │  node tools/make-ent.mjs spec.mjs --out out.ent
+  │ ④ make-ent 빌드    │  node tools/make-ent.mjs spec.mjs out.ent
   │   → .ent 파일      │  · 이미지 rasterize (sharp), 콘텐츠 해시 dedup
   └────────────────────┘   · block params 를 Entry JSON shape 로 정규화
         │                  · script 필드 JSON.stringify (이중 직렬화)
@@ -408,6 +412,21 @@ Field 슬롯에 `{"type":"text",...}`로 감싸면 엔진이 "text 블록의 결
 
 ### Layer 4. verify-runtime (`npm run verify:runtime`)
 
+먼저 **`node tools/play-check.mjs <.ent>`** 로 검증 스크립트 없이 실제로 돌려 본다. ▶ 뒤 2초 동안 오브젝트가
+어느 쪽으로 얼마나 움직이는지, 변수·글·모양이 어떻게 바뀌는지, 작품이 쓰는 키를 0.6초 누르면 무엇이
+달라지는지를 한국어로 보고하고 무대 스크린샷을 `test-results/play-check/`에 남긴다. 키는 오브젝트 스크립트와
+함수 본문에서 모두 찾는다. 무작위 값은 같은 씨앗으로 고정해 키를 누른 실행과 누르지 않은 실행(두 번)을 비교한다.
+숫자 변수는 누르지 않았을 때의 변화량보다 확실히 다를 때만(자동으로 오르는 점수에 키로 100점을 더하면 보인다),
+글·모양처럼 저절로 바뀌는 값은 키 반응으로 치지 않는다. 부드러운 이동은 저절로 움직이는 몫을 감안해 보고,
+칸 단위 순간이동과 위치 변화는 누르지 않았을 때 가만히 있던 물체에서만 반응으로 본다. 처음에 모든 키가 무반응이면(안내·패턴 표시 중
+키를 막는 작품) 실행 3초 뒤에 한 번 더 누른다. 보이는 상태인데 한 픽셀도 그려지지 않는 오브젝트는 그 오브젝트만
+숨겨 다시 그린 화면과 비교해 찾고, 위 레이어를 걷었을 때 나타나는 것만(=덮인 것) 문제로 친다(빈 도장 원본 등은
+제외). 절반 넘게 무대 밖에 걸친 글상자는 글이 잘린다고 경고한다. 로드 실패·page error·키 코드가
+아닌 키 값·엔트리가 모르는 키 코드·그려지지 않는 오브젝트는 실패(exit 1)다. 눌러 본 키(함수 속 키 포함)가 3초 뒤
+재시도까지 모두 무반응이고 그중 첫 장면 오브젝트가 직접 쓰는 키가 하나라도 있으면 역시 실패다(함수에만 있는
+키는 어느 장면 것인지 몰라 그것만으로는 실패시키지 않는다). 게임 규칙이 맞는지는
+판단하지 않으므로 보고를 의도와 비교한다.
+
 `tools/verify-*.mjs`와 `games/**/verify.mjs`·`verify-*.mjs`를 자동 탐색해 playwright + headless chromium으로 검증한다. 로컬 외부 작품 폴더도 해당 이름의 검증기가 있으면 포함한다. 필수 파일이 없는 검증을 성공으로 처리하지 않는다.
 - 변수 / 리스트 변화 (점수 증가, 클론 카운트, hp drop 등)
 - 메시지 발화 + 핸들러 동작 (race condition 회귀 가드)
@@ -467,6 +486,14 @@ npm run verify   # smoke + verify:links + e2e + verify:runtime 순차
 | **`spec-frontier-guard.mjs`** | **디펜스 게임 종합 reference** — 다중 scene + 빌드 슬롯 + 골드 + 업그레이드 + brush 빔 + multi-type 적 + splash AOE + 데이터 주도 웨이브 + direction-as-id + 25+ 패턴 + 8 함정 회피 |
 
 신규 게임은 가장 비슷한 것부터 복사해 수정하면 빠르다. 복합 게임은 `spec-frontier-guard.mjs` 가 좋은 출발점.
+
+아웃런 스타일 유사 3D 레이싱은 [선셋 드라이브 · SUNSET DRIVE](games/sunset-drive/README.md)를 참고한다.
+커브·언덕 도로를 붓 채우기로 매 프레임 그리고 라이벌 7대·3바퀴 랩 타임·엔진 음높이를 블록으로 구현했으며,
+블록별 실행 비용 실측과 키 입력 봇 1위 완주 검증을 포함한다.
+
+완성된 1인칭 던전 로그라이크는 [심연의 성채 · ABYSSAL KEEP](games/abyssal-keep/README.md)를
+참고한다. 실제 엔트리 블록으로 DDA 레이캐스팅, 깊이 버퍼, 무작위 던전, 길찾기,
+전투·유물·3층 보스를 구현했으며 `.ent`와 키 입력 완주 검증을 포함한다.
 
 ---
 
@@ -529,7 +556,7 @@ npm start                         # http://localhost:3000
 
 # spec → .ent
 node tools/make-ent.mjs tests/fixtures/spec-foo.mjs --check                 # 정적 검증만 (< 1 초)
-node tools/make-ent.mjs tests/fixtures/spec-foo.mjs --out tests/fixtures/foo.ent
+node tools/make-ent.mjs tests/fixtures/spec-foo.mjs tests/fixtures/foo.ent
 
 # 검증 (4 레이어)
 npm run test:smoke                # Node 스모크 (~ 5 초, 23 fixture)
@@ -539,6 +566,7 @@ npm run verify:links              # knowledge md 간 링크 검증 (< 1 초)
 npm run verify                    # 위 4 개 모두
 
 # 일부만
+node tools/play-check.mjs games/foo/foo_001.ent   # 검증 스크립트 없이 실행·키 반응 보고
 node tools/run-all-verify.mjs --filter frontier-guard --keep-server
 node tools/verify-frontier-guard.mjs
 

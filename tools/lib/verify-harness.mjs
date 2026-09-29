@@ -145,6 +145,101 @@ export async function holdKey(page, code, ms = 50) {
 // Briefly tap a key (50ms default).
 export async function tapKey(page, code) { return holdKey(page, code, 50); }
 
+// ── Game-time waits ──────────────────────────────────────────────
+
+// Make `page.waitForTimeout(ms)` wait for `ms` of *game* time instead of wall
+// time, so a verify that holds a key for 500 ms or waits 300 ms for a jump
+// sees the same game progress on a slow or jittery CI runner as on a desktop.
+//
+// Every engine tick advances a page clock by the game's own step. The tick is seen
+// where Entry.engine.update runs the scripts — Entry.container.mapObjectOnScene(
+// engine.computeFunction), run state only — which exists both in the npm build
+// (@entrylabs/entry 4.0.20, used by cold clones and CI) and in newer sources;
+// helpers added later such as engine._processEngineTimeouts are not in 4.0.20.
+//   step = 1/60 (default)  — the game moves a fixed amount per frame
+//   step = '<variable>'    — the game moves by a delta it keeps in that variable
+//                            (e.g. 'dt' = min(.12, timer − last)); its value is added
+// Wall time is not used while the engine runs: Entry's project timer only refreshes
+// on its own interval, so on a busy runner many frames see dt = 0.001 and the game
+// clock falls behind the wall clock. While the engine is stopped the clock follows
+// wall time. A wait that sees no game progress for `ms * slack + 5 s` of wall time
+// throws (the game clock stalled or Entry.engine was replaced) instead of passing,
+// and Node gives up 10 s after that even if the page itself stops responding.
+//
+// VERIFY_CPU_THROTTLE=<n> slows the page CPU n× (CDP) for a local stress run.
+// It also slows the verify's own page.evaluate calls, so it is harsher than CI.
+class GameWaitTimeout extends Error {}
+
+// Reject when `promise` has not settled within `ms` — a hung renderer never answers.
+function withLimit(promise, ms, what) {
+    let timer;
+    const limit = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new GameWaitTimeout(`game-time wait: ${what} did not answer within ${ms} ms`)), ms);
+    });
+    return Promise.race([promise, limit]).finally(() => clearTimeout(timer));
+}
+
+export async function useGameTimeWaits(page, { step = 1 / 60, slack = 40 } = {}) {
+    const throttle = Number(process.env.VERIFY_CPU_THROTTLE || 0);
+    if (throttle > 1) {
+        const cdp = await page.context().newCDPSession(page);
+        await cdp.send('Emulation.setCPUThrottlingRate', { rate: throttle });
+    }
+    const install = () => page.evaluate((step) => {
+        const engine = Entry.engine, container = Entry.container;
+        engine.__gameClock ??= { t: 0 };
+        if (container.__gameClockHooked) return;
+        const read = typeof step === 'number' ? () => step : () => {
+            const v = Entry.variableContainer.variables_.find(x => x.name_ === step);
+            return Math.max(0, Number(v?.getValue()) || 0);
+        };
+        const original = container.mapObjectOnScene.bind(container);
+        container.mapObjectOnScene = (fn, ...rest) => {
+            const out = original(fn, ...rest);
+            // Only the engine's per-tick script pass counts, after the scripts ran.
+            if (fn === Entry.engine.computeFunction && Entry.engine.__gameClock) Entry.engine.__gameClock.t += read();
+            return out;
+        };
+        container.__gameClockHooked = true;
+        window.__gameWait = (ms, cap) => new Promise((resolve, reject) => {
+            const engine = Entry.engine, c = engine.__gameClock;
+            const target = c.t + ms / 1000;
+            const start = performance.now();
+            let prev = start;
+            const poll = setInterval(() => {
+                const now = performance.now();
+                if (Entry.engine !== engine) {
+                    clearInterval(poll);
+                    reject(new Error('game-time wait: Entry.engine was replaced during the wait'));
+                    return;
+                }
+                if (!engine.isState('run')) c.t += (now - prev) / 1000;
+                prev = now;
+                if (c.t >= target) { clearInterval(poll); resolve(); return; }
+                if (now - start > cap) {
+                    clearInterval(poll);
+                    reject(new Error(`game-time wait: ${ms} ms of game time did not pass in ${Math.round(now - start)} ms `
+                        + `(game clock advanced ${Math.round((c.t - target) * 1000 + ms)} ms, engine ${engine.state})`));
+                }
+            }, 5);
+        });
+    }, step);
+    await withLimit(install(), 30000, 'installing the game clock');
+    const wallWait = page.waitForTimeout.bind(page);
+    page.wallWait = wallWait;
+    page.waitForTimeout = async (ms) => {
+        if (!(ms > 0)) return;
+        try {
+            await withLimit(install(), 30000, 'installing the game clock');  // Entry.engine may be replaced after a reload
+        } catch (error) {
+            if (error instanceof GameWaitTimeout) throw error;  // hung page: fail, do not fall back
+            return wallWait(ms);  // no Entry on this page (yet): a plain wall-clock wait
+        }
+        const cap = ms * slack + 5000;
+        await withLimit(page.evaluate(([m, c]) => window.__gameWait(m, c), [ms, cap]), cap + 10000, `waiting ${ms} ms of game time`);
+    };
+}
+
 // ── Polling ──────────────────────────────────────────────────────
 
 // Poll `read(page) → value` until predicate(value) is true or timeout expires.
