@@ -6,13 +6,14 @@
 // Loads the .ent into the offline editor (starts server.js if nothing answers
 // on BASE_URL), presses ▶, and reports what actually happens:
 //   - 2 s untouched: how each object moves, which variables/texts/shapes change
-//   - every key the project listens for (arrows + space when none): held 0.6 s,
+//   - shown objects that add no pixel to the stage (covered by a layer above)
+//   - every key the first scene listens for (arrows + space when none): held 0.6 s,
 //     compared with an untouched run of the same length (Math.random is seeded
 //     identically, so random spawns do not count as a key effect)
 //   - a stage screenshot for a visual look
 // It does not judge game rules — compare the report with what the game should do.
-// Exit 1 on load failure, page errors, key fields that are not key codes, or
-// when no key the project uses changes anything.
+// Exit 1 on load failure, page errors, key fields that are not key codes, shown
+// objects that are never drawn, or when no first-scene key changes anything.
 import fs from 'node:fs';
 import path from 'node:path';
 import { bootEditor, loadFixture } from './lib/editor-harness.mjs';
@@ -46,15 +47,16 @@ function snapshot(page) {
     });
 }
 
-// Run from ▶ with a fixed random seed, optionally holding a key. Motion is
-// tracked inside the page every ~10 ms so fast movers are not mistaken for jumps.
-async function playWindow(page, ms, code = null) {
+// Run from ▶ with a fixed random seed, wait `delay` ms, then watch for `ms` ms,
+// optionally holding a key. Motion is tracked inside the page every ~10 ms so
+// fast movers are not mistaken for jumps.
+async function playWindow(page, ms, code = null, delay = 300) {
     await page.evaluate(() => {
         let seed = 20260929;
         Math.random = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
     });
     await runFresh(page);
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(delay);
     const first = await snapshot(page);
     await page.evaluate((jump) => {
         const prev = {}, motion = {};
@@ -130,6 +132,52 @@ function keyEffect(run, base) {
     return lines.concat(stateDiff(base.last, run.last, '가만히', '키'));
 }
 
+// Objects that are shown and on stage but add no pixel to the picture because an
+// upper layer covers them: render with and without the object (same task, so no
+// tick in between); if nothing changes, hide the upper layers and try again —
+// only objects that appear then count (blank stamp sources and the like do not).
+// Returns null when the stage canvas has no 2D context (WebGL renderer).
+function findCovered(page) {
+    return page.evaluate(() => {
+        const canvas = Entry.stage.canvas?.canvas;
+        const ctx = canvas?.getContext?.('2d');
+        if (!ctx) return null;
+        const grab = () => { Entry.stage.updateForce(); return ctx.getImageData(0, 0, canvas.width, canvas.height).data; };
+        const differs = (a, b) => {
+            let diff = 0;
+            for (let i = 0; i < a.length && diff < 4; i += 4) {
+                if (a[i] !== b[i] || a[i + 1] !== b[i + 1] || a[i + 2] !== b[i + 2]) diff++;
+            }
+            return diff >= 4;
+        };
+        // Does object `e` change the picture while the objects in `hidden` are hidden?
+        const draws = (e, hidden) => {
+            hidden.forEach(h => { h.object.visible = false; });
+            const shown = grab();
+            e.object.visible = false;
+            const gone = grab();
+            e.object.visible = true;
+            hidden.forEach(h => { h.object.visible = true; });
+            return differs(shown, gone);
+        };
+        const objects = Entry.container.getCurrentObjects();  // first = top layer
+        const covered = [];
+        objects.forEach((o, i) => {
+            const e = o.entity;
+            if (!e.getVisible() || e.object.alpha < 0.01) return;
+            if (Math.abs(e.getX()) > 240 || Math.abs(e.getY()) > 135) return;
+            if (draws(e, [])) return;
+            const above = objects.slice(0, i).map(a => a.entity).filter(a => a.getVisible());
+            // Still nothing with every upper layer hidden: blank/transparent by design.
+            if (!above.length || !draws(e, above)) return;
+            const by = above.filter(a => draws(e, [a])).map(a => a.parent.name);
+            covered.push({ name: o.name, by: by.length ? by : above.map(a => a.parent.name).slice(0, 3) });
+        });
+        Entry.stage.updateForce();
+        return covered;
+    });
+}
+
 let server, browser, failed = false;
 try {
     try {
@@ -145,17 +193,20 @@ try {
     await loadFixture(page, path.resolve(file));
 
     const keys = await page.evaluate(() => {
-        const found = new Map();  // raw field value → held (used by is_press_some_key)
+        const found = new Map();  // raw field value → { held: is_press_some_key, here: first-scene object }
+        const first = Entry.scene.selectedScene;
         for (const o of Entry.container.getAllObjects()) {
             for (const b of o.script.getBlockList(false)) {
                 const raw = b.type === 'when_some_key_pressed' ? String(b.params[1])
                     : b.type === 'is_press_some_key' ? String(b.params[0]) : null;
-                if (raw !== null) found.set(raw, found.get(raw) || b.type === 'is_press_some_key');
+                if (raw === null) continue;
+                const k = found.get(raw) || { held: false, here: false };
+                found.set(raw, { held: k.held || b.type === 'is_press_some_key', here: k.here || o.scene === first });
             }
         }
         const toCode = {};
         for (const [code, k] of Object.entries(Entry.KeyboardCode.codeToKeyCode)) toCode[k] ??= code;
-        return [...found].map(([raw, held]) => ({ raw, held, key: Number(raw), code: toCode[raw] || null }));
+        return [...found].map(([raw, k]) => ({ raw, ...k, key: Number(raw), code: toCode[raw] || null }));
     });
 
     console.log(`[play-check] ${path.basename(file)}`);
@@ -166,6 +217,13 @@ try {
         .concat(stateDiff(idle.first, idle.last, '처음', '2초 뒤'));
     console.log('\n가만히 2초:');
     console.log(idleLines.length ? idleLines.map(s => '  ' + s).join('\n') : '  아무 변화 없음');
+    const texts = Object.values(idle.last.objects).filter(o => o.visible && o.text !== undefined && o.text.trim());
+    if (texts.length) console.log('  지금 화면의 글: ' + texts.map(o => `${o.name} "${o.text}"`).join(', '));
+    for (const c of await findCovered(page) || []) {
+        failed = true;
+        console.log(`✗ ${c.name}: 보이는 상태인데 ${c.by.join('·')}에 완전히 가려져 화면에 안 나온다 — `
+            + 'objects 배열은 앞쪽이 위 레이어다(배경은 맨 뒤에). 일부러 겹쳐 숨긴 것이면 무시한다.');
+    }
 
     const shotDir = path.resolve('test-results/play-check');
     fs.mkdirSync(shotDir, { recursive: true });
@@ -182,21 +240,33 @@ try {
         failed = true;
         console.log(`\n✗ 키 값 "${k.raw}" 는 키 코드가 아니다 — 이 키 블록은 절대 실행되지 않는다. 숫자 코드('37' ←, '39' →, '32' 스페이스)나 DSL isPressed('ArrowLeft') 를 쓴다.`);
     }
-    const usable = keys.filter(k => /^\d+$/.test(k.raw));
+    const usable = keys.filter(k => /^\d+$/.test(k.raw) && k.here);
+    const later = keys.filter(k => /^\d+$/.test(k.raw) && !k.here);
+    if (later.length) console.log(`\n다른 장면에서만 쓰는 키: ${later.map(k => keyLabel(k.key)).join(' ')} (첫 장면에서는 누르지 않는다)`);
     const tested = usable.length ? usable : keys.length ? [] : [37, 39, 38, 40, 32].map(key => ({ key, unused: true }));
     const FALLBACK = { 37: 'ArrowLeft', 38: 'ArrowUp', 39: 'ArrowRight', 40: 'ArrowDown', 32: 'Space' };
     let deadKeys = 0;
     const stepKeys = [];
-    if (tested.length) {
-        const baseline = await playWindow(page, 600);
-        console.log(usable.length ? '\n키를 0.6초 누르고 있을 때 (가만히 둘 때와 다른 점):' : '\n키를 쓰는 블록이 없다 — 방향키·스페이스만 눌러 본다:');
+    // Press every key after `delay` ms of running; returns the number of dead keys.
+    async function pressKeys(delay, title) {
+        const baseline = await playWindow(page, 600, null, delay);
+        console.log(title);
+        let dead = 0;
         for (const k of tested) {
             const code = k.code || FALLBACK[k.key];
             if (!code) { console.log(`  ${keyLabel(k.key)}: 이 키를 누를 방법이 없다 (건너뜀)`); continue; }
-            const lines = keyEffect(await playWindow(page, 600, code), baseline);
-            if (!lines.length && !k.unused) deadKeys++;
+            const lines = keyEffect(await playWindow(page, 600, code, delay), baseline);
+            if (!lines.length && !k.unused) dead++;
             console.log(`  ${keyLabel(k.key)}: ${lines.length ? lines.join(' / ') : k.unused ? '반응 없음' : '⚠ 반응 없음'}`);
-            if (!k.unused && !k.held && lines.some(l => l.includes('이동'))) stepKeys.push(keyLabel(k.key));
+            if (!k.unused && !k.held && lines.some(l => l.includes('이동')) && !stepKeys.includes(keyLabel(k.key))) stepKeys.push(keyLabel(k.key));
+        }
+        return dead;
+    }
+    if (tested.length) {
+        deadKeys = await pressKeys(300, usable.length ? '\n키를 0.6초 누르고 있을 때 (가만히 둘 때와 다른 점):' : '\n키를 쓰는 블록이 없다 — 방향키·스페이스만 눌러 본다:');
+        // Keys may be ignored during an intro, a pattern display and so on — try later once.
+        if (usable.length && deadKeys === usable.length) {
+            deadKeys = await pressKeys(3000, '\n처음에는 반응이 없어 실행 3초 뒤에 다시 눌러 본다:');
         }
     }
 
@@ -206,7 +276,8 @@ try {
     }
     if (usable.length && deadKeys === usable.length) {
         failed = true;
-        console.log('\n✗ 이 작품이 쓰는 키를 모두 눌러 봤지만 아무것도 바뀌지 않았다 — 키 블록·조건·좌표를 확인한다.');
+        console.log('\n✗ 이 작품이 쓰는 키를 모두 눌러 봤지만 아무것도 바뀌지 않았다 — 키 블록·조건·좌표를 확인한다. '
+            + '안내 화면처럼 3초 넘게 일부러 키를 막는 작품이면 verify.mjs 로 그 상태를 만든 뒤 확인한다.');
     } else if (deadKeys) {
         console.log(`\n⚠ 반응 없는 키 ${deadKeys}개 — 게임 오버 뒤 재시작처럼 특정 상태에서만 쓰는 키가 아니라면 확인한다.`);
     }
