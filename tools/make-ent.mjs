@@ -265,6 +265,15 @@ export function validateSpec(spec) {
                 const val = block.params[i];
                 if (!slot || val == null) continue;
                 if (slot.type === 'Indicator' || slot.type === 'Text') continue;
+                // Keyboard fields must hold the numeric key code — a name like
+                // 'left' loads fine but the key never fires (engine matches the code).
+                const key = typeof val === 'object' && '__field' in val ? val.__field : val;
+                if (slot.type === 'Keyboard' && typeof key !== 'object' && !/^\d+$/.test(String(key))) {
+                    issues.push({ severity: 'error', path: `${p}.params[${i}]`,
+                        msg: `${block.type}: key "${key}" is not a key code — this key would never fire. `
+                           + `Use a code ('37' ←, '38' ↑, '39' →, '40' ↓, '32' space, '65' A) or the DSL `
+                           + `helpers, which convert names: isPressed('ArrowLeft'), when.keyPressed('space').` });
+                }
                 if (typeof val === 'object' && '__field' in val) continue;  // explicit OK
 
                 if (FIELD_SLOTS.has(slot.type)) {

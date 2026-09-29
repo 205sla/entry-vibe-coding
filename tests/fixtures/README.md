@@ -2,6 +2,9 @@
 
 각 fixture 의 목적, 시연 패턴, 관련 verify 스크립트, 관련 knowledge 페이지를 정리.
 
+> 새 게임을 만든다면 파일 위치(`games/<이름>/spec.mjs`)·`_001` 번호·검증 사다리는 [CLAUDE.md](../../CLAUDE.md)를
+> 따른다. 이 표는 베낄 예제를 고르는 용도다.
+
 > 빌드: `node tools/make-ent.mjs <spec.{json,mjs}> <name>.ent`
 > 검증만 (빌드 없이): `node tools/make-ent.mjs --check <spec>`
 > 트리 보기: `node tools/show-spec.mjs <spec> [--object id] [--func id]`
@@ -30,7 +33,7 @@
 | **textBox 클릭 hit-test (투명 vs hex bgColor)** | [`spec-textbox-click.mjs`](spec-textbox-click.mjs) | ✓ | 버튼 디자인 회귀 가드 |
 | **글상자 레이아웃 — entity 기본값 함정 · lineBreak 접기/클리핑 · 묻기 입력칸·말풍선 · 장면 재진입** | [`spec-textbox-layout.mjs`](spec-textbox-layout.mjs) | ✓ | 화면이 **에러 없이 틀리는** 네 경로의 회귀 가드. `entity` 를 `{x,y}` 만 주면 `fontSize` 가 NaN 이 되는 것까지 재현한다 ([knowledge/07 §fontSize NaN](../../knowledge/07-runtime-quirks.md#글상자-entity-를-비워두면-fontsize-가-nan--글자가-10px-로-쪼그라든다)) |
 | **생김새 17 블록 종합 — 미디어 아트** | [`spec-media-art.mjs`](spec-media-art.mjs) | ✓ | 3×3 mascot 그리드 + 효과/모양/크기/뒤집기/z-order 동시 시연 |
-| **바운스 볼 (Breakout 스타일) — 패들·벽돌·점수·목숨·게임오버** | [`spec-bounce-ball.mjs`](spec-bounce-ball.mjs) | ✓ | 6×3 벽돌 + 메시지 기반 충돌 반사 |
+| **바운스 볼 (Breakout 스타일) — 패들·벽돌·점수·목숨·게임오버** | [`spec-bounce-ball.mjs`](spec-bounce-ball.mjs) | ✓ | 6×3 벽돌 + 메시지 기반 충돌 반사 · 누르고 있는 동안 이동(반복 + `isPressed`) |
 | **과일 사냥 — 3×3 클론 grid + 붓 타이머 + 점수/콤보/레벨** | [`spec-fruit-hunt.mjs`](spec-fruit-hunt.mjs) | ✓ | 클론 좌표 비교로 정답 판정 + 붓 매 프레임 redraw |
 | **프론티어 가드 Phase 3.2 — 디펜스 게임 종합 reference (12 패턴, 7 단계 진화)** | [`spec-frontier-guard.mjs`](spec-frontier-guard.mjs) | ✓ | 다중 scene + 빌드 슬롯 + 골드 + 업그레이드 + 준비 단계 + brush 공격 빔 + 데미지 플래시 + multi-type 적 + splash AOE + direction-as-id + manager-as-spawner + filled-circle 클릭 가능 슬롯. 새 게임 시작 시 reference 로 활용 가능. 자세한 작업 history: [knowledge/CHANGELOG.md §디펜스 게임 회고](../../knowledge/CHANGELOG.md) |
 | **꼬리 재귀로 60fps 틱 우회 + per-frame budget** | [`recursion`](spec-recursion.json) | | |

@@ -49,9 +49,20 @@ npx playwright install chromium    # 헤드리스 검증용 (한 번만)
 3. **정적 검증** — `node tools/make-ent.mjs games/<이름>/spec.mjs --check` (< 1초).
    통과할 때까지 2↔3 반복.
 4. **빌드** — `node tools/make-ent.mjs games/<이름>/spec.mjs games/<이름>/<이름>_001.ent`
-5. **검증 사다리** (아래) — 새 게임이면 `games/<이름>/verify.mjs`도 작성
+5. **검증 사다리** (아래) — 새 게임이면 먼저 `node tools/play-check.mjs <.ent>`(작성 불필요)로
+   실제 움직임을 보고, `games/<이름>/verify.mjs`도 작성
    (기존 `tools/verify-*.mjs` 또는 `games/vampire-survival/verify.mjs` 복제·수정).
 6. **보고** — `.ent` 경로 + 조작법/동작 설명 + 통과한 검증 레이어 명시.
+
+## 엔트리 기본 사실 — 틀려도 로드·정적 검사는 통과한다
+
+- 무대 좌표는 가운데가 (0, 0), x −240~240, **y −135~135이고 위쪽이 +** 다(화면 좌표와 반대).
+  떨어지는 물체는 y 를 줄인다.
+- 키 블록 값은 **숫자 키 코드**다(`37` ← `38` ↑ `39` → `40` ↓ `32` 스페이스). `'left'` 같은 이름은
+  키가 절대 안 먹는다. DSL `isPressed('ArrowLeft')`·`when.keyPressed('space')` 는 이름을 코드로
+  바꿔 주고, `--check` 는 코드가 아닌 값을 오류로 잡는다.
+- 누르고 있는 동안 움직이기는 `repeat.inf` 안의 `if_(isPressed(...))` 로 만든다. `when.keyPressed` 는
+  누를 때마다 한 번 실행돼 이동이 멈칫하므로 점프·발사·재시작에 쓴다.
 
 ## 검증 사다리 — 위에서부터, 막혀도 묻지 말고 끝까지
 
@@ -60,9 +71,13 @@ npx playwright install chromium    # 헤드리스 검증용 (한 번만)
 | L1 정적 | `node tools/make-ent.mjs <spec> --check` | `npm install`만 | 블록 type·슬롯·참조·ID 중복·로컬 에셋 (빌드 시에도 자동 검사) |
 | L2 smoke | `npm run test:smoke` | `npm install`만 | tar/JSON 구조, 에셋 실재 |
 | L3 부트+로드 | `npm run test:e2e` | setup + chromium | 편집기 부팅 console error 0, 전 fixture 로드 |
-| L4 런타임 플레이 | `node tools/run-all-verify.mjs --filter <이름>` | setup + chromium | 실제 플레이: 변수 변화·클론·픽셀 |
+| L4 플레이 확인 | `node tools/play-check.mjs games/<이름>/<이름>_001.ent` | setup + chromium | 작성 없이: 가만히 둘 때·키를 누를 때 무엇이 움직이고 바뀌는지 + 무대 스크린샷 |
+| L4 런타임 검사 | `node tools/run-all-verify.mjs --filter <이름>` | setup + chromium | 작품별 `verify.mjs`: 변수 변화·클론·픽셀 |
 | L5 사람 눈 (선택) | `npm start` → http://localhost:3000 | setup | 편집기에서 `.ent` 열어 ▶ 실행 |
 
+- **L1·L2 통과는 "동작한다"가 아니다.** 키가 전혀 안 먹고 사과가 위로 올라가는 게임도 L1·L2 를
+  통과했다(2026-09-29 저성능 모델 시험). 키 이름은 이제 `--check` 가 잡지만 좌표 방향 같은 실수는
+  실행해야 보인다. 완성 보고 전에 최소한 play-check 보고가 만들려던 게임과 맞는지 비교한다.
 - L3·L4가 **환경 문제**(chromium 설치 불가 등)로 막히면: L1+L2 통과한 `.ent`를 전달하되
   보고에 "런타임 검증 미수행 — 사유"를 명시한다. 사용자에게 검증 방식을 묻지 않는다.
 - ⚠️ `npm run <script> -- --flag` 는 PowerShell 이 `--` 를 삼켜 인자가 유실된다 —

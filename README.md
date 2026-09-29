@@ -5,6 +5,9 @@
 
 > 자연어 요청 → DSL `.mjs` (또는 JSON) spec → `.ent` (tar.gz) → 편집기에서 로드·실행
 
+> 🤖 **AI 에이전트(Codex·Claude 등)라면** 저장소를 받은 뒤 [AGENTS.md](AGENTS.md) → [CLAUDE.md](CLAUDE.md)를
+> 먼저 읽는다. 설치·제작·검증 절차와 틀리기 쉬운 엔트리 기본 사실이 거기 있다.
+
 ---
 
 ## 📑 문서 구성
@@ -69,7 +72,8 @@ npm start            # → http://localhost:3000
 ```bash
 node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --check                       # ① 정적 검증 < 1초
 node tools/make-ent.mjs tests/fixtures/spec-bounce-ball.mjs --out tests/fixtures/x.ent    # ② 빌드
-node tools/run-all-verify.mjs --filter bounce-ball                                        # ③ 헤드리스 런타임 검증
+node tools/play-check.mjs tests/fixtures/bounce-ball.ent                                 # ③ 실행해서 움직임·키 반응 보기 (작성 불필요)
+node tools/run-all-verify.mjs --filter bounce-ball                                        # ④ 작품별 헤드리스 런타임 검증
 # 전체: npm run verify  (smoke + links + e2e + runtime)
 # ⚠️ PowerShell 에선 `npm run x -- --flag` 의 `--` 가 삼켜진다 — 인자 필요하면 node 직접 호출
 ```
@@ -408,6 +412,12 @@ Field 슬롯에 `{"type":"text",...}`로 감싸면 엔진이 "text 블록의 결
 
 ### Layer 4. verify-runtime (`npm run verify:runtime`)
 
+먼저 **`node tools/play-check.mjs <.ent>`** 로 검증 스크립트 없이 실제로 돌려 본다. ▶ 뒤 2초 동안 오브젝트가
+어느 쪽으로 얼마나 움직이는지, 변수·글·모양이 어떻게 바뀌는지, 작품이 쓰는 키를 0.6초 누르면 무엇이
+달라지는지를 한국어로 보고하고 무대 스크린샷을 `test-results/play-check/`에 남긴다. 무작위 값은 같은
+씨앗으로 고정해 키를 누른 실행과 누르지 않은 실행을 비교한다. 로드 실패·page error·키 코드가 아닌 키 값·
+어떤 키에도 반응이 없는 경우는 실패(exit 1)다. 게임 규칙이 맞는지는 판단하지 않으므로 보고를 의도와 비교한다.
+
 `tools/verify-*.mjs`와 `games/**/verify.mjs`·`verify-*.mjs`를 자동 탐색해 playwright + headless chromium으로 검증한다. 로컬 외부 작품 폴더도 해당 이름의 검증기가 있으면 포함한다. 필수 파일이 없는 검증을 성공으로 처리하지 않는다.
 - 변수 / 리스트 변화 (점수 증가, 클론 카운트, hp drop 등)
 - 메시지 발화 + 핸들러 동작 (race condition 회귀 가드)
@@ -547,6 +557,7 @@ npm run verify:links              # knowledge md 간 링크 검증 (< 1 초)
 npm run verify                    # 위 4 개 모두
 
 # 일부만
+node tools/play-check.mjs games/foo/foo_001.ent   # 검증 스크립트 없이 실행·키 반응 보고
 node tools/run-all-verify.mjs --filter frontier-guard --keep-server
 node tools/verify-frontier-guard.mjs
 

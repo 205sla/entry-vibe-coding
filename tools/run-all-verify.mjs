@@ -29,7 +29,7 @@ export function discoverScripts(root = ROOT) {
     return { scripts: scripts.sort(), excluded };
 }
 
-async function stopChild(proc) {
+export async function stopChild(proc) {
     if (!proc || proc.exitCode !== null || proc.signalCode !== null) return;
     if (proc.connected) {
         proc.send({ type: 'shutdown' });
@@ -66,6 +66,39 @@ export function runScript(script, { root = ROOT, timeoutMs = 600_000 } = {}) {
     });
 }
 
+async function isEditorUp(baseURL) {
+    try { return (await fetch(baseURL + '/editor.html', { signal: AbortSignal.timeout(2000) })).ok; }
+    catch { return false; }
+}
+
+// Start server.js on the BASE_URL port unless an editor already answers there.
+// Returns the child process (caller stops it with stopChild) or null when reused.
+export async function startEditorServer(baseURL, onSpawn = () => {}) {
+    if (await isEditorUp(baseURL)) return null;
+    const address = new URL(baseURL);
+    if (!['localhost', '127.0.0.1', '[::1]'].includes(address.hostname)) throw new Error('remote editor unavailable: ' + baseURL);
+    const server = spawn(process.execPath, ['server.js'], {
+        cwd: ROOT, env: { ...process.env, PORT: address.port || '80' }, windowsHide: true,
+        stdio: ['ignore', 'ignore', 'pipe', 'ipc'],
+    });
+    onSpawn(server);
+    let serverError;
+    server.on('error', error => { serverError = error; });
+    server.stderr.on('data', () => {});
+    try {
+        for (let attempt = 0; attempt < 40; attempt++) {
+            if (serverError) throw serverError;
+            if (await isEditorUp(baseURL)) return server;
+            if (server.exitCode !== null) throw new Error('editor server exited: ' + server.exitCode);
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        throw new Error('editor server did not start');
+    } catch (error) {
+        await stopChild(server);
+        throw error;
+    }
+}
+
 export async function main(args = process.argv.slice(2)) {
     const option = name => {
         const index = args.indexOf(name);
@@ -88,33 +121,13 @@ export async function main(args = process.argv.slice(2)) {
     const browser = await chromium.launch();
     await browser.close();
     const baseURL = process.env.BASE_URL || 'http://localhost:3000';
-    async function isUp() {
-        try { return (await fetch(baseURL + '/editor.html', { signal: AbortSignal.timeout(2000) })).ok; }
-        catch { return false; }
-    }
-    let server, serverError, serverReady = false;
+    let server, serverReady = false;
     const interrupted = () => { void Promise.all([...activeChildren, server].map(stopChild)).finally(() => process.exit(130)); };
     process.once('SIGINT', interrupted);
     process.once('SIGTERM', interrupted);
     try {
-        if (!await isUp()) {
-            const address = new URL(baseURL);
-            if (!['localhost', '127.0.0.1', '[::1]'].includes(address.hostname)) throw new Error('remote editor unavailable: ' + baseURL);
-            server = spawn(process.execPath, ['server.js'], {
-                cwd: ROOT, env: { ...process.env, PORT: address.port || '80' }, windowsHide: true,
-                stdio: ['ignore', 'ignore', 'pipe', 'ipc'],
-            });
-            server.on('error', error => { serverError = error; });
-            server.stderr.on('data', () => {});
-            for (let attempt = 0; attempt < 40; attempt++) {
-                if (serverError) throw serverError;
-                if (await isUp()) break;
-                if (server.exitCode !== null) throw new Error('editor server exited: ' + server.exitCode);
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-            if (!await isUp()) throw new Error('editor server did not start');
-            serverReady = true;
-        }
+        server = await startEditorServer(baseURL, spawned => { server = spawned; });
+        serverReady = !!server;
         const results = [];
         for (const script of scripts) {
             const result = await runScript(script, { timeoutMs });

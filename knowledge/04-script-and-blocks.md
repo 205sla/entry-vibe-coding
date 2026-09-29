@@ -185,7 +185,7 @@ reg['repeat_basic']
 | type | params | paramsKeyMap | 비고 |
 |------|:------:|--------------|------|
 | `when_run_button_click`    | 1 | — | 시작 ▶ 클릭 |
-| `when_some_key_pressed`    | 2 | `VALUE=1` | VALUE=키 이름 (`"space"`, `"up"`, `"left"`, `"a"`, …). **필드 문자열** |
+| `when_some_key_pressed`    | 2 | `VALUE=1` | VALUE=**숫자 키 코드 문자열** (`"37"` ←, `"38"` ↑, `"39"` →, `"40"` ↓, `"32"` 스페이스, `"65"` A). 엔진이 코드로 대조하므로([`code.js:137`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/code.js#L137)) `"left"` 같은 이름은 로드는 되지만 **절대 발화하지 않는다**. DSL `when.keyPressed('space')` 는 이름을 코드로 바꿔 준다. keydown 마다 한 번(누르고 있으면 OS 키 반복 지연 뒤 연속) → 점프·발사·재시작용 |
 | `when_message_cast`        | 2 | `VALUE=1` | VALUE=신호 id (messages[*].id). **필드 문자열** |
 | `mouse_clicked`            | 1 | — | 마우스 클릭 순간 |
 | `when_object_click`        | 1 | — | 이 오브젝트 클릭 시 |
@@ -226,7 +226,7 @@ reg['repeat_basic']
 |------|:------:|--------------|------|
 | `boolean_and_or`         | 3 | `LEFTHAND=0, OPERATOR=1, RIGHTHAND=2` | OPERATOR 필드: `"AND"`/`"OR"` |
 | `boolean_basic_operator` | 3 | 동상 | OPERATOR: `"EQUAL"`, `"GREATER"`, `"LESS"`, `"NOT_EQUAL"`, `"GREATER_OR_EQUAL"`, `"LESS_OR_EQUAL"` |
-| `is_press_some_key`      | 2 | `VALUE=0` | 키 누름 감지. **필드**: 키 이름 |
+| `is_press_some_key`      | 2 | `VALUE=0` | 지금 눌려 있는가. **필드**: 숫자 키 코드 문자열(`Number(값)` 으로 대조 — [`block_judgement.js:102`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_judgement.js#L102)). **부드러운 이동은 `repeat.inf` + 이 블록**(DSL `isPressed('ArrowLeft')`) |
 | `reach_something`        | 2 | `VALUE=0` | **필드**: `"mouse"` / `"wall"` / `"wall_up"` / `"wall_down"` / 오브젝트 id |
 
 ### 생김새

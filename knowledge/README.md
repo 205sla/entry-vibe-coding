@@ -90,6 +90,7 @@
 | 기존 script의 단일 파싱 트리·깊은 복제·블록 id와 변경 수 대조 | [04 기존 스크립트 수정](04-script-and-blocks.md#기존-스크립트의-여러-항목을-수정할-때) | 01, lessons |
 | 외부 작품 tar 엔트리 보존과 허용 변경 검사 | [01 부분 수정](01-binary-format.md#기존-작품의-일부만-수정하기) | 16 |
 | 글상자 초기 두 text 필드와 동적 text_write 데이터 출처 | [03 글상자](03-objects-and-assets.md#️-글상자-문자열은-objecttext-와-entitytext-두-곳에-있다) | lessons |
+| 키 블록 값은 숫자 키 코드 · 누르고 있는 이동은 반복 + `isPressed` | [04 이벤트](04-script-and-blocks.md#이벤트-시작-블록) | CLAUDE, lessons |
 | 60fps 암묵 틱 + `wait_second` 비용 | [07 §반복하기 블록](07-runtime-quirks.md#반복하기-블록--1-프레임반복-60fps-암묵-틱) | 04 (브러쉬 패턴 안에서) |
 | 꼬리 재귀가 틱 우회 | [07 §함수 호출은 반복하기의 60fps 틱을 우회](07-runtime-quirks.md#함수-호출은-반복하기의-60fps-틱을-우회-꼬리-재귀-최적화) | 04 (함수 정의), CHANGELOG |
 | `boolean_and_or` 단락 평가 없음 | [07 §`boolean_and_or`](07-runtime-quirks.md#boolean_and_or에-단락-평가short-circuit-없음) | 04 (플랫포머 패턴 안에서) |

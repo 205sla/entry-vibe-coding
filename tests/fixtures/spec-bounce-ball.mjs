@@ -16,7 +16,7 @@
 //   paddle_hit   — 공의 dy 양수 강제 (패들에서 항상 위로)
 
 import {
-    when, repeat, if_, cmp, calc, getVar, setVar, changeVar, wait,
+    when, repeat, if_, cmp, and_, isPressed, calc, getVar, setVar, changeVar, wait,
     moveX, moveY, locateXY, coord, reach,
     sendMessage, stopRepeat,
     obj, picture,
@@ -115,18 +115,15 @@ export default {
                 visible: true,
             },
             threads: [
-                // ← 키
+                // ← → 키를 누르고 있는 동안 매 프레임 이동. when.keyPressed 는 누를 때마다
+                // 한 번만 실행돼서 누르고 있으면 OS 키 반복 전까지 멈칫한다.
                 [
-                    when.keyPressed('37'),
-                    if_(cmp(getVar('game_state'), '==', 0), [
-                        if_(cmp(coord('self', 'x'), '>', -190), [ moveX(-12) ]),
-                    ]),
-                ],
-                // → 키
-                [
-                    when.keyPressed('39'),
-                    if_(cmp(getVar('game_state'), '==', 0), [
-                        if_(cmp(coord('self', 'x'), '<', 190), [ moveX(12) ]),
+                    when.run(),
+                    repeat.inf([
+                        if_(cmp(getVar('game_state'), '==', 0), [
+                            if_(and_(isPressed('ArrowLeft'), cmp(coord('self', 'x'), '>', -190)), [ moveX(-6) ]),
+                            if_(and_(isPressed('ArrowRight'), cmp(coord('self', 'x'), '<', 190)), [ moveX(6) ]),
+                        ]),
                     ]),
                 ],
                 // 공 충돌 → paddle_hit
