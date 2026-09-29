@@ -462,7 +462,10 @@ sendMessage('new_stage'),  // 모든 리스너가 새 값 read
 ### 다른 회피 옵션
 
 - **단일 리스너 + 후속 메시지 체인**: 한 핸들러에서 변수 갱신 → 다른 메시지로 chain (`sendMessage('target_set')` 후 `sendMessage('new_stage')`).
-- **`message_cast_wait`**: 발신자가 핸들러 완료까지 BLOCK. 단 다중 리스너가 있으면 어떤 리스너의 완료를 기다리는지 불명확 (구현상 한 리스너만).
+- **`message_cast_wait`**: 발신자가 핸들러 완료까지 BLOCK. ~~단 다중 리스너가 있으면 어떤 리스너의 완료를 기다리는지 불명확 (구현상 한 리스너만).~~
+  **정정(2026-09-29)**: 현재 장면의 받는 오브젝트(복제본 포함) **모두의 실행기를 모아 전부 끝날 때까지** 기다린다
+  ([block_start.js:500-531](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_start.js#L500) — `raiseMessage` 가 돌려준 실행기 전부를 `runningScript` 에 두고 모두 `isEnd()` 일 때 넘어간다).
+  핸들러 안의 `기다리기` 까지 기다리므로, 조각 여러 개가 시차를 두고 나타나는 연출도 신호 하나 + 기다리기로 끝을 맞출 수 있다([04 장면 조립](04-script-and-blocks.md#장면-조립팝업북--조각을-하나씩-붙이며-장면-열기)).
 
 ### 증거
 
@@ -1673,6 +1676,63 @@ resetSceneDuringRun() {
 
 ---
 
+## 불리언 false와 숫자 0은 같음 비교에서 다르다
+
+2026-09-10 심연의 성채, npm `@entrylabs/entry` 4.0.20 로컬 실행에서 확인.
+`boolean_and_or`는 불리언을 반환한다. 이를 변수에 저장해 놓고 `cmp(value, '==', 0)`으로
+거짓을 검사하면 기대한 분기로 들어가지 않을 수 있다.
+
+`boolean_basic_operator`의 `EQUAL`은 비어 있지 않은 숫자 문자열을 숫자로 바꾼 뒤
+`===`로 비교한다. 따라서 숫자 문자열 `'0'`과 0은 같지만 **불리언 false와 0은 다르다**.
+확인한 소스의 `NOT_EQUAL`은 `!=`를 사용하므로, 혼합 타입에서는 같음과 다름이 단순한
+논리적 반대라고 가정해서도 안 된다.
+
+심연의 성채의 `moving`은 불리언이었다. 정지 중 회피에서 `moving == 0`을 검사하던 것을
+**원래의 숫자 입력인 `fwd == 0 && strafe == 0`**으로 바꾸어 해결했다.
+일반적으로 상태 플래그는 숫자 0/1 또는 불리언 중 하나로 통일하고, 불리언 부정에는
+`boolean_not`을 쓴다. 숫자 0/1이 필요하면 `if_`의 양쪽 분기에서 명시적으로 저장한다.
+
+근거: `src/playground/blocks/block_judgement.js`의 `boolean_basic_operator.func`
+(`EQUAL`/`NOT_EQUAL`)와 `boolean_and_or.func`.
+소스 위치를 찾는 절차는 [공식 소스 인덱스](00-official-sources.md)를 따른다.
+수정: [spec.mjs](../games/abyssal-keep/spec.mjs)의 `moveplayer`.
+회귀 확인: [verify.mjs](../games/abyssal-keep/verify.mjs)의
+`dash advances the player and starts its cooldown`은 이동 키 없이 Shift만 누른다.
+
+## 전역 변수·리스트 조회는 배열 탐색이다
+
+`src/class/variable_container.js`의 `getVariable`은 `variables_`를,
+`getList`는 `lists_`를 ID 조건의 `_.find`로 찾는다. 복제본 전용 값은 이후 해당 엔티티의
+저장소를 추가로 찾는다. 조회가 항상 ID 해시 맵의 상수 시간이라고 가정하면 안 된다.
+
+심연의 성채는 DDA에서 반복해서 읽는 `mx`, `my`, `sideX`, `sideY`, `ddx`, `ddy` 등을
+선언 배열 앞쪽으로 옮겼다. 이는 비교할 후보 수를 줄이는 선택이며 엔진을 수정하지 않는다.
+일반 게임에서도 무조건 재정렬하라는 규칙은 아니다. 조회가 많은 경로인지 먼저 확인하고,
+한 호출에서 재사용할 중간값과 [함수 지역 변수](04-script-and-blocks.md#함수-지역-변수-function-local-variables)를 검토한다.
+
+근거: 위 엔진 함수와 [spec.mjs](../games/abyssal-keep/spec.mjs)의 `hot` 배열·`variables.sort`.
+최종 처리량과 측정 조건은 [사례의 검증 범위](14-abyssal-keep-case-study.md#검증한-버전과-범위)에 있다.
+변수 순서만 바꾼 A/B 수치는 남기지 않았으므로 성능 개선 배수는 미확인이다.
+엔진 버전이 바뀌면 실제 조회 구현을 다시 확인한다.
+
+## 낮은 알파의 클릭판도 pixelPerfect 검사에서 탈락할 수 있다
+
+2026-09-10 심연의 성채에서 불투명 카드 배경 위에 `fill-opacity=".005"`인 별도 sprite를
+클릭판으로 올렸더니 키보드 선택은 되지만 실제 마우스 클릭은 실패했다. 완전한 알파 0이
+아니어도 매우 작은 값은 래스터화 과정에서 낮은 정수 알파가 되어 hit-test 기준을 넘지 못할 수 있다.
+정확한 클릭 원리는 기존 [sprite pixelPerfect 항목](#sprite-도-pixelperfect--투명-픽셀-ring-가운데-등-클릭-안-됨)이 정본이다.
+
+해결은 보이는 카드 그림 자체를 불투명 sprite로 만들어 클릭 이벤트를 받게 한 것이다.
+투명한 여백·배경이 있는 이미지는 파일의 사각 경계 전체가 클릭된다고 가정하지 않는다.
+이전 반투명 이미지의 래스터 알파 값을 별도로 보관하지 않았으므로 특정 반올림 결과까지 단정하지 않는다.
+
+근거: [assets.mjs](../games/abyssal-keep/assets.mjs)의 `relicCard`,
+[spec.mjs](../games/abyssal-keep/spec.mjs)의 `card1`〜`card3`.
+회귀 확인: [verify.mjs](../games/abyssal-keep/verify.mjs)의
+`real canvas click selects the middle relic card`는 실제 무대 좌표를 클릭한 뒤 선택 효과를 검사한다.
+
+---
+
 ## 프로젝트 초시계의 원점과 표시값은 다르다
 
 음악 동기화에서 초시계는 세 가지를 구분한다. **시작 원점**, 원점에서 계산한 경과 시간,
@@ -1748,7 +1808,7 @@ fontSize를 줄여도 같은 크기 블록이 뒤에서 실행되면 다시 커�
 한 프레임에 수백~수천 번 도는 계산(렌더러 루프, 파티클, 경로 탐색)은 **전역 변수에 쓰지 않는다.**
 반복마다 바뀌는 값은 재귀 매개변수로, 한 반복 안의 중간값은 함수 지역 변수로 둔다.
 값 함수 재귀의 관례 `setVar('sink', call(…))`도 단계마다 이 비용을 낸다 — 반환값이 필요 없으면
-보통 함수(문장) 재귀를 쓴다. 변수·리스트를 찾는 조회 비용은 이것과 별개다.
+보통 함수(문장) 재귀를 쓴다. 조회 비용은 [전역 변수·리스트 조회는 배열 탐색이다](#전역-변수-리스트-조회는-배열-탐색이다)와 별개다.
 
 근거: `games/sunset-drive/spike/micro.mjs`·`micro-run.mjs`, 적용과 전체 비용 표는
 [19 선셋 드라이브 §5](19-sunset-drive-case-study.md#5-블록-비용을-재고-설계했다).
@@ -1804,3 +1864,116 @@ BGM은 반복 옵션이 없고 새 BGM을 틀면 이전 BGM이 멈춘다. 반복
 오브젝트는 크기가 다른 모양으로 바꿀 때 기준점이 어긋난다. 도장용 그림은 같은 비율의 캔버스와 가운데 중심점을 쓴다.
 
 근거·회귀 확인: [lessons](lessons.md#유사-3d-레이싱-제작), `games/sunset-drive/spec.mjs`의 `num` 함수.
+
+
+---
+
+## 런타임 오류(`throw`)는 작품을 **멈추고 변수·리스트를 실행 시작 값으로 되돌린다** — 증상이 원인에서 멀리 보인다
+
+블록 하나가 예외를 던지면 실행기가 잡아
+[`Entry.Utils.stopProjectWithToast`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/util/utils.js#L2157)를 부른다
+([executors.js:50](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/executors.js#L50)).
+이 함수는 실행 중이면 [`engine.toggleStop()`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/engine.js#L715)으로
+작품을 멈추고, 멈춤은 모든 변수·리스트를 **실행을 시작한 순간의 스냅숏**으로 되돌린다
+([engine.js:744·747 `loadSnapshot`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/engine.js#L744)).
+그다음 `Runtime Error: <원래 메시지>` 로 다시 던진다(편집기 화면에는 경고 토스트, 워크스페이스에선 문제 블록 강조).
+
+### 실패 예 (2026-09-29, 비공개 로컬 스토리 게임)
+
+대사 글자마다 소리를 내는 반복에서 "차례 < 글자 수 **그리고** 그 차례 글자의 시각이 지났다"를 한 조건에 넣었다.
+[`boolean_and_or` 는 양쪽을 다 계산](#boolean_and_or에-단락-평가short-circuit-없음)하므로 차례가 글자 수에 닿은 뒤에도
+`value_of_index_from_list` 가 다음 칸을 읽었다. 보통은 다음 대사의 첫 글자라 아무 일 없고, **리스트 맨 끝 대사**에서만 범위를 넘어
+`can not insert value to array` 를 던졌다 → 마지막 장면의 버튼을 누른 뒤 게임이 "멈췄다".
+
+헤드리스 verify 에 보인 것은 원인이 아니라 결과였다: 대화 중=0·잠금=0(처음 값), 문자열 변수는 `0`
+([문자열 변수의 빈 값은 불러오면 0](04-script-and-blocks.md#부수-함정--미설정-변수는-0-으로-읽힘--verify-폴링-주의)), 그리고
+엔진 상태 `stop`. 대사를 넘기던 폴링 루프는 "대화가 없는데 다음 장면도 안 온다"며 90초 뒤 시간 초과로 끝났다.
+- 같은 실행에서 **장면 이름은 멈춘 장면 그대로** 읽혔다(관측). 소스상 멈춤은 실행 시작 장면을 다시 고르는데
+  ([engine.js:765 `loadStartSceneSnapshot`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/engine.js#L765)) 이 실행에서 왜 그대로였는지는 확인하지 않았다.
+- 리스트 끝에서만 터지므로 **리스트 앞쪽만 도는 짧은 검사로는 재현되지 않는다**. 끝까지 플레이하는 검사가 잡았다.
+
+### 진단 — 멈춤을 기록한다
+
+헤드리스 검증에서 `toggleStop` 을 감싸 누가 멈췄는지 남기고, `pageerror` 를 모아 시간 초과 메시지에 함께 싣는다.
+
+```js
+await page.evaluate(() => {
+    window.__stops = [];
+    const o = Entry.engine.toggleStop.bind(Entry.engine);
+    Entry.engine.toggleStop = function (...a) {
+        window.__stops.push({ scene: Entry.scene.selectedScene.name, stack: new Error('stop').stack.split('\n').slice(1, 6).join(' | ') });
+        return o(...a);
+    };
+});
+// 대기 루프가 시간 초과로 끝날 때: Entry.engine.state · window.__stops · page.on('pageerror') 로 모은 메시지를 에러 문장에 붙인다
+```
+
+이렇게 하면 "시간 초과" 대신 `engine:"stop"`, `pageErrors=["Runtime Error: can not insert value to array"]` 가 바로 보인다.
+
+### 예외를 던지는 블록 — 범위·존재 검사는 바깥 `만약` 으로
+
+`value_of_index_from_list`([block_variable.js:873](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_variable.js#L873)),
+[`char_at`·`substring`](#char_at--substring-은-범위를-벗어나면-throw--문자열-타일맵에-가드-필수) 등. 검사와 읽기를 같은 `그리고` 에 두지 말고
+`만약 차례 < 글자 수 { 만약 시각 ≥ 리스트[차례] { … } }` 처럼 **중첩**한다.
+
+---
+
+## 신호 핸들러는 **받는 오브젝트의 차례**에 돈다 — 보낸 쪽이 곧바로 바꾼 변수를 읽는다
+
+`신호 보내기` 는 현재 장면의 받는 오브젝트마다 실행기를 **만들어 그 오브젝트의 목록에 넣을 뿐**이다
+([engine.js:1247 `raiseMessage`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/engine.js#L1247) →
+[code.js:123 `raiseEvent`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/code.js#L123)).
+핸들러의 첫 블록은 그 오브젝트의 코드가 이번 틱(또는 이미 지나갔으면 다음 틱)에 돌 때 실행된다. 그 사이 보낸 쪽이
+핸들러가 읽을 변수를 **또 바꾸면**, 핸들러는 새 값을 읽는다.
+[같은 신호의 여러 리스너 경합](#message_cast-핸들러는-동시-실행--같은-메시지-다중-리스너-race)과 달리 **리스너 하나, 신호를 짧은 간격으로 두 번** 보낼 때의 문제다.
+
+### 실패 예 (2026-09-29, 비공개 로컬 스토리 게임) — 효과음이 사라지고 다른 소리가 두 번
+
+효과음을 `효과음 이름 = X` + `신호 sfx` 로 내고, 장면의 소리 오브젝트가 `신호 sfx 받으면 → (효과음 이름) 소리 재생`.
+대사를 넘길 때 ①넘김 소리를 부르고 ②한두 틱 안에 다음 대사의 첫 글자 소리를 불렀다 → **두 핸들러가 모두 ②의 이름을 읽어**
+넘김 소리는 사라지고 글자 소리가 약 15ms 간격으로 두 번 났다(소리 호출 추적으로 확인).
+끝까지 플레이한 검사에서 대사 넘김 소리가 **171번 중 9번** 빠졌다 — 효과음 두 개가 겹치는 모든 곳(마지막 대사 직후의 효과음 등)에서 같은 일이 난다.
+
+### 회피 패턴 — 효과음은 리스트 줄로, 자주 나는 소리는 따로
+
+```js
+// 부르는 쪽: 이름을 줄에 넣기만 한다
+const sfx = (name) => [addToList(name, 'sfx_q')];
+// 소리 오브젝트: 한 틱에 하나씩 꺼내 튼다(음소거면 틀지 않고 버린다 — 줄이 쌓이지 않게)
+repeat.inf([if_(cmp(lengthOfList('sfx_q'), '>', 0), [
+    if_(eq(getVar('snd'), 1), [playSound(valueAt('sfx_q', 1))]),
+    removeFromList(1, 'sfx_q')])])
+```
+
+- 글자마다 나는 소리처럼 **촘촘한 소리**는 별도 이름 변수·별도 신호(또는 별도 줄)로 떼어 효과음과 섞이지 않게 했다.
+- 고친 뒤 같은 검사에서 대사 다섯 줄의 글자 소리 수가 계산값과 모두 같았고, 넘김 소리 검사(넘긴 대사 수의 95% 이상)를 통과했다.
+- 장면이 바뀌기 직전에 넣은 소리는 **다음 장면의 소리 오브젝트**가 꺼내 튼다(리스트는 전역).
+
+일반화: 신호로 "값 전달"을 하려면 핸들러가 읽기 전에 값이 바뀌지 않음을 보장해야 한다. 보장할 수 없으면 **값을 줄(리스트)에 쌓는다.**
+
+---
+
+## `클릭했는가?`(`is_clicked`)는 **누르고 있는 동안만 참** — 틱 사이에 눌렀다 뗀 클릭은 못 본다
+
+`is_clicked` 는 `Entry.stage.isClick` 을 그대로 돌려주고
+([block_judgement.js:27](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_judgement.js#L27)),
+이 값은 캔버스 `mousedown` 에서 참, `mouseup` 에서 거짓이 된다([stage.js:70](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/stage.js#L70)).
+`… 될 때까지 기다리기(클릭했는가?)` 같은 **폴링**은 틱마다 이 값을 보므로, 누르고 떼는 사이가 한 틱(약 17ms)보다 짧으면 놓친다.
+`마우스를 클릭했을 때` 같은 **이벤트 시작 블록**(`canvasClick` 이벤트)은 놓치지 않는다.
+
+- 사람의 클릭은 대개 한 틱보다 길다. 문제는 **헤드리스 테스트**: Playwright `page.mouse.click()` 은 누르고 곧바로 떼서
+  폴링 대기가 클릭을 못 봤다(2026-09-29 관측 — 대사가 넘어가지 않음). `mouse.down()` → 60ms → `mouse.up()` 으로 누른다.
+- "누르고 있는 동안 넘어가지 않게" 하려면 `클릭 안 함 기다리기 → 클릭 기다리기 → 클릭 안 함 기다리기` 세 단계로 쓴다(누른 채로는 한 번만 넘어간다).
+
+---
+
+## 오브젝트 목록의 **앞쪽이 위에 그려진다** — spec `objects` 배열 순서가 곧 레이어
+
+장면을 불러오면 [`stage.sortZorder()`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/stage.js#L280)가
+현재 장면 오브젝트 목록을 **뒤에서부터** 캔버스 자식 순서 0, 1, 2 … 로 놓는다 → 목록의 마지막이 맨 아래, **첫 오브젝트가 맨 위**.
+`make-ent` 는 spec 의 `objects` 순서를 그대로 쓴다([`tools/make-ent.mjs`](../tools/make-ent.mjs) `buildProject` 의 `spec.objects` 순회).
+그래서 spec 에서는 **먼저 `push` 한 오브젝트가 위**다(배경을 마지막에 넣는 이유).
+
+실패 예(2026-09-29): 큰 그림 위를 덮으며 움직여야 하는 작은 오브젝트를 그 그림보다 **뒤에** 넣어 그림 아래에 깔렸다(보이지 않음).
+덮는 것 → 덮이는 것 순으로 넣는다. 실행 중 순서를 바꾸는 블록은 별개이고, 붓 선의 층은
+[붓 선과 채우기 레이어](#붓-선과-채우기-레이어는-처음-만든-순서대로-쌓이고-도장은-항상-그-위다)를 본다.

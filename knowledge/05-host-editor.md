@@ -332,7 +332,7 @@ if (assets.length) throw new Error(`에셋 ${assets.length}개 — 콘솔 붙여
 
 순서를 지키지 않으면 "EntryStatic is not defined" / "createjs is not defined" / "Entry is not defined" 류 에러.
 
-## 필수 vendor 라이브러리 패치
+## 소리 vendor 구성과 부팅 검사
 
 이전 npm 별칭 조합과 예외를 삼키는 방어 래퍼는 폐기됐다. 현재는 공식 CreateJS 0.6.0
 브라우저 배포본의 해시를 검사하고, 초기화 전에 실제 버전을 확인한다.
@@ -384,6 +384,66 @@ for (let i = 0; i < 10; i++) {
 document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowRight', key: 'ArrowRight' }));
 document.dispatchEvent(new KeyboardEvent('keyup',   { code: 'ArrowRight', key: 'ArrowRight' }));
 ```
+
+### 장면으로 바로 가기 — `selectScene` 만으로는 `when_scene_start` 가 안 불린다
+
+디버그 스크립트에서 특정 장면부터 보려고 `Entry.scene.selectScene(s)` 만 부르면 화면은 바뀌어도 그 장면의 시작 스크립트(감독 등)가 돌지 않는다.
+`장면 시작하기` 블록은 고른 **다음** `Entry.engine.fireEvent('when_scene_start')` 를 부른다
+([block_start.js:630](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/playground/blocks/block_start.js#L630),
+[07 §when_scene_start](07-runtime-quirks.md#when_scene_start-는-시작-시-첫-장면에서-발화-안-함--start_scene-전환에서만)). 같이 부른다:
+
+```js
+await page.evaluate(() => { Entry.scene.selectScene(Entry.scene.getScenes().find((x) => x.name === '장면 2')); Entry.engine.fireEvent('when_scene_start'); });
+```
+
+앞 장면에서 채웠어야 할 변수는 직접 넣는다 — 그래도 **처음부터 끝까지 플레이하는 검사를 대신하지 못한다**(아래 "멈춤 진단"의 리스트 끝 오류는 끝까지 가야 났다).
+
+### 누르고 떼기 — 폴링 대기는 60ms 쯤 눌러야 본다
+
+`… 될 때까지 기다리기(클릭했는가?)` 는 눌린 동안만 참인 값을 틱마다 본다([07 is_clicked](07-runtime-quirks.md#클릭했는가is_clicked는-누르고-있는-동안만-참--틱-사이에-눌렀다-뗀-클릭은-못-본다)).
+`page.mouse.click()` 은 누르고 곧바로 떼서 놓칠 수 있다 → `mouse.move` → `mouse.down()` → 60ms → `mouse.up()`.
+
+### 그릴 때마다 재기 — `Entry.stage.update` 감싸기
+
+"한 프레임만 비쳤다", "조각이 정한 순서로 붙었다" 같은 것은 `page.evaluate` 폴링(수십~수백 ms 간격)으로는 못 잡는다.
+화면을 그리는 함수를 감싸면 **그린 화면마다** 잴 수 있다.
+
+```js
+await page.evaluate(() => {
+    const rec = { frames: 0, first: {} };
+    const orig = Entry.stage.update.bind(Entry.stage);
+    Entry.stage.update = function (...a) {
+        const r = orig(...a);
+        try {                                   // 탐침 오류가 게임을 멈추지 않게
+            rec.frames++;
+            for (const o of Entry.container.getCurrentObjects())
+                if (o.entity.getVisible() && !(o.name in rec.first)) rec.first[o.name] = performance.now();
+        } catch { /* 무시 */ }
+        return r;
+    };
+    window.__rec = rec;
+});
+```
+
+- 여러 탐침을 차례로 감싸도 된다(각자 앞의 것을 부른다). 끝까지 플레이한 한 판에서 약 1만 프레임을 쟀다(탐침이 없을 때와 속도 비교는 하지 않았다).
+- 예: 대사를 넘길 때 **다음 대사가 한 프레임 통째로 비쳤다가 숨는** 깜빡임 — 보이는 글자가 "지금 대사의 앞부분이면서 줄었다가 다시 늘면" 실패.
+  대사 변수가 바뀐 직후 한 프레임은 지난 글자가 남는 것이 정상이라 "지금 대사의 앞부분이 아닌 프레임"은 세지 않는다.
+
+### 소리·연출을 창으로 세기 — 창의 시작은 **페이지 안 시각**으로
+
+소리 호출(`Entry.Utils.playSound`)을 감싸 `performance.now()` 를 붙여 두고, 대사·장면이 시작된 순간부터 끝날 때까지의 **창** 안에서 센다
+([15 자동 검사](15-audio-verification.md#자동-검사가-확인하는-것)).
+
+- 창의 시작을 **Node 쪽 폴링으로 알아챈 시각**으로 잡으면 60~300ms 늦게 열려 앞부분을 놓친다. 그래서 처음엔 "기대 수의 60% 이상"으로 느슨하게 잡았고,
+  그 느슨함이 **대사 경계마다 첫 소리가 두 번 나는 실제 버그**를 가렸다(2026-09-29). 창 시작을 위 프레임 탐침이 기록한 "대사가 바뀐 프레임 시각"으로 바꾸자
+  모든 대사가 기대 수 +1 로 드러났고, 고친 뒤엔 **정확히 같았다**. 기대 수는 빌드 때 계산해 두고 정확히 비교한다.
+- 창 안의 소리 **이름**도 본다(화자마다 다른 소리면 다른 화자의 소리가 섞이지 않았는지).
+
+### 멈춤 진단 — 시간 초과 메시지에 엔진 상태를 싣는다
+
+대기 루프가 "시간 초과"로만 끝나면 원인을 모른다. 런타임 오류는 작품을 멈추고 변수를 처음 값으로 되돌리므로
+([07 런타임 오류](07-runtime-quirks.md#런타임-오류throw는-작품을-멈추고-변수리스트를-실행-시작-값으로-되돌린다--증상이-원인에서-멀리-보인다)),
+시간 초과 때 `Entry.engine.state`, `toggleStop` 을 감싸 모은 호출 스택, `page.on('pageerror')` 메시지를 함께 적는다.
 
 ### 관련 도구
 
@@ -466,3 +526,31 @@ async function release(page) {
 
 같은 프로세스에서 브라우저를 ~10 회 재부팅하면 키 이벤트가 게임에 도달하지 않는다 —
 [07 §헤드리스 검증에서 브라우저를 ~10 회 재부팅하면](07-runtime-quirks.md#헤드리스-검증에서-브라우저를-10-회-재부팅하면-키-이벤트가-게임에-도달하지-않는다).
+
+## 기능 검사와 입력 완주는 별도로 기록한다
+
+복잡한 게임은 상황을 통제한 검사와 처음부터 진행하는 검사가 서로 다른 결함을 찾는다.
+[심연의 성채](14-abyssal-keep-case-study.md)에서는 아래 두 스크립트를 함께 사용했다.
+
+| 검사 | 허용하는 준비 | 확인하는 것 | 확인하지 못하는 것 |
+| --- | --- | --- | --- |
+| [verify.mjs](../games/abyssal-keep/verify.mjs) | 지도·체력·적·상태를 fixture로 설정한 뒤 입력 | 벽 뒤 공격 차단, 가림, 피해, 회피, 보상, 보스 전환 같은 개별 규칙 | 플레이로 그 상황까지 도달할 수 있는지 |
+| [playthrough.mjs](../games/abyssal-keep/playthrough.mjs) | 정상 로드·시작 후 상태 읽기와 키 이벤트만 | 탐색→전투→유물→층 전환→승리가 연결되는지 | 사람의 탐색 난이도, 모든 시드·강화 조합 |
+
+fixture는 정답 상태를 넣고 성공이라고 판정하는 용도가 아니다. 예를 들어 벽 뒤 적의 체력을
+설정한 다음 실제 사격 입력을 보내고 **체력이 감소하지 않았는지** 검사한다. 완주 스크립트에는
+변수·리스트 쓰기, 순간이동, 피해 함수 직접 호출을 넣지 않는다. 이 사례의 키 입력은
+`document`에 `KeyboardEvent`를 보내는 방식이며 물리 키보드로 사람이 플레이한 기록은 아니다.
+
+마우스 입력은 별도로 `page.mouse`로 캔버스를 클릭한다. `entityClick` 직접 발신은
+[픽셀 알파 검사](07-runtime-quirks.md#sprite-도-pixelperfect--투명-픽셀-ring-가운데-등-클릭-안-됨)를
+건너뛰므로, 카드 선택 함수를 호출해 본 것만으로 클릭 검증을 대신하지 않는다.
+
+검증 결과에는 파일명·SHA-256·엔진 버전·검사 종류·오류를 남긴다. 완주에는 시드, 층·상태
+전환, 선택한 보상, 시간별 입력, 최종 상태를 기록한다. 성능에는 실제 경과 시간과 측정 장면을
+명시한다. 이 사례는 카메라 정지 시 렌더를 생략하므로 **회전하는 장면**을 측정했다.
+
+보고서는 읽는 쪽에서도 확인해야 한다. `inputsOnly: true`는 작성자의 표기이므로 스크립트가
+실제로 쓰기 도구를 호출하지 않는지 확인한다. 자동으로 최신 `.ent`를 고르는 하네스에서는
+보고서의 파일명과 해시가 문서의 대상 버전과 일치하는지도 검사한다.
+로컬 순정 EntryJS 성공은 공식 사이트 업로드·실행 성공과 구별해서 기록한다.

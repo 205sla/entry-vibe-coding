@@ -42,6 +42,10 @@ node tools/verify-case-study-evidence.mjs --source "C:/작품/chroma_009.ent" --
 
 ## 무엇을 증명하는가
 
+소리 실행 검증은 위 정적 사례와 다른 형식의 [audio-verification-20260911.json](audio-verification-20260911.json)에
+보관한다. 재현 방법과 환경별 범위는 [15 소리 검증](../15-audio-verification.md)을 따른다.
+아래 `verify-case-study-evidence.mjs`의 입력으로 사용하지 않는다.
+
 - `source.sha256`: 분석한 원본 압축 파일의 바이트를 고정한다. 이름이 같아도 해시가 다르면 다른 버전이다.
 - `assertions`: 특정 변수, 함수, 블록과 계수가 그 위치에 존재하는지 재검사한다.
 - `stats` 및 그 밖의 요약: 분석자가 집계·설명한 자료다. 검증기는 요약의 임의 필드를 자동으로 재계산하지 않는다. 개수에 대한 자동 검사도 `assertions`에 들어 있을 때만 수행한다.
