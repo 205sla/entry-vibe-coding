@@ -107,36 +107,58 @@ function describeMotion(name, m, ms) {
     return parts.length ? `${name}: ${parts.join(', ')}` : null;
 }
 
-// Non-motion differences between two end states.
+// Non-motion differences between two end states, as { id, text } so that
+// values which differ between two untouched runs can be filtered out as noise.
 function stateDiff(a, b, labelA, labelB) {
-    const lines = [];
+    const out = [];
     for (const [id, o] of Object.entries(b.objects)) {
         const p = a.objects[id];
         if (!p) continue;
-        if (o.visible !== p.visible) lines.push(`${o.name}: ${labelA} ${p.visible ? '보임' : '숨김'} / ${labelB} ${o.visible ? '보임' : '숨김'}`);
-        if (o.shape !== p.shape) lines.push(`${o.name}: 모양 ${p.shape} → ${o.shape}`);
-        if (o.text !== p.text) lines.push(`${o.name}: 글 "${p.text}" → "${o.text}"`);
-        if (o.clones !== p.clones) lines.push(`${o.name}: 복제본 ${p.clones} → ${o.clones}개`);
+        if (o.visible !== p.visible) out.push({ id: id + ':vis', text: `${o.name}: ${labelA} ${p.visible ? '보임' : '숨김'} / ${labelB} ${o.visible ? '보임' : '숨김'}` });
+        if (o.shape !== p.shape) out.push({ id: id + ':shape', text: `${o.name}: 모양 ${p.shape} → ${o.shape}` });
+        if (o.text !== p.text) out.push({ id: id + ':text', text: `${o.name}: 글 "${p.text}" → "${o.text}"` });
+        if (o.clones !== p.clones) out.push({ id: id + ':clones', text: `${o.name}: 복제본 ${p.clones} → ${o.clones}개` });
     }
     for (const [name, v] of Object.entries(b.vars)) {
-        if (a.vars[name] !== v) lines.push(`변수 ${name}: ${a.vars[name]} → ${v}`);
+        if (a.vars[name] !== v) out.push({ id: 'var:' + name, text: `변수 ${name}: ${a.vars[name]} → ${v}` });
     }
-    if (a.scene !== b.scene) lines.push(`장면: ${a.scene} → ${b.scene}`);
-    return lines;
+    if (a.scene !== b.scene) out.push({ id: 'scene', text: `장면: ${a.scene} → ${b.scene}` });
+    return out;
 }
 
-// What a key run did that the untouched run did not.
-function keyEffect(run, base) {
+const NO_MOTION = { dx: 0, dy: 0, jumps: 0 };
+
+// How much two untouched runs of the same length disagree — frame timing alone
+// moves timers, counters and fast objects a little between runs.
+function noiseOf(a, b) {
+    const motion = {};
+    for (const [id, o] of Object.entries(a.last.objects)) {
+        const m = a.motion[id] || NO_MOTION, n = b.motion[id] || NO_MOTION, q = b.last.objects[id] || o;
+        motion[id] = {
+            d: Math.hypot(m.dx - n.dx, m.dy - n.dy),
+            jumps: Math.abs(m.jumps - n.jumps),
+            pos: Math.hypot(o.x - q.x, o.y - q.y),
+        };
+    }
+    return { ids: new Set(stateDiff(a.last, b.last, '', '').map(d => d.id)), motion };
+}
+
+// What a key run did that the untouched run did not, beyond run-to-run noise.
+// Smooth motion, teleports (grid steps, locateXY) and final positions all count.
+function keyEffect(run, base, noise) {
     const lines = [];
     for (const [id, o] of Object.entries(run.last.objects)) {
-        const m = run.motion[id] || { dx: 0, dy: 0, jumps: 0 };
-        const b = base.motion[id] || { dx: 0, dy: 0, jumps: 0 };
-        const gap = Math.hypot(m.dx - b.dx, m.dy - b.dy);
-        if (gap > Math.max(4, 0.25 * Math.hypot(b.dx, b.dy))) {
-            lines.push(describeMotion(o.name, m, run.ms) || `${o.name}: 가만히 둘 때와 달리 멈춤`);
-        }
+        const m = run.motion[id] || NO_MOTION, b = base.motion[id] || NO_MOTION;
+        const nz = noise.motion[id] || { d: 0, jumps: 0, pos: 0 };
+        const p = base.last.objects[id] || o;
+        const moved = Math.hypot(m.dx - b.dx, m.dy - b.dy) > Math.max(4, 0.25 * Math.hypot(b.dx, b.dy), 2 * nz.d);
+        const jumped = Math.abs(m.jumps - b.jumps) > nz.jumps;
+        const displaced = Math.hypot(o.x - p.x, o.y - p.y) > Math.max(12, 3 * nz.pos);
+        if (!moved && !jumped && !displaced) continue;
+        lines.push(describeMotion(o.name, m, run.ms)
+            || (displaced ? `${o.name}: 가만히 둘 때 (${Math.round(p.x)}, ${Math.round(p.y)}) → 키 (${Math.round(o.x)}, ${Math.round(o.y)})` : `${o.name}: 가만히 둘 때와 달리 멈춤`));
     }
-    return lines.concat(stateDiff(base.last, run.last, '가만히', '키'));
+    return lines.concat(stateDiff(base.last, run.last, '가만히', '키').filter(d => !noise.ids.has(d.id)).map(d => d.text));
 }
 
 // Objects that are shown and on stage but add no pixel to the picture because an
@@ -186,6 +208,13 @@ function findCovered(page) {
 }
 
 let server, browser, failed = false;
+const cleanup = async () => {
+    await browser?.close().catch(() => {});
+    await stopChild(server);
+};
+for (const signal of ['SIGINT', 'SIGTERM']) {
+    process.once(signal, () => { void cleanup().finally(() => process.exit(130)); });
+}
 try {
     try {
         const { chromium } = await import('@playwright/test');
@@ -194,23 +223,28 @@ try {
         console.error('Chromium 을 띄울 수 없다 — `npx playwright install chromium` 을 먼저 실행한다.\n' + e.message.split('\n')[0]);
         process.exit(2);
     }
-    server = await startEditorServer(baseURL);
+    server = await startEditorServer(baseURL, (spawned) => { server = spawned; });
     let page, pageErrors;
     ({ browser, page, pageErrors } = await bootEditor({ baseUrl: baseURL }));
     await loadFixture(page, path.resolve(file));
 
     const keys = await page.evaluate(() => {
-        const found = new Map();  // raw field value → { held: is_press_some_key, here: first-scene object }
+        // raw field value → { held: is_press_some_key, here: pressed in the first scene,
+        //                     inObject: used by a first-scene object script, not only in a function }
+        const found = new Map();
         const first = Entry.scene.selectedScene;
-        for (const o of Entry.container.getAllObjects()) {
-            for (const b of o.script.getBlockList(false)) {
+        const collect = (blocks, here, inObject) => {
+            for (const b of blocks) {
                 const raw = b.type === 'when_some_key_pressed' ? String(b.params[1])
                     : b.type === 'is_press_some_key' ? String(b.params[0]) : null;
                 if (raw === null) continue;
-                const k = found.get(raw) || { held: false, here: false };
-                found.set(raw, { held: k.held || b.type === 'is_press_some_key', here: k.here || o.scene === first });
+                const k = found.get(raw) || { held: false, here: false, inObject: false };
+                found.set(raw, { held: k.held || b.type === 'is_press_some_key', here: k.here || here, inObject: k.inObject || inObject });
             }
-        }
+        };
+        for (const o of Entry.container.getAllObjects()) collect(o.script.getBlockList(false), o.scene === first, o.scene === first);
+        // Function bodies are shared by every scene, so their keys are pressed too.
+        for (const f of Object.values(Entry.variableContainer.functions_ || {})) collect(f.content?.getBlockList?.(false) || [], true, false);
         const toCode = {};
         for (const [code, k] of Object.entries(Entry.KeyboardCode.codeToKeyCode)) toCode[k] ??= code;
         return [...found].map(([raw, k]) => ({ raw, ...k, key: Number(raw), code: toCode[raw] || null }));
@@ -221,7 +255,7 @@ try {
     const idleLines = Object.entries(idle.last.objects)
         .map(([id, o]) => idle.motion[id] && describeMotion(o.name, idle.motion[id], idle.ms))
         .filter(Boolean)
-        .concat(stateDiff(idle.first, idle.last, '처음', '2초 뒤'));
+        .concat(stateDiff(idle.first, idle.last, '처음', '2초 뒤').map(d => d.text));
     console.log('\n가만히 2초:');
     console.log(idleLines.length ? idleLines.map(s => '  ' + s).join('\n') : '  아무 변화 없음');
     const texts = Object.values(idle.last.objects).filter(o => o.visible && o.text !== undefined && o.text.trim());
@@ -251,25 +285,34 @@ try {
         failed = true;
         console.log(`\n✗ 키 값 "${k.raw}" 는 키 코드가 아니다 — 이 키 블록은 절대 실행되지 않는다. 숫자 코드('37' ←, '39' →, '32' 스페이스)나 DSL isPressed('ArrowLeft') 를 쓴다.`);
     }
-    const usable = keys.filter(k => /^\d+$/.test(k.raw) && k.here);
-    const later = keys.filter(k => /^\d+$/.test(k.raw) && !k.here);
+    for (const k of keys.filter(k => /^\d+$/.test(k.raw) && !k.code)) {
+        failed = true;
+        console.log(`\n✗ 키 코드 ${k.raw} 는 엔트리가 아는 키가 아니다(Entry.KeyboardCode 에 없음) — 이 키 블록은 실행되지 않는다.`);
+    }
+    const usable = keys.filter(k => k.code && k.here);
+    const later = keys.filter(k => k.code && !k.here);
     if (later.length) console.log(`\n다른 장면에서만 쓰는 키: ${later.map(k => keyLabel(k.key)).join(' ')} (첫 장면에서는 누르지 않는다)`);
     const tested = usable.length ? usable : keys.length ? [] : [37, 39, 38, 40, 32].map(key => ({ key, unused: true }));
     const FALLBACK = { 37: 'ArrowLeft', 38: 'ArrowUp', 39: 'ArrowRight', 40: 'ArrowDown', 32: 'Space' };
-    let deadKeys = 0;
+    let deadKeys = 0, deadInObject = 0;
+    const drifting = stateDiff(idle.first, idle.last, '', '').map(d => d.id);
     const stepKeys = [];
     // Press every key after `delay` ms of running; returns the number of dead keys.
     async function pressKeys(delay, title) {
+        // Two untouched runs: the first is the reference, their disagreement is the noise floor.
         const baseline = await playWindow(page, 600, null, delay);
+        const noise = noiseOf(baseline, await playWindow(page, 600, null, delay));
+        // Values that already change while untouched (frame counters, timers) cannot show a key effect.
+        for (const id of drifting) noise.ids.add(id);
         console.log(title);
         let dead = 0;
+        deadInObject = 0;
         for (const k of tested) {
             const code = k.code || FALLBACK[k.key];
-            if (!code) { console.log(`  ${keyLabel(k.key)}: 이 키를 누를 방법이 없다 (건너뜀)`); continue; }
-            const lines = keyEffect(await playWindow(page, 600, code, delay), baseline);
-            if (!lines.length && !k.unused) dead++;
+            const lines = keyEffect(await playWindow(page, 600, code, delay), baseline, noise);
+            if (!lines.length && !k.unused) { dead++; if (k.inObject) deadInObject++; }
             console.log(`  ${keyLabel(k.key)}: ${lines.length ? lines.join(' / ') : k.unused ? '반응 없음' : '⚠ 반응 없음'}`);
-            if (!k.unused && !k.held && lines.some(l => l.includes('이동')) && !stepKeys.includes(keyLabel(k.key))) stepKeys.push(keyLabel(k.key));
+            if (!k.unused && !k.held && lines.some(l => l.includes('이동 (초당')) && !stepKeys.includes(keyLabel(k.key))) stepKeys.push(keyLabel(k.key));
         }
         return dead;
     }
@@ -285,7 +328,8 @@ try {
         failed = true;
         console.log('\n✗ page error ' + pageErrors.length + '건:\n  ' + pageErrors.slice(0, 5).join('\n  '));
     }
-    if (usable.length && deadKeys === usable.length) {
+    // Keys that live only in functions may belong to a later scene, so they alone never fail the run.
+    if (usable.length && deadKeys === usable.length && deadInObject > 0) {
         failed = true;
         console.log('\n✗ 이 작품이 쓰는 키를 모두 눌러 봤지만 아무것도 바뀌지 않았다 — 키 블록·조건·좌표를 확인한다. '
             + '안내 화면처럼 3초 넘게 일부러 키를 막는 작품이면 verify.mjs 로 그 상태를 만든 뒤 확인한다.');
@@ -303,7 +347,6 @@ try {
     failed = true;
     console.error('[play-check] ' + e.message);
 } finally {
-    await browser?.close();
-    await stopChild(server);
+    await cleanup();
 }
 process.exit(failed ? 1 : 0);

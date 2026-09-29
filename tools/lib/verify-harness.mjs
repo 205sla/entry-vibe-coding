@@ -159,7 +159,9 @@ export async function tapKey(page, code) { return holdKey(page, code, 50); }
 // Wall time is not used while the engine runs: Entry's project timer only refreshes
 // on its own interval, so on a busy runner many frames see dt = 0.001 and the game
 // clock falls behind the wall clock. While the engine is stopped the clock follows
-// wall time. A wait gives up after `ms * slack + 5 s` of wall time.
+// wall time. A wait that sees no game progress for `ms * slack + 5 s` of wall time
+// throws (the game clock stalled or Entry.engine was replaced) instead of passing,
+// and Node gives up 10 s after that even if the page itself stops responding.
 //
 // VERIFY_CPU_THROTTLE=<n> slows the page CPU n× (CDP) for a local stress run.
 // It also slows the verify's own page.evaluate calls, so it is harsher than CI.
@@ -182,16 +184,26 @@ export async function useGameTimeWaits(page, { step = 1 / 60, slack = 40 } = {})
             clock.t += read();
             return original(...args);
         };
-        window.__gameWait = (ms, cap) => new Promise((resolve) => {
-            const c = Entry.engine.__gameClock;
+        window.__gameWait = (ms, cap) => new Promise((resolve, reject) => {
+            const engine = Entry.engine, c = engine.__gameClock;
             const target = c.t + ms / 1000;
             const start = performance.now();
             let prev = start;
             const poll = setInterval(() => {
                 const now = performance.now();
-                if (!Entry.engine.isState('run')) c.t += (now - prev) / 1000;
+                if (Entry.engine !== engine) {
+                    clearInterval(poll);
+                    reject(new Error('game-time wait: Entry.engine was replaced during the wait'));
+                    return;
+                }
+                if (!engine.isState('run')) c.t += (now - prev) / 1000;
                 prev = now;
-                if (c.t >= target || now - start > cap) { clearInterval(poll); resolve(); }
+                if (c.t >= target) { clearInterval(poll); resolve(); return; }
+                if (now - start > cap) {
+                    clearInterval(poll);
+                    reject(new Error(`game-time wait: ${ms} ms of game time did not pass in ${Math.round(now - start)} ms `
+                        + `(game clock advanced ${Math.round((c.t - target) * 1000 + ms)} ms, engine ${engine.state})`));
+                }
             }, 5);
         });
     }, step);
@@ -202,9 +214,18 @@ export async function useGameTimeWaits(page, { step = 1 / 60, slack = 40 } = {})
         if (!(ms > 0)) return;
         try {
             await install();  // Entry.engine may be replaced after a reload
-            await page.evaluate(([m, cap]) => window.__gameWait(m, cap), [ms, ms * slack + 5000]);
         } catch {
-            await wallWait(ms);
+            return wallWait(ms);  // no Entry on this page (yet): a plain wall-clock wait
+        }
+        const cap = ms * slack + 5000;
+        let timer;
+        const unresponsive = new Promise((_, reject) => {
+            timer = setTimeout(() => reject(new Error(`game-time wait: page did not answer within ${cap + 10000} ms`)), cap + 10000);
+        });
+        try {
+            await Promise.race([page.evaluate(([m, c]) => window.__gameWait(m, c), [ms, cap]), unresponsive]);
+        } finally {
+            clearTimeout(timer);
         }
     };
 }
