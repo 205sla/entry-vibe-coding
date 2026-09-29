@@ -169,7 +169,7 @@
 ## 2026-09-10 — 외부 작품 3종 병렬 분석과 근거 재검증
 
 - [RPG 사례](09-rpg-case-study.md): 공통 배치 함수, 오브젝트 전용 상태와 병렬 리스트, 대화 입력 단계, 맵 전환, 저장 직렬화와 외부 확장 연동 경계를 추가했다.
-- [뮤직비디오 사례](10-music-video-case-study.md): 타이머 기준 모양 갱신, 신호별 레이어, SVG 자막, 공유 RESET과 떨어진 스택을 분석했다. 기존 shogi 파일과는 해시가 다른 버전이다.
+- [뮤직비디오 사례](10-music-video-case-study.md): 타이머 기준 모양 갱신, 신호별 레이어, SVG 자막, 공유 RESET과 떨어진 스택을 분석했다.
 - [3D 사례](11-3d-game-case-study.md): 정육면체 직교투영, 꼭짓점·법선 회전, 면 선택, 조명, 드래그 관성과 고속 반복 패턴을 추가했다.
 - [03 이미지 정본](03-objects-and-assets.md)의 “항상 PNG” 단정을 **현재 생성 정책**으로 범위를 좁히고, 실제 외부 작품의 SVG 원본·PNG 동반 파일을 구분했다. 01·quick-reference·README의 요약도 함께 정정했다.
 - [04 변수 스코프](04-script-and-blocks.md#오브젝트-전용-변수와-클론별-상태): “클론별 로컬 변수가 없다”는 과거 설명을 정정했다. RPG의 변수 선언과 로컬 엔진의 `addCloneVariables`, `getVariable`, `getList`를 대조했다. 아래 과거 날짜의 관련 기록은 당시 판단의 역사로 남긴다.
@@ -403,7 +403,7 @@ freeze. 금지 동일.
 
 원형/그리드 변수 배치 작업 (`games/bad-apple`, `games/name-row`, `games/name-circle`) 에서 발견:
 
-- **Variable Y vs Entity Y — 부호 반대**: entity 는 `setY` 에서 `this.object.y = -this.y` 로 반전하지만 variable 은 `view_.y = getY()` 직접 사용 → variable 의 `y > 0` 은 화면 **아래**. 시계 fixture 가 반시계로 돌던 원인. 실측은 [`tools/verify-coord-test.mjs`](../tools/verify-coord-test.mjs) 와 [`games/coord-test/coord-test_001.ent`](../games/coord-test/).
+- **Variable Y vs Entity Y — 부호 반대**: entity 는 `setY` 에서 `this.object.y = -this.y` 로 반전하지만 variable 은 `view_.y = getY()` 직접 사용 → variable 의 `y > 0` 은 화면 **아래**. 시계 fixture 가 반시계로 돌던 원인. 실측은 `tools/verify-coord-test.mjs` 와 `games/coord-test/coord-test_001.ent` (2026-09-30 공개 저장소에서 내림 — 결과는 [07](07-runtime-quirks.md) 표에 남아 있다).
 - **변수 좌표 x=0 또는 y=0 → bin-packer 폴백**: [`variable.js:136`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/variable/variable.js#L136) 의 `if (this.getX() && this.getY())` truthy check 때문에 정확히 0 인 좌표는 무시되고 자동 배치. 그리드 중앙 행/열만 흩어지는 증상. 회피는 ±1 시프트 또는 0.5 오프셋.
 
 ## 2026-04-29 — 뱀서라이크 확장팩 (`games/vampire-survival/` Phase A→E)
@@ -1016,7 +1016,7 @@ spec 작성 (DSL)
 
 ### 오브젝트 · 자산
 - [x] **playentry.org 레퍼런스 분석**: tar에 PNG만 (SVG 없음), picture에 `thumbUrl` 필드 없음,
-  `imageType: "png"`. 출처: `C:\Users\young\Downloads\260423_작품.ent`
+  `imageType: "png"`. 출처: playentry.org 에서 내보낸 로컬 작품 `.ent`
 - [x] make-ent.mjs가 `fileurl: /images/...`를 자동으로 public/에서 해석해 tar에 번들
 - [x] SVG는 `sharp(svg).png()`로 래스터라이즈 — tar에는 PNG만 저장
 - [x] 썸네일은 같은 hash의 96px PNG (`temp/aa/bb/thumb/<hash>.png`)

@@ -60,7 +60,7 @@ node tools/verify-case-study-evidence.mjs --source "C:/작품/chroma_009.ent" --
 
 ```powershell
 node tools/verify-case-study-evidence.mjs --source "C:/작품/엔트리 최대규모 RPG게임의 리메이크.ent" --evidence knowledge/evidence/rpg-remake.json
-node tools/verify-case-study-evidence.mjs --source "C:/작품/쇼기한판_의 리메이크.ent" --evidence knowledge/evidence/music-video-remake.json
+node tools/verify-case-study-evidence.mjs --source "C:/작품/뮤직비디오 원본.ent" --evidence knowledge/evidence/music-video-remake.json
 node tools/verify-case-study-evidence.mjs --source "C:/작품/3D의 리메이크.ent" --evidence knowledge/evidence/3d-remake.json
 node tools/verify-case-study-evidence.mjs --source "C:/작품/A Ball 2의 리메이크.ent" --evidence knowledge/evidence/a-ball-2-remake.json
 node tools/verify-case-study-evidence.mjs --source "C:/작품/BOUNCY BALL의 리메이크 (1).ent" --evidence knowledge/evidence/bouncy-ball-remake.json

@@ -109,7 +109,7 @@ node tools/run-all-verify.mjs --filter bounce-ball                              
 | 키 이벤트 `document` + `event.code`, 클릭 `Entry.dispatchEvent('entityClick', e)` 로 주입 | [`tools/lib/verify-harness.mjs`](tools/lib/verify-harness.mjs) | playwright 로 실제 입력 시뮬 → 게임 플레이 검증 |
 
 > ⚠️ 위 적응은 **전부 호스트 코드(editor.js · setup.mjs · server.js · tools/lib)** — **entryjs 엔진 소스 패치는 0**
-> (검증: `upstream/entryjs` 의 src 와 `dist/entry.min.js` 가 순정과 동일). entryjs 버전 업 시 이 A·B 지점만 확인하면 된다.
+> (검증: 사용하는 entryjs 의 src 와 `dist/entry.min.js` 가 순정과 동일). entryjs 버전 업 시 이 A·B 지점만 확인하면 된다.
 > 향후 어떤 테스트가 엔진 소스 패치를 요구하면 → `scripts/setup.mjs` 패치 단계로 추가하고 이 표에 순정 대비 diff 한 줄 기록.
 
 ---

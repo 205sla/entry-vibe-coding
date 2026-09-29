@@ -833,7 +833,7 @@ stage container 자체는 `canvas.x/y = (320, 180)` 으로 중앙 이동 + `scal
 
 ### 실측 (2026-05-18, headless chromium)
 
-`coord-test_001.ent` 의 변수 4 개 — 이름은 MATH 컨벤션 (y 양수 = 위) 가정으로 명명:
+변수 4 개만 둔 좌표 시험 작품 — 이름은 MATH 컨벤션 (y 양수 = 위) 가정으로 명명:
 
 | 변수 이름 | stage (x, y) | canvas pixel (x, y) | 실제 사분면 |
 |-----------|-------------|---------------------|------------|
@@ -859,12 +859,13 @@ x = cx + r * Math.sin(theta);
 y = cy - r * Math.cos(theta);   // y + = 화면 아래라서 부호 반대로
 ```
 
-검증: [`games/name-circle/build.mjs`](../games/name-circle/build.mjs) `angleCoords` — 시침/분침/초침 시계방향 회전.
+검증: 변수 360 개를 원형으로 배치한 시계 작품의 `angleCoords` 로 시침/분침/초침이 시계방향으로 도는 것을 확인했다.
 
 ### 증거
 
-- [`tools/verify-coord-test.mjs`](../tools/verify-coord-test.mjs) — variable 4 개 픽셀 위치 측정. canvas 중앙 (320, 180) 기준 사분면 판정.
-- [`games/coord-test/coord-test_001.ent`](../games/coord-test/) — 테스트 fixture.
+- 헤드리스 검사로 변수 4 개의 픽셀 위치를 재고 canvas 중앙 (320, 180) 기준 사분면을 판정했다(위 표).
+- 그 시험 작품과 검사는 개인 원본 파일로 만든 예전 실험이라 2026-09-30 공개 저장소에서 내렸다.
+  재현은 변수 4 개를 (±100, ±100) 에 둔 프로젝트면 충분하다.
 
 ### 클릭 좌표 변환과의 차이
 
@@ -920,9 +921,9 @@ for (let x = -239; x <= 239; x += 2) xValues.push(x);
 
 ### 증거
 
-- [`games/bad-apple/build.mjs`](../games/bad-apple/build.mjs) `Y_OFFSET = 1` — 11 행 그리드에서 row 5 의 y=0 회피.
-- [`games/name-circle/build.mjs`](../games/name-circle/build.mjs) `CX = CY = 0.5` — 원형 배치에서 4 사분점의 x=0/y=0 회피.
-- [`games/name-row/build.mjs`](../games/name-row/build.mjs) — x = -239..+239 step 2 (홀수만) 로 x=0 자연 회피.
+- 변수 그리드·원형 배치 실험 작품 세 개(2026-09-30 공개 저장소에서 내림 — 개인 원본 파일로 만든 예전 실험)에서 확인했다:
+  11 행 그리드 `Y_OFFSET = 1`(row 5 의 y=0 회피), 원형 배치 `CX = CY = 0.5`(4 사분점의 x=0/y=0 회피),
+  x = -239..+239 step 2(홀수만) 가로 줄(x=0 자연 회피).
 - 빌드 어서션: `if (v.x === 0 || v.y === 0) throw` — 파라미터 변경 시 재발 가드.
 
 ---

@@ -182,7 +182,8 @@ for (const absPath of sources) {
 
 fs.writeFileSync(OUT_FILE, JSON.stringify({
     generatedAt: new Date().toISOString(),
-    entryjsPath: ENTRYJS,
+    // Relative to the repo so the committed registry carries no machine path.
+    entryjsPath: path.relative(ROOT, ENTRYJS).split(path.sep).join('/'),
     blockCount: Object.keys(registry).length,
     issues,
     blocks: registry

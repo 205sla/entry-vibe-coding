@@ -44,7 +44,7 @@
 
 | | |
 |---|---|
-| [`known-good.ent`](known-good.ent) | playentry.org 실제 export (`01_정답의 리메이크`). spec 짝 없음 — smoke 회귀 가드 ([`tests/smoke.test.js`](../smoke.test.js) 상단 주석 참조) |
+| [`known-good.ent`](known-good.ent) | playentry.org 실제 export (`01_정답의 리메이크` — 저장소 관리자의 리메이크 작품, 출처는 [NOTICE](../../NOTICE.md)). spec 짝 없음 — smoke 회귀 가드 ([`tests/smoke.test.js`](../smoke.test.js) 상단 주석 참조) |
 
 ## DSL vs JSON
 

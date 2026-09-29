@@ -216,10 +216,7 @@ playentry 안에서 iframe N개 + 브라우저 내 허브로 돌려 준다(등�
 
 ## 관련 공통 지식
 
-이 문서는 **작품 제작자 관점**만 다룬다. 계약·서버 동작의 정본은 워크스페이스 쪽이다.
+이 문서는 **작품 제작자 관점**만 다룬다. 동기화 설계·예약 변수·확장 구현(후킹·재접속)·공유 채널 모드의
+정본은 Entry Online 서버·확장 쪽 문서에 있고, 이 저장소에는 포함하지 않는다.
 
-- 동기화 설계 SSOT — `_docs/entry-online-sync-plan.md`
-- 예약 변수 정본 — `apps/entry-online/지식/기능/예약-변수.md`
-- 확장 구현(후킹·재접속) — `extensions/Entry Online/지식/아키텍처.md`
-- Pro(공유 채널) 모드 — `_docs/entry-online-shared-mode-plan.md`
 - 실제 적용 예 — [games/hexo/spec.mjs](../games/hexo/spec.mjs), 기획 `games/hexo/기획/설계.md`

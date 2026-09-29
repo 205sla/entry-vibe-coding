@@ -212,7 +212,7 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
                 if (r.filename) p.filename = r.filename;
                 if (r.ext) p.imageType = r.ext;
                 // Drop thumbUrl — playentry.org's exports omit it (see
-                // Downloads/260423_작품.ent). Entry's updateThumbnailView
+                // a real playentry export). Entry's updateThumbnailView
                 // falls back to fileurl; and fileurl is now a PNG, which
                 // CSS backgroundImage renders fine.
                 delete p.thumbUrl;
