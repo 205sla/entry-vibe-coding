@@ -3,7 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {chromium} from '@playwright/test';
 import {loadFixture} from '../../tools/lib/editor-harness.mjs';
-import {runFresh} from '../../tools/lib/verify-harness.mjs';
+import {runFresh,useGameTimeWaits} from '../../tools/lib/verify-harness.mjs';
 export const dir=path.dirname(fileURLToPath(import.meta.url));
 export const latest=()=>fs.readdirSync(dir).filter(x=>/^abyssal-keep_\d+\.ent$/.test(x)).sort().at(-1);
 export async function boot(){
@@ -17,6 +17,9 @@ export async function boot(){
  await page.waitForFunction(()=>window.__myentryReady);await page.evaluate(()=>window.__myentryReady);
  await loadFixture(page,path.join(dir,latest()));await runFresh(page);
  await page.waitForFunction(()=>Number(Entry.variableContainer.variables_.find(v=>v.name_==='frames').getValue())>4);
+ // The game moves by its own dt (project timer delta, clamped to .001–.12), so waits
+ // count that: on CI the timer refreshes late and wall time outruns game time.
+ await useGameTimeWaits(page,{step:'dt'});
  return {browser,page,errors,failed};
 }
 export const sense=page=>page.evaluate(()=>({

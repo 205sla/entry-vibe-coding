@@ -145,6 +145,70 @@ export async function holdKey(page, code, ms = 50) {
 // Briefly tap a key (50ms default).
 export async function tapKey(page, code) { return holdKey(page, code, 50); }
 
+// ── Game-time waits ──────────────────────────────────────────────
+
+// Make `page.waitForTimeout(ms)` wait for `ms` of *game* time instead of wall
+// time, so a verify that holds a key for 500 ms or waits 300 ms for a jump
+// sees the same game progress on a slow or jittery CI runner as on a desktop.
+//
+// Every engine tick (Entry.engine.update → _processEngineTimeouts, run state
+// only) advances a page clock by the game's own step:
+//   step = 1/60 (default)  — the game moves a fixed amount per frame
+//   step = '<variable>'    — the game moves by a delta it keeps in that variable
+//                            (e.g. 'dt' = min(.12, timer − last)); its value is added
+// Wall time is not used while the engine runs: Entry's project timer only refreshes
+// on its own interval, so on a busy runner many frames see dt = 0.001 and the game
+// clock falls behind the wall clock. While the engine is stopped the clock follows
+// wall time. A wait gives up after `ms * slack + 5 s` of wall time.
+//
+// VERIFY_CPU_THROTTLE=<n> slows the page CPU n× (CDP) for a local stress run.
+// It also slows the verify's own page.evaluate calls, so it is harsher than CI.
+export async function useGameTimeWaits(page, { step = 1 / 60, slack = 40 } = {}) {
+    const throttle = Number(process.env.VERIFY_CPU_THROTTLE || 0);
+    if (throttle > 1) {
+        const cdp = await page.context().newCDPSession(page);
+        await cdp.send('Emulation.setCPUThrottlingRate', { rate: throttle });
+    }
+    const install = () => page.evaluate((step) => {
+        const engine = Entry.engine;
+        if (engine.__gameClock) return;
+        const clock = engine.__gameClock = { t: 0 };
+        const read = typeof step === 'number' ? () => step : () => {
+            const v = Entry.variableContainer.variables_.find(x => x.name_ === step);
+            return Math.max(0, Number(v?.getValue()) || 0);
+        };
+        const original = engine._processEngineTimeouts.bind(engine);
+        engine._processEngineTimeouts = (...args) => {
+            clock.t += read();
+            return original(...args);
+        };
+        window.__gameWait = (ms, cap) => new Promise((resolve) => {
+            const c = Entry.engine.__gameClock;
+            const target = c.t + ms / 1000;
+            const start = performance.now();
+            let prev = start;
+            const poll = setInterval(() => {
+                const now = performance.now();
+                if (!Entry.engine.isState('run')) c.t += (now - prev) / 1000;
+                prev = now;
+                if (c.t >= target || now - start > cap) { clearInterval(poll); resolve(); }
+            }, 5);
+        });
+    }, step);
+    await install();
+    const wallWait = page.waitForTimeout.bind(page);
+    page.wallWait = wallWait;
+    page.waitForTimeout = async (ms) => {
+        if (!(ms > 0)) return;
+        try {
+            await install();  // Entry.engine may be replaced after a reload
+            await page.evaluate(([m, cap]) => window.__gameWait(m, cap), [ms, ms * slack + 5000]);
+        } catch {
+            await wallWait(ms);
+        }
+    };
+}
+
 // ── Polling ──────────────────────────────────────────────────────
 
 // Poll `read(page) → value` until predicate(value) is true or timeout expires.
