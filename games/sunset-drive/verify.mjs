@@ -307,13 +307,9 @@ try {
     // off-road on the right, where the palms stand
     await key('ArrowRight', true); await sleep(1100); await key('ArrowRight', false);
     const off0 = await V(['offroad', 'px', 'crash', 'lastCrash']);
-    await sleep(1800);
-    const off1 = await V(['offroad', 'speed', 'px', 'crash', 'lastCrash']);
-    await shot('offroad');
-    check('leaving the asphalt sets offroad and caps speed (~36%)', off0.offroad === 1 && off1.speed < CONST.MAXV * 0.45, { px: off0.px, speed: Math.round(off1.speed) });
-    // keep driving in the scenery until a palm is hit. The crash is sampled inside the
-    // page the moment lastCrash changes: polled from Node, a slow runner saw it only
-    // when the crash timer had nearly run out and the car had already sped up again.
+    // The first crash after leaving the road is sampled inside the page the moment
+    // lastCrash changes. Checked later from Node it was often a palm already hit during
+    // the 1.8 s below — its crash timer run out and the car back up to speed.
     await page.evaluate((last0) => {
       const get = (n) => Number(Entry.variableContainer.variables_.find((v) => v.name_ === n).getValue());
       window.__crashSample = null;
@@ -324,6 +320,11 @@ try {
         }
       }, 5);
     }, off0.lastCrash);
+    await sleep(1800);
+    const off1 = await V(['offroad', 'speed', 'px', 'crash', 'lastCrash']);
+    await shot('offroad');
+    check('leaving the asphalt sets offroad and caps speed (~36%)', off0.offroad === 1 && off1.speed < CONST.MAXV * 0.45, { px: off0.px, speed: Math.round(off1.speed) });
+    // keep driving in the scenery until a palm is hit
     let hit = null; const tHit = Date.now();
     while (Date.now() - tHit < 12000) {
       hit = await page.evaluate(() => window.__crashSample);
