@@ -7,7 +7,7 @@
 
 | 상황 | 읽을 문서 | 파일 유형 |
 |------|-----------|-----------|
-| 새 환경 설치·재현 실패·공개 저장소 경계 | [17-cold-clone.md](17-cold-clone.md) | Guide · 현행 · 2026-09-17 |
+| 새 환경 설치·재현 실패·공개 저장소 경계 | [17-cold-clone.md](17-cold-clone.md) | Guide · 현행 · 2026-09-30 |
 | **소리가 안 남** / 소리 등록·디코딩·블록 출력·음소거·내보내기 왕복 / 웹 음원 404 | [15-audio-verification.md](15-audio-verification.md) | Guide · 현행 · 2026-09-17 |
 | **처음 들어왔다 · 30초 요약** | [quick-reference.md](quick-reference.md) | 진입점 |
 | 공식 typedef·API 직접 확인 / 어떤 필드가 공식인지 | [00-official-sources.md](00-official-sources.md) | Reference |

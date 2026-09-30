@@ -8,9 +8,9 @@
 // Source priority for each asset:
 //   1. Sibling clone (../entryjs with dist/, ../MYentry) — dev machine, zero network
 //   2. npm registry — @entrylabs/entry ships prebuilt dist/ + extern/ + images/
-//   3. GitHub dist branches (entrylabs/entry-tool, entrylabs/legacy-video)
-//   4. Static file download (entry-paint / entry-lms / sound-editor — no public
-//      repo, but the built files are served by playentry.org / code.205.kr)
+//   3. GitHub dist branch (entrylabs/entry-tool)
+//   4. Static file download (entry-paint / entry-lms / sound-editor / legacy-video —
+//      no public build, but the built files are served by playentry.org / code.205.kr)
 //
 // Usage:
 //   npm run setup                              # full setup
@@ -70,15 +70,16 @@ const FILE_FALLBACKS = {
     ],
 };
 
-// File that proves a module is actually usable (editor.html loads it).
-// A git clone or junction without this file counts as a failed acquisition.
-const MODULE_REQUIRED = {
-    'entry-tool':   'dist/entry-tool.js',
-    'entry-paint':  'dist/static/js/entry-paint.js',
-    'entry-lms':    'dist/assets/app.js',
-    'sound-editor': 'sound-editor.js',
-    'legacy-video': 'index.js',
-};
+// Files that prove a module is actually usable — every file editor.html loads
+// from it, i.e. each FILE_FALLBACKS list. A git clone, junction or earlier
+// half-finished download missing any of them (or leaving one empty) counts as a
+// failed acquisition, so a missing app.css is fetched instead of skipped.
+function moduleUsable(dir, m) {
+    return FILE_FALLBACKS[m].every(f => {
+        try { return fs.statSync(path.join(dir, f.rel)).size > 0; }
+        catch { return false; }
+    });
+}
 
 const ARGS  = process.argv.slice(2);
 const FLAGS = new Set(ARGS.filter(a => !a.includes('=')));
@@ -179,9 +180,17 @@ function gitClone(url, dest, { branch, depth = 1 } = {}) {
 
 // Fetch the prebuilt @entrylabs/entry npm tarball (dist/ + extern/ + images/),
 // extract into .setup-cache/entry-npm/package. NO compilation involved.
+// The extracted copy is reused only when its package.json names the requested
+// version — `--entry-version` must never be satisfied by another version's files.
 function ensureEntryNpmArtifact() {
     const pkgDir = path.join(CACHE, 'entry-npm', 'package');
-    if (fs.existsSync(path.join(pkgDir, 'dist', 'entry.min.js'))) return pkgDir;
+    const cachedVersion = (() => {
+        try { return JSON.parse(fs.readFileSync(path.join(pkgDir, 'package.json'), 'utf8')).version; }
+        catch { return null; }
+    })();
+    if (cachedVersion === ENTRY_NPM_VERSION && fs.existsSync(path.join(pkgDir, 'dist', 'entry.min.js'))) return pkgDir;
+    // Another version or a half-extracted copy — tar would merge into it, so start clean.
+    fs.rmSync(pkgDir, { recursive: true, force: true });
 
     fs.mkdirSync(path.join(CACHE, 'entry-npm'), { recursive: true });
     const tgz = path.join(CACHE, `entrylabs-entry-${ENTRY_NPM_VERSION}.tgz`);
@@ -315,9 +324,9 @@ async function copyEntryAssets() {
 async function linkExternalModules() {
     const notes = [];
     const failed = [];
-    for (const [m, required] of Object.entries(MODULE_REQUIRED)) {
+    for (const m of Object.keys(FILE_FALLBACKS)) {
         const dst = path.join(ROOT, 'public/lib', m);
-        const usable = () => fs.existsSync(path.join(dst, required));
+        const usable = () => moduleUsable(dst, m);
         if (usable()) { notes.push(`${m}: present`); continue; }
 
         // dst exists but is unusable (broken junction, source-only clone, …) —
@@ -390,7 +399,7 @@ async function main() {
         (FLAGS.has('--with-entryjs-src') ? ' (+entryjs src)' : '') + '\n');
 
     if (!which('git')) {
-        console.error(errMark('git command not found on PATH — required for fetching entry-tool/legacy-video.'));
+        console.error(errMark('git command not found on PATH — required for fetching entry-tool.'));
         process.exit(1);
     }
 

@@ -3,6 +3,7 @@
 
 const express = require('express');
 const fs = require('fs');
+const http = require('http');
 const path = require('path');
 const zlib = require('zlib');
 const multer = require('multer');
@@ -66,6 +67,9 @@ function rewriteAssetUrl(url, sid) {
 // POST /api/load — receive an uploaded .ent, unzip + untar, return the project.json
 // with fileurl/thumbUrl rewritten to /api/ent-asset/<sid>/...
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
+// A 50 MB upload of gzip-compressed zeros inflates to tens of GB; real .ent
+// files are mostly PNG/MP3 and barely shrink, so 256 MB is five times the upload cap.
+const MAX_TAR_BYTES = 256 * 1024 * 1024;
 
 app.post('/api/load', upload.single('ent'), (req, res) => {
     try {
@@ -74,11 +78,24 @@ app.post('/api/load', upload.single('ent'), (req, res) => {
         }
         let tarBuf;
         try {
-            tarBuf = zlib.gunzipSync(req.file.buffer);
+            tarBuf = zlib.gunzipSync(req.file.buffer, { maxOutputLength: MAX_TAR_BYTES });
         } catch (e) {
+            if (e.code === 'ERR_BUFFER_TOO_LARGE') {
+                return res.status(413).json({ error: 'unpacked .ent exceeds ' + (MAX_TAR_BYTES >> 20) + ' MB' });
+            }
             return res.status(400).json({ error: 'gunzip failed: ' + e.message });
         }
-        const jsonBuf = extractTarFile(tarBuf, 'temp/project.json');
+        // Walk the whole archive once: it is kept for /api/ent-asset and export,
+        // so a malformed entry anywhere must be rejected here, not on first use.
+        let jsonBuf = null;
+        try {
+            forEachTarEntry(tarBuf, e => {
+                if (!jsonBuf && (e.name === 'temp/project.json' || e.name === './temp/project.json')) jsonBuf = e.data;
+            });
+        } catch (e) {
+            if (e.code !== 'EBADTAR') throw e;
+            return res.status(400).json({ error: 'invalid .ent archive: ' + e.message });
+        }
         if (!jsonBuf) return res.status(400).json({ error: 'temp/project.json not found in .ent' });
 
         const sid = entryStyleHash().slice(0, 16);
@@ -254,18 +271,56 @@ app.post('/api/export', express.json({ limit: '25mb' }), async (req, res) => {
     }
 });
 
+// Listen on loopback only unless HOST says otherwise: the editor accepts .ent
+// uploads and has no login, so it must not be reachable from the LAN by
+// accident (HOST=0.0.0.0 opens it on purpose). Both loopback families are
+// bound — `localhost` resolves to ::1 first on Windows, and Node 18 clients do
+// not fall back to 127.0.0.1 on their own.
+async function startServer({ port = PORT, host = process.env.HOST } = {}) {
+    const hosts = host ? [host] : ['127.0.0.1', '::1'];
+    const servers = [];
+    for (const [i, h] of hosts.entries()) {
+        const server = http.createServer(app);
+        try {
+            await new Promise((resolve, reject) => {
+                server.once('error', reject);
+                server.listen(i === 0 ? port : servers[0].address().port, h, () => {
+                    server.off('error', reject);
+                    resolve();
+                });
+            });
+        } catch (e) {
+            // A machine without IPv6 has no ::1; the IPv4 loopback is enough there.
+            if (i > 0 && (e.code === 'EADDRNOTAVAIL' || e.code === 'EAFNOSUPPORT')) continue;
+            await Promise.all(servers.map(s => new Promise(r => s.close(r))));
+            throw e;
+        }
+        servers.push(server);
+    }
+    return servers;
+}
+
 // Expose helpers for smoke tests (loaded via require()).
 module.exports = {
-    app, extractTarFile, forEachTarEntry,
+    app, startServer, extractTarFile, forEachTarEntry,
     tarHeader, makeTar, entryStyleHash, sessions
 };
 
 if (require.main === module) {
-    const server = app.listen(PORT, () => {
-        console.log('MYentry-game running at http://localhost:' + PORT);
+    startServer().then(servers => {
+        console.log('MYentry-game running at http://localhost:' + servers[0].address().port +
+            (process.env.HOST ? ' (HOST=' + process.env.HOST + ')' : ''));
+        let closing = false;
+        const shutdown = () => {
+            if (closing) return;
+            closing = true;
+            Promise.all(servers.map(s => new Promise(r => s.close(r)))).then(() => process.exit(0));
+        };
+        process.on('message', message => { if (message?.type === 'shutdown') shutdown(); });
+        process.once('SIGINT', shutdown);
+        process.once('SIGTERM', shutdown);
+    }, error => {
+        console.error('[server] listen failed:', error.message);
+        process.exit(1);
     });
-    const shutdown = () => server.close(() => process.exit(0));
-    process.on('message', message => { if (message?.type === 'shutdown') shutdown(); });
-    process.once('SIGINT', shutdown);
-    process.once('SIGTERM', shutdown);
 }
