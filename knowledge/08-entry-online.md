@@ -211,8 +211,8 @@ const setList = (name, arr) => page.evaluate(({ n, a }) => {
 3. 플레이어가 확장 설치 후 `/project/<id>` 접속
    (만들기 화면 `/ws/` 에서는 확장이 동작하지 않는다)
 
-서버 없이 2인 플레이만 먼저 보고 싶으면 `extensions/entry-online-devtools` 가
-playentry 안에서 iframe N개 + 브라우저 내 허브로 돌려 준다(등록 불필요).
+서버 없이 확인할 수 있는 것은 위의 로컬 검사까지다. 두 사람이 실제로 값을 주고받는 동기화는
+등록한 작품으로 실사이트에서 확인한다.
 
 ## 관련 공통 지식
 

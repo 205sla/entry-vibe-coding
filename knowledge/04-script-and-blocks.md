@@ -1255,7 +1255,7 @@ Array.from({ length: 19 }, (_, x) => 174 + x * 2);
 
 함수 안에서만 쓰는 임시값은 **전역 변수 대신 함수 지역 변수**로 둘 수 있다. 전역
 namespace 오염 방지 + 함수별 격리(같은 이름이라도 함수마다 별개 저장소 → 중첩 호출
-clobbering 없음). playentry.org export (`260603_205님 작품.ent`) 로 포맷 확인 + make-ent
+clobbering 없음). playentry.org 에서 내보낸 작품으로 포맷 확인 + make-ent
 라운드트립으로 실제 동작 검증 완료.
 
 ### 포맷 (`project.functions[*]`)

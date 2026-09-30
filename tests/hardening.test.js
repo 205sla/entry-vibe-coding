@@ -81,6 +81,20 @@ test('tar reader rejects negative, non-octal and out-of-bounds sizes instead of 
     assert.equal(extractTarFile(tarWithSize('00000000016'), 'temp/project.json').toString(), '{"objects":[]}');
 });
 
+test('tar reader rejects an archive cut inside a header or padding, but not a missing end marker', () => {
+    const { forEachTarEntry, makeTar } = require('../lib/tar-portable.js');
+    // Layout: header 512 | project.json padded 512 | header 512 | image padded 512 | end marker 1024.
+    const tar = makeTar([
+        { name: 'temp/project.json', data: Buffer.from('{}') },
+        { name: 'temp/a.png', data: Buffer.alloc(10, 1) },
+    ]);
+    const names = cut => { const seen = []; forEachTarEntry(tar.subarray(0, cut), e => { seen.push(e.name); }); return seen; };
+    assert.throws(() => names(1024 + 200), error => error.code === 'EBADTAR', 'cut inside the second header');
+    assert.throws(() => names(1536 + 10), error => error.code === 'EBADTAR', 'cut inside the last padding');
+    assert.deepEqual(names(2048), ['temp/project.json', 'temp/a.png']);
+    assert.deepEqual(names(2048 + 100), ['temp/project.json', 'temp/a.png']);
+});
+
 test('HTTP load answers 400 for a malformed archive', async t => {
     const { app } = require('../server.js');
     const server = app.listen(0, '127.0.0.1');
