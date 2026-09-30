@@ -5,7 +5,7 @@ tar 내부에 있는 유일한 JSON 파일. 프로젝트의 모든 상태가 여
 ## 최상위 키
 
 [`entryjs/src/class/project.js:76`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/project.js#L76) `Entry.getStartProject()`와
-레퍼런스 `C:\Users\young\Downloads\260423_작품.ent` (저장소 외부, 사용자 로컬)에서 관찰한 내용을 합쳤다.
+playentry.org 에서 내보낸 실제 작품 `.ent`(저장소 밖의 로컬 파일)에서 관찰한 내용을 합쳤다.
 
 ### 필수
 

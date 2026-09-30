@@ -1,4 +1,3 @@
-/* global createjs */
 // Observe real native-block playback; do not replace it with direct Sound.play calls.
 export async function installAudioProbe(page) {
     await page.evaluate(() => {

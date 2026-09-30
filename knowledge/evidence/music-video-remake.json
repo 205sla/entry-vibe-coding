@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "filename": "쇼기한판_의 리메이크.ent",
+    "filename": "뮤직비디오 원본.ent",
     "sha256": "97a77cb6217216fcbe8040ece1ad858c13f4f0f417e589835e9d92af674f479e",
     "bytes": 10040361,
     "projectEntry": "temp/project.json",
@@ -74,60 +74,6 @@
       "sound_something_with_block": 1,
       "get_sounds": 1
     }
-  },
-  "comparison": {
-    "files": [
-      {
-        "file": "shogi_000.ent",
-        "sha256": "278a061c8202793d0e3ca31c5bed342f9a21913cdda6b262c2f1ad43ac8dd562"
-      },
-      {
-        "file": "shogi_001.ent",
-        "sha256": "6674423c868f334df7f243f975cfbdaeabe81298072c51d321f846730e86889b"
-      },
-      {
-        "file": "shogi_002.ent",
-        "sha256": "789fee86f8f5de1ddeece5283cdd6ad9ce6961acaaedcc32393c1232b65b3b28"
-      },
-      {
-        "file": "shogi_003.ent",
-        "sha256": "32d3aabb66fcfb667a20bd74895ab80be7ecf1b1cb74b24942f7c78662ec4ce6"
-      },
-      {
-        "file": "shogi_004.ent",
-        "sha256": "66c6d1bdc68dad861e399dbb00685f09570bdf4df2eeebaf200e17b61d93d0ba"
-      },
-      {
-        "file": "shogi_005.ent",
-        "sha256": "684812fae0074266b5ec01bba832ac7a8561c29e664458f18c9f4d52843e7e52"
-      },
-      {
-        "file": "shogi_006.ent",
-        "sha256": "52b19f9f747aab556c71b4f3168456af5cfd9929fac44fed045ad7b67cb2aa22"
-      },
-      {
-        "file": "shogi_007.ent",
-        "sha256": "73d232891bd0c38eb2e56e0e38741f8c7bc9cb2dac74b291aec072b0428d2419"
-      },
-      {
-        "file": "shogi_008.ent",
-        "sha256": "415d2189167b5fafe48a5a80b36099ffaeeed992598999bad271ae8fb01a2938"
-      },
-      {
-        "file": "shogi_009.ent",
-        "sha256": "83f8dacb42b67d17c8bf91a96f62e9007293a5405dc1c0c59fc59e60a7a26d20"
-      },
-      {
-        "file": "shogi_010.ent",
-        "sha256": "06108247e26b4b4e08a403f56220c05e378ad45a26741437c3e33e2ad126232b"
-      },
-      {
-        "file": "shogi_011.ent",
-        "sha256": "6f1e078dff1aa8c6c2663fe3deae285e682ad0f0c5914104de7d6bb53d8b0895"
-      }
-    ],
-    "exactSourceMatch": false,
-    "note": "games/shogi의 기존 12개 파일과 원본 바이트 해시가 다름. 기존 작업 결과·런타임 검증을 첨부 원본에 전이하지 않음."
   },
   "observations": {
     "subtitleSamples": [

@@ -8,7 +8,7 @@
 ## 재현 조건
 
 - Node·npm·Git·tar가 필요하다. 2026-09-17 로컬 검증 환경은 Windows / Git Bash,
-  Node 22.17.0, npm 10.9.2다. CI에는 Windows와 Ubuntu / Node 22를 구성했다.
+  Node 22.17.0, npm 10.9.2다. CI(Windows·Ubuntu / Node 22)는 2026-09-30 main 에서 전 과정 초록이다(아래 현재 상태).
 - 설치 시 npm registry, GitHub, CreateJS의 raw GitHub 배포본, `playentry.org`,
   `code.205.kr` 접속이 필요하다. 특히 일부 편집기 모듈은 마지막 호스트에만 의존한다.
 - L3·L4에는 Playwright Chromium과 해당 OS의 브라우저 실행 라이브러리가 필요하다.
@@ -31,6 +31,14 @@ npm run verify
 재현 검사에는 기존 `node_modules`, `.setup-cache`, `public/lib`를 복사하지 않는다.
 사용 중인 로컬 서버를 재사용하면 다른 사본을 검증할 수 있으므로 비어 있는 전용 포트와
 그 클론에서 시작한 서버를 사용한다. `setup`의 파일 검사 OK와 실제 브라우저 부팅은 별개다.
+
+## 현재 상태 (2026-09-30)
+
+- main 의 [cold-clone.yml](../.github/workflows/cold-clone.yml) 이 Windows·Ubuntu(Node 22)의 새 클론에서
+  `npm ci` → `npm run setup`(재실행 포함) → Chromium 설치 → L1 → `npm run verify` 까지 통과한다.
+- 2026-09-17 기록의 알려진 L4 실패(Brick Kingdom)는 작품을 공개 저장소에서 내려 검사 목록에서 빠졌고,
+  느린 CI 러너에서 깨지던 다른 게임 검사는 [게임 시계 기준](05-host-editor.md#느린-러너에서는-시간을-게임-시계로-잰다)으로 고쳤다.
+- 아래 진단·검증 기록과 실패 기록은 **2026-09-17 회차의 역사**다. 테스트 개수 등 수치는 당시 값이다.
 
 ## 2026-09-17 진단 검토
 
@@ -62,7 +70,7 @@ npm run verify
 지식은 `knowledge/`에 유지하고, 레퍼런스와 기획을 구분하며, 상태·갱신은 이 클러스터
 [문서 지도](README.md)에서 관리한다. 공개 저장소에는 워크스페이스 상향 링크를 요구하지 않는다.
 
-`bootstrap-prompt.txt`는 경로를 유지하고 파일 맨 앞에 실행 금지와 현행 정본을 표시했다.
+보관용 초기 지시문(`bootstrap-prompt.txt`)은 당시 경로를 유지하고 실행 금지를 표시했다가, 2026-09-30 개인 경로가 많아 공개 저장소에서 내렸다.
 과거 지시문을 현재 명령으로 실행하지 않는다.
 
 ## 재발 방지 검사
@@ -73,14 +81,14 @@ npm run verify
   경계 이탈을 검출하고 정상적인 인코딩된 내부 경로는 허용한다.
 - [audio-vendor.test.js](../tests/audio-vendor.test.js), [audio-e2e.spec.js](../tests/audio-e2e.spec.js):
   손상된 다운로드 거부, 실제 버전 가드, WAV·MP3 출력·음소거·내보내기 왕복 확인.
-- Brick Kingdom 검사(2026-09-29 로컬 전용으로 옮김): 실제 게임 프레임과 적 슬롯을 읽어
+- Brick Kingdom 검사(2026-09-29 저장소에서 내림): 실제 게임 프레임과 적 슬롯을 읽어
   키 입력만 수행한다. 앞으로 이동할 때에는 이미 뒤로 지나간 적을 표적으로 잡지 않는다.
   검증 결과를 맞추려고 변수·리스트·엔진 함수를 덮어쓰지 않는다.
 - [전체 런타임 러너](../tools/run-all-verify.mjs): 기본 스크립트 제한 600초와 실패 반환을
   유지하고, 스크립트별 출력(마지막 256,000자)을 `test-results/runtime/`에 저장한다.
   콘솔에 보이는 마지막 30줄만으로 앞선 단언 실패를 놓치지 않도록 한다.
 - [cold-clone.yml](../.github/workflows/cold-clone.yml): 형제 저장소가 없는 Windows·Ubuntu에서
-  설치·재실행·L1·전체 verify를 실행한다. CI 설정 추가와 원격 CI 실행 완료는 별개다.
+  설치·재실행·L1·전체 verify를 실행한다. CI 설정 추가와 원격 CI 실행 완료는 별개다(2026-09-30 main 에서 실행·통과).
 
 ## 검증 기록
 
@@ -102,7 +110,7 @@ npm run verify
 | 엔진·작품 보존 | 설치된 `entry.min.js`와 npm prebuilt 해시 일치. 기존 Brick Kingdom `_002.ent`와 오디오 `_003.ent` 해시 보존 |
 | L4 전체 러너 | **28 PASS / 1 FAIL** — 아래에 남긴 Brick Kingdom의 실패·600초 제한 초과 |
 | L5·공식 웹·공식 오프라인 앱 | 이번 회차 미실행. 로컬 WebAudio 신호 관측은 실제 스피커 청취나 공식 배포 환경 검증을 뜻하지 않는다 |
-| Windows·Ubuntu 원격 CI | 설정만 추가. 아직 커밋·push하지 않아 실행 결과 없음 |
+| Windows·Ubuntu 원격 CI | 당시 설정만 추가(실행 결과 없음). 2026-09-30 main 에서 초록 — 위 현재 상태 |
 
 측정값·해시·명령 결과는 [콜드 클론 근거](evidence/cold-clone-20260917.json),
 Brick Kingdom 실행 로그는 2026-09-29 작품과 함께 공개 저장소에서 내렸다.
@@ -133,8 +141,8 @@ memory-ranking 단독 반복 3회도 통과했다. 후보와 검증 사본의 �
 기존 게임 README에도 `_002` 재검증 미완과
 장거리 봇 조작 한계가 기록돼 있었다. 호스트 설치·소리 복구와 분리하여 이 상태를 보존한다.
 통과시키기 위해 단언을 지우거나 기대값을 완화하거나 게임 변수를 정답으로 바꾸지 않았다.
-기본 600초 제한과 nonzero 종료도 유지한다. 따라서 **현재 `npm run verify`와 이 조건을
-재현하는 CI는 전체 녹색이 아니다**. 문서화된 실패는 성공 판정의 예외가 아니다.
+기본 600초 제한과 nonzero 종료도 유지한다. 따라서 **당시 `npm run verify`와 이 조건을
+재현하는 CI는 전체 녹색이 아니었다**(2026-09-30 현재는 초록 — 위 현재 상태). 문서화된 실패는 성공 판정의 예외가 아니다.
 
 후속 수정은 작품의 Phase 2 계획(경로 재생 검증)과
 연결한다. [3]·[4]의 입력·프레임 추적을 먼저 고정해 게임/봇 원인을 분리하고,

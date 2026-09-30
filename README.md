@@ -31,11 +31,11 @@
 > 우리가 작업한 환경(오프라인 엔트리 편집기 + 헤드리스 검증)을 그대로 재현한다.
 
 ### 0. 전제
-- **Node 18+**, **git** (git 은 entryjs 등 자동 클론에 필요)
-- 헤드리스 테스트(`verify:runtime`/`test:e2e`)를 돌리려면 **Playwright Chromium**:
-  ```bash
-  npx playwright install chromium
-  ```
+- **Node 22 권장**(CI 와 같은 판, 최소 18.18), **git** (setup 이 entry-tool 을 GitHub 에서 받을 때 필요)
+- 헤드리스 테스트(`verify:runtime`/`test:e2e`)에는 **Playwright Chromium** 이 필요하다 — 아래 1단계에서
+  `npm install` **뒤에** 설치한다(먼저 설치하면 저장소가 고정한 Playwright 판과 브라우저 판이 어긋날 수 있다).
+- ⚠️ **Windows PowerShell** 에서 `npm`·`npx` 가 "이 시스템에서 스크립트를 실행할 수 없으므로…" 로 막히면
+  실행 정책 문제다 — `npm` 대신 `npm.cmd`, `npx` 대신 `npx.cmd` 로 입력한다(설정을 바꿀 필요 없음).
 
 ### 1. 설치 + 편집기 띄우기
 ```bash
@@ -43,10 +43,13 @@ git clone https://github.com/205sla/entry-vibe-coding
 cd entry-vibe-coding
 npm install
 npm run setup        # 엔트리 원본·외부 모듈·vendor 자동 구성 (아래 표) — 한 번만, idempotent
+npx playwright install chromium   # 헤드리스 검증용 브라우저 — npm install 뒤에, 한 번만
 npm start            # → http://localhost:3000
 ```
 **`http://localhost:3000` 이 곧 엔트리 "만들기" 페이지(오프라인 편집기)** — 생성한 `.ent` 를
 로드·실행(▶)·수정·저장한다. 헤드리스 검증 스크립트도 이 서버에 붙어 동작한다.
+서버는 **이 PC 안에서만** 열린다(127.0.0.1·::1). 같은 네트워크의 다른 기기에서 열어야 하면 환경 변수
+`HOST=0.0.0.0` 을 주고 띄운다 — 로그인 없이 파일을 받는 서버이니 믿을 수 있는 네트워크에서만 쓴다.
 
 ### 2. 필수 외부 의존성 — `npm run setup` 이 가져오는 것
 
@@ -109,8 +112,9 @@ node tools/run-all-verify.mjs --filter bounce-ball                              
 | 키 이벤트 `document` + `event.code`, 클릭 `Entry.dispatchEvent('entityClick', e)` 로 주입 | [`tools/lib/verify-harness.mjs`](tools/lib/verify-harness.mjs) | playwright 로 실제 입력 시뮬 → 게임 플레이 검증 |
 
 > ⚠️ 위 적응은 **전부 호스트 코드(editor.js · setup.mjs · server.js · tools/lib)** — **entryjs 엔진 소스 패치는 0**
-> (검증: `upstream/entryjs` 의 src 와 `dist/entry.min.js` 가 순정과 동일). entryjs 버전 업 시 이 A·B 지점만 확인하면 된다.
-> 향후 어떤 테스트가 엔진 소스 패치를 요구하면 → `scripts/setup.mjs` 패치 단계로 추가하고 이 표에 순정 대비 diff 한 줄 기록.
+> (검증: 사용하는 entryjs 의 src 와 `dist/entry.min.js` 가 순정과 동일). entryjs 버전 업 시 이 A·B 지점만 확인하면 된다.
+> 어떤 테스트가 엔진을 고쳐야만 될 것처럼 보여도 엔진 소스·`dist` 는 고치지 않는다([CLAUDE.md](CLAUDE.md) 절대 규칙 4).
+> 편집기 페이지(`editor.js`)나 검사 도구(`tools/lib`)에서 공개 API·이벤트를 감싸는 호스트 적응으로 풀고 위 표에 한 줄 추가한다.
 
 ---
 
@@ -122,13 +126,13 @@ node tools/run-all-verify.mjs --filter bounce-ball                              
 | `tools/lib/spec-dsl.mjs` | **DSL** — `setVar`, `when.run`, `obj`, `if_`, `repeat` 등 fluent helper. 8 단 중첩 JSON 회피, paramCount/슬롯 wrap 자동 |
 | `tools/lib/sprite-gen.mjs` | **SVG primitive 생성** — `circle`, `rect`, `ring`, `regularPolygon`, `star`, `heart`, `shadedBall` 등 inline SVG 생성 |
 | `tools/lib/game-assets.mjs` | **정적 자산 카탈로그** — `assets('ball-blue')` 등 의미 있는 이름 → fileurl. 콘텐츠 해시 dedup |
-| `tools/block-registry.json` | 274 개 엔트리 블록의 type·params·statements 메타데이터 (entryjs 소스에서 AST 자동 추출) |
+| `tools/block-registry.json` | 474 개 엔트리 블록의 type·params·statements 메타데이터 (entryjs 소스에서 AST 자동 추출) |
 | `public/` | 오프라인 엔트리 편집기 — 생성된 `.ent`를 로드·수정·저장 |
 | `server.js` | 편집기 백엔드 (`/api/load`, `/api/export`, `/api/ent-asset/:sid/*`) |
 | `knowledge/` | `.ent` 포맷·블록·편집기·런타임 quirks·디자인 패턴·해결한 함정 위키 ([README](knowledge/README.md)) |
-| `tests/fixtures/spec-*.{mjs,json}` | 21 개 예시 spec (empty ~ frontier-guard 디펜스 게임). DSL 우선 권장 |
+| `tests/fixtures/spec-*.{mjs,json}` | 22 개 예시 spec (empty ~ frontier-guard 디펜스 게임). DSL 우선 권장 |
 | `tests/smoke.test.js` | 23 fixture 의 구조 검증 (tar/JSON 파싱, 블록 type 유효성, 자산 일치) |
-| `tools/verify-*.mjs` | 14 fixture 의 런타임 동작 검증 (playwright + chromium): 변수 변화, 클론 카운트, 픽셀 색상, 실제 click hit-test |
+| `tools/verify-*.mjs` | fixture 런타임 동작 검증 (playwright + chromium): 변수 변화, 클론 카운트, 픽셀 색상, 실제 click hit-test. 작품별 `games/**/verify*.mjs` 와 함께 모아 돈다(목록: `node tools/run-all-verify.mjs --list`) |
 | `tools/run-all-verify.mjs` | 모든 verify 일괄 실행 |
 | `tests/e2e.spec.js` | 편집기 부트 + 모든 fixture 로드 시 console error 0 확인 |
 
@@ -436,9 +440,11 @@ Field 슬롯에 `{"type":"text",...}`로 감싸면 엔진이 "text 블록의 결
 
 `node tools/run-all-verify.mjs --list`로 서버 없이 목록을 확인한다. `--filter <name>`으로 일부만, `--timeout-ms 600000`으로 스크립트별 제한 시간을 지정한다(기본 10분). 실패·시간 초과는 전체 실패로 집계하며 직접 띄운 서버는 종료한다. `--keep-server`는 서버를 유지한다. 개인 원본 인자가 필요한 `verify-case-study-evidence.mjs`와 공식 앱 설치 경로가 필요한 `verify-audio-offline.mjs`는 사유를 출력하고 제외한다. 실행 전에 브라우저 설치 여부를 한 번 확인한다.
 
-### Layer 5. knowledge links (`npm run verify:links`, < 1 초)
+### 보조 검사. 문서 링크 (`npm run verify:links`, < 1 초)
 
-knowledge/ 의 13 markdown 파일 간 cross-ref 검증 (300+ 링크). 깨진 앵커/경로 잡기.
+저장소의 모든 markdown 의 상대 경로·앵커를 검사한다(검사한 파일·링크 개수는 실행 결과에 나온다). 깨진 링크와
+저장소 밖을 가리키는 경로를 잡는다. 작품 동작과 무관한 문서 검사라 검증 사다리의 레이어로 세지 않는다
+([CLAUDE.md](CLAUDE.md) 의 L5 는 편집기에서 사람이 직접 보는 확인이다).
 
 ### `npm run verify` — 전체
 
@@ -454,7 +460,7 @@ npm run verify   # smoke + verify:links + e2e + verify:runtime 순차
 
 ## 실전 예시 카탈로그
 
-`tests/fixtures/` 의 spec/`.ent` 짝 (21 spec, 23 fixture). 전체 색인은 [`tests/fixtures/README.md`](tests/fixtures/README.md) 참조.
+`tests/fixtures/` 의 spec/`.ent` 짝 (22 spec, 23 fixture). 전체 색인은 [`tests/fixtures/README.md`](tests/fixtures/README.md) 참조.
 
 ### 기초 (JSON spec)
 
@@ -504,13 +510,16 @@ npm run verify   # smoke + verify:links + e2e + verify:runtime 순차
 1. **entryjs dist·extern·images** — 형제 `../entryjs` 에 **빌드된 dist** 가 있으면 그걸 복사(개발 머신).
    없으면 npm `@entrylabs/entry` (버전 핀, [setup.mjs](scripts/setup.mjs) 의 `ENTRY_NPM_VERSION_DEFAULT`) 를
    `npm pack` 으로 받아 `.setup-cache/` 에 풀고 복사. **소스만 있는 `../entryjs` 는 빌드 대상이 아니라 무시 대상** —
-   이때도 npm 아티팩트를 쓴다.
+   이때도 npm 아티팩트를 쓴다. 풀어 둔 캐시는 요청한 버전일 때만 다시 쓴다(`--entry-version` 으로 바꾸면
+   그 버전을 새로 푼다).
 2. **entryjs 소스 (선택)** — `node scripts/setup.mjs --with-entryjs-src` 일 때만 `.setup-cache/entryjs` 로 클론 후
    `../entryjs` 링크. `build:registry`·knowledge 문서의 소스 인용(`../entryjs/src/...`)에만 필요.
 3. **External modules** (entry-tool / entry-paint / entry-lms / sound-editor / legacy-video) —
-   `../MYentry/public/lib/*` 우선 링크 → entry-tool·legacy-video 는 공개 GitHub `dist/develop` 클론 →
-   entry-paint·entry-lms·sound-editor 는 **playentry.org / code.205.kr 정적 파일 다운로드**
-   (편집기가 로드하는 빌드 파일만: `entry-paint.js`, `app.js`+`app.css`, `sound-editor.js`).
+   `../MYentry/public/lib/*` 우선 링크 → entry-tool 은 공개 GitHub `dist/develop` 클론 →
+   나머지(와 클론이 실패한 entry-tool)는 **playentry.org / code.205.kr 정적 파일 다운로드**
+   (편집기가 로드하는 빌드 파일만: `entry-paint.js`, `app.js`+`app.css`, `sound-editor.js`, legacy-video `index.js` —
+   legacy-video 의 GitHub repo 는 소스만 있어 클론으로는 쓸 수 없다). 편집기가 읽는 파일이 **하나라도** 없거나
+   비어 있으면 그 모듈을 다시 받는다.
 4. **Mascot 이미지 + 커서** — repo 에 커밋돼 있음. 형제 `../MYentry` 있으면 최신으로 덮어쓰기만.
 5. **Vendor npm 패키지** — jQuery / jQuery-UI / lodash / Velocity / CodeMirror / React / CreateJS 등을
    임시 설치 후 dist 파일만 `public/lib/vendor/` 로.
@@ -525,7 +534,7 @@ npm vendor만 스킵: `node scripts/setup.mjs --skip-vendor` (소리 vendor 검�
 
 `verify:runtime`·`test:e2e` 는 Playwright + Chromium 으로 실제 편집기를 띄워 검증:
 ```bash
-npx playwright install chromium     # 한 번만
+npx playwright install chromium     # 한 번만 — npm install 뒤에 (저장소가 고정한 Playwright 판에 맞는 브라우저)
 ```
 
 ### 외부(콜드) 클론에서 알아둘 것
@@ -552,7 +561,7 @@ npm run build:registry            # entryjs 업데이트 시 블록 레지스트
 npm run build:assets              # public/images/game/*.svg + manifest.json 재생성
 
 # 개발 서버 (편집기)
-npm start                         # http://localhost:3000
+npm start                         # http://localhost:3000 (이 PC 안에서만 — 다른 기기는 HOST=0.0.0.0)
 
 # spec → .ent
 node tools/make-ent.mjs tests/fixtures/spec-foo.mjs --check                 # 정적 검증만 (< 1 초)
@@ -562,7 +571,7 @@ node tools/make-ent.mjs tests/fixtures/spec-foo.mjs tests/fixtures/foo.ent
 npm run test:smoke                # Node 스모크 (~ 5 초, 23 fixture)
 npm run test:e2e                  # Playwright e2e (~ 30 초)
 npm run verify:runtime            # tools/ + games/ 검증; 실행 시간은 대상별로 다름
-npm run verify:links              # knowledge md 간 링크 검증 (< 1 초)
+npm run verify:links              # 저장소 markdown 링크 검증 (< 1 초, 보조 검사)
 npm run verify                    # 위 4 개 모두
 
 # 일부만
@@ -615,3 +624,10 @@ node tools/show-spec.mjs tests/fixtures/spec-foo.mjs [--object id] [--func id]
 
 생성된 `.ent`는 **자가완결** (이미지 · 사운드 tar 내부 번들). 어떤 엔트리 편집기에
 가져가도 동작 — 이 저장소 서버 밖 (playentry.org 포함) 에서도 이미지가 깨지지 않는다.
+
+---
+
+## 라이선스
+
+이 저장소의 코드·문서와 저장소 도구로 만든 그림·소리는 [MIT](LICENSE) 로 배포한다. 출처나 조건이 다른 파일
+(커서·회귀용 `known-good.ent` 등)과 `npm run setup` 이 내려받는 엔트리 엔진·모듈의 조건은 [NOTICE.md](NOTICE.md) 에 정리했다.

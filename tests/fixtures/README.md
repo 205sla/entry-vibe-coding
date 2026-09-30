@@ -44,11 +44,11 @@
 
 | | |
 |---|---|
-| [`known-good.ent`](known-good.ent) | playentry.org 실제 export (`01_정답의 리메이크`). spec 짝 없음 — smoke 회귀 가드 ([`tests/smoke.test.js`](../smoke.test.js) 상단 주석 참조) |
+| [`known-good.ent`](known-good.ent) | playentry.org 실제 export (`01_정답의 리메이크` — 저장소 관리자의 리메이크 작품, 출처는 [NOTICE](../../NOTICE.md)). spec 짝 없음 — smoke 회귀 가드 ([`tests/smoke.test.js`](../smoke.test.js) 상단 주석 참조) |
 
 ## DSL vs JSON
 
-기존 fixture 22개 중 `spec-fibonacci.mjs` 만 [DSL](../../tools/lib/spec-dsl.mjs) 로 작성됨 — 비교용 데모 (76 LOC vs 이전 JSON 163 LOC, 동일 `.ent`). 새 fixture 부터는 **DSL 권장**:
+fixture spec 22개 중 9개(`spec-fibonacci`·`spec-bounce-ball`·`spec-frontier-guard` 등)가 [DSL](../../tools/lib/spec-dsl.mjs) `.mjs` 이고 13개가 JSON 이다. `spec-fibonacci.mjs` 는 같은 `.ent` 를 만드는 이전 JSON 판(163 LOC)을 DSL 로 옮긴 비교용 데모다(76 LOC). 새 fixture 는 **DSL 권장**:
 
 ```js
 // .mjs spec example

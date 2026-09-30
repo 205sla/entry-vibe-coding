@@ -47,17 +47,19 @@ module.exports = [
         },
     },
 
-    // Node ESM (tools/*.mjs, scripts/*.mjs) — inside page.evaluate() closures we
-    // reference browser globals (Entry, window, KeyboardEvent, etc.); those
-    // strings never execute in Node, but ESLint sees them so we allow them here.
+    // Node ESM (tools/*.mjs, scripts/*.mjs, games/**/*.mjs) — inside page.evaluate()
+    // closures we reference browser globals (Entry, createjs, window, KeyboardEvent,
+    // etc.); those closures never execute in Node, but ESLint sees them so we allow
+    // them here. Games get the whole folder: harness/spike/playthrough scripts
+    // are named freely per game.
     {
-        files: ['tools/**/*.mjs', 'scripts/**/*.mjs', 'games/**/verify*.mjs',
-            'games/**/_*verify*.mjs', 'games/**/shots.mjs', 'games/**/capture-*.mjs'],
+        files: ['tools/**/*.mjs', 'scripts/**/*.mjs', 'games/**/*.mjs'],
         languageOptions: {
             globals: {
                 ...globals.node,
                 ...globals.browser,
                 Entry: 'readonly',
+                createjs: 'readonly',
             },
             sourceType: 'module',
             ecmaVersion: 2022,

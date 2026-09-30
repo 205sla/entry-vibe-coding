@@ -195,7 +195,7 @@ CDP `Emulation.setCPUThrottlingRate`로 모의한 결과는 2배 제한 40~45 fp
 
 작품 목록에 쓰는 움직이는 썸네일은 실제 실행 화면을 캡처해 만들었다. 파일과 스크립트는 로컬 전용
 `games/sunset-drive/thumbnail/`에 두고 공개 저장소에서 제외했다. 썸네일을 적용하는 도구인 Entry Debugger
-실험실의 "작품 썸네일 변경"(워크스페이스 `extensions/Entry Debugger/지식/thumbnail-experiment.md`)의 변환 규칙이
+실험실의 "작품 썸네일 변경" 기능(Entry Debugger 는 공개 크롬 확장이다)의 변환 규칙이
 설계 조건이었다.
 
 - **변환 예산.** 이 도구는 모든 프레임을 480×270 RGBA 전체 프레임(PNG Sub 필터 + deflate)으로 다시 압축하고,

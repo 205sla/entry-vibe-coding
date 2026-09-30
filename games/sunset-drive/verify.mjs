@@ -515,7 +515,11 @@ try {
     await sleep(3000);
     const a = await V(['state', 'frames']);
     const snd = await page.evaluate(() => Entry.container.getAllObjects().flatMap((o) => o.sounds.map((s) => !!createjs.Sound._idHash[s.id] && !!createjs.Sound.activePlugin._audioSources?.[s.path]?.getChannelData)));
-    check('re-imported game boots to the title and animates', a.state === 0 && a.frames > 120, a);
+    // "animates" = the frame counter keeps advancing. A fixed count after 3 s of wall
+    // time failed on a slow Windows runner (104 frames ≈ 35 fps) while the game was fine.
+    await sleep(1000);
+    const b = await V(['frames']);
+    check('re-imported game boots to the title and animates', a.state === 0 && a.frames > 0 && b.frames > a.frames, { state: a.state, frames: [a.frames, b.frames] });
     check('re-imported sounds register and decode', snd.length === 8 && snd.every(Boolean), snd);
     await tap('Space');
     await sleep(4200);

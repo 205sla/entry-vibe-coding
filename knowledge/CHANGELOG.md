@@ -12,6 +12,26 @@
 > - 플랫포머 발판 충돌 패턴 → `04-script-and-blocks.md §플랫포머 발판 충돌 패턴`
 > - 헤드리스 런타임 검증 → `05-host-editor.md §헤드리스 런타임 검증`
 
+## 2026-09-30 — 공개 저장소 정리: 라이선스, 로컬 서버 잠금, 설치 캐시
+
+Codex(gpt-6-astra) main 전체 최종 검토의 지적을 두 커밋으로 반영했다.
+
+- 예전 실험 작품 5개(bad-apple·clock·coord-test·name-circle·name-row)와 그 검사는 개인 원본을 읽거나
+  원본 이용자 정보가 든 `.ent` 라 공개 저장소에서 내렸다. 개인 경로·비공개 작품 흔적을 지우고
+  [MIT](../LICENSE) 라이선스와 [NOTICE](../NOTICE.md)(제3자 구성 요소·자산 출처)를 더했다.
+- 편집기 서버는 이제 루프백(127.0.0.1·::1)에서만 듣는다(`HOST` 로 바꿀 수 있음). `localhost` 가 Windows 에서
+  ::1 을 먼저 돌려주고 Node 18 은 IPv4 로 다시 시도하지 않으므로 두 주소를 모두 연다.
+- `.ent` 읽기: tar 크기 칸이 음수면 offset 이 뒤로 가 무한 반복했다. 8진수가 아니거나 버퍼를 넘는 크기,
+  중간에 잘린 헤더(전에는 조용히 끝나 뒤 파일이 사라졌다)는 예외로 거부하고 `/api/load` 는 400 을 준다.
+  압축 해제는 256MB 상한(넘으면 413).
+- 그림을 PNG 로 바꾸지 못하면 원본 바이트를 `.png` 이름으로 넣고 성공 처리하던 것을 빌드·내보내기 실패로 바꿨다.
+- setup: 풀어 둔 엔진 캐시를 버전 확인 없이 다시 쓰던 것(`--entry-version` 이 무시됨)과, 모듈마다 파일 하나만
+  보고 넘어가 `app.css` 같은 나머지 파일이 빠져도 "present" 로 치던 것을 고쳤다.
+- ESLint: `games/**` 의 `page.evaluate` 콜백이 쓰는 브라우저 전역을 설정에 넣어 오류 93 → 0.
+- 문서: README 의 "엔진 소스 패치를 setup 단계로" 문구를 절대 규칙 4 에 맞게 고치고, 링크 검사를 레이어가 아닌
+  보조 검사로, [17](17-cold-clone.md) 에 CI 초록 현재 상태를, PowerShell `npm.cmd`·Chromium 설치 순서·Node 판·
+  옛 수치를 바로잡았다.
+
 ## 2026-09-29 — 느린 CI 러너 대응과 미완성 작품 내리기
 
 - Windows·Ubuntu 콜드 클론 CI 에서 심연의 성채·선셋 드라이브 검사가 실패했다. 설치·smoke·e2e·소리는
@@ -169,7 +189,7 @@
 ## 2026-09-10 — 외부 작품 3종 병렬 분석과 근거 재검증
 
 - [RPG 사례](09-rpg-case-study.md): 공통 배치 함수, 오브젝트 전용 상태와 병렬 리스트, 대화 입력 단계, 맵 전환, 저장 직렬화와 외부 확장 연동 경계를 추가했다.
-- [뮤직비디오 사례](10-music-video-case-study.md): 타이머 기준 모양 갱신, 신호별 레이어, SVG 자막, 공유 RESET과 떨어진 스택을 분석했다. 기존 shogi 파일과는 해시가 다른 버전이다.
+- [뮤직비디오 사례](10-music-video-case-study.md): 타이머 기준 모양 갱신, 신호별 레이어, SVG 자막, 공유 RESET과 떨어진 스택을 분석했다.
 - [3D 사례](11-3d-game-case-study.md): 정육면체 직교투영, 꼭짓점·법선 회전, 면 선택, 조명, 드래그 관성과 고속 반복 패턴을 추가했다.
 - [03 이미지 정본](03-objects-and-assets.md)의 “항상 PNG” 단정을 **현재 생성 정책**으로 범위를 좁히고, 실제 외부 작품의 SVG 원본·PNG 동반 파일을 구분했다. 01·quick-reference·README의 요약도 함께 정정했다.
 - [04 변수 스코프](04-script-and-blocks.md#오브젝트-전용-변수와-클론별-상태): “클론별 로컬 변수가 없다”는 과거 설명을 정정했다. RPG의 변수 선언과 로컬 엔진의 `addCloneVariables`, `getVariable`, `getList`를 대조했다. 아래 과거 날짜의 관련 기록은 당시 판단의 역사로 남긴다.
@@ -403,7 +423,7 @@ freeze. 금지 동일.
 
 원형/그리드 변수 배치 작업 (`games/bad-apple`, `games/name-row`, `games/name-circle`) 에서 발견:
 
-- **Variable Y vs Entity Y — 부호 반대**: entity 는 `setY` 에서 `this.object.y = -this.y` 로 반전하지만 variable 은 `view_.y = getY()` 직접 사용 → variable 의 `y > 0` 은 화면 **아래**. 시계 fixture 가 반시계로 돌던 원인. 실측은 [`tools/verify-coord-test.mjs`](../tools/verify-coord-test.mjs) 와 [`games/coord-test/coord-test_001.ent`](../games/coord-test/).
+- **Variable Y vs Entity Y — 부호 반대**: entity 는 `setY` 에서 `this.object.y = -this.y` 로 반전하지만 variable 은 `view_.y = getY()` 직접 사용 → variable 의 `y > 0` 은 화면 **아래**. 시계 fixture 가 반시계로 돌던 원인. 실측은 `tools/verify-coord-test.mjs` 와 `games/coord-test/coord-test_001.ent` (2026-09-30 공개 저장소에서 내림 — 결과는 [07](07-runtime-quirks.md) 표에 남아 있다).
 - **변수 좌표 x=0 또는 y=0 → bin-packer 폴백**: [`variable.js:136`](https://github.com/entrylabs/entryjs/blob/53e121523760f15961cd14ab7cb93563a79eaab3/src/class/variable/variable.js#L136) 의 `if (this.getX() && this.getY())` truthy check 때문에 정확히 0 인 좌표는 무시되고 자동 배치. 그리드 중앙 행/열만 흩어지는 증상. 회피는 ±1 시프트 또는 0.5 오프셋.
 
 ## 2026-04-29 — 뱀서라이크 확장팩 (`games/vampire-survival/` Phase A→E)
@@ -1016,7 +1036,7 @@ spec 작성 (DSL)
 
 ### 오브젝트 · 자산
 - [x] **playentry.org 레퍼런스 분석**: tar에 PNG만 (SVG 없음), picture에 `thumbUrl` 필드 없음,
-  `imageType: "png"`. 출처: `C:\Users\young\Downloads\260423_작품.ent`
+  `imageType: "png"`. 출처: playentry.org 에서 내보낸 로컬 작품 `.ent`
 - [x] make-ent.mjs가 `fileurl: /images/...`를 자동으로 public/에서 해석해 tar에 번들
 - [x] SVG는 `sharp(svg).png()`로 래스터라이즈 — tar에는 PNG만 저장
 - [x] 썸네일은 같은 hash의 96px PNG (`temp/aa/bb/thumb/<hash>.png`)

@@ -2,6 +2,7 @@
   "name": "myentry-game",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Offline-first Entry editor for authoring .ent game projects, based on entryjs dist.",
   "scripts": {
     "setup": "node scripts/setup.mjs",

@@ -67,6 +67,15 @@ tests/fixtures/*-shots/
 # 포함하고 용량도 크므로 공개 저장소에 올리지 않는다. 개조 결과물도 같은 이유로 로컬 전용.
 games/shogi/
 
+# 예전 실험 작품 5개 — 개인 로컬 원본(.ent)을 읽어 만들어서 저장소만으로는 다시 만들 수 없고,
+# 원본의 이용자 ID·그림이 들어 있어 공개 저장소에서 내렸다 (2026-09-30, 로컬 전용).
+# 여기서 나온 엔진 지식(변수 좌표·원형 배치 등)은 knowledge/07 에 남아 있다.
+games/bad-apple/
+games/clock/
+games/coord-test/
+games/name-circle/
+games/name-row/
+
 # 미완성 작품 — 검사가 다 통과하지 않은 상태라 공개 저장소에서 내렸다 (2026-09-29, 로컬 전용).
 # 여기서 나온 일반 지식은 knowledge/04·05·07 에, 도트 그림 도구는 tools/lib/pixel-art.mjs 에 옮겼다.
 games/brick-kingdom/

@@ -64,6 +64,67 @@ test('HTTP export preserves assets after 36 minutes and rejects missing session/
     assert.equal(noURL.status, 422);
 });
 
+// Rewrite the size field of the first header (offset 124, 12 bytes) — checksum is not verified.
+function tarWithSize(sizeField) {
+    const { makeTar } = require('../lib/tar-portable.js');
+    const tar = makeTar([{ name: 'temp/project.json', data: Buffer.from('{"objects":[]}') }]);
+    tar.fill(0, 124, 136);
+    tar.write(sizeField, 124, 12, 'ascii');
+    return tar;
+}
+
+test('tar reader rejects negative, non-octal and out-of-bounds sizes instead of looping', () => {
+    const { forEachTarEntry, extractTarFile } = require('../lib/tar-portable.js');
+    for (const field of ['-0000002000', '00000000019', 'garbage', '', '77777777777']) {
+        assert.throws(() => forEachTarEntry(tarWithSize(field), () => {}), error => error.code === 'EBADTAR', JSON.stringify(field));
+    }
+    assert.equal(extractTarFile(tarWithSize('00000000016'), 'temp/project.json').toString(), '{"objects":[]}');
+});
+
+test('tar reader rejects an archive cut inside a header or padding, but not a missing end marker', () => {
+    const { forEachTarEntry, makeTar } = require('../lib/tar-portable.js');
+    // Layout: header 512 | project.json padded 512 | header 512 | image padded 512 | end marker 1024.
+    const tar = makeTar([
+        { name: 'temp/project.json', data: Buffer.from('{}') },
+        { name: 'temp/a.png', data: Buffer.alloc(10, 1) },
+    ]);
+    const names = cut => { const seen = []; forEachTarEntry(tar.subarray(0, cut), e => { seen.push(e.name); }); return seen; };
+    assert.throws(() => names(1024 + 200), error => error.code === 'EBADTAR', 'cut inside the second header');
+    assert.throws(() => names(1536 + 10), error => error.code === 'EBADTAR', 'cut inside the last padding');
+    assert.deepEqual(names(2048), ['temp/project.json', 'temp/a.png']);
+    assert.deepEqual(names(2048 + 100), ['temp/project.json', 'temp/a.png']);
+});
+
+test('HTTP load answers 400 for a malformed archive', async t => {
+    const { app } = require('../server.js');
+    const server = app.listen(0, '127.0.0.1');
+    await new Promise(resolve => server.once('listening', resolve));
+    t.after(() => new Promise(resolve => server.close(resolve)));
+    const fd = new FormData();
+    fd.append('ent', new Blob([zlib.gzipSync(tarWithSize('-0000002000'))]), 'bad.ent');
+    const response = await fetch('http://127.0.0.1:' + server.address().port + '/api/load', { method: 'POST', body: fd });
+    assert.equal(response.status, 400);
+    assert.match((await response.json()).error, /invalid .ent archive/);
+});
+
+test('server listens on loopback only unless HOST is given', async t => {
+    const { startServer } = require('../server.js');
+    const servers = await startServer({ port: 0, host: '' });
+    t.after(() => Promise.all(servers.map(s => new Promise(resolve => s.close(resolve)))));
+    const addresses = servers.map(s => s.address().address);
+    assert.equal(addresses[0], '127.0.0.1');
+    for (const address of addresses) assert.ok(['127.0.0.1', '::1'].includes(address), address);
+    assert.equal(new Set(servers.map(s => s.address().port)).size, 1);
+});
+
+test('asset bundler fails on an image it cannot convert instead of storing raw bytes as .png', async () => {
+    const { createAssetBundler } = require('../lib/asset-bundler.js');
+    const bundler = createAssetBundler();
+    await assert.rejects(bundler.bundle({ buf: Buffer.from('not an image'), kind: 'image', cacheKey: 'broken.png' }),
+        error => error.status === 422 && /broken\.png/.test(error.message));
+    assert.equal(bundler.getFiles().payloads.length, 0);
+});
+
 test('semantic validation rejects bad references, duplicate IDs and missing assets before build', async () => {
     const { validateSpec, buildProject } = await import('../tools/make-ent.mjs');
     const script = [[{ type: 'set_variable', params: [{ __field: 'missing' }, 1, null] }, { type: 'func_undefined', params: [] }]];

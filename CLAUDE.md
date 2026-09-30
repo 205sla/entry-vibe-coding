@@ -20,9 +20,11 @@
 ```bash
 npm install
 npm run setup                      # 편집기 의존성 자동 구성 (~수 분, 87MB npm 아티팩트 다운로드)
-npx playwright install chromium    # 헤드리스 검증용 (한 번만)
+npx playwright install chromium    # 헤드리스 검증용 (한 번만, npm install 뒤에)
 ```
 
+- Windows PowerShell 에서 `npm`·`npx` 가 실행 정책 오류("스크립트를 실행할 수 없으므로")로 막히면
+  `npm.cmd`·`npx.cmd` 로 부른다. Node 는 CI 와 같은 22 권장(최소 18.18).
 - `verify editor boot files … OK`는 설치 파일 검사 통과다. Chromium 설치 후 L3로 실제
   부팅·로드·소리 출력을 검증해야 하며, 작품별 동작은 L4로 확인한다.
 - setup 실패 시: 에러 메시지의 지시를 따른 뒤 **재실행** (idempotent).

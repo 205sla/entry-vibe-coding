@@ -443,7 +443,7 @@ export async function buildProject(spec) {
             }
             const fileurl = bundled ? bundled.fileurl : (p.fileurl || null);
             // Picture object shape matches playentry.org's output
-            // (Downloads/260423_작품.ent): id, dimension, filename, name,
+            // (a real playentry export): id, dimension, filename, name,
             // imageType, fileurl — no thumbUrl. Entry's updateThumbnailView
             // falls back to fileurl when thumbUrl is absent.
             pictures.push({

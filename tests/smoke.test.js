@@ -5,7 +5,8 @@
 // with a spec-<name>.json that make-ent.mjs generated from. One exception:
 //
 //   known-good.ent
-//     — real playentry.org export (`01_정답의 리메이크`), no spec pair.
+//     — real playentry.org export (`01_정답의 리메이크`, the maintainer's remix;
+//       provenance in NOTICE.md), no spec pair.
 //     Kept as a regression guard: our smoke parser must not choke on a
 //     genuine third-party .ent shape. If we break field handling, this is
 //     the first fixture that catches it.
